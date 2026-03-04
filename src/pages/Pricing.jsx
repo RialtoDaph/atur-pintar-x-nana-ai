@@ -232,9 +232,7 @@ export default function Pricing() {
           <p className="text-lg text-[#8FA4C8] mb-8">
             Upgrade to Premium dan nikmati akses ke AI financial advisor yang personal untuk kamu.
           </p>
-          <Button className="bg-[#FF6A00] hover:bg-[#e05e00] text-white px-8 py-6 text-base font-semibold rounded-xl">
-            Start Premium Now
-          </Button>
+          <CheckoutButton user={user} />
         </div>
       </section>
     </div>
