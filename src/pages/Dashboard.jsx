@@ -103,10 +103,10 @@ export default function Dashboard() {
         {/* Recent transactions */}
         {widgets.recentTransactions && (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 pt-5 pb-3">
-              <h2 className="font-bold text-[#0A0A0A] text-base">Recent Transactions</h2>
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="font-bold text-[#0A0A0A] text-sm">Transaksi Terbaru</h2>
               <Link to={createPageUrl("Transactions")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
-                See all <ChevronRight className="w-3.5 h-3.5" />
+                Lihat semua <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
             <RecentTransactions transactions={transactions.slice(0, 5)} loading={loading} onRefresh={loadData} />
@@ -116,25 +116,26 @@ export default function Dashboard() {
         {/* Savings Goals */}
         {widgets.savingsGoals && (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 pt-5 pb-3">
-              <h2 className="font-bold text-[#0A0A0A] text-base">Savings Goals</h2>
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="font-bold text-[#0A0A0A] text-sm">Savings Goals</h2>
               <button
                 onClick={() => setShowAddGoal(true)}
                 className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5"
               >
-                + Add goal
+                + Tambah
               </button>
             </div>
             <GoalsMiniList goals={goals} loading={loading} />
             {goals.length > 0 && (
-              <div className="px-5 pb-4">
+              <div className="px-4 pb-3">
                 <Link to={createPageUrl("Goals")} className="text-xs text-[#8FA4C8] flex items-center gap-0.5 hover:text-[#1B2559]">
-                  View all goals <ChevronRight className="w-3 h-3" />
+                  Lihat semua <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
             )}
           </div>
         )}
+        <div className="h-2" />
 
       </div>
 
