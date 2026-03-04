@@ -26,6 +26,13 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [showAddTx, setShowAddTx] = useState(false);
+  const [widgets, setWidgets] = useState(getWidgets());
+
+  useEffect(() => {
+    const onStorage = () => setWidgets(getWidgets());
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   useEffect(() => { loadData(); }, []);
 
