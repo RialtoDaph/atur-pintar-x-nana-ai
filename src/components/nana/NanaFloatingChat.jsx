@@ -87,16 +87,12 @@ export default function NanaFloatingChat() {
       `}</style>
       {/* Floating button */}
       {!open && (
-        <button onClick={openChat} className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-center gap-1 hover:opacity-90 transition-all active:scale-95 nana-float cursor-pointer bg-none border-none p-0">
-          <div className="w-14 h-14 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg">
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/83b9f64b6_generated_image.png" 
-              alt="Nana AI" 
-              className="w-12 h-12 rounded-full"
-            />
-          </div>
-          <p className="text-white text-xs font-bold bg-[#0A0A0A] px-2 py-0.5 rounded-full whitespace-nowrap">Nana AI</p>
-        </button>
+        <img 
+          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/83b9f64b6_generated_image.png" 
+          alt="Nana AI" 
+          onClick={openChat}
+          className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 hover:opacity-90 transition-all active:scale-95 nana-float cursor-pointer"
+        />
       )}
 
       {/* Chat panel */}
