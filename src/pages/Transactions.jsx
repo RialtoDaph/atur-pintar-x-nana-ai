@@ -173,6 +173,14 @@ export default function Transactions() {
           }}
         />
       )}
+
+      {editingTx && (
+        <EditTransactionModal
+          transaction={editingTx}
+          onClose={() => setEditingTx(null)}
+          onSave={handleEdit}
+        />
+      )}
     </div>
   );
 }
