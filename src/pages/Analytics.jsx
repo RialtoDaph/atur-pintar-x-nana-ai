@@ -129,14 +129,14 @@ export default function Analytics() {
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-20 sm:pb-10">
       {/* Header */}
-      <div className="bg-[#0A0A0A] px-5 pt-10 pb-8">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-[#8FA4C8] text-sm font-medium">Wawasan Keuangan</p>
-          <h1 className="text-white text-2xl font-bold mt-0.5">Analitik</h1>
+      <div className="bg-[#0A0A0A] sticky top-0 z-30 px-5 py-4">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-[#8FA4C8] text-xs font-medium">Wawasan Keuangan</p>
+          <h1 className="text-white text-xl font-bold mt-0.5">Analitik</h1>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-5 mt-6 space-y-6">
+      <div className="max-w-2xl mx-auto px-5 py-6 space-y-6 pb-20">
         
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3">
