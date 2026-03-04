@@ -145,69 +145,60 @@ export default function AnalyticsPage() {
   const netBalance = totalIncome - totalExpense;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-gray-950 dark:via-[#0A0A0A] dark:to-gray-950">
+    <div className="min-h-screen bg-[#F2F4F7] dark:bg-[#111] p-6">
       {/* Header */}
-      <div className="sticky top-0 z-20 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-800/50">
-        <div className="px-8 py-6 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analitik Keuangan</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Dashboard insight keuangan real-time</p>
-            </div>
-          </div>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analitik Keuangan</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Lihat tren dan insight dari pengeluaran Anda</p>
       </div>
 
-      <div className="px-8 py-8 max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Top stats grid - 3 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Current month income */}
-          <div className="group relative bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-green-400/20 to-green-600/20 rounded-full blur-3xl group-hover:scale-110 transition-transform" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Pemasukan Bulan Ini</p>
-                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-950 flex items-center justify-center">
-                  <ArrowDownRight className="w-5 h-5 text-green-600 dark:text-green-400 rotate-180" />
+          <Card className="dm-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Pemasukan Bulan Ini</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatRupiah(totalIncome)}</p>
+                </div>
+                <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-950 flex items-center justify-center">
+                  <ArrowDownRight className="w-6 h-6 text-green-600 dark:text-green-400 rotate-180" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatRupiah(totalIncome)}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">+2.5% dari bulan lalu</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Current month expense */}
-          <div className="group relative bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-orange-400/20 to-orange-600/20 rounded-full blur-3xl group-hover:scale-110 transition-transform" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Pengeluaran Bulan Ini</p>
-                <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-950 flex items-center justify-center">
-                  <ArrowUpRight className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+          <Card className="dm-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Pengeluaran Bulan Ini</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatRupiah(totalExpense)}</p>
+                </div>
+                <div className="w-12 h-12 rounded-lg bg-orange-100 dark:bg-orange-950 flex items-center justify-center">
+                  <ArrowUpRight className="w-6 h-6 text-[#FF6A00]" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatRupiah(totalExpense)}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">-1.2% dari bulan lalu</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Net balance */}
-          <div className="group relative bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full blur-3xl group-hover:scale-110 transition-transform" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Net Balance</p>
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${netBalance >= 0 ? "bg-blue-100 dark:bg-blue-950" : "bg-red-100 dark:bg-red-950"}`}>
-                  <TrendingUp className={`w-5 h-5 ${netBalance >= 0 ? "text-blue-600 dark:text-blue-400" : "text-red-600 dark:text-red-400"}`} />
+          <Card className="dm-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Net Balance</p>
+                  <p className={`text-2xl font-bold ${netBalance >= 0 ? "text-gray-900 dark:text-white" : "text-red-600 dark:text-red-400"}`}>{formatRupiah(netBalance)}</p>
+                </div>
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${netBalance >= 0 ? "bg-blue-100 dark:bg-blue-950" : "bg-red-100 dark:bg-red-950"}`}>
+                  <TrendingUp className={`w-6 h-6 ${netBalance >= 0 ? "text-blue-600 dark:text-blue-400" : "text-red-600 dark:text-red-400"}`} />
                 </div>
               </div>
-              <p className={`text-3xl font-bold ${netBalance >= 0 ? "text-gray-900 dark:text-white" : "text-red-600 dark:text-red-400"}`}>{formatRupiah(netBalance)}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">{netBalance >= 0 ? "Surplus" : "Deficit"}</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Charts section */}
