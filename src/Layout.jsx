@@ -159,6 +159,9 @@ export default function Layout({ children, currentPageName }) {
         </button>
       </div>
 
+      {/* Nana Floating Chat */}
+      {currentPageName !== "Nana" && <NanaFloatingChat />}
+
       {/* More menu popup */}
       {showMoreMenu && (
         <>
