@@ -52,6 +52,11 @@ export default function Settings() {
     localStorage.setItem("currency", code);
   }
 
+  function selectLanguage(code) {
+    setLanguage(code);
+    localStorage.setItem("language", code);
+  }
+
   function toggleWidget(key) {
     const next = { ...widgets, [key]: !widgets[key] };
     setWidgets(next);
