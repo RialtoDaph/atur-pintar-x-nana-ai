@@ -95,6 +95,9 @@ export default function Dashboard() {
         {/* Reminder Widget */}
         <ReminderWidget />
 
+        {/* Smart Alerts Panel */}
+        <SmartAlertsPanel />
+
         {/* Smart Alerts */}
         {widgets.smartAlerts && <SmartAlerts transactions={transactions} loading={loading} />}
 
