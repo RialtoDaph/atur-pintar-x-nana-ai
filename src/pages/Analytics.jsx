@@ -265,7 +265,7 @@ export default function Analytics() {
 
         {/* Empty State */}
         {filteredTransactions.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-sm p-10 text-center">
+          <div className="bg-white rounded-2xl shadow-sm p-10 text-center border border-[#E2E8F0]">
             <p className="text-[#8FA4C8] text-sm">Tidak ada data transaksi untuk periode ini</p>
           </div>
         )}
