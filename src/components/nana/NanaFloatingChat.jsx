@@ -188,7 +188,7 @@ export default function NanaFloatingChat() {
           <div className="px-3 py-2.5 bg-black border-t border-[#2D2D2D] flex-shrink-0">
             <div className="flex gap-2 bg-[#2D2D2D] rounded-xl border border-[#3D3D3D] px-3 py-1.5">
               <textarea
-                className="flex-1 text-xs text-[#1A1A1A] resize-none outline-none bg-transparent placeholder:text-[#C0C9D8] max-h-16"
+                className="flex-1 text-xs text-white resize-none outline-none bg-transparent placeholder:text-[#8FA4C8] max-h-16"
                 rows={1}
                 placeholder="Tanya Nana sesuatu..."
                 value={input}
