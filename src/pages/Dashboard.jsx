@@ -73,6 +73,15 @@ export default function Dashboard() {
 
       <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-4">
 
+        {/* Smart Alerts */}
+        <SmartAlerts transactions={transactions} loading={loading} />
+
+        {/* Cashflow Forecast */}
+        <CashflowForecast transactions={transactions} loading={loading} />
+
+        {/* Subscription Detector */}
+        <SubscriptionDetector transactions={transactions} loading={loading} />
+
         {/* Spending breakdown */}
         <SpendingChart transactions={thisMonthTx} loading={loading} />
 
