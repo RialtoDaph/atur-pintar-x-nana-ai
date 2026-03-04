@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Moon, Sun, DollarSign, Globe, LayoutDashboard, Bell, User, LogOut, ChevronRight, Check } from "lucide-react";
 
+const LANGUAGES = [
+  { code: "id", label: "Indonesia", flag: "🇮🇩" },
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+];
+
 const CURRENCIES = [
   { code: "IDR", label: "Rupiah", symbol: "Rp", flag: "🇮🇩" },
   { code: "USD", label: "US Dollar", symbol: "$", flag: "🇺🇸" },
