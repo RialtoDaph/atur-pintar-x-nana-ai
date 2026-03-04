@@ -40,14 +40,14 @@ export default function Layout({ children, currentPageName }) {
     { name: "Dashboard", label: "Home", icon: LayoutDashboard, page: "Dashboard" },
     { name: "Transactions", label: "Transaksi", icon: ArrowLeftRight, page: "Transactions" },
     { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
-    { name: "Settings", label: "Setting", icon: Settings, page: "Settings" },
+    { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
   ];
 
   const mobileMoreNav = [
     { name: "Goals", label: "Tujuan", icon: Target, page: "Goals" },
     { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
     { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
-    { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
+    { name: "Settings", label: "Setting", icon: Settings, page: "Settings" },
     { name: "Reminders", label: "Pengingat", icon: Bell, page: "Reminders" },
   ];
 
