@@ -285,24 +285,25 @@ export default function AnalyticsPage() {
 
         {/* Budget allocation vs spending */}
         {budgetComparison.length > 0 && (
-          <Card className="dm-card border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle>Alokasi Anggaran vs Pengeluaran</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={budgetComparison}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="category" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
-                  <Tooltip formatter={(value) => formatRupiah(value)} contentStyle={{ backgroundColor: "#1f2937", border: "none", borderRadius: "8px", color: "#fff" }} />
-                  <Legend />
-                  <Bar dataKey="budget" fill="#6A4C93" name="Anggaran" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="spent" fill="#FF6A00" name="Pengeluaran" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 hover:shadow-md transition-all">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Anggaran vs Pengeluaran</h3>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={budgetComparison} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <XAxis dataKey="category" stroke="#9ca3af" style={{ fontSize: "12px" }} />
+                <YAxis stroke="#9ca3af" style={{ fontSize: "12px" }} />
+                <Tooltip formatter={(value) => formatRupiah(value)} contentStyle={{ backgroundColor: "#1f2937", border: "none", borderRadius: "8px", color: "#fff" }} />
+                <Legend wrapperStyle={{ paddingTop: "20px" }} />
+                <Bar dataKey="budget" fill="#6A4C93" name="Anggaran" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="spent" fill="#FF6A00" name="Pengeluaran" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         )}
 
         {/* Savings goals and investments */}
