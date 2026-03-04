@@ -10,11 +10,28 @@ export default function NanaFloatingChat() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [preferences, setPreferences] = useState(null);
   const bottomRef = useRef(null);
+
+  useEffect(() => {
+    loadUserPreferences();
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  async function loadUserPreferences() {
+    try {
+      const user = await base44.auth.me();
+      const prefs = await base44.entities.NanaPreferences.filter({ created_by: user.email });
+      if (prefs && prefs.length > 0) {
+        setPreferences(prefs[0]);
+      }
+    } catch (error) {
+      console.error("Error loading preferences:", error);
+    }
+  }
 
   useEffect(() => {
     if (!activeConv) return;
@@ -52,14 +69,20 @@ export default function NanaFloatingChat() {
     if (!conv) {
       conv = await base44.agents.createConversation({
         agent_name: "nana",
-        metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` }
+        metadata: {
+          name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}`,
+          preferences: preferences
+        }
       });
       setActiveConv(conv);
     }
     setSending(true);
     const text = input;
     setInput("");
-    await base44.agents.addMessage(conv, { role: "user", content: text });
+    const messageContent = preferences 
+      ? `${text}\n\n[Preferensi pengguna: Nada: ${preferences.tone}, Jenis saran utama: ${preferences.preferred_advice_types.join(", ")}, Frekuensi: ${preferences.frequency_preference}]`
+      : text;
+    await base44.agents.addMessage(conv, { role: "user", content: messageContent });
     setSending(false);
   }
 
