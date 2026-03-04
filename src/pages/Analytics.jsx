@@ -192,8 +192,8 @@ export default function Analytics() {
         </div>
 
         {/* Trend Chart */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
-          <h2 className="text-[#1A1A1A] font-bold mb-4">Tren Bulanan</h2>
+        <div className="bg-white rounded-2xl shadow-sm p-5 border border-[#E2E8F0]">
+          <h2 className="text-[#1A1A1A] font-bold text-base mb-4">Tren Bulanan</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
