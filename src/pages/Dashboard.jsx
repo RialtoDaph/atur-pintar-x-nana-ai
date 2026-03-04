@@ -89,48 +89,52 @@ export default function Dashboard() {
       <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-4">
 
         {/* Smart Alerts */}
-        <SmartAlerts transactions={transactions} loading={loading} />
+        {widgets.smartAlerts && <SmartAlerts transactions={transactions} loading={loading} />}
 
         {/* Cashflow Forecast */}
-        <CashflowForecast transactions={transactions} loading={loading} />
+        {widgets.cashflowForecast && <CashflowForecast transactions={transactions} loading={loading} />}
 
         {/* Subscription Detector */}
-        <SubscriptionDetector transactions={transactions} loading={loading} />
+        {widgets.subscriptionDetector && <SubscriptionDetector transactions={transactions} loading={loading} />}
 
         {/* Spending breakdown */}
-        <SpendingChart transactions={thisMonthTx} loading={loading} />
+        {widgets.spendingChart && <SpendingChart transactions={thisMonthTx} loading={loading} />}
 
         {/* Recent transactions */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 pt-5 pb-3">
-            <h2 className="font-bold text-[#0A0A0A] text-base">Recent Transactions</h2>
-            <Link to={createPageUrl("Transactions")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
-              See all <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-          <RecentTransactions transactions={transactions.slice(0, 5)} loading={loading} onRefresh={loadData} />
-        </div>
-
-        {/* Savings Goals */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 pt-5 pb-3">
-            <h2 className="font-bold text-[#0A0A0A] text-base">Savings Goals</h2>
-            <button
-              onClick={() => setShowAddGoal(true)}
-              className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5"
-            >
-              + Add goal
-            </button>
-          </div>
-          <GoalsMiniList goals={goals} loading={loading} />
-          {goals.length > 0 && (
-            <div className="px-5 pb-4">
-              <Link to={createPageUrl("Goals")} className="text-xs text-[#8FA4C8] flex items-center gap-0.5 hover:text-[#1B2559]">
-                View all goals <ChevronRight className="w-3 h-3" />
+        {widgets.recentTransactions && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
+              <h2 className="font-bold text-[#0A0A0A] text-base">Recent Transactions</h2>
+              <Link to={createPageUrl("Transactions")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
+                See all <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-          )}
-        </div>
+            <RecentTransactions transactions={transactions.slice(0, 5)} loading={loading} onRefresh={loadData} />
+          </div>
+        )}
+
+        {/* Savings Goals */}
+        {widgets.savingsGoals && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
+              <h2 className="font-bold text-[#0A0A0A] text-base">Savings Goals</h2>
+              <button
+                onClick={() => setShowAddGoal(true)}
+                className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5"
+              >
+                + Add goal
+              </button>
+            </div>
+            <GoalsMiniList goals={goals} loading={loading} />
+            {goals.length > 0 && (
+              <div className="px-5 pb-4">
+                <Link to={createPageUrl("Goals")} className="text-xs text-[#8FA4C8] flex items-center gap-0.5 hover:text-[#1B2559]">
+                  View all goals <ChevronRight className="w-3 h-3" />
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
 
       </div>
 
