@@ -202,46 +202,44 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Charts section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* 12-month spending trend */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 hover:shadow-md transition-all">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-950 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Tren Pengeluaran</h3>
-            </div>
-            <ResponsiveContainer width="100%" height={320}>
-              <LineChart data={last12Months} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="month" stroke="#9ca3af" style={{ fontSize: "12px" }} />
-                <YAxis stroke="#9ca3af" style={{ fontSize: "12px" }} />
-                <Tooltip formatter={(value) => formatRupiah(value)} contentStyle={{ backgroundColor: "#1f2937", border: "none", borderRadius: "8px", color: "#fff" }} />
-                <Line type="monotone" dataKey="expense" stroke="#FF6A00" strokeWidth={3} dot={{ fill: "#FF6A00", r: 5 }} activeDot={{ r: 7 }} isAnimationActive={true} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <Card className="dm-card">
+            <CardHeader>
+              <CardTitle>Tren Pengeluaran (12 Bulan)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={last12Months}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => formatRupiah(value)} />
+                  <Line type="monotone" dataKey="expense" stroke="#FF6A00" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
           {/* 6-month income vs expense */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 hover:shadow-md transition-all">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-950 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Perbandingan Aliran Dana</h3>
-            </div>
-            <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={last6Months} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="month" stroke="#9ca3af" style={{ fontSize: "12px" }} />
-                <YAxis stroke="#9ca3af" style={{ fontSize: "12px" }} />
-                <Tooltip formatter={(value) => formatRupiah(value)} contentStyle={{ backgroundColor: "#1f2937", border: "none", borderRadius: "8px", color: "#fff" }} />
-                <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                <Bar dataKey="income" fill="#10B981" name="Pemasukan" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="expense" fill="#FF6A00" name="Pengeluaran" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <Card className="dm-card">
+            <CardHeader>
+              <CardTitle>Pemasukan vs Pengeluaran (6 Bulan)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={last6Months}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => formatRupiah(value)} />
+                  <Legend />
+                  <Bar dataKey="income" fill="#10B981" name="Pemasukan" />
+                  <Bar dataKey="expense" fill="#FF6A00" name="Pengeluaran" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Current month by category */}
