@@ -1,8 +1,9 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, TrendingUp, Moon, Sun, Settings, MoreHorizontal, Bell, Sparkles } from "lucide-react";
+import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, TrendingUp, Moon, Sun, Settings, MoreHorizontal, Bell } from "lucide-react";
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import NanaFloatingChat from "@/components/nana/NanaFloatingChat";
 
 export default function Layout({ children, currentPageName }) {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
