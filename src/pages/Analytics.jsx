@@ -171,21 +171,21 @@ export default function Analytics() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-[#8FA4C8] text-xs font-bold uppercase">Pemasukan</p>
-            <p className="text-[#1A1A1A] text-lg font-bold mt-1">{formatRupiah(stats.income)}</p>
+            <p className="text-[#1A1A1A] text-base font-bold mt-2">{formatRupiah(stats.income)}</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-[#8FA4C8] text-xs font-bold uppercase">Pengeluaran</p>
-            <p className="text-[#FF6B6B] text-lg font-bold mt-1">{formatRupiah(stats.expense)}</p>
+            <p className="text-[#FF6B6B] text-base font-bold mt-2">{formatRupiah(stats.expense)}</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-[#8FA4C8] text-xs font-bold uppercase">Tabungan</p>
-            <p className="text-[#1A1A1A] text-lg font-bold mt-1">{formatRupiah(stats.savings)}</p>
+            <p className="text-[#1A1A1A] text-base font-bold mt-2">{formatRupiah(stats.savings)}</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-[#8FA4C8] text-xs font-bold uppercase">Saldo</p>
-            <p className={`text-lg font-bold mt-1 ${stats.balance >= 0 ? "text-[#4ECDC4]" : "text-[#FF6B6B]"}`}>
+            <p className={`text-base font-bold mt-2 ${stats.balance >= 0 ? "text-[#4ECDC4]" : "text-[#FF6B6B]"}`}>
               {formatRupiah(stats.balance)}
             </p>
           </div>
