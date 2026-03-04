@@ -34,6 +34,8 @@ export default function AddTransactionModal({ onClose, onSave }) {
   const [showManage, setShowManage] = useState(false);
   const [recurring, setRecurring] = useState(false);
   const [recurringInterval, setRecurringInterval] = useState("monthly");
+  const [scanning, setScanning] = useState(false);
+  const fileRef = useRef(null);
 
   useEffect(() => { loadCustomCats(); }, []);
 
