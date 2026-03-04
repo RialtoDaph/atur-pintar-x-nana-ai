@@ -55,11 +55,9 @@ import Debts from './pages/Debts';
 import Goals from './pages/Goals';
 import Investments from './pages/Investments';
 import Nana from './pages/Nana';
-import Pricing from './pages/Pricing';
 import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import Transactions from './pages/Transactions';
-import SubscriptionManagement from './pages/SubscriptionManagement';
 import __Layout from './Layout.jsx';
 
 
@@ -72,11 +70,9 @@ export const PAGES = {
     "Goals": Goals,
     "Investments": Investments,
     "Nana": Nana,
-    "Pricing": Pricing,
     "Reminders": Reminders,
     "Settings": Settings,
     "Transactions": Transactions,
-    "SubscriptionManagement": SubscriptionManagement,
 }
 
 export const pagesConfig = {

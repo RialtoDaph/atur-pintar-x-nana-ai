@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Pencil, Upload } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import { formatRupiah } from "@/components/utils/formatRupiah";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import EditTransactionModal from "@/components/transactions/EditTransactionModal";
-import UploadTransactionsModal from "@/components/transactions/UploadTransactionsModal";
 
 const CATEGORY_CONFIG = {
   housing: { emoji: "🏠", label: "Housing", color: "#4F7CFF" },
@@ -28,7 +27,6 @@ export default function Transactions() {
   const [filter, setFilter] = useState("all");
   const [showAddTx, setShowAddTx] = useState(false);
   const [editingTx, setEditingTx] = useState(null);
-  const [showUploadTx, setShowUploadTx] = useState(false);
 
   useEffect(() => { loadData(); }, []);
 
@@ -71,21 +69,12 @@ export default function Transactions() {
       <div className="bg-[#1B2559] px-5 pt-10 pb-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <h1 className="text-white text-2xl font-bold">Transactions</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowUploadTx(true)}
-              className="w-10 h-10 rounded-full bg-[#4F7CFF] flex items-center justify-center shadow-lg hover:bg-[#3956CC] transition-colors"
-              title="Import from receipt/statement"
-            >
-              <Upload className="w-5 h-5 text-white" />
-            </button>
-            <button
-              onClick={() => setShowAddTx(true)}
-              className="w-10 h-10 rounded-full bg-[#00C9A7] flex items-center justify-center shadow-lg hover:bg-[#00b596] transition-colors"
-            >
-              <Plus className="w-5 h-5 text-white" />
-            </button>
-          </div>
+          <button
+            onClick={() => setShowAddTx(true)}
+            className="w-10 h-10 rounded-full bg-[#00C9A7] flex items-center justify-center shadow-lg hover:bg-[#00b596] transition-colors"
+          >
+            <Plus className="w-5 h-5 text-white" />
+          </button>
         </div>
       </div>
 
@@ -193,14 +182,6 @@ export default function Transactions() {
           onSave={handleEdit}
         />
       )}
-
-      <UploadTransactionsModal
-        open={showUploadTx}
-        onOpenChange={(open) => {
-          setShowUploadTx(open);
-          if (!open) loadData();
-        }}
-      />
     </div>
   );
 }

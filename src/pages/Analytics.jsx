@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { formatRupiah } from "@/components/utils/formatRupiah";
-import PremiumGate from "@/components/premium/PremiumGate";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line, Area, AreaChart, CartesianGrid
@@ -29,16 +28,14 @@ export default function Analytics() {
   const [budgets, setBudgets] = useState([]);
   const [investments, setInvestments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     Promise.all([
-      base44.auth.me().then(setUser).catch(() => setUser(null)),
       base44.entities.Transaction.list("-date", 500),
       base44.entities.SavingsGoal.list("-created_date"),
       base44.entities.Budget.list(),
       base44.entities.Investment.list()
-    ]).then(([_, t, g, b, i]) => {
+    ]).then(([t, g, b, i]) => {
       setTransactions(t);
       setGoals(g);
       setBudgets(b);
@@ -131,16 +128,6 @@ export default function Analytics() {
     return (
       <div className="min-h-screen bg-[#F2F4F7] flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-[#00C9A7] border-t-transparent animate-spin" />
-      </div>
-    );
-  }
-
-  if (user?.subscription_status !== "premium") {
-    return (
-      <div className="min-h-screen bg-[#F2F4F7] pt-10">
-        <div className="max-w-2xl mx-auto px-5">
-          <PremiumGate user={user} feature="Analytics & Insights" />
-        </div>
       </div>
     );
   }

@@ -14,9 +14,6 @@ import SmartAlerts from "@/components/dashboard/SmartAlerts";
 import SmartAlertsPanel from "@/components/dashboard/SmartAlertsPanel";
 import SubscriptionDetector from "@/components/dashboard/SubscriptionDetector";
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
-import BudgetOverspendAlert from "@/components/dashboard/BudgetOverspendAlert";
-import GoalAchievementNotice from "@/components/dashboard/GoalAchievementNotice";
-import CategorySpendingTrend from "@/components/dashboard/CategorySpendingTrend";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 
@@ -29,7 +26,6 @@ function getWidgets() {
 export default function Dashboard() {
   const [goals, setGoals] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [showAddTx, setShowAddTx] = useState(false);
@@ -46,14 +42,12 @@ export default function Dashboard() {
 
   async function loadData() {
     setLoading(true);
-    const [g, t, b] = await Promise.all([
+    const [g, t] = await Promise.all([
       base44.entities.SavingsGoal.list("-created_date"),
       base44.entities.Transaction.list("-date", 100),
-      base44.entities.Budget.list("-created_date"),
     ]);
     setGoals(g);
     setTransactions(t);
-    setBudgets(b);
     setLoading(false);
   }
 
@@ -68,30 +62,25 @@ export default function Dashboard() {
   const totalSaved = goals.reduce((s, g) => s + (g.current_amount || 0), 0);
 
   return (
-    <div className="min-h-screen bg-[#F2F4F7]">
+    <div className="min-h-screen bg-[#F2F4F7] pb-8">
       <RecurringManager />
-      
-      {/* Top Header Section */}
-      <div className="bg-[#0A0A0A] sticky top-0 z-30">
-        <div className="max-w-2xl mx-auto px-5 py-4">
-          <div className="flex items-center justify-between">
+      {/* Top Header */}
+      <div className="bg-[#0A0A0A] px-5 pt-6 pb-14">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-[#8FA4C8] text-xs font-medium">Halo 👋</p>
-              <h1 className="text-white text-xl font-bold mt-1">Keuanganmu</h1>
+              <h1 className="text-white text-xl font-bold mt-0.5">Keuanganmu</h1>
             </div>
             <button
               onClick={() => setShowAddTx(true)}
-              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-all duration-200 transform hover:scale-105"
+              className="w-9 h-9 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
             >
-              <Plus className="w-5 h-5 text-white" />
+              <Plus className="w-4 h-4 text-white" />
             </button>
           </div>
-        </div>
-      </div>
 
-      {/* Balance Card - Full Width Below Header */}
-      <div className="bg-[#0A0A0A]">
-        <div className="max-w-2xl mx-auto px-5 pb-6">
+          {/* Balance Card */}
           <BalanceCard
             income={monthIncome}
             expense={monthExpense}
@@ -101,62 +90,62 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-2xl mx-auto px-5 py-6 space-y-4 pb-20">
+      <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-3">
 
-        {/* Alerts & Achievements Section - Priority High */}
-        <SmartAlertsPanel />
-        <GoalAchievementNotice goals={goals} transactions={transactions} loading={loading} />
-        {widgets.smartAlerts && <SmartAlerts transactions={transactions} loading={loading} />}
-        <BudgetOverspendAlert transactions={transactions} budgets={budgets} loading={loading} />
-        <CategorySpendingTrend transactions={transactions} loading={loading} />
-
-        {/* Quick Reminders */}
+        {/* Reminder Widget */}
         <ReminderWidget />
 
-        {/* Analytics & Insights Section */}
-        <div className="space-y-4">
-          {widgets.spendingChart && <SpendingChart transactions={thisMonthTx} loading={loading} />}
-          {widgets.cashflowForecast && <CashflowForecast transactions={transactions} loading={loading} />}
-          {widgets.subscriptionDetector && <SubscriptionDetector transactions={transactions} loading={loading} />}
-        </div>
+        {/* Smart Alerts Panel */}
+        <SmartAlertsPanel />
 
-        {/* Transactions & Goals Section */}
-        <div className="space-y-4">
-          {widgets.recentTransactions && (
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-[#E2E8F0]">
-              <div className="flex items-center justify-between px-5 py-4">
-                <h2 className="font-bold text-[#1A1A1A] text-base">Transaksi Terbaru</h2>
-                <Link to={createPageUrl("Transactions")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-1 hover:opacity-80">
-                  Lihat semua <ChevronRight className="w-3.5 h-3.5" />
+        {/* Smart Alerts */}
+        {widgets.smartAlerts && <SmartAlerts transactions={transactions} loading={loading} />}
+
+        {/* Cashflow Forecast */}
+        {widgets.cashflowForecast && <CashflowForecast transactions={transactions} loading={loading} />}
+
+        {/* Subscription Detector */}
+        {widgets.subscriptionDetector && <SubscriptionDetector transactions={transactions} loading={loading} />}
+
+        {/* Spending breakdown */}
+        {widgets.spendingChart && <SpendingChart transactions={thisMonthTx} loading={loading} />}
+
+        {/* Recent transactions */}
+        {widgets.recentTransactions && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="font-bold text-[#0A0A0A] text-sm">Transaksi Terbaru</h2>
+              <Link to={createPageUrl("Transactions")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
+                Lihat semua <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <RecentTransactions transactions={transactions.slice(0, 5)} loading={loading} onRefresh={loadData} />
+          </div>
+        )}
+
+        {/* Savings Goals */}
+        {widgets.savingsGoals && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="font-bold text-[#0A0A0A] text-sm">Tujuan Tabungan</h2>
+              <button
+                onClick={() => setShowAddGoal(true)}
+                className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5"
+              >
+                + Tambah
+              </button>
+            </div>
+            <GoalsMiniList goals={goals} loading={loading} />
+            {goals.length > 0 && (
+              <div className="px-4 pb-3">
+                <Link to={createPageUrl("Goals")} className="text-xs text-[#8FA4C8] flex items-center gap-0.5 hover:text-[#1B2559]">
+                  Lihat semua <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
-              <RecentTransactions transactions={transactions.slice(0, 5)} loading={loading} onRefresh={loadData} />
-            </div>
-          )}
-
-          {widgets.savingsGoals && (
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-[#E2E8F0]">
-              <div className="flex items-center justify-between px-5 py-4">
-                <h2 className="font-bold text-[#1A1A1A] text-base">Tujuan Tabungan</h2>
-                <button
-                  onClick={() => setShowAddGoal(true)}
-                  className="text-xs text-[#FF6A00] font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity"
-                >
-                  + Tambah
-                </button>
-              </div>
-              <GoalsMiniList goals={goals} loading={loading} />
-              {goals.length > 0 && (
-                <div className="px-5 py-3 border-t border-[#E2E8F0]">
-                  <Link to={createPageUrl("Goals")} className="text-xs text-[#8FA4C8] flex items-center gap-1 hover:text-[#FF6A00]">
-                    Lihat semua <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
+        <div className="h-2" />
 
       </div>
 
