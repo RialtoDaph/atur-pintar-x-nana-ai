@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
+import { formatRupiah } from "@/components/utils/formatRupiah";
 
 export default function BalanceCard({ income, expense, savings, loading }) {
   const balance = income - expense;

@@ -97,11 +97,11 @@ export default function AddTransactionModal({ onClose, onSave }) {
           <div className="mb-5">
             <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Amount</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-lg">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-base">Rp</span>
               <input
                 autoFocus type="number"
-                className="w-full border border-[#E2E8F0] rounded-xl pl-9 pr-4 py-3.5 text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                placeholder="0.00"
+                className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3.5 text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                placeholder="0"
                 value={form.amount}
                 onChange={(e) => setForm({ ...form, amount: e.target.value })}
               />

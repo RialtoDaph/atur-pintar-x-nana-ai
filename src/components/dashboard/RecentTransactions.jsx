@@ -1,3 +1,5 @@
+import { formatRupiah } from "@/components/utils/formatRupiah";
+
 const CATEGORY_CONFIG = {
   housing: { emoji: "🏠", color: "#4F7CFF" },
   food: { emoji: "🍔", color: "#00C9A7" },
