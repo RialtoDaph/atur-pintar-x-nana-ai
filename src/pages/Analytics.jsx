@@ -244,32 +244,32 @@ export default function AnalyticsPage() {
 
         {/* Current month by category */}
         {pieData.length > 0 && (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 hover:shadow-md transition-all">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-950 flex items-center justify-center">
-                <PieChartIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Pengeluaran Per Kategori</h3>
-            </div>
-            <ResponsiveContainer width="100%" height={350}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${formatRupiah(value)}`}
-                  outerRadius={100}
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => formatRupiah(value)} contentStyle={{ backgroundColor: "#1f2937", border: "none", borderRadius: "8px", color: "#fff" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <Card className="dm-card">
+            <CardHeader>
+              <CardTitle>Pengeluaran Bulan Ini Berdasarkan Kategori</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${formatRupiah(value)}`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => formatRupiah(value)} />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         )}
 
         {/* Budget allocation vs spending */}
