@@ -139,7 +139,7 @@ export default function NanaFloatingChat() {
                 <div className="flex flex-col gap-1.5 mt-1 w-full">
                   {["Berapa pengeluaranku bulan ini?", "Bantu buat target tabungan", "Cek tagihan jatuh tempo"].map(s => (
                     <button key={s} onClick={() => setInput(s)}
-                      className="text-left text-xs bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 text-[#1A1A1A] hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 transition-colors">
+                      className="text-left text-xs bg-[#2D2D2D] border border-[#3D3D3D] rounded-xl px-3 py-2 text-white hover:border-[#FF6A00] hover:bg-[#FF6A00]/10 transition-colors">
                       {s}
                     </button>
                   ))}
