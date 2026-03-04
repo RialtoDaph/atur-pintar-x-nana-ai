@@ -40,7 +40,7 @@ export default function Layout({ children, currentPageName }) {
   const mobileMainNav = [
     { name: "Dashboard", label: "Home", icon: LayoutDashboard, page: "Dashboard" },
     { name: "Transactions", label: "Transaksi", icon: ArrowLeftRight, page: "Transactions" },
-    { name: "Nana", label: "Nana AI", icon: Sparkles, page: "Nana" },
+    { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
     { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
   ];
 
