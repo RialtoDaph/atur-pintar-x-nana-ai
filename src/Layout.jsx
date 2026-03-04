@@ -24,21 +24,40 @@ export default function Layout({ children, currentPageName }) {
     }
   }, [darkMode]);
 
-  const navItems = [
-    { name: "Dashboard", label: "Home", icon: LayoutDashboard, page: "Dashboard" },
-    { name: "Transactions", label: "Transaksi", icon: ArrowLeftRight, page: "Transactions" },
-    { name: "Goals", label: "Tujuan", icon: Target, page: "Goals" },
-    { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
-    { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
-    { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
-    { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
-    { name: "Alerts", label: "Alerts", icon: Bell, page: "Alerts" },
-    { name: "Reminders", label: "Pengingat", icon: Bell, page: "Reminders" },
-    { name: "Pricing", label: "Premium", icon: DollarSign, page: "Pricing" },
-    { name: "Settings", label: "Pengaturan", icon: Settings, page: "Settings" },
+  const navSections = [
+    {
+      label: "Utama",
+      items: [
+        { name: "Dashboard", label: "Dashboard", icon: LayoutDashboard, page: "Dashboard" },
+        { name: "Transaksi", label: "Transaksi", icon: ArrowLeftRight, page: "Transactions" },
+      ]
+    },
+    {
+      label: "Kelola Keuangan",
+      items: [
+        { name: "Goals", label: "Tujuan Tabungan", icon: Target, page: "Goals" },
+        { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
+        { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
+        { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
+      ]
+    },
+    {
+      label: "Insights & Reminders",
+      items: [
+        { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
+        { name: "Alerts", label: "Notifikasi", icon: Bell, page: "Alerts" },
+        { name: "Reminders", label: "Pengingat", icon: Bell, page: "Reminders" },
+      ]
+    },
+    {
+      label: "Akun",
+      items: [
+        { name: "Pricing", label: "Premium", icon: DollarSign, page: "Pricing" },
+        { name: "Settings", label: "Pengaturan", icon: Settings, page: "Settings" },
+      ]
+    }
   ];
 
-  // Mobile: only 4 main + "More"
   const mobileMainNav = [
     { name: "Dashboard", label: "Home", icon: LayoutDashboard, page: "Dashboard" },
     { name: "Transactions", label: "Transaksi", icon: ArrowLeftRight, page: "Transactions" },
@@ -50,10 +69,10 @@ export default function Layout({ children, currentPageName }) {
     { name: "Goals", label: "Tujuan", icon: Target, page: "Goals" },
     { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
     { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
-    { name: "Alerts", label: "Alerts", icon: Bell, page: "Alerts" },
-    { name: "Pricing", label: "Premium", icon: DollarSign, page: "Pricing" },
-    { name: "Settings", label: "Setting", icon: Settings, page: "Settings" },
+    { name: "Alerts", label: "Notifikasi", icon: Bell, page: "Alerts" },
     { name: "Reminders", label: "Pengingat", icon: Bell, page: "Reminders" },
+    { name: "Pricing", label: "Premium", icon: DollarSign, page: "Pricing" },
+    { name: "Settings", label: "Pengaturan", icon: Settings, page: "Settings" },
   ];
 
   const initials = user?.full_name ? user.full_name.split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase() : "U";
