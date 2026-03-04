@@ -83,7 +83,7 @@ export default function Analytics() {
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-10">
       {/* Header */}
-      <div className="bg-[#1B2559] px-5 pt-10 pb-8">
+      <div className="bg-[#0A0A0A] px-5 pt-10 pb-8">
         <div className="max-w-2xl mx-auto">
           <p className="text-[#8FA4C8] text-sm font-medium">Overview</p>
           <h1 className="text-white text-2xl font-bold mt-0.5">Analytics</h1>
