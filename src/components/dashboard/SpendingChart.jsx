@@ -60,7 +60,7 @@ export default function SpendingChart({ transactions, loading }) {
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(v) => `$${v.toFixed(2)}`} />
+              <Tooltip formatter={(v) => formatRupiah(v)} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -72,7 +72,7 @@ export default function SpendingChart({ transactions, loading }) {
                 <span className="text-xs text-[#4A5568]">{d.emoji} {d.label}</span>
               </div>
               <div className="text-right">
-                <span className="text-xs font-semibold text-[#1A1A1A]">${d.value.toFixed(0)}</span>
+                <span className="text-xs font-semibold text-[#1A1A1A]">{formatRupiah(d.value)}</span>
                 <span className="text-[10px] text-[#8FA4C8] ml-1">{total > 0 ? ((d.value / total) * 100).toFixed(0) : 0}%</span>
               </div>
             </div>
