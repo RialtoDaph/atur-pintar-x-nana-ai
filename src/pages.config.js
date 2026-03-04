@@ -57,6 +57,7 @@ import Nana from './pages/Nana';
 import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import Transactions from './pages/Transactions';
+import Analytics from './pages/Analytics';
 import __Layout from './Layout.jsx';
 
 
@@ -71,6 +72,7 @@ export const PAGES = {
     "Reminders": Reminders,
     "Settings": Settings,
     "Transactions": Transactions,
+    "Analytics": Analytics,
 }
 
 export const pagesConfig = {
