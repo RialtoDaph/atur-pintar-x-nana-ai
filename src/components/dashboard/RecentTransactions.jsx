@@ -52,7 +52,7 @@ export default function RecentTransactions({ transactions, loading }) {
               className="text-sm font-bold flex-shrink-0"
               style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}
             >
-              {isIncome ? "+" : "−"}${tx.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              {isIncome ? "+" : "−"}{formatRupiah(tx.amount)}
             </span>
           </div>
         );

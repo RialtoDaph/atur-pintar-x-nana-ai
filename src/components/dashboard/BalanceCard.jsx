@@ -13,8 +13,8 @@ export default function BalanceCard({ income, expense, savings, loading }) {
   return (
     <div className="bg-[#161616] rounded-2xl p-4 border border-[#222]">
       <p className="text-[#8FA4C8] text-[10px] font-semibold uppercase tracking-widest mb-0.5">Bulan Ini</p>
-      <p className="text-white text-3xl font-bold mb-3">
-        {balance >= 0 ? "+" : ""}${balance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      <p className="text-white text-2xl font-bold mb-3">
+        {balance >= 0 ? "+" : "-"}{formatRupiah(Math.abs(balance))}
       </p>
       <div className="grid grid-cols-3 gap-2">
         <div className="flex items-center gap-1.5">
@@ -23,7 +23,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">Pemasukan</p>
-            <p className="text-white text-xs font-semibold">${income.toLocaleString("en-US", { minimumFractionDigits: 0 })}</p>
+            <p className="text-white text-xs font-semibold">{formatRupiah(income)}</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
@@ -32,7 +32,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">Pengeluaran</p>
-            <p className="text-white text-xs font-semibold">${expense.toLocaleString("en-US", { minimumFractionDigits: 0 })}</p>
+            <p className="text-white text-xs font-semibold">{formatRupiah(expense)}</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
@@ -41,7 +41,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">Tabungan</p>
-            <p className="text-white text-xs font-semibold">${savings.toLocaleString("en-US", { minimumFractionDigits: 0 })}</p>
+            <p className="text-white text-xs font-semibold">{formatRupiah(savings)}</p>
           </div>
         </div>
       </div>
