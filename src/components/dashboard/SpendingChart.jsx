@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { base44 } from "@/api/base44Client";
+import { formatRupiah } from "@/components/utils/formatRupiah";
 
 const DEFAULT_CONFIG = {
   housing: { label: "Housing", color: "#4F7CFF", emoji: "🏠" },
