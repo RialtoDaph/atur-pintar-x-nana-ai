@@ -44,6 +44,46 @@ export default function AddTransactionModal({ onClose, onSave }) {
     setCustomCats(cats);
   }
 
+  async function handleScanReceipt(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setScanning(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `Kamu adalah OCR untuk struk belanja. Ekstrak informasi dari gambar struk ini dan kembalikan dalam format JSON.
+      
+      Ekstrak:
+      - amount: total belanja dalam angka (tanpa tanda titik atau koma, hanya angka bulat dalam rupiah)
+      - date: tanggal transaksi dalam format YYYY-MM-DD (jika tidak ada, gunakan hari ini: ${new Date().toISOString().split("T")[0]})
+      - note: nama toko atau merchant
+      - category: salah satu dari kategori ini (pilih yang paling sesuai): housing, food, transport, health, entertainment, shopping, subscriptions, other
+      
+      Jika tidak bisa membaca informasi tertentu, gunakan nilai default yang masuk akal.`,
+      file_urls: [file_url],
+      response_json_schema: {
+        type: "object",
+        properties: {
+          amount: { type: "number" },
+          date: { type: "string" },
+          note: { type: "string" },
+          category: { type: "string" },
+        }
+      }
+    });
+    if (result) {
+      setTab("expense");
+      setForm(f => ({
+        ...f,
+        amount: result.amount ? String(Math.round(result.amount)) : f.amount,
+        date: result.date || f.date,
+        note: result.note || f.note,
+        category: result.category || f.category,
+      }));
+    }
+    setScanning(false);
+    e.target.value = "";
+  }
+
   async function handleSave() {
     if (!form.amount || !form.category) return;
     setSaving(true);
