@@ -75,17 +75,24 @@ export default function NanaFloatingChat() {
   return (
     <>
       <style>{`
-        @keyframes pulse-ring {
-          0% { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0.7), inset 0 0 0 0 rgba(255, 106, 0, 0); }
-          50% { box-shadow: 0 0 0 12px rgba(255, 106, 0, 0), inset 0 0 0 3px rgba(255, 106, 0, 0.2); }
-          100% { box-shadow: 0 0 0 0 rgba(255, 106, 0, 0), inset 0 0 0 3px rgba(255, 106, 0, 0); }
+        @keyframes float-bounce {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-8px) rotate(2deg); }
         }
-        .nana-float { animation: pulse-ring 2s ease-in-out infinite; }
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 4px 20px rgba(255,106,0,0.3); }
+          50% { box-shadow: 0 4px 30px rgba(255,106,0,0.6); }
+        }
+        .nana-float { animation: float-bounce 3s ease-in-out infinite, pulse-glow 2s ease-in-out infinite; }
       `}</style>
       {/* Floating button */}
       {!open &&
-      <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full bg-black border-2 border-[#FF6A00] flex items-center justify-center hover:opacity-90 transition-all active:scale-95 nana-float cursor-pointer" onClick={openChat}>
-        <Sparkles className="w-6 h-6 text-[#FF6A00]" />
+      <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-[40px] bg-black border-2 border-[#FF6A00] overflow-hidden hover:opacity-90 transition-all active:scale-95 nana-float cursor-pointer" onClick={openChat}>
+        <img
+          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/83b9f64b6_generated_image.png"
+          alt="Nana AI"
+          className="w-full h-full object-cover"
+        />
       </div>
       }
 
