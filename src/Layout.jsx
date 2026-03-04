@@ -42,11 +42,9 @@ export default function Layout({ children, currentPageName }) {
       ]
     },
     {
-      label: "Insights & Reminders",
+      label: "Insights",
       items: [
         { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
-        { name: "Alerts", label: "Notifikasi", icon: Bell, page: "Alerts" },
-        { name: "Reminders", label: "Pengingat", icon: Bell, page: "Reminders" },
       ]
     },
     {
