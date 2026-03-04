@@ -68,23 +68,20 @@ export default function Transactions() {
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
       {/* Header */}
-       <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+      <div className="bg-[#1B2559] px-5 pt-10 pb-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-[#8FA4C8] text-sm font-medium">Catatan</p>
-            <h1 className="text-white text-2xl font-bold mt-0.5">Transaksi</h1>
-          </div>
+          <h1 className="text-white text-2xl font-bold">Transactions</h1>
           <div className="flex gap-2">
             <button
               onClick={() => setShowUploadTx(true)}
-              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+              className="w-10 h-10 rounded-full bg-[#4F7CFF] flex items-center justify-center shadow-lg hover:bg-[#3956CC] transition-colors"
               title="Import from receipt/statement"
             >
               <Upload className="w-5 h-5 text-white" />
             </button>
             <button
               onClick={() => setShowAddTx(true)}
-              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+              className="w-10 h-10 rounded-full bg-[#00C9A7] flex items-center justify-center shadow-lg hover:bg-[#00b596] transition-colors"
             >
               <Plus className="w-5 h-5 text-white" />
             </button>
@@ -100,7 +97,7 @@ export default function Transactions() {
               key={tab}
               onClick={() => setFilter(tab)}
               className={`flex-1 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${
-                filter === tab ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8] hover:text-[#0A0A0A]"
+                filter === tab ? "bg-[#1B2559] text-white shadow-sm" : "text-[#8FA4C8] hover:text-[#1B2559]"
               }`}
             >
               {tab}
@@ -113,7 +110,7 @@ export default function Transactions() {
             {[1,2,3,4,5].map(i => <div key={i} className="h-16 bg-white rounded-2xl animate-pulse" />)}
           </div>
         ) : sortedGroups.length === 0 ? (
-           <div className="bg-white rounded-2xl shadow-sm border border-[#E2E8F0] p-12 text-center">
+          <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
             <p className="text-4xl mb-3">📭</p>
             <p className="text-[#1B2559] font-semibold mb-1">No transactions yet</p>
             <p className="text-[#8FA4C8] text-sm">Tap + to add your first transaction</p>
@@ -125,9 +122,9 @@ export default function Transactions() {
             const monthExpense = group.items.filter(t => t.type === "expense").reduce((s,t) => s + t.amount, 0);
 
             return (
-              <div key={key} className="bg-white rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
+              <div key={key} className="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-5 py-3 border-b border-[#F2F4F7] flex items-center justify-between">
-                  <p className="text-sm font-bold text-[#1A1A1A]">{group.label}</p>
+                  <p className="text-sm font-bold text-[#1B2559]">{group.label}</p>
                   <div className="flex gap-3 text-xs">
                     {monthIncome > 0 && <span className="text-[#00C9A7] font-semibold">+{formatRupiah(monthIncome)}</span>}
                     {monthExpense > 0 && <span className="text-[#FF6B6B] font-semibold">−{formatRupiah(monthExpense)}</span>}
@@ -145,7 +142,7 @@ export default function Transactions() {
                         {cat.emoji}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1A1A1A] truncate">
+                        <p className="text-sm font-medium text-[#1B2559] truncate">
                           {tx.note || cat.label}
                         </p>
                         <p className="text-xs text-[#8FA4C8]">

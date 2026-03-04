@@ -74,7 +74,7 @@ export default function DebtsPage() {
         {loading ? (
           [...Array(2)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" />)
         ) : activeDebts.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#E2E8F0]">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
             <CreditCard className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
             <p className="text-[#4A5568] font-semibold">Tidak ada utang aktif</p>
             <p className="text-[#8FA4C8] text-sm mt-1">Tap + untuk mencatat utang atau kredit</p>
@@ -84,7 +84,7 @@ export default function DebtsPage() {
             const type = DEBT_TYPES[debt.type] || DEBT_TYPES.lainnya;
             const progress = debt.total_amount > 0 ? ((debt.total_amount - debt.remaining_amount) / debt.total_amount) * 100 : 0;
             return (
-              <div key={debt.id} className="bg-white rounded-2xl p-5 shadow-sm border border-[#E2E8F0]">
+              <div key={debt.id} className="bg-white rounded-2xl p-5 shadow-sm">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#FF6B6B]/10 flex items-center justify-center text-xl">
@@ -118,7 +118,7 @@ export default function DebtsPage() {
         )}
 
         {paidDebts.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E2E8F0]">
+          <div className="bg-white rounded-2xl p-4 shadow-sm">
             <p className="text-sm font-semibold text-[#8FA4C8] mb-2">✅ Sudah Lunas ({paidDebts.length})</p>
             {paidDebts.map(debt => (
               <div key={debt.id} className="flex items-center justify-between py-2 border-t border-[#F2F4F7] first:border-0">

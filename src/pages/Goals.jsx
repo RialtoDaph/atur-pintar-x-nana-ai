@@ -259,7 +259,7 @@ export default function Goals() {
       {loading ? (
         [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
       ) : goals.length === 0 ? (
-       <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#E2E8F0]">
+        <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
           <TrendingUp className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
           <p className="text-[#4A5568] font-semibold">Belum ada tujuan finansial</p>
           <p className="text-[#8FA4C8] text-sm mt-1">Tap + untuk membuat tujuan tabungan pertama Anda</p>

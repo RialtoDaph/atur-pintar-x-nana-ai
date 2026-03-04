@@ -106,7 +106,7 @@ export default function BudgetPage() {
             <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />
           ))
         ) : budgets.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#E2E8F0]">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
             <TrendingUp className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
             <p className="text-[#4A5568] font-semibold">Belum ada anggaran</p>
             <p className="text-[#8FA4C8] text-sm mt-1">Tap + untuk menambahkan anggaran per kategori</p>
@@ -118,7 +118,7 @@ export default function BudgetPage() {
             const percent = Math.min((spent / budget.amount) * 100, 100);
             const isOver = spent > budget.amount;
             return (
-              <div key={budget.id} className="bg-white rounded-2xl p-5 shadow-sm border border-[#E2E8F0]">
+              <div key={budget.id} className="bg-white rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl" style={{ backgroundColor: cat.color + "20" }}>
