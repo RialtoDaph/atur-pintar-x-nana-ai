@@ -51,6 +51,7 @@ export default function Layout({ children, currentPageName }) {
       label: "Akun",
       items: [
         { name: "Pricing", label: "Premium", icon: DollarSign, page: "Pricing" },
+        { name: "SubscriptionManagement", label: "Subscription", icon: CreditCard, page: "SubscriptionManagement" },
         { name: "Settings", label: "Pengaturan", icon: Settings, page: "Settings" },
       ]
     }
@@ -67,6 +68,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Goals", label: "Tujuan", icon: Target, page: "Goals" },
     { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
     { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
+    { name: "SubscriptionManagement", label: "Subscription", icon: DollarSign, page: "SubscriptionManagement" },
     { name: "Pricing", label: "Premium", icon: DollarSign, page: "Pricing" },
     { name: "Settings", label: "Pengaturan", icon: Settings, page: "Settings" },
   ];
