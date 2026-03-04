@@ -122,9 +122,9 @@ export default function Transactions() {
                   const cat = CATEGORY_CONFIG[tx.category] || CATEGORY_CONFIG.other;
                   const isIncome = tx.type === "income";
                   return (
-                    <div key={tx.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors group">
+                    <div key={tx.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] transition-colors group">
                       <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0"
                         style={{ backgroundColor: cat.color + "18" }}
                       >
                         {cat.emoji}
@@ -137,10 +137,16 @@ export default function Transactions() {
                           {new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · {cat.label}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <span className="text-sm font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
                           {isIncome ? "+" : "−"}${tx.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                         </span>
+                        <button
+                          onClick={() => setEditingTx(tx)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#4F7CFF] ml-1"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
                         <button
                           onClick={() => handleDelete(tx.id)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#FF6B6B]"
