@@ -157,6 +157,11 @@ export default function Settings() {
           ))}
         </div>
 
+        {/* Nana AI Preferences */}
+        <div className="bg-white rounded-2xl shadow-sm p-5">
+          <NanaPreferencesSettings />
+        </div>
+
         {/* Widget Dashboard */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-5 pt-4 pb-2">
