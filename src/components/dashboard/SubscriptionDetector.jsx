@@ -23,7 +23,7 @@ export default function SubscriptionDetector({ transactions, loading }) {
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-bold text-[#0A0A0A] text-base">🔁 Subscription Detector</h2>
         <span className="text-xs font-semibold text-[#FF6A00] bg-orange-50 px-2 py-1 rounded-full">
-          ${totalSubs.toLocaleString("en-US", { minimumFractionDigits: 2 })} / bulan
+          {formatRupiah(totalSubs)} / bulan
         </span>
       </div>
       {list.length === 0 ? (
@@ -39,7 +39,7 @@ export default function SubscriptionDetector({ transactions, loading }) {
                 <p className="text-sm font-medium text-[#1A1A1A]">{s.name}</p>
               </div>
               <span className="text-sm font-semibold text-[#1A1A1A]">
-                ${s.total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                {formatRupiah(s.total)}
               </span>
             </div>
           ))}

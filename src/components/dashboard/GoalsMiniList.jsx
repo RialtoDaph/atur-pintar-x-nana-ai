@@ -37,7 +37,7 @@ export default function GoalsMiniList({ goals, loading }) {
               <span className="text-lg">{goal.icon || "💰"}</span>
               <span className="flex-1 text-sm font-medium text-[#1B2559] truncate">{goal.name}</span>
               <span className="text-xs font-semibold text-[#8FA4C8]">
-                ${(goal.current_amount || 0).toLocaleString()} / ${goal.target_amount.toLocaleString()}
+                {formatRupiah(goal.current_amount || 0)} / {formatRupiah(goal.target_amount)}
               </span>
             </div>
             <div className="h-1.5 bg-[#F0F0EE] rounded-full overflow-hidden ml-8">

@@ -65,11 +65,11 @@ export default function SpendingChart({ transactions, loading }) {
       </div>
       <div className="mt-3 space-y-2">
         {data.slice(0, 5).map((d) => (
-          <div key={d.key} className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
-            <span className="text-xs text-[#4A5568] flex-1 truncate">{d.emoji} {d.label}</span>
-            <span className="text-xs font-semibold text-[#1A1A1A] flex-shrink-0">{formatRupiah(d.value)}</span>
-            <span className="text-[10px] text-[#8FA4C8] w-7 text-right flex-shrink-0">{total > 0 ? ((d.value / total) * 100).toFixed(0) : 0}%</span>
+          <div key={d.key} className="flex items-center gap-2 min-w-0">
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
+            <span className="text-xs text-[#4A5568] flex-1 min-w-0 truncate">{d.emoji} {d.label}</span>
+            <span className="text-xs font-semibold text-[#1A1A1A] flex-shrink-0 whitespace-nowrap">{formatRupiah(d.value)}</span>
+            <span className="text-[10px] text-[#8FA4C8] flex-shrink-0 w-8 text-right whitespace-nowrap">{total > 0 ? ((d.value / total) * 100).toFixed(0) : 0}%</span>
           </div>
         ))}
       </div>
