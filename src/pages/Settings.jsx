@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Moon, Sun, DollarSign, Globe, LayoutDashboard, Bell, User, LogOut, ChevronRight, Check, AlertCircle, Clock } from "lucide-react";
+import { Moon, Sun, DollarSign, Globe, LayoutDashboard, Bell, User, LogOut, ChevronRight, Check, AlertCircle, Clock, Star, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import NanaPreferencesSettings from "@/components/settings/NanaPreferencesSettings";
 import RiskProfileAssessment from "@/components/settings/RiskProfileAssessment";
+import CheckoutButton from "@/components/pricing/CheckoutButton";
 
 const LANGUAGES = [
   { code: "id", label: "Indonesia", flag: "🇮🇩" },
@@ -158,6 +159,33 @@ export default function Settings() {
               {currency === cur.code && <Check className="w-4 h-4 text-[#FF6A00]" />}
             </button>
           ))}
+        </div>
+
+        {/* Premium Subscription */}
+        <div className={`rounded-2xl shadow-sm overflow-hidden ${user?.subscription_status === "premium" ? "bg-gradient-to-r from-[#FF6A00]/10 to-[#FF6A00]/5 border border-[#FF6A00]/30" : "bg-white"}`}>
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Langganan Premium</p>
+          </div>
+          <div className="px-5 py-3.5 border-t border-[#F2F4F7]">
+            <div className="flex items-start gap-3">
+              <Star className={`w-5 h-5 flex-shrink-0 mt-0.5 ${user?.subscription_status === "premium" ? "text-[#FF6A00] fill-[#FF6A00]" : "text-[#D1D5DB]"}`} />
+              <div className="flex-1">
+                <p className="font-medium text-[#1A1A1A] text-sm">
+                  {user?.subscription_status === "premium" ? "✓ Anda Member Premium" : "Tingkatkan ke Premium"}
+                </p>
+                <p className="text-xs text-[#8FA4C8] mt-0.5">
+                  {user?.subscription_status === "premium" 
+                    ? "Nikmati akses penuh ke semua fitur AI dan insights premium"
+                    : "Buka AI advisor pribadi, analisis mendalam, dan prediksi cashflow"}
+                </p>
+              </div>
+            </div>
+            {user?.subscription_status !== "premium" && (
+              <div className="mt-3">
+                <CheckoutButton user={user} />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Notifications & Reminders */}
