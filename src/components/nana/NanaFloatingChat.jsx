@@ -174,7 +174,7 @@ export default function NanaFloatingChat() {
                    alt="Nana" 
                    className="w-6 h-6 rounded-full flex-shrink-0"
                  />
-                <div className="bg-white border border-[#E2E8F0] rounded-2xl px-3 py-2 flex gap-1 items-center">
+                <div className="bg-[#2D2D2D] border border-[#3D3D3D] rounded-2xl px-3 py-2 flex gap-1 items-center">
                   {[0,1,2].map(i => (
                     <div key={i} className="w-1.5 h-1.5 bg-[#8FA4C8] rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
                   ))}
