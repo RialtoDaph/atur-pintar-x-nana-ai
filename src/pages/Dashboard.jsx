@@ -90,7 +90,7 @@ export default function Dashboard() {
             <h2 className="font-bold text-[#1B2559] text-base">Savings Goals</h2>
             <button
               onClick={() => setShowAddGoal(true)}
-              className="text-xs text-[#00C9A7] font-semibold flex items-center gap-0.5"
+              className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5"
             >
               + Add goal
             </button>
