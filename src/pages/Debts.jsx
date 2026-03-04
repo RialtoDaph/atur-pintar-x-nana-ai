@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Trash2, CreditCard, CheckCircle } from "lucide-react";
-import AddDebtModal from "@/components/debts/AddDebtModal";
+import AddDebtModal from "@/components/debts/AddDebtModal.jsx";
 
 const DEBT_TYPES = {
   kpr: { label: "KPR", emoji: "🏠" },

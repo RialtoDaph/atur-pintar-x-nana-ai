@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Trash2, TrendingUp } from "lucide-react";
-import AddBudgetModal from "@/components/budget/AddBudgetModal";
+import AddBudgetModal from "@/components/budget/AddBudgetModal.jsx";
 
 const DEFAULT_CATEGORIES = {
   housing: { label: "Housing", emoji: "🏠", color: "#4F7CFF" },

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Trash2, TrendingUp, TrendingDown } from "lucide-react";
-import AddInvestmentModal from "@/components/investments/AddInvestmentModal";
+import AddInvestmentModal from "@/components/investments/AddInvestmentModal.jsx";
 
 const INVESTMENT_TYPES = {
   saham: { label: "Saham", emoji: "📈" },
