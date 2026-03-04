@@ -24,6 +24,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
     { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
     { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
+    { name: "Settings", label: "Pengaturan", icon: Settings, page: "Settings" },
   ];
 
   const mobileNav = [
