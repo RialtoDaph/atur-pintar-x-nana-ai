@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, TrendingUp, Moon, Sun, Settings, MoreHorizontal, Bell, DollarSign, LineChart } from "lucide-react";
+import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, TrendingUp, Moon, Sun, Settings, MoreHorizontal, Bell, DollarSign } from "lucide-react";
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import NanaFloatingChat from "@/components/nana/NanaFloatingChat";
@@ -35,14 +35,18 @@ export default function Layout({ children, currentPageName }) {
     {
       label: "Kelola Keuangan",
       items: [
-        { name: "Analytics", label: "Analitik", icon: LineChart, page: "Analytics" },
         { name: "Goals", label: "Tujuan Tabungan", icon: Target, page: "Goals" },
         { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
         { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
         { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
       ]
     },
-
+    {
+      label: "Insights",
+      items: [
+        { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
+      ]
+    },
     {
       label: "Akun",
       items: [
@@ -56,12 +60,11 @@ export default function Layout({ children, currentPageName }) {
   const mobileMainNav = [
     { name: "Dashboard", label: "Home", icon: LayoutDashboard, page: "Dashboard" },
     { name: "Transactions", label: "Transaksi", icon: ArrowLeftRight, page: "Transactions" },
-
+    { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
     { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
   ];
 
   const mobileMoreNav = [
-    { name: "Analytics", label: "Analitik", icon: LineChart, page: "Analytics" },
     { name: "Goals", label: "Tujuan", icon: Target, page: "Goals" },
     { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
     { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
