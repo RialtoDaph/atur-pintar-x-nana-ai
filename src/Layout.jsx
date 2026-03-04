@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import { LayoutDashboard, Target, ArrowLeftRight } from "lucide-react";
+import { LayoutDashboard, Target, ArrowLeftRight, BarChart2 } from "lucide-react";
 
 export default function Layout({ children, currentPageName }) {
   const navItems = [
