@@ -87,7 +87,7 @@ export default function Dashboard() {
         {/* Savings Goals */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 pt-5 pb-3">
-            <h2 className="font-bold text-[#1B2559] text-base">Savings Goals</h2>
+            <h2 className="font-bold text-[#0A0A0A] text-base">Savings Goals</h2>
             <button
               onClick={() => setShowAddGoal(true)}
               className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5"
