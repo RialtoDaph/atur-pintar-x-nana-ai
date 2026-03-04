@@ -53,8 +53,9 @@ import Dashboard from './pages/Dashboard';
 import Debts from './pages/Debts';
 import Goals from './pages/Goals';
 import Investments from './pages/Investments';
-import Transactions from './pages/Transactions';
 import Settings from './pages/Settings';
+import Transactions from './pages/Transactions';
+import Reminders from './pages/Reminders';
 import __Layout from './Layout.jsx';
 
 
@@ -65,8 +66,9 @@ export const PAGES = {
     "Debts": Debts,
     "Goals": Goals,
     "Investments": Investments,
-    "Transactions": Transactions,
     "Settings": Settings,
+    "Transactions": Transactions,
+    "Reminders": Reminders,
 }
 
 export const pagesConfig = {
