@@ -33,8 +33,8 @@ export default function Layout({ children, currentPageName }) {
                 to={createPageUrl(item.page)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#00C9A7] text-white shadow-sm"
-                    : "text-[#8FA4C8] hover:text-white hover:bg-white/10"
+                    ? "bg-[#FF6A00] text-white shadow-sm"
+                    : "text-[#888] hover:text-white hover:bg-white/10"
                 }`}
               >
                 <item.icon className="w-4 h-4" />
