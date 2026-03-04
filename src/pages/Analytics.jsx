@@ -244,8 +244,8 @@ export default function AnalyticsPage() {
 
         {/* Current month by category */}
         {pieData.length > 0 && (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-5 border border-gray-100 dark:border-gray-800">
-            <h2 className="font-bold text-[#1A1A1A] dark:text-white text-base mb-3">Pengeluaran per Kategori</h2>
+          <div className="bg-white rounded-2xl shadow-sm p-5">
+            <h2 className="font-bold text-[#1A1A1A] text-base mb-3">Pengeluaran per Kategori</h2>
             <div className="w-full h-36">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -264,9 +264,9 @@ export default function AnalyticsPage() {
                 return (
                   <div key={d.name} className="flex items-center gap-2 min-w-0">
                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
-                    <span className="text-xs text-gray-600 dark:text-gray-400 flex-1 min-w-0 truncate">{d.name}</span>
-                    <span className="text-xs font-semibold text-gray-900 dark:text-white flex-shrink-0 whitespace-nowrap">{formatRupiah(d.value)}</span>
-                    <span className="text-[10px] text-gray-500 dark:text-gray-500 flex-shrink-0 w-8 text-right whitespace-nowrap">{total > 0 ? ((d.value / total) * 100).toFixed(0) : 0}%</span>
+                    <span className="text-xs text-[#4A5568] flex-1 min-w-0 truncate">{d.name}</span>
+                    <span className="text-xs font-semibold text-[#1A1A1A] flex-shrink-0 whitespace-nowrap">{formatRupiah(d.value)}</span>
+                    <span className="text-[10px] text-[#8FA4C8] flex-shrink-0 w-8 text-right whitespace-nowrap">{total > 0 ? ((d.value / total) * 100).toFixed(0) : 0}%</span>
                   </div>
                 );
               })}
