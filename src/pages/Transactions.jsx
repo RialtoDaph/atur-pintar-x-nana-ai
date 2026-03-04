@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
+import EditTransactionModal from "@/components/transactions/EditTransactionModal";
 
 const CATEGORY_CONFIG = {
   housing: { emoji: "🏠", label: "Housing", color: "#4F7CFF" },
