@@ -88,7 +88,7 @@ export default function Goals() {
 
     return (
       <div className="min-h-screen bg-[#F7F6F3] max-w-lg mx-auto px-4 py-8">
-        <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2 text-[#9B9B9B] hover:text-[#1A1A1A] text-sm mb-8 transition-colors">
+        <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2 text-[#9B9B9B] hover:text-[#0A0A0A] text-sm mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back
         </Link>
 
@@ -208,7 +208,7 @@ export default function Goals() {
   // All goals list view
   return (
     <div className="min-h-screen bg-[#F7F6F3] max-w-lg mx-auto px-4 py-8">
-      <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2 text-[#9B9B9B] hover:text-[#1A1A1A] text-sm mb-8 transition-colors">
+      <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2 text-[#9B9B9B] hover:text-[#0A0A0A] text-sm mb-8 transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back
       </Link>
       <h1 className="text-2xl font-bold text-[#1A1A1A] mb-6">All Goals</h1>
