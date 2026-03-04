@@ -183,11 +183,11 @@ export default function NanaFloatingChat() {
 
                      </div>
             }
-                  <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs ${
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs ${
             msg.role === "user" ? "bg-[#FF6A00] text-white" : "bg-[#2D2D2D] border border-[#3D3D3D] text-white"}`
             }>
                     {msg.role === "assistant" ?
-              <ReactMarkdown className="prose prose-xs max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 text-white">
+              <ReactMarkdown className="prose prose-xs max-w-none text-white [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:my-2 [&>ol]:my-2 [&>li]:mb-1 [&>strong]:font-semibold [&>code]:bg-black/30 [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>pre]:bg-black/50 [&>pre]:p-2 [&>pre]:rounded [&>pre]:text-[10px] [&>pre]:overflow-x-auto [&>h3]:font-semibold [&>h3]:mt-2 [&>h3]:mb-1">
                         {msg.content}
                       </ReactMarkdown> :
               <p>{msg.content}</p>}
