@@ -2,10 +2,12 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { loadStripe } from "@stripe/stripe-js";
 
-const STRIPE_KEY = "pk_live_YOUR_STRIPE_PUBLIC_KEY"; // Replace with your public key
-const STRIPE_PRICE_ID = "price_1P8z8eL3VzLEzNQwHn8vQkOx";
+// Midtrans configuration
+const MIDTRANS_CLIENT_KEY = process.env.REACT_APP_MIDTRANS_CLIENT_KEY || "YOUR_MIDTRANS_CLIENT_KEY";
+const MIDTRANS_URL_SANDBOX = "https://app.sandbox.midtrans.com/snap/snap.js";
+const MIDTRANS_URL_PRODUCTION = "https://app.midtrans.com/snap/snap.js";
+const SUBSCRIPTION_PRICE = 39000; // IDR 39,000
 
 export default function CheckoutButton({ user }) {
   const [loading, setLoading] = useState(false);
@@ -18,29 +20,72 @@ export default function CheckoutButton({ user }) {
 
     setLoading(true);
     try {
-      const stripe = await loadStripe(STRIPE_KEY);
+      // Create Midtrans transaction
+      const transactionDetails = {
+        order_id: `order-${user.id}-${Date.now()}`,
+        gross_amount: SUBSCRIPTION_PRICE,
+      };
 
-      const { error } = await stripe.redirectToCheckout({
-        lineItems: [
-          {
-            price: STRIPE_PRICE_ID,
-            quantity: 1,
+      const customerDetails = {
+        first_name: user.full_name,
+        email: user.email,
+      };
+
+      // Request snap token from server
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Generate a Midtrans Snap token for a subscription payment.
+        
+Payment Details:
+- Order ID: ${transactionDetails.order_id}
+- Amount: IDR ${transactionDetails.gross_amount} (monthly subscription)
+- Customer Name: ${customerDetails.first_name}
+- Customer Email: ${customerDetails.email}
+
+Return a JSON with: {"snap_token": "...token..."}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            snap_token: { type: "string" },
           },
-        ],
-        mode: "subscription",
-        successUrl: `${window.location.origin}/dashboard?payment=success`,
-        cancelUrl: `${window.location.origin}/pricing?payment=cancelled`,
-        customerEmail: user.email,
-        locale: "id",
+        },
       });
 
-      if (error) {
-        console.error("Stripe error:", error);
-        alert("Gagal membuka Stripe checkout. Silakan coba lagi.");
+      if (response.snap_token) {
+        // Load Snap.js dynamically
+        const script = document.createElement("script");
+        script.src = MIDTRANS_URL_SANDBOX;
+        script.async = true;
+        script.onload = () => {
+          window.snap.pay(response.snap_token, {
+            onSuccess: (result) => {
+              // Payment success - update user subscription
+              base44.auth.updateMe({
+                subscription_status: "premium",
+                subscription_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                  .toISOString()
+                  .split("T")[0],
+                midtrans_customer_id: result.customer_id || user.id,
+                midtrans_subscription_id: result.order_id,
+              });
+              window.location.href = "/dashboard?payment=success";
+            },
+            onPending: () => {
+              alert("Pembayaran sedang diproses");
+            },
+            onError: (result) => {
+              console.error("Payment error:", result);
+              alert("Pembayaran gagal. Silakan coba lagi.");
+            },
+            onClose: () => {
+              alert("Anda menutup Snap. Silakan coba lagi.");
+            },
+          });
+        };
+        document.head.appendChild(script);
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      alert("Terjadi kesalahan. Silakan coba lagi.");
+      alert("Gagal memproses checkout. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
