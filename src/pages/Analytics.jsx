@@ -240,8 +240,8 @@ export default function Analytics() {
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="text-[#1A1A1A] font-bold mb-4">Detail Kategori</h2>
+            <div className="bg-white rounded-2xl shadow-sm p-5 border border-[#E2E8F0]">
+              <h2 className="text-[#1A1A1A] font-bold text-base mb-4">Detail Kategori</h2>
               <div className="space-y-3">
                 {categoryData.map((cat, i) => {
                   const percent = ((cat.value / stats.expense) * 100).toFixed(1);
