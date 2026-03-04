@@ -72,7 +72,7 @@ export default function InvestmentsPage() {
         {loading ? (
           [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
         ) : investments.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#E2E8F0]">
             <TrendingUp className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
             <p className="text-[#4A5568] font-semibold">Belum ada investasi</p>
             <p className="text-[#8FA4C8] text-sm mt-1">Tap + untuk mencatat investasi Anda</p>
@@ -85,7 +85,7 @@ export default function InvestmentsPage() {
             const isPositive = gain >= 0;
             const portfolioWeight = totalValue > 0 ? ((inv.current_value / totalValue) * 100).toFixed(1) : 0;
             return (
-              <div key={inv.id} className="bg-white rounded-2xl p-5 shadow-sm">
+              <div key={inv.id} className="bg-white rounded-2xl p-5 shadow-sm border border-[#E2E8F0]">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#4F7CFF]/10 flex items-center justify-center text-xl">
