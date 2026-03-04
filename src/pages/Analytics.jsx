@@ -214,8 +214,8 @@ export default function Analytics() {
         {/* Category Breakdown */}
         {categoryData.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl shadow-sm p-5">
-              <h2 className="text-[#1A1A1A] font-bold mb-4">Pengeluaran per Kategori</h2>
+            <div className="bg-white rounded-2xl shadow-sm p-5 border border-[#E2E8F0]">
+              <h2 className="text-[#1A1A1A] font-bold text-base mb-4">Pengeluaran per Kategori</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
