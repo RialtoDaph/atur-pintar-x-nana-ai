@@ -89,11 +89,10 @@ export default function NanaFloatingChat() {
       {!open && (
         <button
           onClick={openChat}
-          className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:opacity-90 transition-all active:scale-95 nana-float overflow-hidden"
-          style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}
+          className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center hover:opacity-90 transition-all active:scale-95 nana-float overflow-hidden"
         >
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/166a055ec_IMG_8610.jpg" 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/f91470034_generated_image.png" 
             alt="Nana AI" 
             className="w-full h-full object-cover"
           />
