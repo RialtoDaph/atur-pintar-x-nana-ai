@@ -34,13 +34,13 @@ export default function CashflowForecast({ transactions, loading }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4">
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-2.5">
         <Calendar className="w-4 h-4 text-[#FF6A00]" />
-        <h2 className="font-bold text-[#0A0A0A] text-base">Cashflow Forecast</h2>
+        <h2 className="font-bold text-[#0A0A0A] text-sm">Proyeksi Cashflow</h2>
       </div>
 
       {/* Month progress */}
-      <div className="mb-4">
+      <div className="mb-3">
         <div className="flex justify-between text-xs text-[#9B9B9B] mb-1">
           <span>Hari ke-{dayOfMonth}</span>
           <span>{daysLeft} hari lagi</span>
@@ -53,31 +53,30 @@ export default function CashflowForecast({ transactions, loading }) {
         </div>
       </div>
 
-      {/* Prediction */}
-      <div className={`rounded-xl px-4 py-3 mb-3 ${isPositive ? "bg-green-50 border border-green-100" : "bg-red-50 border border-red-100"}`}>
-        <p className="text-xs text-[#9B9B9B] mb-0.5">Prediksi saldo akhir bulan</p>
-        <p className={`text-xl font-bold ${isPositive ? "text-green-600" : "text-red-500"}`}>
-          {isPositive ? "+" : "-"}{formatRupiah(Math.abs(projectedBalance))}
-        </p>
-        <p className="text-xs text-[#9B9B9B] mt-0.5">
-          {isPositive ? "Keuanganmu aman bulan ini 🎉" : "Pengeluaran melebihi pemasukan ⚠️"}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        <div className="bg-[#F9F9F9] rounded-xl p-3">
-          <div className="flex items-center gap-1.5 mb-1">
-            <TrendingUp className="w-3.5 h-3.5 text-green-500" />
-            <p className="text-xs text-[#9B9B9B]">Estimasi Pemasukan</p>
+      {/* Prediction + grid combined */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className={`col-span-3 rounded-xl px-3 py-2.5 flex items-center justify-between ${isPositive ? "bg-green-50 border border-green-100" : "bg-red-50 border border-red-100"}`}>
+          <div>
+            <p className="text-[10px] text-[#9B9B9B]">Prediksi akhir bulan</p>
+            <p className={`text-base font-bold ${isPositive ? "text-green-600" : "text-red-500"}`}>
+              {isPositive ? "+" : "-"}{formatRupiah(Math.abs(projectedBalance))}
+            </p>
           </div>
-          <p className="text-sm font-bold text-[#1A1A1A]">{formatRupiah(projectedTotalIncome)}</p>
+          <p className="text-xs text-[#9B9B9B]">{isPositive ? "Aman 🎉" : "Awas ⚠️"}</p>
         </div>
-        <div className="bg-[#F9F9F9] rounded-xl p-3">
-          <div className="flex items-center gap-1.5 mb-1">
-            <TrendingDown className="w-3.5 h-3.5 text-red-400" />
-            <p className="text-xs text-[#9B9B9B]">Estimasi Pengeluaran</p>
+        <div className="col-span-1 bg-[#F9F9F9] rounded-xl p-2.5">
+          <div className="flex items-center gap-1 mb-0.5">
+            <TrendingUp className="w-3 h-3 text-green-500" />
+            <p className="text-[10px] text-[#9B9B9B]">Est. Masuk</p>
           </div>
-          <p className="text-sm font-bold text-[#1A1A1A]">{formatRupiah(projectedTotalExpense)}</p>
+          <p className="text-xs font-bold text-[#1A1A1A]">{formatRupiah(projectedTotalIncome)}</p>
+        </div>
+        <div className="col-span-2 bg-[#F9F9F9] rounded-xl p-2.5">
+          <div className="flex items-center gap-1 mb-0.5">
+            <TrendingDown className="w-3 h-3 text-red-400" />
+            <p className="text-[10px] text-[#9B9B9B]">Est. Keluar</p>
+          </div>
+          <p className="text-xs font-bold text-[#1A1A1A]">{formatRupiah(projectedTotalExpense)}</p>
         </div>
       </div>
     </div>

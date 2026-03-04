@@ -56,12 +56,12 @@ export default function SmartAlerts({ transactions, loading }) {
   if (alerts.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 space-y-2">
-      <h2 className="font-bold text-[#0A0A0A] text-base mb-3">🔔 Smart Alerts</h2>
+    <div className="bg-white rounded-2xl shadow-sm p-4 space-y-1.5">
+      <h2 className="font-bold text-[#0A0A0A] text-sm mb-2">🔔 Peringatan Cerdas</h2>
       {alerts.map((a, i) => (
-        <div key={i} className={`flex items-start gap-3 rounded-xl px-3 py-3 border ${a.bg} ${a.border}`}>
-          <a.icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${a.color}`} />
-          <p className="text-sm text-[#1A1A1A] font-medium">{a.text}</p>
+        <div key={i} className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 border ${a.bg} ${a.border}`}>
+          <a.icon className={`w-3.5 h-3.5 flex-shrink-0 ${a.color}`} />
+          <p className="text-xs text-[#1A1A1A] font-medium">{a.text}</p>
         </div>
       ))}
     </div>

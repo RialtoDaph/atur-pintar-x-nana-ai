@@ -26,7 +26,7 @@ export default function RecentTransactions({ transactions, loading }) {
   if (transactions.length === 0) {
     return (
       <div className="px-5 pb-5 text-center py-8 text-[#8FA4C8] text-sm">
-        No transactions yet. Add your first one!
+        Belum ada transaksi. Tambahkan yang pertama!
       </div>
     );
   }
@@ -37,19 +37,19 @@ export default function RecentTransactions({ transactions, loading }) {
         const cat = CATEGORY_CONFIG[tx.category] || CATEGORY_CONFIG.other;
         const isIncome = tx.type === "income";
         return (
-          <div key={tx.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors">
+          <div key={tx.id} className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-gray-50 transition-colors">
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0"
               style={{ backgroundColor: cat.color + "18" }}
             >
               {cat.emoji}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#1B2559] truncate">{tx.note || (tx.category ? tx.category.charAt(0).toUpperCase() + tx.category.slice(1) : "Transaction")}</p>
-              <p className="text-xs text-[#8FA4C8]">{new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric" })}</p>
+              <p className="text-xs font-medium text-[#1B2559] truncate">{tx.note || (tx.category ? tx.category.charAt(0).toUpperCase() + tx.category.slice(1) : "Transaksi")}</p>
+              <p className="text-[10px] text-[#8FA4C8]">{new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric" })}</p>
             </div>
             <span
-              className="text-sm font-bold flex-shrink-0"
+              className="text-xs font-bold flex-shrink-0"
               style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}
             >
               {isIncome ? "+" : "−"}{formatRupiah(tx.amount)}

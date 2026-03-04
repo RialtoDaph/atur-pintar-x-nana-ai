@@ -64,12 +64,12 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
       <RecurringManager />
       {/* Top Header */}
-      <div className="bg-[#0A0A0A] px-5 pt-8 pb-16">
+      <div className="bg-[#0A0A0A] px-5 pt-6 pb-14">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-[#8FA4C8] text-xs font-medium">Good day 👋</p>
-              <h1 className="text-white text-xl font-bold mt-0.5">Your Finances</h1>
+              <p className="text-[#8FA4C8] text-xs font-medium">Halo 👋</p>
+              <h1 className="text-white text-xl font-bold mt-0.5">Keuanganmu</h1>
             </div>
             <button
               onClick={() => setShowAddTx(true)}
@@ -89,7 +89,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 -mt-8 space-y-3">
+      <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-3">
 
         {/* Reminder Widget */}
         <ReminderWidget />
@@ -123,7 +123,7 @@ export default function Dashboard() {
         {widgets.savingsGoals && (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 pt-4 pb-2">
-              <h2 className="font-bold text-[#0A0A0A] text-sm">Savings Goals</h2>
+              <h2 className="font-bold text-[#0A0A0A] text-sm">Tujuan Tabungan</h2>
               <button
                 onClick={() => setShowAddGoal(true)}
                 className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5"

@@ -19,13 +19,13 @@ export default function GoalsMiniList({ goals, loading }) {
   if (goals.length === 0) {
     return (
       <div className="px-5 pb-5 text-center py-6 text-[#8FA4C8] text-sm">
-        No goals yet. Start saving for something!
+        Belum ada tujuan. Mulai menabung sekarang!
       </div>
     );
   }
 
   return (
-    <div className="px-5 pb-2 space-y-3">
+    <div className="px-4 pb-2 space-y-2.5">
       {goals.slice(0, 3).map((goal) => {
         const color = COLORS[goal.color] || COLORS.blue;
         const progress = goal.target_amount > 0
@@ -33,14 +33,14 @@ export default function GoalsMiniList({ goals, loading }) {
           : 0;
         return (
           <Link key={goal.id} to={createPageUrl(`Goals?id=${goal.id}`)} className="block">
-            <div className="flex items-center gap-3 mb-1.5">
-              <span className="text-lg">{goal.icon || "💰"}</span>
-              <span className="flex-1 text-sm font-medium text-[#1B2559] truncate">{goal.name}</span>
-              <span className="text-xs font-semibold text-[#8FA4C8]">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-base">{goal.icon || "💰"}</span>
+              <span className="flex-1 text-xs font-medium text-[#1B2559] truncate">{goal.name}</span>
+              <span className="text-[10px] font-semibold text-[#8FA4C8]">
                 {formatRupiah(goal.current_amount || 0)} / {formatRupiah(goal.target_amount)}
               </span>
             </div>
-            <div className="h-1.5 bg-[#F0F0EE] rounded-full overflow-hidden ml-8">
+            <div className="h-1 bg-[#F0F0EE] rounded-full overflow-hidden ml-6">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{ width: `${progress}%`, backgroundColor: color }}
