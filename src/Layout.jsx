@@ -33,6 +33,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
     { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
     { name: "Analytics", label: "Analitik", icon: BarChart2, page: "Analytics" },
+    { name: "Settings", label: "Setting", icon: Settings, page: "Settings" },
   ];
 
   return (
