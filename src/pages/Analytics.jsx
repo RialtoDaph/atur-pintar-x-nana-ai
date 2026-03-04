@@ -103,7 +103,7 @@ export default function Analytics() {
                 formatter={(value) => [`$${value.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, undefined]}
                 contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
               />
-              <Bar dataKey="Income" fill="#00C9A7" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="Income" fill="#FF6A00" radius={[6, 6, 0, 0]} />
               <Bar dataKey="Expenses" fill="#FF6B6B" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
