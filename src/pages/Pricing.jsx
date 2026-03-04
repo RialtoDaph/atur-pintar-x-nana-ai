@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, X, ChevronDown, ChevronUp, Lock, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
+import CheckoutButton from "@/components/pricing/CheckoutButton";
 
 export default function Pricing() {
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    base44.auth
+      .me()
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
 
   const features = {
     free: [
@@ -82,8 +94,8 @@ export default function Pricing() {
                 </p>
               </div>
 
-              <Button className="w-full mb-8 bg-white border-2 border-[#E2E8F0] text-[#1A1A1A] hover:bg-[#F9FAFB]">
-                Continue Free
+              <Button disabled className="w-full mb-8 bg-white border-2 border-[#E2E8F0] text-[#8FA4C8] hover:bg-[#F9FAFB]">
+                {user?.subscription_status === "free" ? "Your Current Plan" : "Continue Free"}
               </Button>
 
               {/* Features List */}
@@ -121,9 +133,7 @@ export default function Pricing() {
                 </p>
               </div>
 
-              <Button className="w-full mb-8 bg-[#FF6A00] hover:bg-[#e05e00] text-white">
-                Upgrade to Premium
-              </Button>
+              <CheckoutButton user={user} />
 
               {/* Features List */}
               <div className="space-y-4 flex-1">
