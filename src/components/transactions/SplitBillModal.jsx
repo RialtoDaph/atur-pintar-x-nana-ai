@@ -131,36 +131,71 @@ export default function SplitBillModal({ receiptData, onClose, onConfirm }) {
 
           {/* Participants */}
           <div>
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block flex items-center gap-1">
-              <Users className="w-3 h-3" /> Peserta
+            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">
+              <Users className="w-3 h-3 inline mr-1" /> Peserta
             </label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {participants.map(name => (
-                <div key={name} className="flex items-center gap-1 bg-[#F2F4F7] rounded-full px-3 py-1">
-                  <span className="text-xs font-medium text-[#1A1A1A]">{name}</span>
-                  {name !== "Saya" && (
-                    <button onClick={() => removeParticipant(name)} className="text-[#9B9B9B] hover:text-red-500 transition-colors ml-0.5">
-                      <X className="w-3 h-3" />
+
+            {/* App users quick-add */}
+            {appUsers.length > 0 && (
+              <div className="mb-3">
+                <p className="text-[10px] text-[#8FA4C8] mb-1.5 font-medium">Dari kontak aplikasi:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {appUsers.filter(u => !participants.find(p => p.email === u.email)).map(u => (
+                    <button key={u.id} onClick={() => addFromAppUser(u)}
+                      className="flex items-center gap-1.5 text-xs bg-[#F2F4F7] hover:bg-[#FF6A00]/10 hover:border-[#FF6A00] border border-[#E2E8F0] rounded-full px-2.5 py-1 transition-all">
+                      <span className="w-4 h-4 rounded-full bg-[#FF6A00] text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">
+                        {u.full_name?.[0]?.toUpperCase() || "?"}
+                      </span>
+                      <span className="text-[#1A1A1A] font-medium">{u.full_name}</span>
+                      <Plus className="w-3 h-3 text-[#8FA4C8]" />
                     </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2 mb-2">
+              {participants.map(p => (
+                <div key={p.name} className="flex items-center gap-1 bg-[#F2F4F7] rounded-full px-3 py-1">
+                  <span className="text-xs font-medium text-[#1A1A1A]">{p.name}</span>
+                  {p.name !== "Saya" && (
+                    <>
+                      {p.email && (
+                        <button onClick={() => inviteParticipant(p.email)} disabled={inviting === p.email}
+                          title={`Invite ${p.email}`}
+                          className="text-[#8FA4C8] hover:text-[#FF6A00] transition-colors ml-0.5">
+                          <Mail className="w-3 h-3" />
+                        </button>
+                      )}
+                      <button onClick={() => removeParticipant(p.name)} className="text-[#9B9B9B] hover:text-red-500 transition-colors ml-0.5">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </>
                   )}
                 </div>
               ))}
             </div>
-            <div className="flex gap-2">
+
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                  placeholder="Nama teman..."
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && addParticipant()}
+                />
+                <button onClick={addParticipant} disabled={!newName.trim()}
+                  className="px-3 py-2 rounded-xl bg-[#0A0A0A] text-white disabled:opacity-40 hover:bg-[#333] transition-colors">
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
               <input
-                className="flex-1 border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                placeholder="Nama teman..."
-                value={newName}
-                onChange={e => setNewName(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && addParticipant()}
+                className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                placeholder="Email (opsional, untuk invite ke app)"
+                value={newEmail}
+                onChange={e => setNewEmail(e.target.value)}
               />
-              <button
-                onClick={addParticipant}
-                disabled={!newName.trim()}
-                className="px-3 py-2 rounded-xl bg-[#0A0A0A] text-white disabled:opacity-40 hover:bg-[#333] transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
             </div>
           </div>
 
