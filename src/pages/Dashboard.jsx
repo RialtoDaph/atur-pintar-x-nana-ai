@@ -18,7 +18,6 @@ import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
-import GoalMilestoneAlerts from "@/components/dashboard/GoalMilestoneAlerts";
 
 function getWidgets() {
   const saved = localStorage.getItem("widgets");
@@ -142,9 +141,6 @@ export default function Dashboard() {
 
         {/* Portfolio Summary */}
         <PortfolioSummary />
-
-        {/* Goal Milestone Alerts */}
-        {!loading && goals.length > 0 && <GoalMilestoneAlerts goals={goals} />}
 
         {/* Savings Goals */}
         {widgets.savingsGoals && (
