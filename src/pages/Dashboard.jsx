@@ -17,7 +17,6 @@ import CashflowForecast from "@/components/dashboard/CashflowForecast";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
-import TrendChart from "@/components/dashboard/TrendChart";
 
 function getWidgets() {
   const saved = localStorage.getItem("widgets");
@@ -107,9 +106,6 @@ export default function Dashboard() {
 
         {/* Reminder Widget */}
         <ReminderWidget />
-
-        {/* Trend Chart */}
-        <TrendChart transactions={transactions} loading={loading} />
 
         {/* Personal Insights */}
         {!loading && <DashboardInsights transactions={transactions} goals={goals} />}
