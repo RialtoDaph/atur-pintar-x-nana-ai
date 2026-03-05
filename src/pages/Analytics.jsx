@@ -121,8 +121,9 @@ export default function Analytics() {
   const totalExpenses = pieData.reduce((s, d) => s + d.value, 0);
 
   // Build 12 months trend data for spending analysis
-  const last12Months = Array.from({ length: 12 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
+  const areaChartMonthRange = parseInt(filterPeriod) >= 12 || customDateRange ? monthDiff + 1 : 12;
+  const last12Months = Array.from({ length: Math.max(areaChartMonthRange, 12) }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (Math.max(areaChartMonthRange, 12) - 1 - i), 1);
     const month = d.getMonth();
     const year = d.getFullYear();
     const monthTx = transactions.filter(t => {
