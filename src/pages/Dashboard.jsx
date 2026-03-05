@@ -50,7 +50,7 @@ export default function Dashboard() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  useEffect(() => { if (user) loadData(); }, [user]);
+  useEffect(() => { if (user?.onboarding_completed) loadData(); }, [user]);
 
   async function loadData() {
     setLoading(true);
