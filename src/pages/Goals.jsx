@@ -329,10 +329,8 @@ export default function Goals() {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  if (window.confirm("Hapus tujuan ini?")) {
-                    base44.entities.SavingsGoal.delete(g.id);
-                    loadData();
-                  }
+                  e.stopPropagation();
+                  handleDeleteGoal();
                 }}
                 className="mt-3 text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1 w-full justify-center"
               >
