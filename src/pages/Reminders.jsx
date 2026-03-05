@@ -27,12 +27,19 @@ export default function Reminders() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [user, setUser] = useState(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    base44.auth.me().then(u => {
+      setUser(u);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => { if (user) load(); }, [user]);
 
   async function load() {
     setLoading(true);
-    const data = await base44.entities.Reminder.list("-created_date");
+    const data = await base44.entities.Reminder.filter({ created_by: user.email }, "-created_date");
     setReminders(data);
     setLoading(false);
   }

@@ -27,15 +27,23 @@ export default function Goals() {
 
   const goal = goals.find((g) => g.id === goalId) || null;
 
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
-    loadData();
-  }, [goalId]);
+    base44.auth.me().then(u => {
+      setUser(u);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (user) loadData();
+  }, [goalId, user]);
 
   async function loadData() {
     setLoading(true);
     const [g, t] = await Promise.all([
-      base44.entities.SavingsGoal.list("-created_date"),
-      goalId ? base44.entities.Transaction.filter({ goal_id: goalId }, "-created_date") : Promise.resolve([]),
+      base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
+      goalId ? base44.entities.Transaction.filter({ goal_id: goalId, created_by: user.email }, "-created_date") : Promise.resolve([]),
     ]);
     setGoals(g);
     setTransactions(t);

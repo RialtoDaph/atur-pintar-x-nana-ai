@@ -16,12 +16,19 @@ export default function DebtsPage() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [user, setUser] = useState(null);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    base44.auth.me().then(u => {
+      setUser(u);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => { if (user) loadData(); }, [user]);
 
   async function loadData() {
     setLoading(true);
-    const d = await base44.entities.Debt.list("-created_date");
+    const d = await base44.entities.Debt.filter({ created_by: user.email }, "-created_date");
     setDebts(d);
     setLoading(false);
   }
