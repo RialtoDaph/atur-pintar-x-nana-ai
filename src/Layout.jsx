@@ -53,6 +53,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
     { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
     { name: "Alerts", label: "Alerts", icon: Bell, page: "Alerts" },
+    { name: "Tips", label: "Tips", icon: Lightbulb, page: "Tips" },
     { name: "Settings", label: "Setting", icon: Settings, page: "Settings" },
     { name: "Reminders", label: "Pengingat", icon: Bell, page: "Reminders" },
   ];
