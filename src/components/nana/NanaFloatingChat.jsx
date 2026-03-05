@@ -13,26 +13,19 @@ export default function NanaFloatingChat() {
   const [loading, setLoading] = useState(false);
   const [preferences, setPreferences] = useState(null);
   const bottomRef = useRef(null);
+  const { context, formatContextForMessage } = useFinancialContext();
 
   useEffect(() => {
-    loadUserPreferences();
+    base44.auth.me().then((user) => {
+      base44.entities.NanaPreferences.filter({ created_by: user.email }).then((prefs) => {
+        if (prefs?.length > 0) setPreferences(prefs[0]);
+      });
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  async function loadUserPreferences() {
-    try {
-      const user = await base44.auth.me();
-      const prefs = await base44.entities.NanaPreferences.filter({ created_by: user.email });
-      if (prefs && prefs.length > 0) {
-        setPreferences(prefs[0]);
-      }
-    } catch (error) {
-      console.error("Error loading preferences:", error);
-    }
-  }
 
   useEffect(() => {
     if (!activeConv) return;
