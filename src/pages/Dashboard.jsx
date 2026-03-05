@@ -16,6 +16,7 @@ import SubscriptionDetector from "@/components/dashboard/SubscriptionDetector";
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
+import DashboardInsights from "@/components/dashboard/DashboardInsights";
 
 function getWidgets() {
   const saved = localStorage.getItem("widgets");
