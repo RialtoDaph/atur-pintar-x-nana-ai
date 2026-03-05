@@ -208,7 +208,18 @@ export default function Transactions() {
                   const cat = CATEGORY_CONFIG[tx.category] || CATEGORY_CONFIG.other;
                   const isIncome = tx.type === "income";
                   return (
-                    <div key={tx.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] transition-colors group">
+                    <div
+                      key={tx.id}
+                      className={`flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] transition-colors group ${selectMode ? "cursor-pointer" : ""} ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
+                      onClick={selectMode ? () => toggleSelect(tx.id) : undefined}
+                    >
+                      {selectMode && (
+                        <div className="flex-shrink-0">
+                          {selectedIds.has(tx.id)
+                            ? <CheckSquare className="w-5 h-5 text-[#FF6A00]" />
+                            : <Square className="w-5 h-5 text-[#CBD5E0]" />}
+                        </div>
+                      )}
                       <div
                         className="w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0"
                         style={{ backgroundColor: cat.color + "18" }}
