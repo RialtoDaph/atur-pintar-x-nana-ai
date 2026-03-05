@@ -209,7 +209,7 @@ export default function Analytics() {
 
         {/* Monthly Trend Bar Chart */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Pemasukan vs Pengeluaran (6 bulan)</h2>
+          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Pemasukan vs Pengeluaran</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={trendData} barCategoryGap="30%">
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
