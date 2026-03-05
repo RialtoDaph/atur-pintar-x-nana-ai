@@ -294,31 +294,44 @@ export default function Goals() {
                   {g.status === "completed" && <CheckCircle className="w-5 h-5 text-[#00C9A7]" />}
                 </div>
 
-              <div className="mb-3">
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-[#4A5568] font-medium">Rp {(g.current_amount || 0).toLocaleString("id-ID")} dari Rp {g.target_amount.toLocaleString("id-ID")}</span>
-                  <span className="font-bold" style={{ color }}>{progress.toFixed(0)}%</span>
+                <div className="mb-3">
+                  <div className="flex justify-between text-xs mb-1.5">
+                    <span className="text-[#4A5568] font-medium">Rp {(g.current_amount || 0).toLocaleString("id-ID")} dari Rp {g.target_amount.toLocaleString("id-ID")}</span>
+                    <span className="font-bold" style={{ color }}>{progress.toFixed(0)}%</span>
+                  </div>
+                  <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: color }} />
+                  </div>
                 </div>
-                <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: color }} />
-                </div>
-              </div>
 
-              <div className="flex gap-3 text-xs">
-                {g.deadline && (
-                  <div className="flex items-center gap-1 text-[#8FA4C8]">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {daysLeft >= 0 ? `${daysLeft} hari` : "Kadaluarsa"}
-                  </div>
-                )}
-                {suggestedMonthly && (
-                  <div className={`flex items-center gap-1 ${isUrgent ? "text-[#FF6B6B]" : "text-[#8FA4C8]"}`}>
-                    <Zap className="w-3.5 h-3.5" />
-                    Rp {suggestedMonthly.toLocaleString("id-ID")}/bln
-                  </div>
-                )}
-              </div>
-            </Link>
+                <div className="flex gap-3 text-xs">
+                  {g.deadline && (
+                    <div className="flex items-center gap-1 text-[#8FA4C8]">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {daysLeft >= 0 ? `${daysLeft} hari` : "Kadaluarsa"}
+                    </div>
+                  )}
+                  {suggestedMonthly && (
+                    <div className={`flex items-center gap-1 ${isUrgent ? "text-[#FF6B6B]" : "text-[#8FA4C8]"}`}>
+                      <Zap className="w-3.5 h-3.5" />
+                      Rp {suggestedMonthly.toLocaleString("id-ID")}/bln
+                    </div>
+                  )}
+                </div>
+              </Link>
+
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (window.confirm("Hapus tujuan ini?")) {
+                    base44.entities.SavingsGoal.delete(g.id);
+                    loadData();
+                  }
+                }}
+                className="mt-3 text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1 w-full justify-center"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Hapus
+              </button>
           );
         })
       )}
