@@ -29,6 +29,7 @@ function getWidgets() {
 export default function Dashboard() {
   const [goals, setGoals] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [showAddTx, setShowAddTx] = useState(false);
