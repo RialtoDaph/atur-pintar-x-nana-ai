@@ -175,9 +175,10 @@ export default function Dashboard() {
       )}
 
       {showOnboarding && (
-        <OnboardingModal onClose={() => {
+        <OnboardingQuestionnaire onClose={() => {
           setShowOnboarding(false);
           localStorage.setItem("onboarding_done", "true");
+          loadData();
         }} />
       )}
 
