@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, CheckSquare, Square, X } from "lucide-react";
 import { formatRupiah } from "@/components/utils/formatRupiah";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import EditTransactionModal from "@/components/transactions/EditTransactionModal";
@@ -27,12 +27,22 @@ export default function Transactions() {
   const [filter, setFilter] = useState("all");
   const [showAddTx, setShowAddTx] = useState(false);
   const [editingTx, setEditingTx] = useState(null);
+  const [user, setUser] = useState(null);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    base44.auth.me().then(u => {
+      setUser(u);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => { if (user) loadData(); }, [user]);
 
   async function loadData() {
     setLoading(true);
-    const t = await base44.entities.Transaction.list("-date", 200);
+    const t = await base44.entities.Transaction.filter({ created_by: user.email }, "-date", 200);
     setTransactions(t);
     setLoading(false);
   }
@@ -46,6 +56,42 @@ export default function Transactions() {
   async function handleEdit(id, data) {
     await base44.entities.Transaction.update(id, data);
     setEditingTx(null);
+    loadData();
+  }
+
+  function toggleSelect(id) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function selectAll() {
+    setSelectedIds(new Set(filtered.map(t => t.id)));
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set());
+    setSelectMode(false);
+  }
+
+  async function handleDeleteSelected() {
+    if (selectedIds.size === 0) return;
+    if (!window.confirm(`Hapus ${selectedIds.size} transaksi yang dipilih?`)) return;
+    setDeleting(true);
+    await Promise.all([...selectedIds].map(id => base44.entities.Transaction.delete(id)));
+    setDeleting(false);
+    clearSelection();
+    loadData();
+  }
+
+  async function handleDeleteAll() {
+    if (!window.confirm(`Hapus SEMUA ${filtered.length} transaksi yang ditampilkan? Tindakan ini tidak bisa dibatalkan.`)) return;
+    setDeleting(true);
+    await Promise.all(filtered.map(t => base44.entities.Transaction.delete(t.id)));
+    setDeleting(false);
+    clearSelection();
     loadData();
   }
 
