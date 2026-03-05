@@ -227,7 +227,14 @@ export default function AddTransactionModal({ onClose, onSave }) {
                 className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3.5 text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
                 placeholder="0"
                 value={form.amount}
-                onChange={(e) => setForm({ ...form, amount: e.target.value.replace(/[^0-9.,]/g, "") })}
+                onChange={(e) => {
+                  let val = e.target.value.replace(/[^0-9]/g, "");
+                  if (val.length > 0) {
+                    val = Math.floor(Number(val) || 0).toString();
+                    val = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                  }
+                  setForm({ ...form, amount: val });
+                }}
               />
             </div>
           </div>
