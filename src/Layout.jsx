@@ -182,6 +182,9 @@ export default function Layout({ children, currentPageName }) {
       {/* Nana Floating Chat */}
       {currentPageName !== "Nana" && <NanaFloatingChat />}
 
+      {/* Global Search */}
+      {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
+
       {/* More menu popup */}
       {showMoreMenu && (
         <>
