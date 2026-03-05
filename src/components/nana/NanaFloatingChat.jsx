@@ -87,7 +87,10 @@ export default function NanaFloatingChat() {
     }
   }
 
-  const visibleMessages = messages.filter((m) => m.role === "user" || m.role === "assistant");
+  // Strip the injected financial context block from user-visible messages
+  const visibleMessages = messages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => m.role === "user" ? { ...m, content: m.content?.replace(/\n\n---\n\[FINANCIAL_CONTEXT[\s\S]*?\[\/FINANCIAL_CONTEXT\]\n---/g, "").trim() } : m);
 
   return (
     <>
