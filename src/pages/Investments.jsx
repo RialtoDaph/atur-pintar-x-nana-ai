@@ -6,6 +6,8 @@ import { createPageUrl } from "@/utils";
 import AddInvestmentModal from "@/components/investments/AddInvestmentModal.jsx";
 import PerformanceMetrics from "@/components/investments/PerformanceMetrics";
 import DiversificationChart from "@/components/investments/DiversificationChart";
+import RiskProfileRecommendation from "@/components/investments/RiskProfileRecommendation";
+import EducationResources from "@/components/investments/EducationResources";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const INVESTMENT_TYPES = {
@@ -108,6 +110,10 @@ export default function InvestmentsPage() {
 
       <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-4">
         <DiversificationChart investments={investments} totalValue={totalValue} formatCurrency={formatCurrency} />
+
+        <RiskProfileRecommendation investments={investments} />
+
+        <EducationResources />
         {loading ? (
           [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
         ) : investments.length === 0 ? (
