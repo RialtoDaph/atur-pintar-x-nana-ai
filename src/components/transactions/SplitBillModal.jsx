@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { X, Plus, Trash2, Users, Equal, List } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Plus, Users, Equal, List, Mail } from "lucide-react";
 import { formatRupiah } from "@/components/utils/formatRupiah";
+import { base44 } from "@/api/base44Client";
 
 export default function SplitBillModal({ receiptData, onClose, onConfirm }) {
   const [participants, setParticipants] = useState(["Saya"]);
