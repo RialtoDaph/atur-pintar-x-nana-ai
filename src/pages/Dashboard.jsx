@@ -131,6 +131,9 @@ export default function Dashboard() {
         {/* Subscription Detector */}
         {widgets.subscriptionDetector && <SubscriptionDetector transactions={transactions} loading={loading} />}
 
+        {/* Income vs Expense Chart */}
+        <IncomeExpenseChart transactions={transactions} loading={loading} />
+
         {/* Spending breakdown */}
         {widgets.spendingChart && <SpendingChart transactions={thisMonthTx} loading={loading} />}
 
