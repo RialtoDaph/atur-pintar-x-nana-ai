@@ -67,7 +67,7 @@ export default function Goals() {
   }
 
   async function handleDelete() {
-    if (!window.confirm("Delete this goal?")) return;
+    if (!window.confirm("Hapus tujuan ini?")) return;
     await base44.entities.SavingsGoal.delete(goalId);
     window.location.href = createPageUrl("Dashboard");
   }

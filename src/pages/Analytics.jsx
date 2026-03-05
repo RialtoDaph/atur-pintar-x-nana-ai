@@ -302,7 +302,7 @@ export default function Analytics() {
                 <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Nilai Sekarang</p>
                 <p className="text-sm font-bold text-[#0A0A0A]">{formatRupiah(totalCurrentValue)}</p>
               </div>
-              <div className={`rounded-xl p-3 ${investmentReturn >= 0 ? "bg-[#00C9A7]/10]" : "bg-[#FF6B6B]/10"}`}>
+              <div className={`rounded-xl p-3 ${investmentReturn >= 0 ? "bg-[#00C9A7]/10" : "bg-[#FF6B6B]/10"}`}>
                 <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Return</p>
                 <p className={`text-sm font-bold ${investmentReturn >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
                   {investmentReturn >= 0 ? "+" : ""}{formatRupiah(investmentReturn)}

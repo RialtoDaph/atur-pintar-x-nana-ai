@@ -38,7 +38,7 @@ export default function Transactions() {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Delete this transaction?")) return;
+    if (!window.confirm("Hapus transaksi ini?")) return;
     await base44.entities.Transaction.delete(id);
     loadData();
   }
