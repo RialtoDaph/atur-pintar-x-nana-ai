@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
+import AssetSearch from "./AssetSearch";
 
 const INVESTMENT_TYPES = [
   { key: "saham", label: "Saham", emoji: "📈" },
@@ -98,11 +99,18 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
 
         <div className="space-y-3 mb-6">
           <div>
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Nama Investasi</label>
-            <input type="text" placeholder="e.g. BBCA, Bitcoin, Reksa Dana Manulife"
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-              value={form.name}
-              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Cari Aset</label>
+            <AssetSearch 
+              type={form.type} 
+              onSelect={(asset) => {
+                setForm(f => ({
+                  ...f,
+                  name: asset.symbol,
+                  current_value: asset.price?.toString() || ""
+                }));
+                setPricePerUnit(asset.price?.toString() || "");
+              }}
+              placeholder="Ketik nama atau simbol aset..."
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
