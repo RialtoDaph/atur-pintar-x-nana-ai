@@ -6,6 +6,7 @@ import { Plus, ChevronRight } from "lucide-react";
 import AddGoalModal from "@/components/goals/AddGoalModal";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
+import ResetDataModal from "@/components/onboarding/ResetDataModal";
 import BalanceCard from "@/components/dashboard/BalanceCard";
 import SpendingChart from "@/components/dashboard/SpendingChart";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
