@@ -134,7 +134,7 @@ export default function Transactions() {
                         {cat.emoji}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1B2559] truncate">
+                        <p className="text-sm font-medium text-[#1A1A1A] truncate">
                           {tx.note || cat.label}
                         </p>
                         <p className="text-xs text-[#8FA4C8]">
