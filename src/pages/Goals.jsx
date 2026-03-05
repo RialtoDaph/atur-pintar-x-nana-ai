@@ -272,6 +272,12 @@ export default function Goals() {
           const suggestedMonthly = calculateSuggestedMonthly(g);
           const isUrgent = daysLeft && daysLeft < 30;
 
+          const handleDeleteGoal = async () => {
+            if (!window.confirm("Hapus tujuan ini?")) return;
+            await base44.entities.SavingsGoal.delete(g.id);
+            loadData();
+          };
+
           return (
             <div
               key={g.id}
