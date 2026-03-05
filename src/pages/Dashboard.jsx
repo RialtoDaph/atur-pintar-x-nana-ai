@@ -173,6 +173,10 @@ export default function Dashboard() {
         }} />
       )}
 
+      {!showOnboarding && showResetPrompt && (
+        <ResetDataModal onClose={() => setShowResetPrompt(false)} />
+      )}
+
       {showAddTx && (
         <AddTransactionModal
           onClose={() => setShowAddTx(false)}
