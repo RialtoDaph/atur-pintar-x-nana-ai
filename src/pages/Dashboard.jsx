@@ -56,12 +56,14 @@ export default function Dashboard() {
 
   async function loadData() {
     setLoading(true);
-    const [g, t] = await Promise.all([
+    const [g, t, b] = await Promise.all([
       base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
       base44.entities.Transaction.filter({ created_by: user.email }, "-date", 100),
+      base44.entities.Budget.filter({ created_by: user.email }),
     ]);
     setGoals(g);
     setTransactions(t);
+    setBudgets(b);
     setLoading(false);
   }
 
