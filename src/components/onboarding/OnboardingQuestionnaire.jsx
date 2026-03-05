@@ -150,9 +150,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
         <div className="p-6">
           <div className="flex items-center justify-between mb-5">
             <span className="text-xs font-semibold text-[#8FA4C8]">{step + 1} / {totalSteps}</span>
-            <button onClick={handleSkip} className="text-xs text-[#8FA4C8] hover:text-[#4A5568] font-medium transition-colors">
-              Lewati Semua
-            </button>
+
           </div>
 
           {/* STEP: Welcome */}
