@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [showAddTx, setShowAddTx] = useState(false);
   const [widgets, setWidgets] = useState(getWidgets());
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("onboarding_done"));
+  const [showResetPrompt, setShowResetPrompt] = useState(() => !localStorage.getItem("reset_prompt_shown"));
 
   useEffect(() => {
     const onStorage = () => setWidgets(getWidgets());
