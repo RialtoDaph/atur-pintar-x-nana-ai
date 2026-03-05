@@ -96,9 +96,14 @@ export default function InvestmentsPage() {
                       <p className="text-xs text-[#8FA4C8]">{type.label} · {portfolioWeight}% portofolio</p>
                     </div>
                   </div>
-                  <button onClick={() => handleDelete(inv.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowAdd(true)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors">
+                      ✏️
+                    </button>
+                    <button onClick={() => handleDelete(inv.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-3 flex justify-between items-end">
                   <div>
@@ -121,6 +126,7 @@ export default function InvestmentsPage() {
 
       {showAdd && (
         <AddInvestmentModal
+          investment={null}
           onClose={() => setShowAdd(false)}
           onSave={async (data) => {
             await base44.entities.Investment.create(data);

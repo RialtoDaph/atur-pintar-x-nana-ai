@@ -7,7 +7,7 @@ export default function CashflowForecast({ transactions, loading }) {
   const now = new Date();
   const dayOfMonth = now.getDate();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const daysLeft = daysInMonth - dayOfMonth;
+  const daysLeft = Math.max(0, daysInMonth - dayOfMonth);
 
   const thisMonth = transactions.filter(t => {
     const d = new Date(t.date);
@@ -17,14 +17,15 @@ export default function CashflowForecast({ transactions, loading }) {
   const currentIncome = thisMonth.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const currentExpense = thisMonth.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
 
-  // Daily average expense so far
-  const dailyExpenseAvg = dayOfMonth > 0 ? currentExpense / dayOfMonth : 0;
-  const projectedExtraExpense = dailyExpenseAvg * daysLeft;
+  // Only project if we have actual data (not first day)
+  const daysElapsed = dayOfMonth - 1;
+  const dailyExpenseAvg = daysElapsed > 0 ? currentExpense / daysElapsed : currentExpense;
+  const projectedExtraExpense = daysLeft > 0 ? dailyExpenseAvg * daysLeft : 0;
   const projectedTotalExpense = currentExpense + projectedExtraExpense;
 
   // Daily avg income
-  const dailyIncomeAvg = dayOfMonth > 0 ? currentIncome / dayOfMonth : 0;
-  const projectedExtraIncome = dailyIncomeAvg * daysLeft;
+  const dailyIncomeAvg = daysElapsed > 0 ? currentIncome / daysElapsed : currentIncome;
+  const projectedExtraIncome = daysLeft > 0 ? dailyIncomeAvg * daysLeft : 0;
   const projectedTotalIncome = currentIncome + projectedExtraIncome;
 
   const projectedBalance = projectedTotalIncome - projectedTotalExpense;

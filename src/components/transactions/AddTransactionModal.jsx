@@ -136,7 +136,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-        <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+        <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto scroll-smooth">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-[#1A1A1A]">Add Transaction</h2>
             <div className="flex items-center gap-2">
@@ -227,7 +227,12 @@ export default function AddTransactionModal({ onClose, onSave }) {
                 className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3.5 text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
                 placeholder="0"
                 value={form.amount}
-                onChange={(e) => setForm({ ...form, amount: e.target.value.replace(/[^0-9.,]/g, "") })}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.,]/g, "");
+                  // Auto-format: convert , to . for decimals
+                  const formatted = val.replace(/,/g, ".").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                  setForm({ ...form, amount: formatted });
+                }}}
               />
             </div>
           </div>

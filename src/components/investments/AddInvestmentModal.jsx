@@ -11,8 +11,8 @@ const INVESTMENT_TYPES = [
   { key: "lainnya", label: "Lainnya", emoji: "💼" },
 ];
 
-export default function AddInvestmentModal({ onClose, onSave }) {
-  const [form, setForm] = useState({
+export default function AddInvestmentModal({ onClose, onSave, investment = null }) {
+  const [form, setForm] = useState(investment || {
     name: "", type: "reksa_dana", initial_amount: "", current_value: "", purchase_date: "", quantity: "", notes: ""
   });
   const [saving, setSaving] = useState(false);
@@ -33,7 +33,7 @@ export default function AddInvestmentModal({ onClose, onSave }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-[#1A1A1A]">Tambah Investasi</h2>
+          <h2 className="text-lg font-bold text-[#1A1A1A]">{investment ? "Edit Investasi" : "Tambah Investasi"}</h2>
           <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A]"><X className="w-5 h-5" /></button>
         </div>
 
@@ -74,7 +74,7 @@ export default function AddInvestmentModal({ onClose, onSave }) {
 
         <button onClick={handleSave} disabled={saving || !form.name || !form.initial_amount || !form.current_value}
           className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] disabled:opacity-40 hover:bg-[#e05e00] transition-colors">
-          {saving ? "Menyimpan..." : "Simpan Investasi"}
+          {saving ? "Menyimpan..." : investment ? "Update Investasi" : "Simpan Investasi"}
         </button>
       </div>
     </div>
