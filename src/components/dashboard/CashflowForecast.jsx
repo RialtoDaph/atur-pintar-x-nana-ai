@@ -17,15 +17,14 @@ export default function CashflowForecast({ transactions, loading }) {
   const currentIncome = thisMonth.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const currentExpense = thisMonth.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
 
-  // Daily average expense so far (use current day if within range)
-  const daysWithTransactions = Math.max(dayOfMonth, 1);
-  const dailyExpenseAvg = daysWithTransactions > 0 ? currentExpense / daysWithTransactions : 0;
-  const projectedExtraExpense = Math.max(daysLeft, 0) * dailyExpenseAvg;
+  // Daily average expense so far
+  const dailyExpenseAvg = dayOfMonth > 0 ? currentExpense / dayOfMonth : 0;
+  const projectedExtraExpense = dailyExpenseAvg * daysLeft;
   const projectedTotalExpense = currentExpense + projectedExtraExpense;
 
   // Daily avg income
-  const dailyIncomeAvg = daysWithTransactions > 0 ? currentIncome / daysWithTransactions : 0;
-  const projectedExtraIncome = Math.max(daysLeft, 0) * dailyIncomeAvg;
+  const dailyIncomeAvg = dayOfMonth > 0 ? currentIncome / dayOfMonth : 0;
+  const projectedExtraIncome = dailyIncomeAvg * daysLeft;
   const projectedTotalIncome = currentIncome + projectedExtraIncome;
 
   const projectedBalance = projectedTotalIncome - projectedTotalExpense;
