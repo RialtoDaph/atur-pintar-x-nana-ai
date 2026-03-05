@@ -232,7 +232,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
                   // Auto-format: convert , to . for decimals
                   const formatted = val.replace(/,/g, ".").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                   setForm({ ...form, amount: formatted });
-                }}}
+                }}
               />
             </div>
           </div>
