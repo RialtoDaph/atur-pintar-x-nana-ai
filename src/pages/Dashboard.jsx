@@ -108,6 +108,9 @@ export default function Dashboard() {
         {/* Reminder Widget */}
         <ReminderWidget />
 
+        {/* Trend Chart */}
+        <TrendChart transactions={transactions} loading={loading} />
+
         {/* Personal Insights */}
         {!loading && <DashboardInsights transactions={transactions} goals={goals} />}
 
