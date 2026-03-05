@@ -187,9 +187,9 @@ export default function Analytics() {
         {/* Financial Calendar */}
         <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
 
-        {/* 12 Month Spending Trend */}
+        {/* Spending Trend */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Tren Pengeluaran (12 bulan)</h2>
+          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Tren Pengeluaran</h2>
           <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={last12Months}>
               <defs>
