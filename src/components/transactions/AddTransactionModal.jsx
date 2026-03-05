@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { X, Settings2, Camera, Loader2, Scissors } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { parseRupiah } from "@/components/utils/parseRupiah";
 import ManageCategoriesModal from "./ManageCategoriesModal";
 import SplitBillModal from "./SplitBillModal";
 import ReceiptCorrectionForm from "./ReceiptCorrectionForm";
@@ -117,7 +118,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
     await onSave({
       ...form,
       type: tab,
-      amount: parseFloat(form.amount),
+      amount: parseRupiah(form.amount),
       is_recurring: recurring,
       recurring_interval: recurring ? recurringInterval : undefined,
       recurring_last_generated: recurring ? form.date : undefined,
@@ -222,11 +223,11 @@ export default function AddTransactionModal({ onClose, onSave }) {
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-base">Rp</span>
               <input
-                autoFocus type="number"
+                autoFocus type="text" inputMode="numeric"
                 className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3.5 text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
                 placeholder="0"
                 value={form.amount}
-                onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                onChange={(e) => setForm({ ...form, amount: e.target.value.replace(/[^0-9.,]/g, "") })}
               />
             </div>
           </div>
