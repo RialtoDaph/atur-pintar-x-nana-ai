@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, Trash2, TrendingUp, TrendingDown, Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import AddInvestmentModal from "@/components/investments/AddInvestmentModal.jsx";
+import PerformanceMetrics from "@/components/investments/PerformanceMetrics";
+import DiversificationChart from "@/components/investments/DiversificationChart";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const INVESTMENT_TYPES = {
@@ -21,6 +25,8 @@ export default function InvestmentsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [editingInv, setEditingInv] = useState(null);
   const [user, setUser] = useState(null);
+  const [showWatchlist, setShowWatchlist] = useState(false);
+  const [watchlist, setWatchlist] = useState([]);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -32,8 +38,12 @@ export default function InvestmentsPage() {
 
   async function loadData() {
     setLoading(true);
-    const inv = await base44.entities.Investment.filter({ created_by: user.email }, "-created_date");
+    const [inv, watch] = await Promise.all([
+      base44.entities.Investment.filter({ created_by: user.email }, "-created_date"),
+      base44.entities.InvestmentWatchlist.filter({ created_by: user.email }, "-created_date").catch(() => []),
+    ]);
     setInvestments(inv);
+    setWatchlist(watch);
     setLoading(false);
   }
 
@@ -80,7 +90,7 @@ export default function InvestmentsPage() {
             </button>
           </div>
 
-          <div className="bg-white/10 rounded-2xl p-5">
+          <div className="bg-white/10 rounded-2xl p-5 mb-4">
             <p className="text-white/60 text-sm mb-1">{t('total_portfolio')}</p>
             <p className="text-white font-bold text-3xl mb-2">{formatCurrency(totalValue)}</p>
             <div className="flex items-center gap-1">
@@ -91,10 +101,13 @@ export default function InvestmentsPage() {
               <span className="text-white/40 text-xs ml-1">dari modal {formatCurrency(totalInvested)}</span>
             </div>
           </div>
+
+          <PerformanceMetrics investments={investments} totalValue={totalValue} totalInvested={totalInvested} formatCurrency={formatCurrency} />
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-3">
+      <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-4">
+        <DiversificationChart investments={investments} totalValue={totalValue} formatCurrency={formatCurrency} />
         {loading ? (
           [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
         ) : investments.length === 0 ? (
@@ -111,7 +124,11 @@ export default function InvestmentsPage() {
             const isPositive = gain >= 0;
             const portfolioWeight = totalValue > 0 ? ((inv.current_value / totalValue) * 100).toFixed(1) : 0;
             return (
-              <div key={inv.id} className="bg-white rounded-2xl p-5 shadow-sm">
+              <Link
+                key={inv.id}
+                to={`${createPageUrl("InvestmentDetail")}?id=${inv.id}`}
+                className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow block"
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#4F7CFF]/10 flex items-center justify-center text-xl">
@@ -122,7 +139,7 @@ export default function InvestmentsPage() {
                       <p className="text-xs text-[#8FA4C8]">{type.label} · {portfolioWeight}% portofolio</p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2" onClick={(e) => e.preventDefault()}>
                    <button onClick={() => handleEdit(inv)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors">
                      ✏️
                    </button>
@@ -144,9 +161,40 @@ export default function InvestmentsPage() {
                    </div>
                 </div>
                 {inv.notes && <p className="text-xs text-[#8FA4C8] mt-2 italic">{inv.notes}</p>}
-              </div>
+              </Link>
             );
           })
+        )}
+
+        {watchlist.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-[#1A1A1A] text-base">Pantau Aset</h2>
+              <button onClick={() => setShowWatchlist(!showWatchlist)} className="text-xs text-[#FF6A00] font-medium">
+                {showWatchlist ? "Sembunyikan" : "Tampilkan"}
+              </button>
+            </div>
+            {showWatchlist && (
+              <div className="space-y-2">
+                {watchlist.map((item) => (
+                  <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-[#1A1A1A]">{item.name}</p>
+                      <p className="text-xs text-[#8FA4C8]">{item.symbol || item.type}</p>
+                    </div>
+                    {item.current_price && (
+                      <div className="text-right">
+                        <p className="font-bold text-[#1A1A1A]">{formatCurrency(item.current_price)}</p>
+                        {item.target_price && (
+                          <p className="text-xs text-[#8FA4C8]">Target: {formatCurrency(item.target_price)}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
 
