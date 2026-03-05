@@ -78,11 +78,15 @@ export default function AssetSearch({ type, onSelect, placeholder = "Cari aset..
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold text-[#1A1A1A] text-sm">{asset.name}</p>
-                  <p className="text-xs text-[#8FA4C8]">{asset.symbol}</p>
+                  <p className="text-xs text-[#8FA4C8]">{asset.symbol} · {asset.priceFormatted || `$${asset.price?.toFixed(2)}`}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-[#1A1A1A] text-sm">{asset.priceFormatted || `$${asset.price?.toFixed(2)}`}</p>
-                  {asset.change24h && (
+                  {asset.changePercent && (
+                    <p className={`text-xs font-semibold ${asset.changePercent >= 0 ? 'text-[#00C9A7]' : 'text-[#FF6B6B]'}`}>
+                      {asset.changePercent >= 0 ? '+' : ''}{asset.changePercent.toFixed(2)}%
+                    </p>
+                  )}
+                  {asset.change24h && !asset.changePercent && (
                     <p className={`text-xs ${asset.change24h >= 0 ? 'text-[#00C9A7]' : 'text-[#FF6B6B]'}`}>
                       {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                     </p>

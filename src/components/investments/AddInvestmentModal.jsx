@@ -27,12 +27,14 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
     if (!form.name) return;
     setFetchingPrice(true);
     try {
-      const response = await base44.functions.invoke('getInvestmentPrice', {
-        symbol: form.name,
-        type: form.type === 'crypto' ? 'crypto' : 'stock'
+      const response = await base44.functions.invoke('searchAssets', {
+        query: form.name,
+        type: form.type
       });
-      if (response.data?.price) {
-        setForm(f => ({ ...f, current_value: response.data.price.toString() }));
+      if (response.data?.results?.[0]) {
+        const asset = response.data.results[0];
+        setForm(f => ({ ...f, current_value: asset.price?.toString() || "" }));
+        setPricePerUnit(asset.price?.toString() || "");
       }
     } catch (e) {
       console.log('Price fetch failed:', e.message);
