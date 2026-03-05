@@ -43,7 +43,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Settings", label: "Pengaturan", icon: Settings, page: "Settings" },
   ];
 
-  // Mobile: only 4 main + "More"
+  // Mobile: only 4 main + "Lainnya"
   const mobileMainNav = [
     { name: "Dashboard", label: "Home", icon: LayoutDashboard, page: "Dashboard" },
     { name: "Transactions", label: "Transaksi", icon: ArrowLeftRight, page: "Transactions" },
@@ -51,15 +51,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Investments", label: "Investasi", icon: TrendingUp, page: "Investments" },
   ];
 
-  const mobileMoreNav = [
-    { name: "Goals", label: "Tujuan", icon: Target, page: "Goals" },
-    { name: "Budget", label: "Anggaran", icon: PiggyBank, page: "Budget" },
-    { name: "Debts", label: "Utang", icon: CreditCard, page: "Debts" },
-    { name: "Alerts", label: "Alerts", icon: Bell, page: "Alerts" },
-    { name: "Tips", label: "Tips", icon: Lightbulb, page: "Tips" },
-    { name: "Settings", label: "Setting", icon: Settings, page: "Settings" },
-    { name: "Reminders", label: "Pengingat", icon: Bell, page: "Reminders" },
-  ];
+  const mobileMorePages = ["Goals", "Budget", "Debts", "Reminders", "Alerts", "Tips", "Settings", "Menu"];
 
   const initials = user?.full_name ? user.full_name.split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase() : "U";
 
