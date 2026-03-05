@@ -79,37 +79,32 @@ export default function AddTransactionModal({ onClose, onSave }) {
     setShowSplitBill(false);
     setSaving(true);
 
-    if (splitMode === "equal") {
-      // One transaction per participant
-      for (const share of shares) {
-        const note = share.name === "Saya"
-          ? `${receiptData.store_name} (split bill)`
-          : `${receiptData.store_name} — dibayarkan untuk ${share.name}`;
-        await onSave({
-          type: "expense",
-          amount: share.amount,
-          category: form.category || "food",
-          note,
-          date: form.date,
-          is_recurring: false,
-        });
-      }
-    } else {
-      // itemized: one transaction per participant based on allocated items
-      for (const share of shares) {
-        if (share.amount <= 0) continue;
-        const note = share.name === "Saya"
-          ? `${receiptData.store_name} (split bill)`
-          : `${receiptData.store_name} — dibayarkan untuk ${share.name}`;
-        await onSave({
-          type: "expense",
-          amount: share.amount,
-          category: form.category || "food",
-          note,
-          date: form.date,
-          is_recurring: false,
-        });
-      }
+    const myShare = shares.find(s => s.name === "Saya");
+
+    // Save my own transaction (full amount — I paid upfront)
+    await onSave({
+      type: "expense",
+      amount: receiptData.total_amount,
+      category: form.category || "food",
+      note: `${receiptData.store_name} (split bill)`,
+      date: form.date,
+      is_recurring: false,
+    });
+
+    // Create IOU records for each non-"Saya" participant
+    for (const share of shares) {
+      if (share.name === "Saya" || share.amount <= 0) continue;
+      await base44.entities.SplitIOU.create({
+        store_name: receiptData.store_name,
+        date: form.date,
+        debtor_name: share.name,
+        debtor_email: share.email || "",
+        creditor_name: "Saya",
+        amount: share.amount,
+        status: "unpaid",
+        receipt_image_url: receiptData.receipt_image_url || "",
+        notes: `Split bill ${splitMode === "equal" ? "bagi rata" : "per item"}`,
+      });
     }
 
     setSaving(false);
