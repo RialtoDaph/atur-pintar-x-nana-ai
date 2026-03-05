@@ -118,12 +118,20 @@ export default function Transactions() {
             <p className="text-[#8FA4C8] text-sm font-medium">Riwayat</p>
             <h1 className="text-white text-2xl font-bold mt-0.5">Transaksi</h1>
           </div>
-          <button
-            onClick={() => setShowAddTx(true)}
-            className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
-          >
-            <Plus className="w-5 h-5 text-white" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${selectMode ? "bg-white text-[#0A0A0A]" : "bg-white/10 text-white hover:bg-white/20"}`}
+            >
+              {selectMode ? "Batal" : "Pilih"}
+            </button>
+            <button
+              onClick={() => setShowAddTx(true)}
+              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+            >
+              <Plus className="w-5 h-5 text-white" />
+            </button>
+          </div>
         </div>
       </div>
 
