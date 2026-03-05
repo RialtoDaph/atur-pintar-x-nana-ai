@@ -23,23 +23,19 @@ export default function IntegrationSettings() {
   async function handleExportToSheets() {
     setExportingSheets(true);
     setMessage(null);
-    const response = await base44.functions.invoke("exportToGoogleSheets", {});
-    setExportingSheets(false);
-    if (response.data) {
-      // For now, download as JSON since Google Sheets auth not yet set up
-      const dataStr = JSON.stringify(response.data, null, 2);
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `atur-in-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      setMessage({ type: "success", text: "📊 Data berhasil diunduh!" });
-      setTimeout(() => setMessage(null), 3000);
-    } else {
+    try {
+      const response = await base44.functions.invoke("exportMonthlyReportToGoogleSheets", {});
+      if (response.data?.spreadsheetUrl) {
+        setMessage({ type: "success", text: "📊 Laporan berhasil dibuat di Google Sheets!" });
+        window.open(response.data.spreadsheetUrl, '_blank');
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: "error", text: "Gagal membuat laporan. Coba lagi." });
+      }
+    } catch (error) {
       setMessage({ type: "error", text: "Gagal mengekspor data. Coba lagi." });
     }
+    setExportingSheets(false);
   }
 
   return (
