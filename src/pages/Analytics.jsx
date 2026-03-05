@@ -181,6 +181,9 @@ export default function Analytics() {
 
       <div className="max-w-2xl mx-auto px-5 mt-6 space-y-5">
 
+        {/* Date Range Filter */}
+        <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
+
         {/* Financial Calendar */}
         <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
 
