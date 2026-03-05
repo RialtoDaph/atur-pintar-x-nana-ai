@@ -18,6 +18,7 @@ import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
+import BudgetAlertWidget from "@/components/dashboard/BudgetAlertWidget";
 
 function getWidgets() {
   const saved = localStorage.getItem("widgets");

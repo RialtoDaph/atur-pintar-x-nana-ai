@@ -50,7 +50,6 @@
 import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
 import Budget from './pages/Budget';
-import Dashboard from './pages/Dashboard';
 import Debts from './pages/Debts';
 import Goals from './pages/Goals';
 import Investments from './pages/Investments';
@@ -60,6 +59,7 @@ import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import Tips from './pages/Tips';
 import Transactions from './pages/Transactions';
+import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -67,7 +67,6 @@ export const PAGES = {
     "Alerts": Alerts,
     "Analytics": Analytics,
     "Budget": Budget,
-    "Dashboard": Dashboard,
     "Debts": Debts,
     "Goals": Goals,
     "Investments": Investments,
@@ -77,6 +76,7 @@ export const PAGES = {
     "Settings": Settings,
     "Tips": Tips,
     "Transactions": Transactions,
+    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
