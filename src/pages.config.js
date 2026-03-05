@@ -54,12 +54,12 @@ import Dashboard from './pages/Dashboard';
 import Debts from './pages/Debts';
 import Goals from './pages/Goals';
 import Investments from './pages/Investments';
+import Menu from './pages/Menu';
 import Nana from './pages/Nana';
 import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import Tips from './pages/Tips';
 import Transactions from './pages/Transactions';
-import Menu from './pages/Menu';
 import __Layout from './Layout.jsx';
 
 
@@ -71,12 +71,12 @@ export const PAGES = {
     "Debts": Debts,
     "Goals": Goals,
     "Investments": Investments,
+    "Menu": Menu,
     "Nana": Nana,
     "Reminders": Reminders,
     "Settings": Settings,
     "Tips": Tips,
     "Transactions": Transactions,
-    "Menu": Menu,
 }
 
 export const pagesConfig = {

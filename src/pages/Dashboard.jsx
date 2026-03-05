@@ -17,6 +17,7 @@ import CashflowForecast from "@/components/dashboard/CashflowForecast";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
+import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
 
 function getWidgets() {
   const saved = localStorage.getItem("widgets");
