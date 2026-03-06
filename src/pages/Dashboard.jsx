@@ -21,7 +21,7 @@ import ReminderWidget from "@/components/reminders/ReminderWidget";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
 import BudgetAlertWidget from "@/components/dashboard/BudgetAlertWidget";
-import IncomeExpenseChart from "@/components/dashboard/IncomeExpenseChart";
+
 
 function getWidgets() {
   const saved = localStorage.getItem("widgets");
@@ -135,8 +135,7 @@ export default function Dashboard() {
         {/* Subscription Detector */}
         {widgets.subscriptionDetector && <SubscriptionDetector transactions={transactions} loading={loading} />}
 
-        {/* Income vs Expense Chart */}
-        <IncomeExpenseChart transactions={transactions} loading={loading} />
+
 
         {/* Spending breakdown */}
         {widgets.spendingChart && <SpendingChart transactions={thisMonthTx} loading={loading} />}

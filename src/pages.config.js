@@ -50,6 +50,9 @@
 import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
 import Budget from './pages/Budget';
+import Dashboard from './pages/Dashboard';
+import Debts from './pages/Debts';
+import Goals from './pages/Goals';
 import InvestmentDetail from './pages/InvestmentDetail';
 import Investments from './pages/Investments';
 import Menu from './pages/Menu';
@@ -58,9 +61,6 @@ import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import Tips from './pages/Tips';
 import Transactions from './pages/Transactions';
-import Debts from './pages/Debts';
-import Dashboard from './pages/Dashboard';
-import Goals from './pages/Goals';
 import __Layout from './Layout.jsx';
 
 
@@ -68,6 +68,9 @@ export const PAGES = {
     "Alerts": Alerts,
     "Analytics": Analytics,
     "Budget": Budget,
+    "Dashboard": Dashboard,
+    "Debts": Debts,
+    "Goals": Goals,
     "InvestmentDetail": InvestmentDetail,
     "Investments": Investments,
     "Menu": Menu,
@@ -76,9 +79,6 @@ export const PAGES = {
     "Settings": Settings,
     "Tips": Tips,
     "Transactions": Transactions,
-    "Debts": Debts,
-    "Dashboard": Dashboard,
-    "Goals": Goals,
 }
 
 export const pagesConfig = {
