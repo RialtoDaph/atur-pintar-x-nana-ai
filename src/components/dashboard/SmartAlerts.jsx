@@ -19,25 +19,25 @@ export default function SmartAlerts({ transactions, loading }) {
     if (loading) return;
 
     const now = new Date();
-    const thisMonth = transactions.filter(t => {
+    const thisMonth = transactions.filter((t) => {
       const d = new Date(t.date);
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     });
-    const lastMonth = transactions.filter(t => {
+    const lastMonth = transactions.filter((t) => {
       const d = new Date(t.date);
       const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
     });
 
-    const thisExpense = thisMonth.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-    const lastExpense = lastMonth.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-    const thisIncome = thisMonth.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+    const thisExpense = thisMonth.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+    const lastExpense = lastMonth.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+    const thisIncome = thisMonth.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
 
     const generatedAlerts = [];
 
     // Alert 1: Spending spike
     if (lastExpense > 0 && thisExpense > lastExpense) {
-      const pct = Math.round(((thisExpense - lastExpense) / lastExpense) * 100);
+      const pct = Math.round((thisExpense - lastExpense) / lastExpense * 100);
       const alertId = "spending_spike";
       if (!dismissedIds.includes(alertId)) {
         generatedAlerts.push({
@@ -50,7 +50,7 @@ export default function SmartAlerts({ transactions, loading }) {
           title: t('alert_spending_spike') || "Pengeluaran Meningkat",
           text: `Pengeluaran naik ${pct}% dibanding bulan lalu`,
           severity: "medium",
-          message: `Pengeluaran naik ${pct}% dibanding bulan lalu`,
+          message: `Pengeluaran naik ${pct}% dibanding bulan lalu`
         });
 
         // Save to database
@@ -65,7 +65,7 @@ export default function SmartAlerts({ transactions, loading }) {
     }
 
     // Alert 2: High single transactions
-    const highTx = thisMonth.filter(t => t.type === "expense" && t.amount > 500000);
+    const highTx = thisMonth.filter((t) => t.type === "expense" && t.amount > 500000);
     if (highTx.length > 0) {
       const alertId = "high_transactions";
       if (!dismissedIds.includes(alertId)) {
@@ -79,7 +79,7 @@ export default function SmartAlerts({ transactions, loading }) {
           title: t('alert_high_transaction') || "Transaksi Besar",
           text: `${highTx.length} transaksi besar (>Rp 500rb) bulan ini`,
           severity: "high",
-          message: `${highTx.length} transaksi besar (>Rp 500rb) bulan ini`,
+          message: `${highTx.length} transaksi besar (>Rp 500rb) bulan ini`
         });
 
         // Save to database
@@ -95,7 +95,7 @@ export default function SmartAlerts({ transactions, loading }) {
 
     // Alert 3: High expense ratio
     if (thisIncome > 0 && thisExpense / thisIncome > 0.8) {
-      const ratio = Math.round((thisExpense / thisIncome) * 100);
+      const ratio = Math.round(thisExpense / thisIncome * 100);
       const alertId = "high_expense_ratio";
       if (!dismissedIds.includes(alertId)) {
         generatedAlerts.push({
@@ -108,7 +108,7 @@ export default function SmartAlerts({ transactions, loading }) {
           title: t('alert_expense_ratio') || "Pengeluaran Tinggi",
           text: `Kamu sudah pakai ${ratio}% dari pemasukan bulan ini`,
           severity: "medium",
-          message: `Kamu sudah pakai ${ratio}% dari pemasukan bulan ini`,
+          message: `Kamu sudah pakai ${ratio}% dari pemasukan bulan ini`
         });
 
         // Save to database
@@ -139,7 +139,7 @@ export default function SmartAlerts({ transactions, loading }) {
       if (existing.length === 0) {
         await base44.entities.Alert.create({
           ...alertData,
-          status: "unread",
+          status: "unread"
         });
       }
     } catch (error) {
@@ -151,26 +151,26 @@ export default function SmartAlerts({ transactions, loading }) {
     const updated = [...dismissedIds, alertId];
     setDismissedIds(updated);
     localStorage.setItem("dismissed_smart_alerts", JSON.stringify(updated));
-    setAlerts(alerts.filter(a => a.id !== alertId));
+    setAlerts(alerts.filter((a) => a.id !== alertId));
   }
 
   if (loading || alerts.length === 0) return null;
 
-  return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 space-y-1.5">
-      <h2 className="font-bold text-[#0A0A0A] text-sm mb-2">{t('smart_alerts_title')}</h2>
-      {alerts.map((a) => (
-        <div key={a.id} className={`flex items-start gap-2.5 rounded-xl px-3 py-2.5 border ${a.bg} ${a.border}`}>
-          <a.icon className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${a.color}`} />
-          <p className="text-xs text-[#1A1A1A] font-medium flex-1">{a.text}</p>
-          <button
-            onClick={() => handleDismiss(a.id)}
-            className="text-[#CBD5E0] hover:text-[#1A1A1A] transition-colors flex-shrink-0"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      ))}
-    </div>
-  );
+  return null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
