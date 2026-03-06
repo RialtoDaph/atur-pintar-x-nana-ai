@@ -42,6 +42,48 @@ export function useFinancialContext() {
       const thisExpense = thisTx.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
       const lastExpense = lastTx.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
 
+      // Calculate projected expense (similar to EstimatedExpense component logic)
+      const dayOfMonth = now.getDate();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysLeft = Math.max(0, daysInMonth - dayOfMonth);
+      
+      // Get recurring expense templates
+      const recurringTemplates = transactions.filter((t) => t.is_recurring && t.type === "expense");
+      
+      // Count future recurring occurrences this month
+      let scheduledFutureExpense = 0;
+      const childParentIdsThisMonth = new Set(
+        thisTx.filter((t) => t.is_recurring_child && t.recurring_parent_id).map((t) => t.recurring_parent_id)
+      );
+
+      for (const tpl of recurringTemplates) {
+        const interval = tpl.recurring_interval;
+        const templateDate = new Date(tpl.date);
+        const templateDay = templateDate.getDate();
+        const futureStart = dayOfMonth + 1;
+
+        if (interval === "monthly" && !childParentIdsThisMonth.has(tpl.id)) {
+          if (templateDay >= futureStart && templateDay <= daysInMonth) {
+            scheduledFutureExpense += tpl.amount;
+          }
+        } else if (interval === "weekly") {
+          const templateWeekday = templateDate.getDay();
+          for (let d = futureStart; d <= daysInMonth; d++) {
+            const wd = new Date(now.getFullYear(), now.getMonth(), d).getDay();
+            if (wd === templateWeekday) scheduledFutureExpense += tpl.amount;
+          }
+        } else if (interval === "daily") {
+          scheduledFutureExpense += tpl.amount * daysLeft;
+        }
+      }
+
+      // Non-recurring expense average
+      const nonRecurringExpense = thisTx.filter((t) => t.type === "expense" && !t.is_recurring_child).reduce((s, t) => s + t.amount, 0);
+      const daysElapsed = Math.max(15, dayOfMonth - 1);
+      const dailyExpenseAvg = nonRecurringExpense / daysElapsed;
+      const projectedExtraExpense = dailyExpenseAvg * daysLeft + scheduledFutureExpense;
+      const projectedTotalExpense = thisExpense + projectedExtraExpense;
+
       // Category breakdown this month
       const catBreakdown = {};
       thisTx.filter((t) => t.type === "expense").forEach((t) => {
@@ -96,6 +138,7 @@ export function useFinancialContext() {
         thisMonth: {
           income: thisIncome,
           expense: thisExpense,
+          projectedExpense: Math.round(projectedTotalExpense),
           net: thisIncome - thisExpense,
           expenseVsLastMonth: lastExpense ? Math.round(((thisExpense - lastExpense) / lastExpense) * 100) : null,
           categoryBreakdown: catBreakdown,
@@ -152,7 +195,8 @@ export function useFinancialContext() {
       snapshot.riskProfile ? `Profil Risiko: ${snapshot.riskProfile.risk_tolerance}, Pengalaman=${snapshot.riskProfile.investment_experience}, Tujuan=${snapshot.riskProfile.financial_goal}` : "",
       `\nKEUANGAN BULAN INI:`,
       `- Pemasukan: ${fmt(snapshot.thisMonth.income)}`,
-      `- Pengeluaran: ${fmt(snapshot.thisMonth.expense)}`,
+      `- Pengeluaran saat ini: ${fmt(snapshot.thisMonth.expense)}`,
+      `- Est. Pengeluaran akhir bulan: ${fmt(snapshot.thisMonth.projectedExpense)}`,
       `- Net: ${fmt(snapshot.thisMonth.net)}${snapshot.thisMonth.expenseVsLastMonth !== null ? ` (pengeluaran ${snapshot.thisMonth.expenseVsLastMonth > 0 ? "+" : ""}${snapshot.thisMonth.expenseVsLastMonth}% vs bulan lalu)` : ""}`,
     ];
 
