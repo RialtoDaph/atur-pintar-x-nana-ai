@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { X, Settings2 } from "lucide-react";
+import { X, Settings2, GripVertical } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { parseRupiah } from "@/components/utils/parseRupiah";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import ManageCategoriesModal from "./ManageCategoriesModal";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const DEFAULT_CATEGORIES = {
   expense: [
@@ -36,10 +37,21 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const [saving, setSaving] = useState(false);
   const [customCats, setCustomCats] = useState([]);
   const [showManage, setShowManage] = useState(false);
+  const [catOrder, setCatOrder] = useState([]);
+  const [appSettings, setAppSettings] = useState(null);
 
   useEffect(() => {
     loadCustomCats();
+    loadAppSettings();
   }, []);
+
+  async function loadAppSettings() {
+    const settings = await base44.entities.AppSettings.list();
+    if (settings.length > 0) {
+      setAppSettings(settings[0]);
+      setCatOrder(settings[0].category_order || []);
+    }
+  }
 
   useEffect(() => {
     const unsubscribe = base44.entities.CustomCategory.subscribe((event) => {
@@ -69,8 +81,37 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const filteredCustom = customCats.filter(c => c.type === tab || c.type === "both");
   const allCats = [
     ...defaultCats.map(c => ({ ...c, label: t(c.i18nKey) })),
-    ...filteredCustom.map(c => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji, color: c.color || "#888" })),
+    ...filteredCustom.map(c => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji, color: c.color || "#888", parent_category_key: c.parent_category_key })),
   ];
+
+  // Build category structure with sub-categories
+  const mainCats = allCats.filter(c => !c.parent_category_key);
+  const subCatsByParent = {};
+  allCats.filter(c => c.parent_category_key).forEach(c => {
+    if (!subCatsByParent[c.parent_category_key]) subCatsByParent[c.parent_category_key] = [];
+    subCatsByParent[c.parent_category_key].push(c);
+  });
+  
+  // Apply drag order if available
+  const orderedCats = catOrder.length > 0 
+    ? catOrder.map(key => mainCats.find(c => c.key === key)).filter(Boolean)
+    : mainCats;
+
+  const handleDragEnd = async (result) => {
+    const { source, destination } = result;
+    if (!destination || source.index === destination.index) return;
+    
+    const newOrder = Array.from(orderedCats);
+    const [moved] = newOrder.splice(source.index, 1);
+    newOrder.splice(destination.index, 0, moved);
+    const newOrderKeys = newOrder.map(c => c.key);
+    setCatOrder(newOrderKeys);
+    
+    // Save to AppSettings
+    if (appSettings) {
+      await base44.entities.AppSettings.update(appSettings.id, { category_order: newOrderKeys });
+    }
+  };
 
   return (
     <>
@@ -132,17 +173,65 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
           {/* Category */}
           <div className="mb-4">
             <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('category')}</label>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {allCats.map((c) => (
-                <button key={c.key} onClick={() => setForm({ ...form, category: c.key })}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
-                    form.category === c.key ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"
-                  }`}>
-                  <span className="text-lg sm:text-xl">{c.emoji}</span>
-                  <span className="text-[9px] sm:text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
-                </button>
-              ))}
-            </div>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="categories" direction="horizontal">
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`grid grid-cols-3 sm:grid-cols-4 gap-2 p-2 rounded-lg transition-colors ${snapshot.isDraggingOver ? "bg-[#FF6A00]/5" : ""}`}
+                  >
+                    {orderedCats.map((c, idx) => (
+                      <Draggable key={c.key} draggableId={c.key} index={idx}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={`relative transition-all ${snapshot.isDragging ? "opacity-50" : ""}`}
+                          >
+                            <div>
+                              <button
+                                {...provided.dragHandleProps}
+                                onClick={() => setForm({ ...form, category: c.key })}
+                                className={`w-full flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
+                                  form.category === c.key ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"
+                                }`}
+                              >
+                                <span className="text-lg sm:text-xl">{c.emoji}</span>
+                                <span className="text-[9px] sm:text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
+                              </button>
+                              {/* Sub-categories */}
+                              {subCatsByParent[c.key]?.length > 0 && (
+                                <div className="mt-1.5 pl-1 space-y-1">
+                                  {subCatsByParent[c.key].map(sub => (
+                                    <button
+                                      key={sub.key}
+                                      onClick={() => setForm({ ...form, category: sub.key })}
+                                      className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-[8px] sm:text-[9px] font-medium transition-all ${
+                                        form.category === sub.key ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]" : "border-[#E2E8F0] bg-white text-[#4A5568] hover:border-[#CBD5E0]"
+                                      }`}
+                                    >
+                                      <span>{sub.emoji}</span>
+                                      <span className="truncate">{sub.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            {snapshot.isDragging && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl">
+                                <GripVertical className="w-4 h-4 text-[#FF6A00]" />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
 
           {/* Note & Date & Goal */}
