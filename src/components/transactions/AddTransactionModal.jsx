@@ -241,7 +241,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
 
           {/* Category */}
           <div className="mb-5">
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">Category</label>
+            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('category')}</label>
             <div className="grid grid-cols-4 gap-2">
               {allCats.map((c) => (
                 <button key={c.key} onClick={() => setForm({ ...form, category: c.key })}
