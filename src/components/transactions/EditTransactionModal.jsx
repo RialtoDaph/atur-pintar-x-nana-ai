@@ -56,7 +56,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const defaultCats = DEFAULT_CATEGORIES[tab] || [];
   const filteredCustom = customCats.filter(c => c.type === tab || c.type === "both");
   const allCats = [
-    ...defaultCats,
+    ...defaultCats.map(c => ({ ...c, label: t(c.i18nKey) })),
     ...filteredCustom.map(c => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji, color: c.color || "#888" })),
   ];
 
