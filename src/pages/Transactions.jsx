@@ -237,7 +237,7 @@ export default function Transactions() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="text-sm font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
-                          {isIncome ? "+" : "−"}{formatRupiah(tx.amount)}
+                          {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
                         </span>
                         {!selectMode && (
                           <>
