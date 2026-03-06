@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Settings2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 import ManageCategoriesModal from "./ManageCategoriesModal";
 
 const DEFAULT_CATEGORIES = {
