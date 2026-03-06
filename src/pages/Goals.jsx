@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, Plus, Minus, Trash2, CheckCircle, TrendingUp, Calendar, Zap } from "lucide-react";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import AddTransactionModal from "@/components/goals/AddTransactionModal";
@@ -16,6 +17,7 @@ const COLORS = {
 };
 
 export default function Goals() {
+  const { t, formatCurrency } = useAppSettings();
   const urlParams = new URLSearchParams(window.location.search);
   const goalId = urlParams.get("id");
 
@@ -75,7 +77,7 @@ export default function Goals() {
   }
 
   async function handleDelete() {
-    if (!window.confirm("Hapus tujuan ini?")) return;
+    if (!window.confirm(t('goals_delete_confirm'))) return;
     await base44.entities.SavingsGoal.delete(goalId);
     window.location.href = createPageUrl("Dashboard");
   }
@@ -121,7 +123,7 @@ export default function Goals() {
     return (
       <div className="min-h-screen bg-[#F7F6F3] max-w-lg mx-auto px-4 py-8">
         <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2 text-[#9B9B9B] hover:text-[#0A0A0A] text-sm mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back
+          <ArrowLeft className="w-4 h-4" /> {t('goals_back')}
         </Link>
 
         {/* Goal hero */}
@@ -145,7 +147,7 @@ export default function Goals() {
               <span className="font-bold text-[#1A1A1A] text-2xl">
                 Rp {(goal.current_amount || 0).toLocaleString("id-ID")}
               </span>
-              <span className="text-[#9B9B9B] self-end text-sm">dari Rp {goal.target_amount.toLocaleString("id-ID")}</span>
+              <span className="text-[#9B9B9B] self-end text-sm">dari {formatCurrency(goal.target_amount)}</span>
             </div>
             <div className="h-2 bg-[#F0F0EE] rounded-full overflow-hidden">
               <div
@@ -154,8 +156,8 @@ export default function Goals() {
               />
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-xs text-[#9B9B9B]">{progress.toFixed(1)}% tercapai</span>
-              {remaining > 0 && <span className="text-xs text-[#9B9B9B]">Sisa Rp {remaining.toLocaleString("id-ID")}</span>}
+              <span className="text-xs text-[#9B9B9B]">{progress.toFixed(1)}{t('goals_achieved_pct')}</span>
+              {remaining > 0 && <span className="text-xs text-[#9B9B9B]">{t('goals_remaining')} {formatCurrency(remaining)}</span>}
             </div>
           </div>
 
@@ -173,13 +175,13 @@ export default function Goals() {
                 onClick={() => setShowTxModal("deposit")}
                 className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors"
               >
-                <Plus className="w-4 h-4" /> Add Money
+                <Plus className="w-4 h-4" /> {t('goals_add_money')}
               </button>
               <button
                 onClick={() => setShowTxModal("withdrawal")}
                 className="flex items-center justify-center gap-2 bg-[#F7F6F3] text-[#1A1A1A] py-3 rounded-xl text-sm font-semibold hover:bg-[#EFEFED] transition-colors border border-[#EFEFED]"
               >
-                <Minus className="w-4 h-4" /> Withdraw
+                <Minus className="w-4 h-4" /> {t('goals_withdraw')}
               </button>
             </div>
           )}
@@ -187,14 +189,14 @@ export default function Goals() {
 
         {/* Transactions */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold text-[#1A1A1A]">Activity</h2>
+          <h2 className="font-semibold text-[#1A1A1A]">{t('goals_activity')}</h2>
           <button onClick={handleDelete} className="text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1">
-            <Trash2 className="w-3.5 h-3.5" /> Delete goal
+            <Trash2 className="w-3.5 h-3.5" /> {t('goals_delete_goal')}
           </button>
         </div>
 
         {transactions.length === 0 ? (
-          <div className="text-center py-12 text-[#9B9B9B] text-sm">No transactions yet</div>
+          <div className="text-center py-12 text-[#9B9B9B] text-sm">{t('goals_no_tx')}</div>
         ) : (
           <div className="space-y-2">
             {transactions.map((tx) => (
