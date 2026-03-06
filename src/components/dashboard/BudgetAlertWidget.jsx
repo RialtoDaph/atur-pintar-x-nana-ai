@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { AlertTriangle, CheckCircle, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const DEFAULT_CATEGORIES = {
   housing: { label: "Housing", emoji: "🏠", color: "#4F7CFF" },
