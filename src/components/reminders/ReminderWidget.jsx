@@ -20,6 +20,7 @@ const TYPE_EMOJI = {
 };
 
 export default function ReminderWidget() {
+  const { formatCurrency } = useAppSettings();
   const [reminders, setReminders] = useState([]);
 
   useEffect(() => {
