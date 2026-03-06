@@ -38,8 +38,20 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const [showManage, setShowManage] = useState(false);
 
   useEffect(() => {
-    base44.entities.CustomCategory.list("-created_date").then(setCustomCats);
+    loadCustomCats();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = base44.entities.CustomCategory.subscribe((event) => {
+      loadCustomCats();
+    });
+    return unsubscribe;
+  }, []);
+
+  async function loadCustomCats() {
+    const cats = await base44.entities.CustomCategory.list("-created_date");
+    setCustomCats(cats);
+  }
 
   async function handleSave() {
     if (!form.amount || !form.category) return;

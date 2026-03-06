@@ -46,6 +46,11 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
   const fileRef = useRef(null);
 
   useEffect(() => { loadCustomCats(); }, []);
+  useEffect(() => {
+    base44.entities.CustomCategory.subscribe((event) => {
+      loadCustomCats();
+    });
+  }, []);
 
   async function loadCustomCats() {
     const cats = await base44.entities.CustomCategory.list("-created_date");
