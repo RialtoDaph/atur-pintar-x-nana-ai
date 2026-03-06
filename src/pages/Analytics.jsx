@@ -11,16 +11,16 @@ import {
 
 const CATEGORY_CONFIG = {
   housing:       { label: "Housing",       emoji: "🏠", color: "#4F7CFF" },
-  food:          { label: "Food",           emoji: "🍔", color: "#FF6B6B" },
+  food:          { label: "Food",           emoji: "🍔", color: "#00C9A7" },
   transport:     { label: "Transport",      emoji: "🚗", color: "#F5A623" },
-  health:        { label: "Health",         emoji: "❤️", color: "#FF5E8A" },
+  health:        { label: "Health",         emoji: "❤️", color: "#FF6B6B" },
   entertainment: { label: "Entertainment",  emoji: "🎬", color: "#9B59B6" },
   shopping:      { label: "Shopping",       emoji: "🛍️", color: "#E91E8C" },
   subscriptions: { label: "Subscriptions",  emoji: "📱", color: "#1ABC9C" },
-  salary:        { label: "Salary",         emoji: "💼", color: "#00C9A7" },
-  freelance:     { label: "Freelance",      emoji: "💻", color: "#34C87A" },
-  savings:       { label: "Savings",        emoji: "🐷", color: "#4F7CFF" },
-  other:         { label: "Other",          emoji: "📦", color: "#8FA4C8" },
+  salary:        { label: "Salary",         emoji: "💼", color: "#27AE60" },
+  freelance:     { label: "Freelance",      emoji: "💻", color: "#2ECC71" },
+  savings:       { label: "Savings",        emoji: "💰", color: "#3498DB" },
+  other:         { label: "Other",          emoji: "📦", color: "#95A5A6" },
 };
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];

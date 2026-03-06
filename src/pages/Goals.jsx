@@ -157,7 +157,7 @@ export default function Goals() {
             </div>
             <div className="flex justify-between mt-2">
               <span className="text-xs text-[#9B9B9B]">{progress.toFixed(1)}{t('goals_achieved_pct')}</span>
-              {remaining > 0 && <span className="text-xs text-[#9B9B9B]">{t('goals_remaining')} {formatCurrency(remaining)}</span>}
+               {remaining > 0 && <span className="text-xs text-[#9B9B9B]">{t('goals_remaining')} {formatCurrency(remaining)}</span>}
             </div>
           </div>
 
@@ -217,10 +217,10 @@ export default function Goals() {
                   </div>
                 </div>
                 <span
-                  className="text-sm font-bold"
-                  style={{ color: tx.type === "deposit" ? "#34C87A" : "#FF5252" }}
+                className="text-sm font-bold"
+                style={{ color: tx.type === "deposit" ? "#34C87A" : "#FF5252" }}
                 >
-                  {tx.type === "deposit" ? "+" : "−"}Rp {tx.amount.toLocaleString("id-ID")}
+                {tx.type === "deposit" ? "+" : "−"}{formatCurrency(tx.amount)}
                 </span>
               </div>
             ))}
@@ -312,7 +312,7 @@ export default function Goals() {
 
                 <div className="mb-3">
                   <div className="flex justify-between text-xs mb-1.5">
-                    <span className="text-[#4A5568] font-medium">Rp {(g.current_amount || 0).toLocaleString("id-ID")} dari Rp {g.target_amount.toLocaleString("id-ID")}</span>
+                    <span className="text-[#4A5568] font-medium">{formatCurrency(g.current_amount || 0)} dari {formatCurrency(g.target_amount)}</span>
                     <span className="font-bold" style={{ color }}>{progress.toFixed(0)}%</span>
                   </div>
                   <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden">
@@ -329,9 +329,9 @@ export default function Goals() {
                   )}
                   {suggestedMonthly && (
                     <div className={`flex items-center gap-1 ${isUrgent ? "text-[#FF6B6B]" : "text-[#8FA4C8]"}`}>
-                      <Zap className="w-3.5 h-3.5" />
-                      Rp {suggestedMonthly.toLocaleString("id-ID")}/bln
-                    </div>
+                       <Zap className="w-3.5 h-3.5" />
+                       {formatCurrency(suggestedMonthly)}/bln
+                     </div>
                   )}
                 </div>
               </Link>

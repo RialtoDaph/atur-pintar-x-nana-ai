@@ -66,7 +66,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
           </div>
         </div>
         <Link to={createPageUrl("Budget")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
-          Lihat <ChevronRight className="w-3 h-3" />
+          {t('view_all')} <ChevronRight className="w-3 h-3" />
         </Link>
       </div>
     );
@@ -80,7 +80,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
           <h2 className="font-bold text-[#0A0A0A] text-sm">{t('budget_alert_title')}</h2>
         </div>
         <Link to={createPageUrl("Budget")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
-          Lihat semua <ChevronRight className="w-3 h-3" />
+          {t('view_all')} <ChevronRight className="w-3 h-3" />
         </Link>
       </div>
 
