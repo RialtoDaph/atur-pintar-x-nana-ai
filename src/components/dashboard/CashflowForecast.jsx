@@ -2,7 +2,7 @@ import { TrendingUp, TrendingDown, Calendar } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function CashflowForecast({ transactions, loading }) {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, t } = useAppSettings();
   if (loading) return null;
 
   const now = new Date();

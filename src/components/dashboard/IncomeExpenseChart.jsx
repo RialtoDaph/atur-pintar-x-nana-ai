@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function IncomeExpenseChart({ transactions, loading }) {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, t } = useAppSettings();
   const [months, setMonths] = useState(6);
 
   const chartData = useMemo(() => {

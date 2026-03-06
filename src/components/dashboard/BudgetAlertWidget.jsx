@@ -17,7 +17,7 @@ const DEFAULT_CATEGORIES = {
 };
 
 export default function BudgetAlertWidget({ transactions = [], loading = false, budgets = [] }) {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, t } = useAppSettings();
   const currentMonth = useMemo(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;

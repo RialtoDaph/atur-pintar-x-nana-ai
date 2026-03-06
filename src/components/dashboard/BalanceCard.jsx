@@ -2,7 +2,7 @@ import { TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function BalanceCard({ income, expense, savings, loading }) {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, t } = useAppSettings();
   const balance = income - expense;
 
   if (loading) {

@@ -2,7 +2,7 @@ import { RefreshCw } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function SubscriptionDetector({ transactions, loading }) {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, t } = useAppSettings();
   if (loading) return null;
 
   const subs = transactions.filter(t => t.category === "subscriptions" && t.type === "expense");

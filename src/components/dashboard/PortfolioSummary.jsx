@@ -17,7 +17,7 @@ const INVESTMENT_TYPES = {
 };
 
 export default function PortfolioSummary() {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, t } = useAppSettings();
   const [investments, setInvestments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
