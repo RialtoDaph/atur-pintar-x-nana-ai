@@ -58,9 +58,10 @@ export async function processRecurringTransactions(userEmail) {
 }
 
 // Silent background component that runs on mount
-export default function RecurringManager() {
+export default function RecurringManager({ userEmail }) {
   useEffect(() => {
-    processRecurringTransactions().catch(console.error);
-  }, []);
+    if (!userEmail) return;
+    processRecurringTransactions(userEmail).catch(console.error);
+  }, [userEmail]);
   return null;
 }
