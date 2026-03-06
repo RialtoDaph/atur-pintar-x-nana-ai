@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Trash2, TrendingUp } from "lucide-react";
 import AddBudgetModal from "@/components/budget/AddBudgetModal.jsx";
-import BudgetRecommendation from "@/components/budget/BudgetRecommendation";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const DEFAULT_CATEGORIES = {
@@ -112,15 +111,6 @@ export default function BudgetPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-3">
-        {!loading && transactions.length > 0 && (
-          <BudgetRecommendation 
-            transactions={transactions} 
-            currentMonth={currentMonth} 
-            user={user}
-            onApply={loadData}
-          />
-        )}
-
         {loading ? (
           [...Array(3)].map((_, i) => (
             <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />
