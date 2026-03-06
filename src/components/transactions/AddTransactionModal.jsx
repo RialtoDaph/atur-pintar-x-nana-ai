@@ -231,8 +231,20 @@ export default function AddTransactionModal({ onClose, onSave }) {
                 value={form.amount}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^0-9.,]/g, "");
-                  // Auto-format: convert , to . for decimals
-                  const formatted = val.replace(/,/g, ".").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                  // Parse using user's separator settings
+                  const numStr = val.replace(new RegExp("\\" + settings.thousand_separator, "g"), "").replace(settings.decimal_separator, ".");
+                  const num = parseFloat(numStr) || 0;
+
+                  // Format with user's separators
+                  const intPart = Math.floor(num);
+                  const decPart = Math.round((num - intPart) * 100);
+                  const intStr = intPart.toString().split('').reverse();
+                  const grouped = [];
+                  for (let i = 0; i < intStr.length; i++) {
+                    if (i > 0 && i % 3 === 0) grouped.push(settings.thousand_separator);
+                    grouped.push(intStr[i]);
+                  }
+                  const formatted = grouped.reverse().join('') + (decPart > 0 ? settings.decimal_separator + decPart.toString().padStart(2, '0') : "");
                   setForm({ ...form, amount: formatted });
                 }}
               />

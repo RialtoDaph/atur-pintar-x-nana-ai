@@ -623,16 +623,41 @@ export function AppSettingsProvider({ children }) {
 
   const formatCurrency = (value) => {
     if (typeof value !== 'number') value = parseFloat(value) || 0;
-    const formatted = Math.abs(value).toLocaleString('id-ID', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-    return `${settings.currency_symbol} ${formatted}`;
+    const absValue = Math.abs(value);
+    const intPart = Math.floor(absValue);
+    const decimalPart = Math.round((absValue - intPart) * 100);
+    
+    // Format integer part with thousand separator
+    const intStr = intPart.toString().split('').reverse();
+    const grouped = [];
+    for (let i = 0; i < intStr.length; i++) {
+      if (i > 0 && i % 3 === 0) grouped.push(settings.thousand_separator);
+      grouped.push(intStr[i]);
+    }
+    const formattedInt = grouped.reverse().join('');
+    
+    // Add decimal if needed
+    const formattedDecimal = decimalPart > 0 ? settings.decimal_separator + decimalPart.toString().padStart(2, '0') : '';
+    
+    return `${settings.currency_symbol} ${formattedInt}${formattedDecimal}`;
   };
 
   const formatNumber = (value, decimals = 0) => {
     if (typeof value !== 'number') value = parseFloat(value) || 0;
-    return value.toLocaleString('id-ID', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    const absValue = Math.abs(value);
+    const intPart = Math.floor(absValue);
+    const decimalPart = decimals > 0 ? Math.round((absValue - intPart) * Math.pow(10, decimals)).toString().padStart(decimals, '0') : '';
+    
+    // Format integer part with thousand separator
+    const intStr = intPart.toString().split('').reverse();
+    const grouped = [];
+    for (let i = 0; i < intStr.length; i++) {
+      if (i > 0 && i % 3 === 0) grouped.push(settings.thousand_separator);
+      grouped.push(intStr[i]);
+    }
+    const formattedInt = grouped.reverse().join('');
+    
+    return decimals > 0 && decimalPart ? `${formattedInt}${settings.decimal_separator}${decimalPart}` : formattedInt;
   };
 
   return (
