@@ -116,19 +116,31 @@ export default function Transactions() {
     if (selectedIds.size === 0) return;
     if (!window.confirm(`${t('tx_delete_selected')} ${selectedIds.size} transaksi yang dipilih?`)) return;
     setDeleting(true);
-    await Promise.all([...selectedIds].map(id => base44.entities.Transaction.delete(id)));
-    setDeleting(false);
-    clearSelection();
-    loadData();
+    try {
+      await Promise.all([...selectedIds].map(id => base44.entities.Transaction.delete(id)));
+      toast.success(t('tx_delete_success'));
+      clearSelection();
+      loadData();
+    } catch (error) {
+      console.error("Bulk delete failed:", error);
+      toast.error(t('tx_delete_error'));
+      setDeleting(false);
+    }
   }
 
   async function handleDeleteAll() {
     if (!window.confirm(`${t('tx_delete_all')} (${filtered.length})? Tindakan ini tidak bisa dibatalkan.`)) return;
     setDeleting(true);
-    await Promise.all(filtered.map(t => base44.entities.Transaction.delete(t.id)));
-    setDeleting(false);
-    clearSelection();
-    loadData();
+    try {
+      await Promise.all(filtered.map(t => base44.entities.Transaction.delete(t.id)));
+      toast.success(t('tx_delete_success'));
+      clearSelection();
+      loadData();
+    } catch (error) {
+      console.error("Delete all failed:", error);
+      toast.error(t('tx_delete_error'));
+      setDeleting(false);
+    }
   }
 
   const filtered = filter === "all" ? transactions : transactions.filter(tx => tx.type === filter);
