@@ -17,6 +17,7 @@ export default function PullToRefresh({ onRefresh, children }) {
     if (startY.current === null || refreshing) return;
     const delta = e.touches[0].clientY - startY.current;
     if (delta > 0) {
+      e.preventDefault();
       setPullDistance(Math.min(delta * 0.5, THRESHOLD + 20));
     }
   }, [refreshing]);
