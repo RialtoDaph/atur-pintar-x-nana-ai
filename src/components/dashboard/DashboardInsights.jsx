@@ -105,10 +105,17 @@ export default function DashboardInsights({ transactions, goals }) {
         <h2 className="font-bold text-[#0A0A0A] text-sm">{t('insight_title')}</h2>
       </div>
       <div className="px-4 pb-4 space-y-2">
-        {insights.map((ins, i) => (
-          <div key={i} className={`flex items-start gap-3 rounded-xl px-3 py-2.5 border ${ins.color}`}>
+        {filteredInsights.map((ins) => (
+          <div key={ins.id} className={`flex items-start gap-3 rounded-xl px-3 py-2.5 border ${ins.color}`}>
             <div className="flex-shrink-0 mt-0.5">{ins.icon}</div>
-            <p className={`text-xs leading-relaxed ${ins.textColor}`}>{ins.text}</p>
+            <p className={`text-xs leading-relaxed flex-1 ${ins.textColor}`}>{ins.text}</p>
+            <button
+              onClick={() => handleDismiss(ins.id)}
+              className="flex-shrink-0 ml-2 p-0.5 hover:bg-black/5 rounded transition-colors"
+              aria-label="Dismiss"
+            >
+              <X className="w-3 h-3" />
+            </button>
           </div>
         ))}
       </div>
