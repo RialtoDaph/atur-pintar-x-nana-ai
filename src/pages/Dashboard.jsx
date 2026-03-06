@@ -83,6 +83,7 @@ export default function Dashboard() {
   const totalSaved = goals.reduce((s, g) => s + (g.current_amount || 0), 0);
 
   return (
+    <PullToRefresh onRefresh={loadData}>
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
       <RecurringManager userEmail={user?.email} />
       {/* Top Header */}
