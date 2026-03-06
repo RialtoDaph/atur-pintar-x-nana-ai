@@ -146,7 +146,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F4F7] hover:bg-[#E2E8F0] transition-colors text-xs font-semibold text-[#4A5568]"
                 title="Scan struk">
                 {scanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                {scanning ? "Memindai..." : "Scan Struk"}
+                {scanning ? t('scanning') : t('scan_receipt')}
               </button>
               <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleScanReceipt} />
               <button onClick={() => setShowManage(true)} className="text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors" title="Manage categories">
