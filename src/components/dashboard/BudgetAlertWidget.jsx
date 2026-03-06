@@ -79,63 +79,52 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
         </Link>
       </div>
 
-      <div className="px-4 pb-4 space-y-4">
+      <div className="px-4 pb-4 flex gap-4 overflow-x-auto pb-2">
         {allBudgets.map(b => {
           const cat = DEFAULT_CATEGORIES[b.category] || { label: b.category, emoji: "📦", color: "#95A5A6" };
           const isOver = b.percent > 100;
           const isNear = b.percent >= 80 && !isOver;
-          const displayPercent = Math.min(Math.round(b.percent), 100);
-          const remaining = b.amount - b.spent;
 
           const pieData = [
             { value: Math.min(b.spent, b.amount), color: isOver ? "#FF6B6B" : isNear ? "#F5A623" : cat.color },
-            { value: Math.max(0, b.amount - b.spent), color: "#F2F4F7" }
+            { value: Math.max(0, b.amount - b.spent), color: "#E8EEF7" }
           ];
 
           return (
-            <div key={b.id}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">{cat.emoji}</span>
-                  <span className="text-sm font-medium text-[#1A1A1A]">{cat.label}</span>
-                  {isOver && (
-                    <span className="text-[10px] font-bold text-white bg-[#FF6B6B] px-1.5 py-0.5 rounded-full">Lewat!</span>
-                  )}
-                  {isNear && !isOver && (
-                    <span className="text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/15 px-1.5 py-0.5 rounded-full">Hampir!</span>
-                  )}
-                </div>
+            <Link
+              key={b.id}
+              to={createPageUrl("Budget")}
+              className="flex flex-col items-center flex-shrink-0 cursor-pointer group"
+            >
+              <div className="relative w-20 h-20 mb-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={24} outerRadius={40} startAngle={90} endAngle={-270}>
+                      {pieData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <span className="absolute inset-0 flex items-center justify-center text-2xl">
+                  {cat.emoji}
+                </span>
               </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 flex-shrink-0">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={18} outerRadius={28} startAngle={90} endAngle={-270}>
-                        {pieData.map((entry, i) => (
-                          <Cell key={i} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="flex-1">
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className="text-sm font-bold text-[#1A1A1A]">{displayPercent}%</span>
-                    <span className="text-[10px] text-[#8FA4C8]">dari {formatCurrency(b.amount)}</span>
-                  </div>
-                  <p className="text-[10px] text-[#8FA4C8]">{formatCurrency(b.spent)} terpakai</p>
-                  <p className="text-[10px]" style={{ color: isOver ? "#FF6B6B" : "#00C9A7" }}>
-                    {isOver
-                      ? `Lebih ${formatCurrency(Math.abs(remaining))}`
-                      : `Sisa ${formatCurrency(remaining)}`}
-                  </p>
-                </div>
-              </div>
-            </div>
+              <p className="text-xs font-medium text-[#1A1A1A] text-center group-hover:text-[#FF6A00] transition-colors whitespace-nowrap">
+                {cat.label}
+              </p>
+            </Link>
           );
         })}
+        <Link
+          to={createPageUrl("Budget")}
+          className="flex flex-col items-center justify-center flex-shrink-0 w-20 h-32 cursor-pointer group"
+        >
+          <div className="w-20 h-20 rounded-full bg-[#F2F4F7] group-hover:bg-[#E8EEF7] transition-colors flex items-center justify-center text-2xl text-[#8FA4C8] mb-2">
+            +
+          </div>
+          <p className="text-xs font-medium text-[#8FA4C8] group-hover:text-[#FF6A00] transition-colors">Tambah</p>
+        </Link>
       </div>
     </div>
   );
