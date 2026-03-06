@@ -296,7 +296,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
                     className={`flex-1 py-2 rounded-xl text-xs font-semibold border capitalize transition-all ${
                       recurringInterval === interval ? "bg-[#0A0A0A] text-white border-[#0A0A0A]" : "text-[#4A5568] border-[#E2E8F0] bg-white hover:border-[#CBD5E0]"
                     }`}>
-                    {interval}
+                    {t(interval)}
                   </button>
                 ))}
               </div>
