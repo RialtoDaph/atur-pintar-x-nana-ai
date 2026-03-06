@@ -256,10 +256,7 @@ export default function Analytics() {
         </div>
 
         {/* Calendar Section */}
-        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_calendar') || 'Financial Calendar'}</h2>
-          <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
-        </div>
+        <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
 
         {/* Charts Grid - 1 on mobile, 2 on desktop */}
         <div className="space-y-5 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
