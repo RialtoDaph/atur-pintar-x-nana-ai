@@ -40,7 +40,7 @@ export default function SubscriptionDetector({ transactions, loading }) {
                 <p className="text-xs font-medium text-[#1A1A1A]">{s.name}</p>
               </div>
               <span className="text-xs font-semibold text-[#1A1A1A]">
-                {formatRupiah(s.total)}
+                {formatCurrency(s.total)}
               </span>
             </div>
           ))}
