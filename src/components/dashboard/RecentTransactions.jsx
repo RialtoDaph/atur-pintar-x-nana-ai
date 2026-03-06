@@ -15,6 +15,7 @@ const CATEGORY_CONFIG = {
 };
 
 export default function RecentTransactions({ transactions, loading }) {
+  const { formatCurrency } = useAppSettings();
   if (loading) {
     return (
       <div className="px-5 pb-5 space-y-3">

@@ -18,6 +18,7 @@ const DEFAULT_CONFIG = {
 };
 
 export default function SpendingChart({ transactions, loading }) {
+  const { formatCurrency } = useAppSettings();
   const [customCats, setCustomCats] = useState([]);
 
   useEffect(() => {
