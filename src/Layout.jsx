@@ -4,6 +4,7 @@ import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCa
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import NanaFloatingChat from "@/components/nana/NanaFloatingChat";
+import { AppSettingsProvider } from "@/components/utils/AppSettingsContext";
 import GlobalSearch from "@/components/search/GlobalSearch";
 
 export default function Layout({ children, currentPageName }) {
