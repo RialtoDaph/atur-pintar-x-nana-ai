@@ -38,16 +38,17 @@ function countFutureOccurrences(template, today, daysInMonth) {
   return count;
 }
 
-export default function CashflowForecast({ transactions, loading }) {
+export default function CashflowForecast({ transactions, loading, user }) {
   const { formatCurrency, t } = useAppSettings();
   const [recurringTemplates, setRecurringTemplates] = useState([]);
   const [recurringLoaded, setRecurringLoaded] = useState(false);
 
   useEffect(() => {
-    base44.entities.Transaction.filter({ is_recurring: true })
+    if (!user) return;
+    base44.entities.Transaction.filter({ is_recurring: true, created_by: user.email })
       .then(data => { setRecurringTemplates(data); setRecurringLoaded(true); })
       .catch(() => setRecurringLoaded(true));
-  }, []);
+  }, [user]);
 
   if (loading || !recurringLoaded) return null;
 
