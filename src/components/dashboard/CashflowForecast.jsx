@@ -99,11 +99,11 @@ export default function CashflowForecast({ transactions, loading, user }) {
     ONE_TIME_INCOME_CATEGORIES.includes(tx.category)
   ).reduce((s, tx) => s + tx.amount, 0);
 
-  // Use at least 15 days as denominator to avoid huge projections early in the month
-  const daysElapsed = Math.max(15, dayOfMonth - 1);
-  const dailyExpenseAvg = nonRecurringExpense / daysElapsed;
+  // Use at least 1 day as denominator; more conservative early-month projections
+  const daysElapsed = Math.max(1, dayOfMonth - 1);
+  const dailyExpenseAvg = daysElapsed > 0 ? nonRecurringExpense / daysElapsed : 0;
   // Only project daily avg for non-salary income; salary already captured in currentIncome
-  const dailyIncomeAvg = nonRecurringIncome / daysElapsed;
+  const dailyIncomeAvg = daysElapsed > 0 ? nonRecurringIncome / daysElapsed : 0;
 
   const projectedExtraExpense = dailyExpenseAvg * daysLeft + scheduledFutureExpense;
   const projectedExtraIncome = dailyIncomeAvg * daysLeft + scheduledFutureIncome;
