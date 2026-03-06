@@ -96,17 +96,17 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
               to={createPageUrl("Budget")}
               className="flex flex-col items-center flex-shrink-0 cursor-pointer group"
             >
-              <div className="relative w-20 h-20 mb-2">
+              <div className="relative w-10 h-10 mb-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={24} outerRadius={40} startAngle={90} endAngle={-270}>
+                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={12} outerRadius={20} startAngle={90} endAngle={-270}>
                       {pieData.map((entry, i) => (
                         <Cell key={i} fill={entry.color} />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-                <span className="absolute inset-0 flex items-center justify-center text-2xl">
+                <span className="absolute inset-0 flex items-center justify-center text-base">
                   {cat.emoji}
                 </span>
               </div>
