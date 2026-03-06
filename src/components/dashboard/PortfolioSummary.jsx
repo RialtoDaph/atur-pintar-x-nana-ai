@@ -125,7 +125,32 @@ export default function PortfolioSummary() {
           </div>
         </div>
 
-
+        {/* Individual items (top 3) */}
+        <div className="mt-3 space-y-2">
+          {investments.slice(0, 3).map(inv => {
+            const type = INVESTMENT_TYPES[inv.type] || INVESTMENT_TYPES.lainnya;
+            const gain = (inv.current_value || 0) - (inv.initial_amount || 0);
+            const gainPct = inv.initial_amount > 0 ? ((gain / inv.initial_amount) * 100).toFixed(1) : 0;
+            const pos = gain >= 0;
+            return (
+              <div key={inv.id} className="flex items-center justify-between bg-[#F8FAFC] rounded-xl px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">{inv.icon || type.emoji}</span>
+                  <div>
+                    <p className="text-xs font-semibold text-[#1A1A1A]">{inv.name}</p>
+                    <p className="text-[10px] text-[#8FA4C8]">{type.label}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-bold text-[#1A1A1A]">{formatCurrency(inv.current_value)}</p>
+                  <p className={`text-[10px] font-semibold ${pos ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+                    {pos ? "+" : ""}{gainPct}%
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { ChevronDown } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function IncomeExpenseChart({ transactions, loading }) {
   const { formatCurrency, t } = useAppSettings();
-  const months = 1;
+  const [months, setMonths] = useState(6);
 
   const chartData = useMemo(() => {
     if (!transactions.length) return [];
@@ -32,7 +33,7 @@ export default function IncomeExpenseChart({ transactions, loading }) {
     });
 
     return Object.values(data);
-  }, [transactions]);
+  }, [transactions, months]);
 
   if (loading) {
     return (
@@ -53,7 +54,21 @@ export default function IncomeExpenseChart({ transactions, loading }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4">
-      <h2 className="font-bold text-[#0A0A0A] text-sm mb-4">{t('income_vs_expense')}</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-bold text-[#0A0A0A] text-sm">{t('income_vs_expense')}</h2>
+        <div className="relative">
+          <select
+            value={months}
+            onChange={(e) => setMonths(Number(e.target.value))}
+            className="appearance-none pl-3 pr-8 py-1.5 rounded-lg bg-[#F2F4F7] text-[#0A0A0A] text-xs font-medium cursor-pointer border border-[#E2E8F0]"
+          >
+            <option value={3}>{t('months_3')}</option>
+            <option value={6}>{t('months_6')}</option>
+            <option value={12}>{t('months_12')}</option>
+          </select>
+          <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-[#8FA4C8] pointer-events-none" />
+        </div>
+      </div>
 
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>

@@ -4,7 +4,6 @@ import { AlertTriangle, CheckCircle, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAppSettings } from "@/components/utils/useAppSettings";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const DEFAULT_CATEGORIES = {
   housing: { label: "Housing", emoji: "🏠", color: "#4F7CFF" },
@@ -94,40 +93,10 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
           const displayPercent = Math.min(Math.round(b.percent), 100);
           const remaining = b.amount - b.spent;
 
-          const pieData = [
-            { value: Math.min(b.spent, b.amount), fill: barColor },
-            { value: Math.max(b.amount - b.spent, 0), fill: "#F0F0EE" }
-          ];
-
           return (
-            <div key={b.id} className="flex items-center gap-3">
-              <div className="w-16 h-16 flex-shrink-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="value"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={20}
-                      outerRadius={32}
-                      startAngle={90}
-                      endAngle={-270}
-                      strokeWidth={0}
-                    >
-                      {pieData.map((entry, idx) => (
-                        <Cell key={idx} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[#1A1A1A]" style={{ width: 64, height: 64 }}>
-                  <span>{displayPercent}%</span>
-                </div>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+            <div key={b.id}>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
                   <span className="text-base">{cat.emoji}</span>
                   <span className="text-sm font-medium text-[#1A1A1A]">{cat.label}</span>
                   {isOver && (
@@ -137,14 +106,23 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
                     <span className="text-[10px] font-bold text-[#F5A623] bg-[#F5A623]/15 px-1.5 py-0.5 rounded-full">Hampir!</span>
                   )}
                 </div>
-                <div className="flex justify-between text-[10px] text-[#8FA4C8]">
-                  <span>{formatCurrency(b.spent)} dari {formatCurrency(b.amount)}</span>
-                  <span style={{ color: isOver ? "#FF6B6B" : "#8FA4C8" }}>
-                    {isOver
-                      ? `Lebih ${formatCurrency(Math.abs(remaining))}`
-                      : `Sisa ${formatCurrency(remaining)}`}
-                  </span>
-                </div>
+                <span className="text-xs font-bold" style={{ color: barColor }}>{displayPercent}%</span>
+              </div>
+
+              <div className="w-full bg-[#F2F4F7] rounded-full h-2 mb-1">
+                <div
+                  className="h-2 rounded-full transition-all"
+                  style={{ width: `${displayPercent}%`, backgroundColor: barColor }}
+                />
+              </div>
+
+              <div className="flex justify-between text-[10px] text-[#8FA4C8]">
+                <span>{formatCurrency(b.spent)} dari {formatCurrency(b.amount)}</span>
+                <span style={{ color: isOver ? "#FF6B6B" : "#8FA4C8" }}>
+                  {isOver
+                    ? `Lebih ${formatCurrency(Math.abs(remaining))}`
+                    : `Sisa ${formatCurrency(remaining)}`}
+                </span>
               </div>
             </div>
           );
