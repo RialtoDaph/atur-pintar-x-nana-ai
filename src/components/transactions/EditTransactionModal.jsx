@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Settings2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { parseRupiah } from "@/components/utils/parseRupiah";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import ManageCategoriesModal from "./ManageCategoriesModal";
 
@@ -23,7 +24,7 @@ const DEFAULT_CATEGORIES = {
 };
 
 export default function EditTransactionModal({ transaction, goals = [], onClose, onSave }) {
-  const { t } = useAppSettings();
+  const { t, settings } = useAppSettings();
   const [tab, setTab] = useState(transaction.type === "income" ? "income" : "expense");
   const [form, setForm] = useState({
     amount: String(transaction.amount || ""),
@@ -46,7 +47,8 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
     await onSave(transaction.id, {
       ...form,
       type: tab,
-      amount: parseFloat(form.amount),
+      amount: parseRupiah(form.amount),
+      goal_id: form.goal_id || undefined,
     });
     setSaving(false);
   }
@@ -63,40 +65,40 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
         <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-[#1A1A1A]">Edit Transaksi</h2>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowManage(true)} className="text-[#9B9B9B] hover:text-[#1A1A1A]">
-                <Settings2 className="w-4 h-4" />
-              </button>
-              <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A]">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
+             <h2 className="text-lg font-bold text-[#1A1A1A]">{t('edit_transaction')}</h2>
+             <div className="flex items-center gap-2">
+               <button onClick={() => setShowManage(true)} className="text-[#9B9B9B] hover:text-[#1A1A1A]" title={t('manage_categories')}>
+                 <Settings2 className="w-4 h-4" />
+               </button>
+               <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A]">
+                 <X className="w-5 h-5" />
+               </button>
+             </div>
+           </div>
 
           {/* Type tabs */}
           <div className="flex bg-[#F2F4F7] rounded-xl p-1 mb-4">
-            {["expense", "income"].map((t) => (
-              <button key={t} onClick={() => { setTab(t); setForm(f => ({ ...f, category: "" })); }}
+            {["expense", "income"].map((tabKey) => (
+              <button key={tabKey} onClick={() => { setTab(tabKey); setForm(f => ({ ...f, category: "" })); }}
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  tab === t
-                    ? t === "expense" ? "bg-[#FF6B6B] text-white shadow-sm" : "bg-[#00C9A7] text-white shadow-sm"
+                  tab === tabKey
+                    ? tabKey === "expense" ? "bg-[#FF6B6B] text-white shadow-sm" : "bg-[#00C9A7] text-white shadow-sm"
                     : "text-[#8FA4C8]"
                 }`}>
-                {t === "expense" ? "Expense" : "Income"}
+                {tabKey === "expense" ? t('expense') : t('income')}
               </button>
             ))}
           </div>
 
           {/* Amount */}
           <div className="mb-4">
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Amount</label>
+            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{t('amount')}</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-lg">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-lg">{settings.currency_symbol}</span>
               <input
-                autoFocus type="number"
+                autoFocus type="text" inputMode="numeric"
                 className="w-full border border-[#E2E8F0] rounded-xl pl-9 pr-4 py-3 text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                placeholder="0.00"
+                placeholder="0"
                 value={form.amount}
                 onChange={(e) => setForm({ ...form, amount: e.target.value })}
               />
@@ -105,7 +107,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
 
           {/* Category */}
           <div className="mb-4">
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">Category</label>
+            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('category')}</label>
             <div className="grid grid-cols-4 gap-2">
               {allCats.map((c) => (
                 <button key={c.key} onClick={() => setForm({ ...form, category: c.key })}
@@ -122,16 +124,16 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
           {/* Note & Date & Goal */}
           <div className="space-y-3 mb-5">
             <div>
-              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Note</label>
+              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{t('note_optional')}</label>
               <input
                 className="w-full border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                placeholder="e.g. Grocery run, Netflix..."
+                placeholder={t('note_placeholder')}
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Date</label>
+              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{t('date')}</label>
               <input type="date"
                 className="w-full border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
                 value={form.date}
@@ -158,7 +160,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
           <button onClick={handleSave} disabled={saving || !form.amount || !form.category}
             className="w-full py-3 rounded-xl font-bold text-sm text-white disabled:opacity-40 transition-colors"
             style={{ backgroundColor: tab === "expense" ? "#FF6B6B" : "#00C9A7" }}>
-            {saving ? "Menyimpan..." : "Simpan Perubahan"}
+            {saving ? t('saving') : t('save_changes')}
           </button>
         </div>
       </div>

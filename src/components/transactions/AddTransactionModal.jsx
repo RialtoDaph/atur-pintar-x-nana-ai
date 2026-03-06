@@ -160,12 +160,12 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
             <div className="flex items-center gap-2">
               <button onClick={() => fileRef.current?.click()} disabled={scanning}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F4F7] hover:bg-[#E2E8F0] transition-colors text-xs font-semibold text-[#4A5568]"
-                title="Scan struk">
+                title={t('scan_receipt')}>
                 {scanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
                 {scanning ? t('scanning') : t('scan_receipt')}
               </button>
               <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleScanReceipt} />
-              <button onClick={() => setShowManage(true)} className="text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors" title="Manage categories">
+              <button onClick={() => setShowManage(true)} className="text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors" title={t('manage_categories')}>
                 <Settings2 className="w-4 h-4" />
               </button>
               <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors">
@@ -318,7 +318,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
           </div>
 
           {/* Linked Goal (if any savings goals exist) */}
-          {goals && goals.length > 0 && tab === "savings" && (
+          {goals && goals.length > 0 && (
             <div className="mb-5">
               <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('link_to_goal')}</label>
               <select

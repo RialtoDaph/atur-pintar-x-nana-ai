@@ -44,7 +44,9 @@ export default function Transactions() {
   useEffect(() => {
     base44.auth.me().then(u => {
       setUser(u);
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("Failed to authenticate user:", err);
+    });
   }, []);
 
   useEffect(() => { if (user) loadData(); }, [user]);
@@ -54,7 +56,10 @@ export default function Transactions() {
     try {
       const [txs, cats, gls] = await Promise.all([
         base44.entities.Transaction.filter({ created_by: user.email }, "-date", 200),
-        base44.entities.CustomCategory.list("-created_date"),
+        base44.entities.CustomCategory.list("-created_date").catch(err => {
+          console.error("Failed to load custom categories:", err);
+          return [];
+        }),
         base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
       ]);
       setTransactions(txs);
@@ -104,6 +109,7 @@ export default function Transactions() {
   }
 
   function selectAll() {
+    if (filtered.length === 0) return;
     setSelectedIds(new Set(filtered.map(t => t.id)));
   }
 
@@ -114,7 +120,7 @@ export default function Transactions() {
 
   async function handleDeleteSelected() {
     if (selectedIds.size === 0) return;
-    if (!window.confirm(`${t('tx_delete_selected')} ${selectedIds.size} transaksi yang dipilih?`)) return;
+    if (!window.confirm(t('tx_confirm_delete_selected', { count: selectedIds.size }))) return;
     setDeleting(true);
     try {
       await Promise.all([...selectedIds].map(id => base44.entities.Transaction.delete(id)));
@@ -129,7 +135,7 @@ export default function Transactions() {
   }
 
   async function handleDeleteAll() {
-    if (!window.confirm(`${t('tx_delete_all')} (${filtered.length})? Tindakan ini tidak bisa dibatalkan.`)) return;
+    if (!window.confirm(t('tx_confirm_delete_all', { count: filtered.length }))) return;
     setDeleting(true);
     try {
       await Promise.all(filtered.map(t => base44.entities.Transaction.delete(t.id)));
@@ -168,10 +174,11 @@ export default function Transactions() {
 
   // Group by month
   const grouped = {};
+  const locale = settings?.locale || "id-ID";
   filtered.forEach(tx => {
     const d = new Date(tx.date);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const label = d.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+    const label = d.toLocaleDateString(locale, { month: "long", year: "numeric" });
     if (!grouped[key]) grouped[key] = { label, items: [] };
     grouped[key].items.push(tx);
   });
@@ -354,7 +361,7 @@ export default function Transactions() {
                            </div>
                          </div>
                          <p className="text-xs text-[#8FA4C8]">
-                           {new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric" })} · {cat.label}
+                           {new Date(tx.date).toLocaleDateString(locale, { month: "short", day: "numeric" })} · {cat.label}
                          </p>
                        </div>
                        <div className="flex items-center gap-1.5">
