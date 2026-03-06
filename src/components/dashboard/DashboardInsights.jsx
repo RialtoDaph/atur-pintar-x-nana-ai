@@ -1,8 +1,14 @@
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Lightbulb } from "lucide-react";
+import { useState, useEffect } from "react";
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Lightbulb, X } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function DashboardInsights({ transactions, goals }) {
   const { formatCurrency, t } = useAppSettings();
+  const [dismissedInsights, setDismissedInsights] = useState(() => {
+    const saved = localStorage.getItem("dismissedInsights");
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const now = new Date();
   const thisMonth = transactions.filter(t => {
     const d = new Date(t.date);
