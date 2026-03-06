@@ -120,14 +120,14 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
           {/* Category */}
           <div className="mb-4">
             <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('category')}</label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               {allCats.map((c) => (
                 <button key={c.key} onClick={() => setForm({ ...form, category: c.key })}
                   className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
                     form.category === c.key ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"
                   }`}>
-                  <span className="text-xl">{c.emoji}</span>
-                  <span className="text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
+                  <span className="text-lg sm:text-xl">{c.emoji}</span>
+                  <span className="text-[9px] sm:text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
                 </button>
               ))}
             </div>
