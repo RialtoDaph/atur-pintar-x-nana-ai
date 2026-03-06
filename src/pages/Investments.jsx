@@ -81,8 +81,8 @@ export default function InvestmentsPage() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-[#8FA4C8] text-sm font-medium">Portofolio</p>
-              <h1 className="text-white text-2xl font-bold mt-0.5">Investasi</h1>
+              <p className="text-[#8FA4C8] text-sm font-medium">{t('investments_portfolio')}</p>
+              <h1 className="text-white text-2xl font-bold mt-0.5">{t('investments_title')}</h1>
             </div>
             <button
               onClick={() => setShowAdd(true)}
@@ -100,7 +100,7 @@ export default function InvestmentsPage() {
               <span className={`text-sm font-semibold ${totalGain >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
                 {totalGain >= 0 ? "+" : ""}{formatCurrency(totalGain)} ({gainPercent}%)
               </span>
-              <span className="text-white/40 text-xs ml-1">dari modal {formatCurrency(totalInvested)}</span>
+              <span className="text-white/40 text-xs ml-1">{t('investments_from_capital')} {formatCurrency(totalInvested)}</span>
             </div>
           </div>
 
@@ -119,8 +119,8 @@ export default function InvestmentsPage() {
         ) : investments.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
             <TrendingUp className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
-            <p className="text-[#4A5568] font-semibold">Belum ada investasi</p>
-            <p className="text-[#8FA4C8] text-sm mt-1">Tap + untuk mencatat investasi Anda</p>
+            <p className="text-[#4A5568] font-semibold">{t('investments_empty_title')}</p>
+            <p className="text-[#8FA4C8] text-sm mt-1">{t('investments_empty_desc')}</p>
           </div>
         ) : (
           investments.map(inv => {
@@ -142,7 +142,7 @@ export default function InvestmentsPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-[#1A1A1A]">{inv.name}</p>
-                      <p className="text-xs text-[#8FA4C8]">{type.label} · {portfolioWeight}% portofolio</p>
+                      <p className="text-xs text-[#8FA4C8]">{type.label} · {portfolioWeight}{t('investments_portfolio_weight')}</p>
                     </div>
                   </div>
                   <div className="flex gap-2" onClick={(e) => e.preventDefault()}>
@@ -175,9 +175,9 @@ export default function InvestmentsPage() {
         {watchlist.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-[#1A1A1A] text-base">Pantau Aset</h2>
+              <h2 className="font-bold text-[#1A1A1A] text-base">{t('investments_watchlist_title')}</h2>
               <button onClick={() => setShowWatchlist(!showWatchlist)} className="text-xs text-[#FF6A00] font-medium">
-                {showWatchlist ? "Sembunyikan" : "Tampilkan"}
+                {showWatchlist ? t('investments_watchlist_hide') : t('investments_watchlist_show')}
               </button>
             </div>
             {showWatchlist && (
@@ -192,7 +192,7 @@ export default function InvestmentsPage() {
                       <div className="text-right">
                         <p className="font-bold text-[#1A1A1A]">{formatCurrency(item.current_price)}</p>
                         {item.target_price && (
-                          <p className="text-xs text-[#8FA4C8]">Target: {formatCurrency(item.target_price)}</p>
+                          <p className="text-xs text-[#8FA4C8]">{t('investments_target')}: {formatCurrency(item.target_price)}</p>
                         )}
                       </div>
                     )}
