@@ -125,6 +125,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
       is_recurring: recurring,
       recurring_interval: recurring ? recurringInterval : undefined,
       recurring_last_generated: recurring ? form.date : undefined,
+      goal_id: form.goal_id || undefined,
     });
     setSaving(false);
   }
