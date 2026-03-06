@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { ArrowLeft, Trash2, Mail, CheckCircle, AlertTriangle, TrendingUp, Info, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const ALERT_CONFIG = {
   spending_spike: {
@@ -44,6 +45,7 @@ const ALERT_CONFIG = {
 };
 
 export default function AlertsPage() {
+  const { t } = useAppSettings();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("unread"); // unread | all
@@ -95,10 +97,10 @@ export default function AlertsPage() {
             to={createPageUrl("Dashboard")}
             className="flex items-center gap-2 text-[#8FA4C8] hover:text-white text-sm mb-6 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Kembali
+            <ArrowLeft className="w-4 h-4" /> {t('alerts_back')}
           </Link>
-          <h1 className="text-white text-2xl font-bold">Smart Alerts</h1>
-          <p className="text-[#8FA4C8] text-sm mt-1">Notifikasi finansial cerdas untuk Anda</p>
+          <h1 className="text-white text-2xl font-bold">{t('alerts_title')}</h1>
+          <p className="text-[#8FA4C8] text-sm mt-1">{t('alerts_subtitle')}</p>
         </div>
       </div>
 
@@ -113,7 +115,7 @@ export default function AlertsPage() {
                 : "text-[#8FA4C8] hover:bg-[#F2F4F7]"
             }`}
           >
-            Belum dibaca ({alerts.filter(a => a.status === "unread").length})
+            {t('alerts_unread')} ({alerts.filter(a => a.status === "unread").length})
           </button>
           <button
             onClick={() => setFilter("all")}
@@ -123,7 +125,7 @@ export default function AlertsPage() {
                 : "text-[#8FA4C8] hover:bg-[#F2F4F7]"
             }`}
           >
-            Semua
+            {t('alerts_all')}
           </button>
         </div>
 
@@ -135,8 +137,8 @@ export default function AlertsPage() {
         ) : alerts.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
             <CheckCircle className="w-10 h-10 text-[#00C9A7] mx-auto mb-3" />
-            <p className="text-[#4A5568] font-semibold">Tidak ada alerts</p>
-            <p className="text-[#8FA4C8] text-sm mt-1">Anda semua catan dengan baik!</p>
+            <p className="text-[#4A5568] font-semibold">{t('alerts_empty_title')}</p>
+            <p className="text-[#8FA4C8] text-sm mt-1">{t('alerts_empty_desc')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -184,7 +186,7 @@ export default function AlertsPage() {
                           className="text-[#FF6A00] text-xs font-medium mt-2 inline-block hover:underline"
                           onClick={() => handleMarkAsRead(alert.id)}
                         >
-                          Tindaklanjuti →
+                          {t('alerts_follow_up')}
                         </Link>
                       )}
 
@@ -206,20 +208,20 @@ export default function AlertsPage() {
                         onClick={() => handleMarkAsRead(alert.id)}
                         className="flex items-center gap-1.5 text-xs font-medium text-[#8FA4C8] hover:text-[#1A1A1A] transition-colors"
                       >
-                        <CheckCircle className="w-3.5 h-3.5" /> Tandai sudah dibaca
+                        <CheckCircle className="w-3.5 h-3.5" /> {t('alerts_mark_read')}
                       </button>
                     )}
                     <button
                       onClick={() => handleResendEmail(alert)}
                       className="flex items-center gap-1.5 text-xs font-medium text-[#8FA4C8] hover:text-[#1A1A1A] transition-colors"
                     >
-                      <Mail className="w-3.5 h-3.5" /> Email
+                      <Mail className="w-3.5 h-3.5" /> {t('alerts_email')}
                     </button>
                     <button
                       onClick={() => handleDelete(alert.id)}
                       className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-700 transition-colors ml-auto"
                     >
-                      <Trash2 className="w-3.5 h-3.5" /> Hapus
+                      <Trash2 className="w-3.5 h-3.5" /> {t('alerts_delete')}
                     </button>
                   </div>
                 </div>
