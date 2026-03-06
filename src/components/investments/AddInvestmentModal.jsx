@@ -168,7 +168,7 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
             <p className="text-xs text-[#8FA4C8] mt-1">{t('change_if_price_differs')}</p>
           </div>
           <div>
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Tanggal Beli</label>
+            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{t('purchase_date')}</label>
             <input type="date"
               className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
               value={form.purchase_date}

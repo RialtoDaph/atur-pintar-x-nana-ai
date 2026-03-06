@@ -178,7 +178,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
                   {receiptData.items.map((item, i) => (
                     <div key={i} className="flex justify-between text-xs text-[#4A5568]">
                       <span>{item.quantity > 1 ? `${item.quantity}x ` : ""}{item.name}</span>
-                      <span>Rp {Math.round(item.price * item.quantity).toLocaleString("id-ID")}</span>
+                      <span>{formatCurrency(item.price * item.quantity)}</span>
                     </div>
                   ))}
                 </div>
