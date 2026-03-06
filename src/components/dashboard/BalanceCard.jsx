@@ -27,7 +27,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">Pemasukan</p>
-            <p className="text-white text-xs font-semibold">{formatRupiah(income)}</p>
+            <p className="text-white text-xs font-semibold">{formatCurrency(income)}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -36,7 +36,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">Pengeluaran</p>
-            <p className="text-white text-xs font-semibold">{formatRupiah(expense)}</p>
+            <p className="text-white text-xs font-semibold">{formatCurrency(expense)}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -45,7 +45,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">Tabungan</p>
-            <p className="text-white text-xs font-semibold">{formatRupiah(savings)}</p>
+            <p className="text-white text-xs font-semibold">{formatCurrency(savings)}</p>
           </div>
         </div>
       </div>
