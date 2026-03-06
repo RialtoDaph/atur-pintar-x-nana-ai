@@ -1,41 +1,42 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 import { Target, PiggyBank, CreditCard, TrendingUp, Lightbulb, ChevronRight, Bell, Settings } from "lucide-react";
-
-const MENU_GROUPS = [
-  {
-    title: "Keuangan",
-    items: [
-      { label: "Tujuan Tabungan", desc: "Pantau dan capai target keuanganmu", icon: Target, emoji: "🎯", page: "Goals", color: "#FF6A00" },
-      { label: "Anggaran", desc: "Kelola batas pengeluaran bulanan", icon: PiggyBank, emoji: "🐷", page: "Budget", color: "#00C9A7" },
-      { label: "Utang", desc: "Lacak cicilan dan sisa hutang", icon: CreditCard, emoji: "💳", page: "Debts", color: "#FF6B6B" },
-      { label: "Investasi", desc: "Monitor portofolio investasimu", icon: TrendingUp, emoji: "📈", page: "Investments", color: "#4F7CFF" },
-    ],
-  },
-  {
-    title: "Notifikasi & Info",
-    items: [
-      { label: "Pengingat", desc: "Tagihan dan cicilan yang akan jatuh tempo", icon: Bell, emoji: "🔔", page: "Reminders", color: "#F5A623" },
-      { label: "Alerts", desc: "Notifikasi cerdas tentang keuanganmu", icon: Bell, emoji: "⚡", page: "Alerts", color: "#9B59B6" },
-      { label: "Tips Keuangan", desc: "Saran dan tips mengelola keuangan", icon: Lightbulb, emoji: "💡", page: "Tips", color: "#F5A623" },
-    ],
-  },
-  {
-    title: "Akun",
-    items: [
-      { label: "Pengaturan", desc: "Profil, preferensi, dan pengaturan aplikasi", icon: Settings, emoji: "⚙️", page: "Settings", color: "#888" },
-    ],
-  },
-];
+import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function Menu() {
+  const { t } = useAppSettings();
+  const MENU_GROUPS = [
+    {
+      title: t('menu_finance'),
+      items: [
+        { label: t('nav_goals'), desc: "Pantau dan capai target keuanganmu", icon: Target, emoji: "🎯", page: "Goals", color: "#FF6A00" },
+        { label: t('nav_budget'), desc: "Kelola batas pengeluaran bulanan", icon: PiggyBank, emoji: "🐷", page: "Budget", color: "#00C9A7" },
+        { label: t('nav_debts'), desc: "Lacak cicilan dan sisa hutang", icon: CreditCard, emoji: "💳", page: "Debts", color: "#FF6B6B" },
+        { label: t('nav_investments'), desc: "Monitor portofolio investasimu", icon: TrendingUp, emoji: "📈", page: "Investments", color: "#4F7CFF" },
+      ],
+    },
+    {
+      title: t('menu_notifications'),
+      items: [
+        { label: t('nav_reminders'), desc: "Tagihan dan cicilan yang akan jatuh tempo", icon: Bell, emoji: "🔔", page: "Reminders", color: "#F5A623" },
+        { label: t('nav_alerts'), desc: "Notifikasi cerdas tentang keuanganmu", icon: Bell, emoji: "⚡", page: "Alerts", color: "#9B59B6" },
+        { label: t('nav_tips'), desc: "Saran dan tips mengelola keuangan", icon: Lightbulb, emoji: "💡", page: "Tips", color: "#F5A623" },
+      ],
+    },
+    {
+      title: t('menu_account'),
+      items: [
+        { label: t('nav_settings'), desc: "Profil, preferensi, dan pengaturan aplikasi", icon: Settings, emoji: "⚙️", page: "Settings", color: "#888" },
+      ],
+    },
+  ];
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
       {/* Header */}
       <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
         <div className="max-w-2xl mx-auto">
-          <p className="text-[#8FA4C8] text-sm font-medium">Navigasi</p>
-          <h1 className="text-white text-2xl font-bold mt-0.5">Menu Lainnya</h1>
+          <p className="text-[#8FA4C8] text-sm font-medium">{t('menu_nav')}</p>
+          <h1 className="text-white text-2xl font-bold mt-0.5">{t('menu_title')}</h1>
         </div>
       </div>
 
