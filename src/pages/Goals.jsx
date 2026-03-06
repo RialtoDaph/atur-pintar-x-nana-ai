@@ -83,10 +83,16 @@ export default function Goals() {
   }
 
   async function handleAddGoal(data) {
-    await base44.entities.SavingsGoal.create(data);
+    if (goal?.id) {
+      await base44.entities.SavingsGoal.update(goal.id, data);
+    } else {
+      await base44.entities.SavingsGoal.create(data);
+    }
     setShowAddGoal(false);
     loadData();
   }
+
+  const [editingGoal, setEditingGoal] = useState(null);
 
   function calculateSuggestedMonthly(goal) {
     if (!goal.deadline) return null;
@@ -169,23 +175,31 @@ export default function Goals() {
           )}
 
           {/* Actions */}
-          {goal.status !== "completed" && (
-            <div className="grid grid-cols-2 gap-3 mt-2">
-              <button
-                onClick={() => setShowTxModal("deposit")}
-                className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors"
-              >
-                <Plus className="w-4 h-4" /> {t('goals_add_money')}
-              </button>
-              <button
-                onClick={() => setShowTxModal("withdrawal")}
-                className="flex items-center justify-center gap-2 bg-[#F7F6F3] text-[#1A1A1A] py-3 rounded-xl text-sm font-semibold hover:bg-[#EFEFED] transition-colors border border-[#EFEFED]"
-              >
-                <Minus className="w-4 h-4" /> {t('goals_withdraw')}
-              </button>
-            </div>
-          )}
-        </div>
+           <div className="grid grid-cols-3 gap-2 mt-4">
+             {goal.status !== "completed" && (
+               <>
+                 <button
+                   onClick={() => setShowTxModal("deposit")}
+                   className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl text-xs font-semibold hover:bg-[#333] transition-colors"
+                 >
+                   <Plus className="w-4 h-4" /> {t('goals_add_money')}
+                 </button>
+                 <button
+                   onClick={() => setShowTxModal("withdrawal")}
+                   className="flex items-center justify-center gap-2 bg-[#F7F6F3] text-[#1A1A1A] py-3 rounded-xl text-xs font-semibold hover:bg-[#EFEFED] transition-colors border border-[#EFEFED]"
+                 >
+                   <Minus className="w-4 h-4" /> {t('goals_withdraw')}
+                 </button>
+               </>
+             )}
+             <button
+               onClick={() => setEditingGoal(goal)}
+               className="flex items-center justify-center gap-2 bg-[#FF6A00] text-white py-3 rounded-xl text-xs font-semibold hover:bg-[#e05e00] transition-colors"
+             >
+               ✏️ {t('edit')}
+             </button>
+           </div>
+          </div>
 
         {/* Transactions */}
         <div className="mb-4 flex items-center justify-between">
@@ -228,16 +242,24 @@ export default function Goals() {
         )}
 
         {showTxModal && (
-          <AddTransactionModal
-            type={showTxModal}
-            onClose={() => setShowTxModal(null)}
-            onSave={handleTransaction}
-            maxWithdrawal={goal.current_amount || 0}
+           <AddTransactionModal
+             type={showTxModal}
+             onClose={() => setShowTxModal(null)}
+             onSave={handleTransaction}
+             maxWithdrawal={goal.current_amount || 0}
+           />
+         )}
+
+        {editingGoal && (
+          <AddGoalModal
+            goal={editingGoal}
+            onClose={() => setEditingGoal(null)}
+            onSave={handleAddGoal}
           />
         )}
-      </div>
-    );
-  }
+        </div>
+        );
+        }
 
   // All goals list view
   return (
@@ -354,6 +376,7 @@ export default function Goals() {
 
     {showAddGoal && (
      <AddGoalModal
+       goal={null}
        onClose={() => setShowAddGoal(false)}
        onSave={handleAddGoal}
      />

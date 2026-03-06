@@ -135,6 +135,20 @@ export default function AddTransactionModal({ onClose, onSave }) {
     ...filteredCustom.map(c => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji, color: c.color || "#888" })),
   ];
 
+  // Format currency input helper
+  const formatCurrencyInput = (val) => {
+    const numStr = val.replace(new RegExp("\\" + settings.thousand_separator, "g"), "").replace(settings.decimal_separator, ".");
+    const num = parseFloat(numStr) || 0;
+    const intPart = Math.floor(num);
+    const intStr = intPart.toString().split('').reverse();
+    const grouped = [];
+    for (let i = 0; i < intStr.length; i++) {
+      if (i > 0 && i % 3 === 0) grouped.push(settings.thousand_separator);
+      grouped.push(intStr[i]);
+    }
+    return grouped.reverse().join('');
+  };
+
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
@@ -231,21 +245,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
                 value={form.amount}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^0-9.,]/g, "");
-                  // Parse using user's separator settings
-                  const numStr = val.replace(new RegExp("\\" + settings.thousand_separator, "g"), "").replace(settings.decimal_separator, ".");
-                  const num = parseFloat(numStr) || 0;
-
-                  // Format with user's separators
-                  const intPart = Math.floor(num);
-                  const decPart = Math.round((num - intPart) * 100);
-                  const intStr = intPart.toString().split('').reverse();
-                  const grouped = [];
-                  for (let i = 0; i < intStr.length; i++) {
-                    if (i > 0 && i % 3 === 0) grouped.push(settings.thousand_separator);
-                    grouped.push(intStr[i]);
-                  }
-                  const formatted = grouped.reverse().join('') + (decPart > 0 ? settings.decimal_separator + decPart.toString().padStart(2, '0') : "");
-                  setForm({ ...form, amount: formatted });
+                  setForm({ ...form, amount: formatCurrencyInput(val) });
                 }}
               />
             </div>
