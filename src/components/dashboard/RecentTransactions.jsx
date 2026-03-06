@@ -53,7 +53,7 @@ export default function RecentTransactions({ transactions, loading }) {
               className="text-xs font-bold flex-shrink-0"
               style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}
             >
-              {isIncome ? "+" : "−"}{formatRupiah(tx.amount)}
+              {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
             </span>
           </div>
         );
