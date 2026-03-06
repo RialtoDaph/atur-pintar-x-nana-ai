@@ -44,6 +44,13 @@ export default function Settings() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (settings) {
+      setCurrency(settings.currency || "IDR");
+      setLanguage(settings.language || "id");
+    }
+  }, [settings]);
+
   function toggleDark() {
     const next = !darkMode;
     setDarkMode(next);
