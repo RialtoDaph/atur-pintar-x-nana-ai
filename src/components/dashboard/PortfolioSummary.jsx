@@ -76,7 +76,7 @@ export default function PortfolioSummary() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-[#8FA4C8] text-[10px] font-semibold uppercase tracking-widest">Total Nilai</p>
-            <p className="text-[#1A1A1A] font-bold text-xl">{formatRp(totalValue)}</p>
+            <p className="text-[#1A1A1A] font-bold text-xl">{formatCurrency(totalValue)}</p>
           </div>
           <div className={`flex flex-col items-end px-3 py-1.5 rounded-xl ${isPositive ? "bg-[#00C9A7]/10" : "bg-[#FF6B6B]/10"}`}>
             <div className="flex items-center gap-1">
