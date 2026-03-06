@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, BookOpen, Lightbulb, HelpCircle } from "lucide-react";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const TIPS = [
   {
@@ -179,6 +180,7 @@ function TipItem({ item }) {
 }
 
 export default function Tips() {
+  const { t } = useAppSettings();
   const [searchQ, setSearchQ] = useState("");
 
   const filtered = TIPS.map(cat => ({
@@ -194,13 +196,13 @@ export default function Tips() {
     <div className="min-h-screen bg-[#F2F4F7] pb-10">
       <div className="bg-[#0A0A0A] px-5 pt-10 pb-8">
         <div className="max-w-2xl mx-auto">
-          <p className="text-[#8FA4C8] text-sm font-medium">Panduan</p>
-          <h1 className="text-white text-2xl font-bold mt-0.5">Tips & Cara Pakai</h1>
+          <p className="text-[#8FA4C8] text-sm font-medium">{t('tips_guide')}</p>
+          <h1 className="text-white text-2xl font-bold mt-0.5">{t('tips_title')}</h1>
           <div className="mt-4">
             <input
               value={searchQ}
               onChange={e => setSearchQ(e.target.value)}
-              placeholder="Cari pertanyaan atau topik..."
+              placeholder={t('tips_search_placeholder')}
               className="w-full bg-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 text-sm border border-white/10 focus:outline-none focus:border-[#FF6A00] transition-colors"
             />
           </div>
@@ -222,8 +224,8 @@ export default function Tips() {
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
             <Lightbulb className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
-            <p className="text-[#4A5568] font-semibold">Tidak ada hasil</p>
-            <p className="text-[#8FA4C8] text-sm mt-1">Coba kata kunci lain</p>
+            <p className="text-[#4A5568] font-semibold">{t('tips_empty_title')}</p>
+            <p className="text-[#8FA4C8] text-sm mt-1">{t('tips_empty_desc')}</p>
           </div>
         ) : (
           filtered.map((cat, i) => (
@@ -241,8 +243,8 @@ export default function Tips() {
         <div className="bg-[#FFF5EB] border border-[#FF6A00]/20 rounded-2xl p-5 flex items-start gap-3">
           <BookOpen className="w-5 h-5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-[#FF6A00] mb-1">Butuh bantuan lebih?</p>
-            <p className="text-sm text-[#4A5568]">Tanya langsung ke Nana AI — asisten keuangan pintarmu yang siap membantu 24/7.</p>
+            <p className="text-sm font-semibold text-[#FF6A00] mb-1">{t('tips_help_title')}</p>
+            <p className="text-sm text-[#4A5568]">{t('tips_help_desc')}</p>
           </div>
         </div>
       </div>
