@@ -142,7 +142,7 @@ export default function PortfolioSummary() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-[#1A1A1A]">{formatRp(inv.current_value)}</p>
+                  <p className="text-xs font-bold text-[#1A1A1A]">{formatCurrency(inv.current_value)}</p>
                   <p className={`text-[10px] font-semibold ${pos ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
                     {pos ? "+" : ""}{gainPct}%
                   </p>
