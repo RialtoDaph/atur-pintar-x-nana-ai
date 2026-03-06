@@ -390,11 +390,18 @@ export default function Transactions() {
 
       {showAddTx && (
         <AddTransactionModal
+          goals={goals}
           onClose={() => setShowAddTx(false)}
           onSave={async (data) => {
-            await base44.entities.Transaction.create(data);
-            setShowAddTx(false);
-            loadData();
+            try {
+              await base44.entities.Transaction.create(data);
+              toast.success(t('tx_create_success'));
+              setShowAddTx(false);
+              loadData();
+            } catch (error) {
+              console.error("Create failed:", error);
+              toast.error(t('tx_create_error'));
+            }
           }}
         />
       )}
