@@ -22,6 +22,7 @@ const CATEGORY_CONFIG = {
 const FILTER_TABS = ["all", "expense", "income"];
 
 export default function Transactions() {
+  const { formatCurrency } = useAppSettings();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");

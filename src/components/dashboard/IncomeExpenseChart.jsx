@@ -82,7 +82,7 @@ export default function IncomeExpenseChart({ transactions, loading }) {
               borderRadius: '8px',
               color: '#fff'
             }}
-            formatter={(value) => `Rp${value.toLocaleString('id-ID')}`}
+            formatter={(value) => formatCurrency(value)}
             labelStyle={{ color: '#fff' }}
           />
           <Legend 
