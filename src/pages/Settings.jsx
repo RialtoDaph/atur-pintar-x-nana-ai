@@ -59,14 +59,21 @@ export default function Settings() {
     else document.documentElement.classList.remove("dark-app");
   }
 
-  function selectCurrency(code) {
+  const CURRENCY_MAP = {
+    IDR: { symbol: "Rp", code: "IDR" },
+    USD: { symbol: "$", code: "USD" },
+    EUR: { symbol: "€", code: "EUR" },
+  };
+
+  async function selectCurrency(code) {
     setCurrency(code);
-    localStorage.setItem("currency", code);
+    const cur = CURRENCY_MAP[code];
+    await updateSettings({ ...settings, currency: code, currency_symbol: cur.symbol });
   }
 
-  function selectLanguage(code) {
+  async function selectLanguage(code) {
     setLanguage(code);
-    localStorage.setItem("language", code);
+    await updateSettings({ ...settings, language: code });
   }
 
   function toggleWidget(key) {
