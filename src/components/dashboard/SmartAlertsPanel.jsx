@@ -53,9 +53,9 @@ export default function SmartAlertsPanel() {
   async function loadAlerts() {
     setLoading(true);
     try {
-      // Get unread and recently read alerts
+      const user = await base44.auth.me();
       const allAlerts = await base44.entities.Alert.filter(
-        { status: { $in: ["unread", "read"] } },
+        { status: { $in: ["unread", "read"] }, created_by: user.email },
         "-created_date",
         20
       );

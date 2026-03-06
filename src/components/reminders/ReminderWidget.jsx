@@ -24,7 +24,9 @@ export default function ReminderWidget() {
   const [reminders, setReminders] = useState([]);
 
   useEffect(() => {
-    base44.entities.Reminder.filter({ is_active: true }).then(setReminders).catch(() => {});
+    base44.auth.me().then(u => {
+      base44.entities.Reminder.filter({ is_active: true, created_by: u.email }).then(setReminders).catch(() => {});
+    }).catch(() => {});
   }, []);
 
   const now = new Date();
