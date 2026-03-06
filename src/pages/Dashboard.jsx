@@ -85,6 +85,7 @@ export default function Dashboard() {
   return (
     <PullToRefresh onRefresh={loadData}>
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
+
       <RecurringManager userEmail={user?.email} />
       {/* Top Header */}
       <div className="bg-[#0A0A0A] px-5 pt-6 pb-14">
