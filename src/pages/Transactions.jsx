@@ -313,59 +313,75 @@ export default function Transactions() {
                   </div>
                 </div>
                 {group.items.map(tx => {
-                  const cat = CATEGORY_CONFIG[tx.category] || CATEGORY_CONFIG.other;
-                  const isIncome = tx.type === "income";
-                  return (
-                    <div
-                      key={tx.id}
-                      className={`flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] transition-colors group ${selectMode ? "cursor-pointer" : ""} ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
-                      onClick={selectMode ? () => toggleSelect(tx.id) : undefined}
-                    >
-                      {selectMode && (
-                        <div className="flex-shrink-0">
-                          {selectedIds.has(tx.id)
-                            ? <CheckSquare className="w-5 h-5 text-[#FF6A00]" />
-                            : <Square className="w-5 h-5 text-[#CBD5E0]" />}
-                        </div>
-                      )}
-                      <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0"
-                        style={{ backgroundColor: cat.color + "18" }}
-                      >
-                        {cat.emoji}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1A1A1A] truncate">
-                          {tx.note || cat.label}
-                        </p>
-                        <p className="text-xs text-[#8FA4C8]">
-                          {new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric" })} · {cat.label}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
-                          {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
-                        </span>
-                        {!selectMode && (
-                          <>
-                            <button
-                              onClick={() => setEditingTx(tx)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#4F7CFF] ml-1"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(tx.id)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#FF6B6B]"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                   const cat = getCategoryConfig(tx.category);
+                   const isIncome = tx.type === "income";
+                   const linkedGoal = goals.find(g => g.id === tx.goal_id);
+                   return (
+                     <div
+                       key={tx.id}
+                       className={`flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] transition-colors group ${selectMode ? "cursor-pointer" : ""} ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
+                       onClick={selectMode ? () => toggleSelect(tx.id) : undefined}
+                     >
+                       {selectMode && (
+                         <div className="flex-shrink-0">
+                           {selectedIds.has(tx.id)
+                             ? <CheckSquare className="w-5 h-5 text-[#FF6A00]" />
+                             : <Square className="w-5 h-5 text-[#CBD5E0]" />}
+                         </div>
+                       )}
+                       <div
+                         className="w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0"
+                         style={{ backgroundColor: cat.color + "18" }}
+                       >
+                         {cat.emoji}
+                       </div>
+                       <div className="flex-1 min-w-0">
+                         <div className="flex items-center gap-2">
+                           <p className="text-sm font-medium text-[#1A1A1A] truncate">
+                             {tx.note || cat.label}
+                           </p>
+                           <div className="flex gap-1 flex-shrink-0">
+                             {tx.is_recurring && (
+                               <div title={t('tx_recurring')} className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[#4F7CFF]/10">
+                                 <Repeat2 className="w-3 h-3 text-[#4F7CFF]" />
+                               </div>
+                             )}
+                             {linkedGoal && (
+                               <div title={linkedGoal.name} className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[#FF6A00]/10">
+                                 <Target className="w-3 h-3 text-[#FF6A00]" />
+                               </div>
+                             )}
+                           </div>
+                         </div>
+                         <p className="text-xs text-[#8FA4C8]">
+                           {new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric" })} · {cat.label}
+                         </p>
+                       </div>
+                       <div className="flex items-center gap-1.5">
+                         <span className="text-sm font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
+                           {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
+                         </span>
+                         {!selectMode && (
+                           <>
+                             <button
+                               onClick={() => setEditingTx(tx)}
+                               className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#4F7CFF] ml-1"
+                             >
+                               <Pencil className="w-3.5 h-3.5" />
+                             </button>
+                             <button
+                               onClick={() => handleDelete(tx.id)}
+                               disabled={deleting}
+                               className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#FF6B6B] disabled:opacity-50"
+                             >
+                               <Trash2 className="w-3.5 h-3.5" />
+                             </button>
+                           </>
+                         )}
+                       </div>
+                     </div>
+                   );
+                 })}
               </div>
             );
           })
