@@ -188,7 +188,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#0A0A0A] text-white text-xs font-bold hover:bg-[#333] transition-colors"
               >
                 <Scissors className="w-3.5 h-3.5" />
-                Split Bill dengan Teman
+                {t('split_bill_with_friends')}
               </button>
               <ReceiptCorrectionForm
                 receiptData={receiptData}
