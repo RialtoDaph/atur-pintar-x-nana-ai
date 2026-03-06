@@ -45,6 +45,7 @@ const TRANSLATIONS = {
 
 export function useAppSettings() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settingsId, setSettingsId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,10 +56,14 @@ export function useAppSettings() {
           const newSettings = await base44.entities.AppSettings.create(DEFAULT_SETTINGS);
           await base44.auth.updateMe({ settings_id: newSettings.id });
           setSettings(newSettings);
+          setSettingsId(newSettings.id);
         } else {
           const appSettings = await base44.entities.AppSettings.list();
           const userSettings = appSettings.find(s => s.id === user.settings_id);
-          setSettings(userSettings || DEFAULT_SETTINGS);
+          if (userSettings) {
+            setSettings(userSettings);
+            setSettingsId(userSettings.id);
+          }
         }
       } catch (e) {
         setSettings(DEFAULT_SETTINGS);
@@ -67,6 +72,13 @@ export function useAppSettings() {
       }
     })();
   }, []);
+
+  const updateSettings = async (newSettings) => {
+    setSettings(newSettings);
+    if (settingsId) {
+      await base44.entities.AppSettings.update(settingsId, newSettings);
+    }
+  };
 
   const t = (key) => TRANSLATIONS[settings.language]?.[key] || key;
 
@@ -84,5 +96,5 @@ export function useAppSettings() {
     return value.toLocaleString('id-ID', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   };
 
-  return { settings, setSettings, loading, t, formatCurrency, formatNumber };
+  return { settings, setSettings, updateSettings, loading, t, formatCurrency, formatNumber };
 }
