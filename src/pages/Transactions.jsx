@@ -5,7 +5,7 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import EditTransactionModal from "@/components/transactions/EditTransactionModal";
 
-const CATEGORY_CONFIG = {
+const CATEGORY_CONFIG_BASE = {
   housing: { emoji: "🏠", label: "Housing", color: "#4F7CFF" },
   food: { emoji: "🍔", label: "Food", color: "#00C9A7" },
   transport: { emoji: "🚗", label: "Transport", color: "#F5A623" },
