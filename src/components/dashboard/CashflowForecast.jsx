@@ -61,7 +61,7 @@ export default function CashflowForecast({ transactions, loading }) {
           <div>
             <p className="text-[10px] text-[#9B9B9B]">Prediksi akhir bulan</p>
             <p className={`text-base font-bold ${isPositive ? "text-green-600" : "text-red-500"}`}>
-              {isPositive ? "+" : "-"}{formatRupiah(Math.abs(projectedBalance))}
+              {isPositive ? "+" : "-"}{formatCurrency(Math.abs(projectedBalance))}
             </p>
           </div>
           <p className="text-xs text-[#9B9B9B]">{isPositive ? "Aman 🎉" : "Awas ⚠️"}</p>
