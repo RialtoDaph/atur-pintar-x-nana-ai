@@ -51,7 +51,7 @@ export default function SpendingChart({ transactions, loading }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-5">
-      <h2 className="font-bold text-[#1A1A1A] text-base mb-3">{t('spending_by_category')}</h2>
+      <h2 className="font-bold text-[#1A1A1A] text-base mb-3">Pengeluaran per Kategori</h2>
       <div className="w-full h-36">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
