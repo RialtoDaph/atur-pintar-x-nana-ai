@@ -27,10 +27,13 @@ export default function Transactions() {
     { key: "expense", label: t('tx_filter_expense') },
     { key: "income", label: t('tx_filter_income') },
   ];
-  const CATEGORY_CONFIG = CATEGORY_CONFIG_BASE;
   const [transactions, setTransactions] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
+  const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [goalFilter, setGoalFilter] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [showAddTx, setShowAddTx] = useState(false);
   const [editingTx, setEditingTx] = useState(null);
   const [user, setUser] = useState(null);
