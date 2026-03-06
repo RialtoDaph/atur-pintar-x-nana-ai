@@ -21,7 +21,7 @@ const DEFAULT_CATEGORIES = {
 };
 
 export default function Transactions() {
-  const { formatCurrency, t } = useAppSettings();
+  const { formatCurrency, t, settings } = useAppSettings();
   const FILTER_TABS = [
     { key: "all", label: t('tx_filter_all') },
     { key: "expense", label: t('tx_filter_expense') },
