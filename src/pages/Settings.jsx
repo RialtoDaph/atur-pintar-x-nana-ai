@@ -30,8 +30,9 @@ const WIDGETS = [
 export default function Settings() {
   const [user, setUser] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
-  const [currency, setCurrency] = useState(() => localStorage.getItem("currency") || "IDR");
-  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "id");
+  const { settings, updateSettings } = useAppSettings();
+  const [currency, setCurrency] = useState("IDR");
+  const [language, setLanguage] = useState("id");
   const [widgets, setWidgets] = useState(() => {
     const saved = localStorage.getItem("widgets");
     if (saved) return JSON.parse(saved);
