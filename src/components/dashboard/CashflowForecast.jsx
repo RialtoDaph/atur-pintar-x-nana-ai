@@ -99,15 +99,11 @@ export default function CashflowForecast({ transactions, loading, user }) {
   );
 
   for (const tpl of recurringTemplates) {
-     const occurrences = countFutureOccurrences(tpl, now, daysInMonth);
-     // Skip if template was already generated today (to avoid double counting)
-     const tplDate = new Date(tpl.date);
-     const isCreatedToday = tplDate.toDateString() === now.toDateString();
-     if (isCreatedToday && childParentIdsThisMonth.has(tpl.id)) continue;
-     if (tpl.recurring_interval === "monthly" && childParentIdsThisMonth.has(tpl.id)) continue;
-     scheduledFutureIncome += (occurrences.income || 0) * tpl.amount;
-     scheduledFutureExpense += (occurrences.expense || 0) * tpl.amount;
-   }
+    const occurrences = countFutureOccurrences(tpl, now, daysInMonth);
+    if (tpl.recurring_interval === "monthly" && childParentIdsThisMonth.has(tpl.id)) continue;
+    scheduledFutureIncome += (occurrences.income || 0) * tpl.amount;
+    scheduledFutureExpense += (occurrences.expense || 0) * tpl.amount;
+  }
 
   // Use historical data for conservative forecasting
   const ONE_TIME_INCOME_CATEGORIES = ["salary", "freelance", "bonus", "dividend", "reimbursement"];

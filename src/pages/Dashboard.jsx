@@ -10,6 +10,7 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import OnboardingQuestionnaire from "@/components/onboarding/OnboardingQuestionnaire";
 import BalanceCard from "@/components/dashboard/BalanceCard";
 import SpendingChart from "@/components/dashboard/SpendingChart";
+import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import GoalsMiniList from "@/components/dashboard/GoalsMiniList";
 import SmartAlerts from "@/components/dashboard/SmartAlerts";
 import SmartAlertsPanel from "@/components/dashboard/SmartAlertsPanel";
@@ -20,7 +21,6 @@ import ReminderWidget from "@/components/reminders/ReminderWidget";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
 import BudgetAlertWidget from "@/components/dashboard/BudgetAlertWidget";
-import BudgetWidget from "@/components/dashboard/BudgetWidget";
 import IncomeExpenseChart from "@/components/dashboard/IncomeExpenseChart";
 
 function getWidgets() {
@@ -117,9 +117,6 @@ export default function Dashboard() {
         {/* Reminder Widget */}
         <ReminderWidget />
 
-        {/* Budget Widget */}
-        <BudgetWidget />
-
         {/* Budget Alert Widget */}
         <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
 
@@ -144,7 +141,20 @@ export default function Dashboard() {
         {/* Spending breakdown */}
         {widgets.spendingChart && <SpendingChart transactions={thisMonthTx} loading={loading} />}
 
-        {/* Portfolio Summary - Compact */}
+        {/* Recent transactions */}
+        {widgets.recentTransactions && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="font-bold text-[#0A0A0A] text-sm">{t('recent_transactions')}</h2>
+              <Link to={createPageUrl("Transactions")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
+                {t('view_all')} <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <RecentTransactions transactions={transactions.slice(0, 5)} loading={loading} onRefresh={loadData} />
+          </div>
+        )}
+
+        {/* Portfolio Summary */}
         <PortfolioSummary />
 
         {/* Savings Goals */}

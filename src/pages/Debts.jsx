@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, CreditCard, CheckCircle, Send } from "lucide-react";
+import { Plus, Trash2, CreditCard, CheckCircle } from "lucide-react";
 import AddDebtModal from "@/components/debts/AddDebtModal.jsx";
 import IOUSection from "@/components/splitbill/IOUSection";
 import { useAppSettings } from "@/components/utils/useAppSettings";
-import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 
 const DEBT_TYPES = {
   kpr: { label: "KPR", emoji: "🏠" },
@@ -19,7 +18,6 @@ export default function DebtsPage() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  const [payingDebt, setPayingDebt] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -110,9 +108,6 @@ export default function DebtsPage() {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => setPayingDebt(debt)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors" title={t('debts_pay')}>
-                      <Send className="w-4 h-4" />
-                    </button>
                     <button onClick={() => markPaid(debt)} className="text-[#CBD5E0] hover:text-[#00C9A7] transition-colors" title={t('debts_mark_paid_title')}>
                       <CheckCircle className="w-4 h-4" />
                     </button>
@@ -155,32 +150,6 @@ export default function DebtsPage() {
           onSave={async (data) => {
             await base44.entities.Debt.create(data);
             setShowAdd(false);
-            loadData();
-          }}
-        />
-      )}
-
-      {payingDebt && (
-        <AddTransactionModal
-          onClose={() => setPayingDebt(null)}
-          onSave={async (data) => {
-            const amount = data.amount;
-            const newRemaining = Math.max((payingDebt.remaining_amount || 0) - amount, 0);
-            
-            await Promise.all([
-              base44.entities.Transaction.create({
-                ...data,
-                type: "expense",
-                category: "other",
-                note: `Payment: ${payingDebt.name}`,
-              }),
-              base44.entities.Debt.update(payingDebt.id, {
-                remaining_amount: newRemaining,
-                status: newRemaining <= 0 ? "paid" : "active",
-              }),
-            ]);
-            
-            setPayingDebt(null);
             loadData();
           }}
         />

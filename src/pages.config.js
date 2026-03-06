@@ -48,37 +48,37 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import Alerts from './pages/Alerts';
-import Analytics from './pages/Analytics';
-import Budget from './pages/Budget';
 import Dashboard from './pages/Dashboard';
-import Debts from './pages/Debts';
-import Goals from './pages/Goals';
 import InvestmentDetail from './pages/InvestmentDetail';
-import Investments from './pages/Investments';
 import Menu from './pages/Menu';
 import Nana from './pages/Nana';
-import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import Tips from './pages/Tips';
+import Budget from './pages/Budget';
+import Debts from './pages/Debts';
+import Investments from './pages/Investments';
+import Reminders from './pages/Reminders';
 import Transactions from './pages/Transactions';
+import Analytics from './pages/Analytics';
+import Goals from './pages/Goals';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Alerts": Alerts,
-    "Analytics": Analytics,
-    "Budget": Budget,
     "Dashboard": Dashboard,
-    "Debts": Debts,
-    "Goals": Goals,
     "InvestmentDetail": InvestmentDetail,
-    "Investments": Investments,
     "Menu": Menu,
     "Nana": Nana,
-    "Reminders": Reminders,
     "Settings": Settings,
     "Tips": Tips,
+    "Budget": Budget,
+    "Debts": Debts,
+    "Investments": Investments,
+    "Reminders": Reminders,
     "Transactions": Transactions,
+    "Analytics": Analytics,
+    "Goals": Goals,
 }
 
 export const pagesConfig = {

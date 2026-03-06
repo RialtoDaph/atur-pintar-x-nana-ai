@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { ArrowLeft, Plus, Minus, Trash2, CheckCircle, TrendingUp, Calendar, Zap, Edit2 } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Trash2, CheckCircle, TrendingUp, Calendar, Zap } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -26,7 +26,6 @@ export default function Goals() {
   const [loading, setLoading] = useState(true);
   const [showTxModal, setShowTxModal] = useState(null); // 'deposit' | 'withdrawal'
   const [showAddGoal, setShowAddGoal] = useState(false);
-  const [editingGoal, setEditingGoal] = useState(null);
 
   const goal = goals.find((g) => g.id === goalId) || null;
 
@@ -84,12 +83,7 @@ export default function Goals() {
   }
 
   async function handleAddGoal(data) {
-    if (editingGoal) {
-      await base44.entities.SavingsGoal.update(editingGoal.id, data);
-      setEditingGoal(null);
-    } else {
-      await base44.entities.SavingsGoal.create(data);
-    }
+    await base44.entities.SavingsGoal.create(data);
     setShowAddGoal(false);
     loadData();
   }
@@ -336,35 +330,22 @@ export default function Goals() {
                   {suggestedMonthly && (
                     <div className={`flex items-center gap-1 ${isUrgent ? "text-[#FF6B6B]" : "text-[#8FA4C8]"}`}>
                       <Zap className="w-3.5 h-3.5" />
-                      {formatCurrency(suggestedMonthly)}/{t('month')}
+                      Rp {suggestedMonthly.toLocaleString("id-ID")}/bln
                     </div>
                   )}
                 </div>
               </Link>
 
-              <div className="mt-3 flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setEditingGoal(g);
-                    setShowAddGoal(true);
-                  }}
-                  className="flex-1 text-xs text-[#FF6A00] hover:text-[#e05e00] transition-colors flex items-center justify-center gap-1"
-                >
-                  <Edit2 className="w-3.5 h-3.5" /> {t('edit')}
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleDeleteGoal();
-                  }}
-                  className="flex-1 text-xs text-red-400 hover:text-red-600 transition-colors flex items-center justify-center gap-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> {t('delete')}
-                </button>
-              </div>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDeleteGoal();
+                }}
+                className="mt-3 text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1 w-full justify-center"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> {t('goals_delete')}
+              </button>
               </div>
               );
         })
@@ -373,12 +354,8 @@ export default function Goals() {
 
     {showAddGoal && (
      <AddGoalModal
-       onClose={() => {
-         setShowAddGoal(false);
-         setEditingGoal(null);
-       }}
+       onClose={() => setShowAddGoal(false)}
        onSave={handleAddGoal}
-       goal={editingGoal}
      />
     )}
     </div>
