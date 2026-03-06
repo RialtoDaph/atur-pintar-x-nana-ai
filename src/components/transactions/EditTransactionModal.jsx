@@ -7,19 +7,19 @@ import ManageCategoriesModal from "./ManageCategoriesModal";
 
 const DEFAULT_CATEGORIES = {
   expense: [
-    { key: "housing", label: "Housing", emoji: "🏠", color: "#4F7CFF" },
-    { key: "food", label: "Food", emoji: "🍔", color: "#00C9A7" },
-    { key: "transport", label: "Transport", emoji: "🚗", color: "#F5A623" },
-    { key: "health", label: "Health", emoji: "❤️", color: "#FF6B6B" },
-    { key: "entertainment", label: "Entertainment", emoji: "🎬", color: "#9B59B6" },
-    { key: "shopping", label: "Shopping", emoji: "🛍️", color: "#E91E8C" },
-    { key: "subscriptions", label: "Subscriptions", emoji: "📱", color: "#1ABC9C" },
-    { key: "other", label: "Other", emoji: "📦", color: "#95A5A6" },
+    { key: "housing", i18nKey: "cat_housing", emoji: "🏠", color: "#4F7CFF" },
+    { key: "food", i18nKey: "cat_food", emoji: "🍔", color: "#00C9A7" },
+    { key: "transport", i18nKey: "cat_transport", emoji: "🚗", color: "#F5A623" },
+    { key: "health", i18nKey: "cat_health", emoji: "❤️", color: "#FF6B6B" },
+    { key: "entertainment", i18nKey: "cat_entertainment", emoji: "🎬", color: "#9B59B6" },
+    { key: "shopping", i18nKey: "cat_shopping", emoji: "🛍️", color: "#E91E8C" },
+    { key: "subscriptions", i18nKey: "cat_subscriptions", emoji: "📱", color: "#1ABC9C" },
+    { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" },
   ],
   income: [
-    { key: "salary", label: "Salary", emoji: "💼", color: "#27AE60" },
-    { key: "freelance", label: "Freelance", emoji: "💻", color: "#2ECC71" },
-    { key: "other", label: "Other", emoji: "📦", color: "#95A5A6" },
+    { key: "salary", i18nKey: "cat_salary", emoji: "💼", color: "#27AE60" },
+    { key: "freelance", i18nKey: "cat_freelance", emoji: "💻", color: "#2ECC71" },
+    { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" },
   ],
 };
 
