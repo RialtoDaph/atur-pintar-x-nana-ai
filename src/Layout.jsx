@@ -203,8 +203,6 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Global Search */}
       {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
-
-
     </div>
     </AppSettingsProvider>
   );
