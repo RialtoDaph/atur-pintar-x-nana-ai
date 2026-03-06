@@ -6,7 +6,7 @@ import FinancialCalendar from "@/components/analytics/FinancialCalendar";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, LineChart, Line, Area, AreaChart, CartesianGrid
+  PieChart, Pie, Cell, LineChart, Line, Area, AreaChart, CartesianGrid
 } from "recharts";
 
 const DEFAULT_CATEGORIES_FLAT = [
@@ -63,7 +63,6 @@ export default function Analytics() {
     }
   }, [user]);
 
-  // Build localized months array
   const localizedMonths = useMemo(() => {
     return [
       t('month_jan'), t('month_feb'), t('month_mar'), t('month_apr'),
@@ -72,7 +71,6 @@ export default function Analytics() {
     ];
   }, [t]);
 
-  // Build category config from defaults + custom
   const allCategoriesConfig = useMemo(() => {
     const config = {};
     DEFAULT_CATEGORIES_FLAT.forEach(cat => {
@@ -84,7 +82,6 @@ export default function Analytics() {
     return config;
   }, [customCategories, t]);
 
-  // Handle filter changes
   const handleFilterChange = (filter) => {
     if (filter.type === "period") {
       setFilterPeriod(filter.value);
@@ -97,10 +94,8 @@ export default function Analytics() {
     }
   };
 
-  // Format Y-axis tick values
   const formatYAxisTick = useCallback((value) => formatShortNumber(value), [formatShortNumber]);
 
-  // Format period label for summary cards
   const formatPeriodLabel = (period) => {
     const months = parseInt(period);
     if (months === 1) return t('this_month') || 'This month';
@@ -110,7 +105,6 @@ export default function Analytics() {
     return `Last ${months} months`;
   };
 
-  // Build trend data based on selected period
   const now = new Date();
   const getMonthRange = () => {
     if (customDateRange) {
@@ -143,7 +137,6 @@ export default function Analytics() {
     };
   });
 
-  // Build category breakdown for current month expenses
   const thisMonthTx = transactions.filter(t => {
     const d = new Date(t.date);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "expense";
@@ -166,7 +159,6 @@ export default function Analytics() {
 
   const totalExpenses = pieData.reduce((s, d) => s + d.value, 0);
 
-  // Build 12 months trend data for spending analysis
   const areaChartMonthRange = parseInt(filterPeriod) >= 12 || customDateRange ? monthDiff + 1 : 12;
   const last12Months = Array.from({ length: Math.max(areaChartMonthRange, 12) }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - (Math.max(areaChartMonthRange, 12) - 1 - i), 1);
@@ -183,7 +175,6 @@ export default function Analytics() {
     };
   });
 
-  // Budget allocation for current month
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const monthBudgets = budgets.filter(b => b.month === thisMonth);
   const budgetData = monthBudgets.map(b => ({
@@ -193,7 +184,6 @@ export default function Analytics() {
     color: allCategoriesConfig[b.category]?.color || "#8FA4C8"
   }));
 
-  // Savings goals progress
   const goalsData = goals.map(g => ({
     name: g.name,
     current: g.current_amount || 0,
@@ -202,7 +192,6 @@ export default function Analytics() {
     color: g.color || "#FF6A00"
   }));
 
-  // Investment summary
   const totalInvested = investments.reduce((s, inv) => s + inv.initial_amount, 0);
   const totalCurrentValue = investments.reduce((s, inv) => s + inv.current_value, 0);
   const investmentReturn = totalCurrentValue - totalInvested;
@@ -215,7 +204,6 @@ export default function Analytics() {
     );
   }
 
-  // Calculate summary stats
   const totalIncome = trendData.reduce((sum, month) => sum + month.Income, 0);
   const periodExpenses = trendData.reduce((sum, month) => sum + month.Expenses, 0);
   const netCashflow = totalIncome - periodExpenses;
@@ -224,105 +212,109 @@ export default function Analytics() {
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-10">
       {/* Header */}
-      <div className="bg-[#0A0A0A] px-5 pt-10 pb-8">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-[#8FA4C8] text-sm font-medium">{t('analytics_overview')}</p>
-          <h1 className="text-white text-2xl font-bold mt-0.5">{t('analytics_title')}</h1>
+      <div className="bg-[#0A0A0A] px-5 pt-8 pb-6 sm:pt-10 sm:pb-8">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-[#8FA4C8] text-xs sm:text-sm font-medium">{t('analytics_overview')}</p>
+          <h1 className="text-white text-xl sm:text-2xl font-bold mt-1">{t('analytics_title')}</h1>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-5 mt-6 space-y-5">
+      <div className="max-w-4xl mx-auto px-5 mt-6 space-y-5">
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {/* Total Income */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#00C9A7]">
-            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_income_label')}</p>
-            <p className="text-lg sm:text-xl font-bold text-[#00C9A7]">{formatShortNumber(totalIncome)}</p>
-            <p className="text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
+        {/* Summary Cards - 4 column grid, responsive to 2 or 1 on mobile */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border-l-4 border-[#00C9A7]">
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_income_label')}</p>
+            <p className="text-base sm:text-lg lg:text-xl font-bold text-[#00C9A7]">{formatShortNumber(totalIncome)}</p>
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
           </div>
 
-          {/* Total Expenses */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#FF6B6B]">
-            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_expense_label')}</p>
-            <p className="text-lg sm:text-xl font-bold text-[#FF6B6B]">{formatShortNumber(periodExpenses)}</p>
-            <p className="text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border-l-4 border-[#FF6B6B]">
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_expense_label')}</p>
+            <p className="text-base sm:text-lg lg:text-xl font-bold text-[#FF6B6B]">{formatShortNumber(periodExpenses)}</p>
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
           </div>
 
-          {/* Net Cashflow */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4" style={{ borderLeftColor: netCashflow >= 0 ? "#00C9A7" : "#FF6B6B" }}>
-            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_cashflow') || 'Net Cashflow'}</p>
-            <p className="text-lg sm:text-xl font-bold" style={{ color: netCashflow >= 0 ? "#00C9A7" : "#FF6B6B" }}>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border-l-4" style={{ borderLeftColor: netCashflow >= 0 ? "#00C9A7" : "#FF6B6B" }}>
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">Net Flow</p>
+            <p className="text-base sm:text-lg lg:text-xl font-bold" style={{ color: netCashflow >= 0 ? "#00C9A7" : "#FF6B6B" }}>
               {netCashflow >= 0 ? "+" : ""}{formatShortNumber(netCashflow)}
             </p>
-            <p className="text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
           </div>
 
-          {/* Savings Rate */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#4F7CFF]">
-            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_savings_rate') || 'Savings Rate'}</p>
-            <p className="text-lg sm:text-xl font-bold text-[#4F7CFF]">{savingsRate}%</p>
-            <p className="text-[10px] text-[#8FA4C8] mt-1">{t('analytics_of_income') || 'of income'}</p>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border-l-4 border-[#4F7CFF]">
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">Savings Rate</p>
+            <p className="text-base sm:text-lg lg:text-xl font-bold text-[#4F7CFF]">{savingsRate}%</p>
+            <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] mt-1">of income</p>
           </div>
         </div>
 
-        {/* Date Range Filter */}
+        {/* Filter */}
         <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
 
-        {/* Financial Calendar */}
-        <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
-
-        {/* Spending Trend */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_spending_trend')}</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={last12Months}>
-              <defs>
-                <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-              <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#8FA4C8" }} />
-              <YAxis tick={{ fontSize: 11, fill: "#8FA4C8" }} tickFormatter={formatYAxisTick} />
-              <Tooltip formatter={(value) => [formatRupiah(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }} />
-              <Area type="monotone" dataKey="Expense" stroke="#FF6B6B" fill="url(#colorExpense)" strokeWidth={2} />
-            </AreaChart>
-          </ResponsiveContainer>
+        {/* Calendar Section */}
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_calendar') || 'Financial Calendar'}</h2>
+          <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
         </div>
 
-        {/* Monthly Trend Bar Chart */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_income_vs_expense')}</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={trendData} barCategoryGap="30%">
-              <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={formatYAxisTick} />
-              <Tooltip
-                formatter={(value) => [formatRupiah(value), undefined]}
-                contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
-              />
-              <Bar dataKey="Income" fill="#00C9A7" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="Expenses" fill="#FF6B6B" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="flex gap-5 mt-2 justify-center">
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#00C9A7] inline-block"/><span className="text-xs text-[#8FA4C8]">{t('analytics_income_label')}</span></div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#FF6B6B] inline-block"/><span className="text-xs text-[#8FA4C8]">{t('analytics_expense_label')}</span></div>
+        {/* Charts Grid - 1 on mobile, 2 on desktop */}
+        <div className="space-y-5 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
+
+          {/* Income vs Expense Bar Chart */}
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_income_vs_expense')}</h2>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={trendData} barCategoryGap="30%">
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={formatYAxisTick} />
+                <Tooltip
+                  formatter={(value) => [formatRupiah(value), undefined]}
+                  contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
+                />
+                <Bar dataKey="Income" fill="#00C9A7" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Expenses" fill="#FF6B6B" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="flex gap-4 mt-3 justify-center text-xs">
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#00C9A7]"/><span className="text-[#8FA4C8]">{t('analytics_income_label')}</span></div>
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#FF6B6B]"/><span className="text-[#8FA4C8]">{t('analytics_expense_label')}</span></div>
+            </div>
           </div>
+
+          {/* Spending Trend Area Chart */}
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_spending_trend')}</h2>
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={last12Months}>
+                <defs>
+                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} />
+                <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} tickFormatter={formatYAxisTick} />
+                <Tooltip formatter={(value) => [formatRupiah(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }} />
+                <Area type="monotone" dataKey="Expense" stroke="#FF6B6B" fill="url(#colorExpense)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
         </div>
 
         {/* Category Breakdown */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
           <h2 className="font-bold text-[#0A0A0A] text-base mb-1">{t('analytics_category_breakdown')}</h2>
           <p className="text-xs text-[#8FA4C8] mb-4">{t('analytics_this_month')}</p>
 
           {pieData.length === 0 ? (
-            <p className="text-center text-[#8FA4C8] text-sm py-10">{t('analytics_no_expense_data')}</p>
+            <p className="text-center text-[#8FA4C8] text-sm py-8">{t('analytics_no_expense_data')}</p>
           ) : (
             <>
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
                     data={pieData}
@@ -330,38 +322,31 @@ export default function Analytics() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={55}
-                    outerRadius={90}
-                    paddingAngle={3}
+                    innerRadius={45}
+                    outerRadius={75}
+                    paddingAngle={2}
                   >
                     {pieData.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
-                   formatter={(value) => [formatRupiah(value), undefined]}
-                    contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
+                    formatter={(value) => [formatRupiah(value), undefined]}
+                    contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
                   />
                 </PieChart>
               </ResponsiveContainer>
 
-              <div className="space-y-2.5 mt-2">
+              <div className="space-y-2 mt-4">
                 {pieData.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 min-w-0">
+                  <div key={i} className="flex items-center gap-2 min-w-0 text-xs sm:text-sm">
                     <span className="text-base flex-shrink-0">{item.emoji}</span>
-                    <span className="text-sm font-medium text-[#0A0A0A] flex-1 min-w-0 truncate">{item.name}</span>
-                    <div className="w-16 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden flex-shrink-0 hidden sm:block">
-                      <div
-                        className="h-full rounded-full"
-                        style={{ width: `${(item.value / totalExpenses) * 100}%`, backgroundColor: item.color }}
-                      />
+                    <span className="font-medium text-[#0A0A0A] flex-1 truncate">{item.name}</span>
+                    <div className="w-12 h-1 bg-[#F2F4F7] rounded-full overflow-hidden flex-shrink-0 hidden sm:block">
+                      <div className="h-full rounded-full" style={{ width: `${(item.value / totalExpenses) * 100}%`, backgroundColor: item.color }} />
                     </div>
-                    <span className="text-xs sm:text-sm font-semibold text-[#0A0A0A] flex-shrink-0 whitespace-nowrap">
-                      {formatRupiah(item.value)}
-                    </span>
-                    <span className="text-[10px] text-[#8FA4C8] flex-shrink-0 w-8 text-right whitespace-nowrap">
-                      {((item.value / totalExpenses) * 100).toFixed(0)}%
-                    </span>
+                    <span className="font-semibold text-[#0A0A0A] flex-shrink-0 whitespace-nowrap">{formatRupiah(item.value)}</span>
+                    <span className="text-[10px] text-[#8FA4C8] flex-shrink-0 w-6 text-right">{((item.value / totalExpenses) * 100).toFixed(0)}%</span>
                   </div>
                 ))}
               </div>
@@ -369,16 +354,16 @@ export default function Analytics() {
           )}
         </div>
 
-        {/* Budget Allocation vs Spent */}
+        {/* Budget Section */}
         {budgetData.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_budget_vs_spent')}</h2>
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={220}>
               <BarChart data={budgetData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} />
-                <YAxis tick={{ fontSize: 11, fill: "#8FA4C8" }} tickFormatter={formatYAxisTick} />
-                <Tooltip formatter={(value) => [formatRupiah(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }} />
+                <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} tickFormatter={formatYAxisTick} />
+                <Tooltip formatter={(value) => [formatRupiah(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }} />
                 <Bar dataKey="budget" fill="#4F7CFF" radius={[6, 6, 0, 0]} name={t('budget_total')} />
                 <Bar dataKey="spent" fill="#FF6B6B" radius={[6, 6, 0, 0]} name={t('budget_spent')} />
               </BarChart>
@@ -386,16 +371,16 @@ export default function Analytics() {
           </div>
         )}
 
-        {/* Savings Goals Progress */}
+        {/* Goals Progress */}
         {goalsData.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_goals_progress')}</h2>
             <div className="space-y-4">
               {goalsData.map((goal, i) => (
                 <div key={i} className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-[#0A0A0A]">{goal.name}</span>
-                    <span className="text-xs font-semibold text-[#8FA4C8]">{goal.progress.toFixed(0)}%</span>
+                  <div className="flex items-center justify-between text-xs sm:text-sm">
+                    <span className="font-medium text-[#0A0A0A]">{goal.name}</span>
+                    <span className="font-semibold text-[#8FA4C8]">{goal.progress.toFixed(0)}%</span>
                   </div>
                   <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(goal.progress, 100)}%`, backgroundColor: goal.color }}/>
@@ -410,36 +395,36 @@ export default function Analytics() {
           </div>
         )}
 
-        {/* Investment Summary */}
+        {/* Investments */}
         {investments.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_investment_summary')}</h2>
-            <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
               <div className="bg-[#F2F4F7] rounded-xl p-3">
-                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_initial_value')}</p>
-                <p className="text-sm font-bold text-[#0A0A0A]">{formatRupiah(totalInvested)}</p>
+                <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_initial_value')}</p>
+                <p className="text-sm sm:text-base font-bold text-[#0A0A0A]">{formatRupiah(totalInvested)}</p>
               </div>
               <div className="bg-[#F2F4F7] rounded-xl p-3">
-                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_current_value')}</p>
-                <p className="text-sm font-bold text-[#0A0A0A]">{formatRupiah(totalCurrentValue)}</p>
+                <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_current_value')}</p>
+                <p className="text-sm sm:text-base font-bold text-[#0A0A0A]">{formatRupiah(totalCurrentValue)}</p>
               </div>
               <div className={`rounded-xl p-3 ${investmentReturn >= 0 ? "bg-[#00C9A7]/10" : "bg-[#FF6B6B]/10"}`}>
-                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_return')}</p>
-                <p className={`text-sm font-bold ${investmentReturn >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+                <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_return')}</p>
+                <p className={`text-sm sm:text-base font-bold ${investmentReturn >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
                   {investmentReturn >= 0 ? "+" : ""}{formatRupiah(investmentReturn)}
                 </p>
               </div>
             </div>
             <div className="space-y-2">
               {investments.map((inv, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-[#F2F4F7] rounded-lg">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[#0A0A0A]">{inv.name}</p>
-                    <p className="text-xs text-[#8FA4C8]">{inv.type}</p>
+                <div key={i} className="flex items-center justify-between p-3 bg-[#F2F4F7] rounded-lg text-xs sm:text-sm">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-[#0A0A0A] truncate">{inv.name}</p>
+                    <p className="text-[10px] text-[#8FA4C8]">{inv.type}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-[#0A0A0A]">{formatRupiah(inv.current_value)}</p>
-                    <p className={`text-xs font-medium ${inv.current_value >= inv.initial_amount ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+                  <div className="text-right flex-shrink-0 ml-2">
+                    <p className="font-bold text-[#0A0A0A]">{formatRupiah(inv.current_value)}</p>
+                    <p className={`text-[10px] font-medium ${inv.current_value >= inv.initial_amount ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
                       {inv.current_value >= inv.initial_amount ? "+" : ""}{formatRupiah(inv.current_value - inv.initial_amount)}
                     </p>
                   </div>
