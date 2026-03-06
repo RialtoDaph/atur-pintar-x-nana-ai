@@ -40,7 +40,7 @@ const TRANSLATIONS = {
     
     // Category labels
     cat_housing: 'Rumah/Sewa',
-    cat_food: 'Makanan & Minuman',
+    cat_food: 'Makanan',
     cat_transport: 'Transportasi',
     cat_health: 'Kesehatan',
     cat_entertainment: 'Hiburan',
@@ -368,7 +368,7 @@ const TRANSLATIONS = {
     
     // Category labels
     cat_housing: 'Housing/Rent',
-    cat_food: 'Food & Beverage',
+    cat_food: 'Food',
     cat_transport: 'Transport',
     cat_health: 'Health',
     cat_entertainment: 'Entertainment',

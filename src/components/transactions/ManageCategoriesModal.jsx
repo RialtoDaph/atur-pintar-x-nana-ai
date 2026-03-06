@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { X, Plus, Trash2, GripVertical } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const PALETTE = ["#FF6A00","#4F7CFF","#00C9A7","#FF6B6B","#9B59B6","#E91E8C","#F5A623","#1ABC9C","#27AE60","#3498DB","#E67E22","#2C3E50"];
 const EMOJIS = ["📦","🏠","🍔","🚗","❤️","🎬","🛍️","📱","💼","💻","✈️","🎓","🐾","🧴","🎁","⚡","🍕","☕","🏋️","🎮"];
@@ -16,7 +15,7 @@ export default function ManageCategoriesModal({ onClose, onUpdated }) {
 
   async function load() {
     setLoading(true);
-    const cats = await base44.entities.CustomCategory.list("order");
+    const cats = await base44.entities.CustomCategory.list("-created_date");
     setCategories(cats);
     setLoading(false);
   }
@@ -35,24 +34,6 @@ export default function ManageCategoriesModal({ onClose, onUpdated }) {
     await base44.entities.CustomCategory.delete(id);
     await load();
     onUpdated();
-  }
-
-  async function handleDragEnd(result) {
-    const { source, destination } = result;
-    if (!destination) return;
-    if (source.index === destination.index) return;
-
-    const newCategories = Array.from(categories);
-    const [moved] = newCategories.splice(source.index, 1);
-    newCategories.splice(destination.index, 0, moved);
-
-    // Update order for all categories
-    setSaving(true);
-    for (let i = 0; i < newCategories.length; i++) {
-      await base44.entities.CustomCategory.update(newCategories[i].id, { order: i });
-    }
-    await load();
-    setSaving(false);
   }
 
   return (
@@ -118,46 +99,24 @@ export default function ManageCategoriesModal({ onClose, onUpdated }) {
         ) : categories.length === 0 ? (
           <p className="text-center text-sm text-[#9B9B9B] py-4">No custom categories yet</p>
         ) : (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="categories">
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className={`space-y-2 ${snapshot.isDraggingOver ? "bg-[#F0F0F0] rounded-xl p-2" : ""}`}
-                >
-                  {categories.map((cat, idx) => (
-                    <Draggable key={cat.id} draggableId={cat.id} index={idx}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          className={`flex items-center justify-between bg-[#F7F6F3] rounded-xl px-4 py-3 transition-all ${snapshot.isDragging ? "bg-[#FF6A00] shadow-lg" : ""}`}
-                        >
-                          <div className="flex items-center gap-2.5 flex-1">
-                            <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing text-[#9B9B9B]">
-                              <GripVertical className="w-4 h-4" />
-                            </div>
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ backgroundColor: (cat.color || "#888") + "22" }}>
-                              {cat.emoji}
-                            </div>
-                            <div>
-                              <p className={`text-sm font-semibold ${snapshot.isDragging ? "text-white" : "text-[#1A1A1A]"}`}>{cat.name}</p>
-                              <p className={`text-[10px] capitalize ${snapshot.isDragging ? "text-white/70" : "text-[#9B9B9B]"}`}>{cat.type}</p>
-                            </div>
-                          </div>
-                          <button onClick={() => handleDelete(cat.id)} disabled={saving} className={`transition-colors ${snapshot.isDragging ? "text-white hover:text-white/70" : "text-[#9B9B9B] hover:text-red-500"}`}>
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+          <div className="space-y-2">
+            {categories.map(cat => (
+              <div key={cat.id} className="flex items-center justify-between bg-[#F7F6F3] rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ backgroundColor: (cat.color || "#888") + "22" }}>
+                    {cat.emoji}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#1A1A1A]">{cat.name}</p>
+                    <p className="text-[10px] text-[#9B9B9B] capitalize">{cat.type}</p>
+                  </div>
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+                <button onClick={() => handleDelete(cat.id)} className="text-[#9B9B9B] hover:text-red-500 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
