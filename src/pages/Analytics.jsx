@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { formatRupiah } from "@/components/utils/formatRupiah";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 import FinancialCalendar from "@/components/analytics/FinancialCalendar";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
 import {
@@ -25,6 +26,7 @@ const CATEGORY_CONFIG = {
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 export default function Analytics() {
+  const { t } = useAppSettings();
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState([]);
   const [budgets, setBudgets] = useState([]);
@@ -183,8 +185,8 @@ export default function Analytics() {
       {/* Header */}
       <div className="bg-[#0A0A0A] px-5 pt-10 pb-8">
         <div className="max-w-2xl mx-auto">
-          <p className="text-[#8FA4C8] text-sm font-medium">Overview</p>
-          <h1 className="text-white text-2xl font-bold mt-0.5">Analytics</h1>
+          <p className="text-[#8FA4C8] text-sm font-medium">{t('analytics_overview')}</p>
+          <h1 className="text-white text-2xl font-bold mt-0.5">{t('analytics_title')}</h1>
         </div>
       </div>
 
@@ -198,7 +200,7 @@ export default function Analytics() {
 
         {/* Spending Trend */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Tren Pengeluaran</h2>
+          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_spending_trend')}</h2>
           <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={last12Months}>
               <defs>
@@ -218,7 +220,7 @@ export default function Analytics() {
 
         {/* Monthly Trend Bar Chart */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Pemasukan vs Pengeluaran</h2>
+          <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_income_vs_expense')}</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={trendData} barCategoryGap="30%">
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
@@ -232,18 +234,18 @@ export default function Analytics() {
             </BarChart>
           </ResponsiveContainer>
           <div className="flex gap-5 mt-2 justify-center">
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#00C9A7] inline-block"/><span className="text-xs text-[#8FA4C8]">Pemasukan</span></div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#FF6B6B] inline-block"/><span className="text-xs text-[#8FA4C8]">Pengeluaran</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#00C9A7] inline-block"/><span className="text-xs text-[#8FA4C8]">{t('analytics_income_label')}</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#FF6B6B] inline-block"/><span className="text-xs text-[#8FA4C8]">{t('analytics_expense_label')}</span></div>
           </div>
         </div>
 
         {/* Category Breakdown */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-1">Pengeluaran per Kategori</h2>
-          <p className="text-xs text-[#8FA4C8] mb-4">Bulan ini</p>
+          <h2 className="font-bold text-[#0A0A0A] text-base mb-1">{t('analytics_category_breakdown')}</h2>
+          <p className="text-xs text-[#8FA4C8] mb-4">{t('analytics_this_month')}</p>
 
           {pieData.length === 0 ? (
-            <p className="text-center text-[#8FA4C8] text-sm py-10">Tidak ada data pengeluaran bulan ini</p>
+            <p className="text-center text-[#8FA4C8] text-sm py-10">{t('analytics_no_expense_data')}</p>
           ) : (
             <>
               <ResponsiveContainer width="100%" height={220}>
@@ -296,15 +298,15 @@ export default function Analytics() {
         {/* Budget Allocation vs Spent */}
         {budgetData.length > 0 && (
           <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Alokasi Anggaran vs Pengeluaran</h2>
+            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_budget_vs_spent')}</h2>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={budgetData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} />
                 <YAxis tick={{ fontSize: 11, fill: "#8FA4C8" }} tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(0)}jt` : v >= 1000 ? `${(v/1000).toFixed(0)}rb` : v} />
                 <Tooltip formatter={(value) => [formatRupiah(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }} />
-                <Bar dataKey="budget" fill="#4F7CFF" radius={[6, 6, 0, 0]} name="Anggaran" />
-                <Bar dataKey="spent" fill="#FF6B6B" radius={[6, 6, 0, 0]} name="Terealisir" />
+                <Bar dataKey="budget" fill="#4F7CFF" radius={[6, 6, 0, 0]} name={t('budget_total')} />
+                <Bar dataKey="spent" fill="#FF6B6B" radius={[6, 6, 0, 0]} name={t('budget_spent')} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -313,7 +315,7 @@ export default function Analytics() {
         {/* Savings Goals Progress */}
         {goalsData.length > 0 && (
           <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Pencapaian Tujuan Tabungan</h2>
+            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_goals_progress')}</h2>
             <div className="space-y-4">
               {goalsData.map((goal, i) => (
                 <div key={i} className="space-y-1.5">
@@ -337,18 +339,18 @@ export default function Analytics() {
         {/* Investment Summary */}
         {investments.length > 0 && (
           <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Ringkasan Investasi</h2>
+            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_investment_summary')}</h2>
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="bg-[#F2F4F7] rounded-xl p-3">
-                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Nilai Awal</p>
+                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_initial_value')}</p>
                 <p className="text-sm font-bold text-[#0A0A0A]">{formatRupiah(totalInvested)}</p>
               </div>
               <div className="bg-[#F2F4F7] rounded-xl p-3">
-                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Nilai Sekarang</p>
+                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_current_value')}</p>
                 <p className="text-sm font-bold text-[#0A0A0A]">{formatRupiah(totalCurrentValue)}</p>
               </div>
               <div className={`rounded-xl p-3 ${investmentReturn >= 0 ? "bg-[#00C9A7]/10" : "bg-[#FF6B6B]/10"}`}>
-                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Return</p>
+                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_return')}</p>
                 <p className={`text-sm font-bold ${investmentReturn >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
                   {investmentReturn >= 0 ? "+" : ""}{formatRupiah(investmentReturn)}
                 </p>
