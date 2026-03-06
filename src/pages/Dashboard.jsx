@@ -26,7 +26,7 @@ import IncomeExpenseChart from "@/components/dashboard/IncomeExpenseChart";
 function getWidgets() {
   const saved = localStorage.getItem("widgets");
   if (saved) return JSON.parse(saved);
-  return { smartAlerts: true, cashflowForecast: true, subscriptionDetector: true, spendingChart: true, budgetAlert: true, portfolioSummary: true, savingsGoals: true };
+  return { smartAlerts: true, cashflowForecast: true, subscriptionDetector: true, spendingChart: true, recentTransactions: true, savingsGoals: true };
 }
 
 export default function Dashboard() {
@@ -141,8 +141,21 @@ export default function Dashboard() {
         {/* Spending breakdown */}
         {widgets.spendingChart && <SpendingChart transactions={thisMonthTx} loading={loading} />}
 
-        {/* Portfolio Summary (Compact) */}
-        {widgets.portfolioSummary && <PortfolioSummary />}
+        {/* Recent transactions */}
+        {widgets.recentTransactions && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <h2 className="font-bold text-[#0A0A0A] text-sm">{t('recent_transactions')}</h2>
+              <Link to={createPageUrl("Transactions")} className="text-xs text-[#FF6A00] font-semibold flex items-center gap-0.5">
+                {t('view_all')} <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <RecentTransactions transactions={transactions.slice(0, 5)} loading={loading} onRefresh={loadData} />
+          </div>
+        )}
+
+        {/* Portfolio Summary */}
+        <PortfolioSummary />
 
         {/* Savings Goals */}
         {widgets.savingsGoals && (

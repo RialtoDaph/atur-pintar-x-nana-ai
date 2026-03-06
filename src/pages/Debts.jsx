@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, CreditCard, CheckCircle, DollarSign } from "lucide-react";
+import { Plus, Trash2, CreditCard, CheckCircle } from "lucide-react";
 import AddDebtModal from "@/components/debts/AddDebtModal.jsx";
-import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import IOUSection from "@/components/splitbill/IOUSection";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
@@ -19,7 +18,6 @@ export default function DebtsPage() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  const [showPayDebt, setShowPayDebt] = useState(null); // debt id for payment
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -39,18 +37,6 @@ export default function DebtsPage() {
 
   async function markPaid(debt) {
     await base44.entities.Debt.update(debt.id, { status: "paid", remaining_amount: 0 });
-    loadData();
-  }
-
-  async function handlePaymentSave(data) {
-    // Create transaction for debt payment
-    await base44.entities.Transaction.create({
-      ...data,
-      type: "expense",
-      category: "debt_payment",
-      note: `${data.note || ''} (${debts.find(d => d.id === showPayDebt)?.name})`.trim(),
-    });
-    setShowPayDebt(null);
     loadData();
   }
 
@@ -97,13 +83,6 @@ export default function DebtsPage() {
 
       <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-3">
         <IOUSection />
-        
-        {showPayDebt && (
-          <AddTransactionModal
-            onClose={() => setShowPayDebt(null)}
-            onSave={handlePaymentSave}
-          />
-        )}
         {loading ? (
           [...Array(2)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" />)
         ) : activeDebts.length === 0 ? (
@@ -129,9 +108,6 @@ export default function DebtsPage() {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => setShowPayDebt(debt.id)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors" title={t('pay_debt') || 'Make Payment'}>
-                      <DollarSign className="w-4 h-4" />
-                    </button>
                     <button onClick={() => markPaid(debt)} className="text-[#CBD5E0] hover:text-[#00C9A7] transition-colors" title={t('debts_mark_paid_title')}>
                       <CheckCircle className="w-4 h-4" />
                     </button>

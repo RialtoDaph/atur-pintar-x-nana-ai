@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const ICONS = ["💰", "🏠", "✈️", "🚗", "💍", "🎓", "🏖️", "💻", "🛍️", "🎯"];
 const COLORS = [
@@ -12,9 +11,8 @@ const COLORS = [
   { name: "teal", hex: "#1ABC9C" },
 ];
 
-export default function AddGoalModal({ onClose, onSave, goal = null }) {
-  const { t, formatCurrency, settings } = useAppSettings();
-  const [form, setForm] = useState(goal || {
+export default function AddGoalModal({ onClose, onSave }) {
+  const [form, setForm] = useState({
     name: "",
     target_amount: "",
     current_amount: "",
@@ -40,7 +38,7 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-[#1A1A1A]">{goal ? t('edit_goal') || 'Edit Goal' : t('add_goal') || 'New Savings Goal'}</h2>
+          <h2 className="text-lg font-bold text-[#1A1A1A]">New Savings Goal</h2>
           <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors">
             <X className="w-5 h-5" />
           </button>
@@ -48,7 +46,7 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
 
         {/* Icon picker */}
         <div className="mb-5">
-          <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2">{t('icon') || 'Icon'}</p>
+          <p className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-2">Icon</p>
           <div className="flex flex-wrap gap-2">
             {ICONS.map((icon) => (
               <button
@@ -66,7 +64,7 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
 
         {/* Color picker */}
         <div className="mb-5">
-          <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2">{t('color') || 'Color'}</p>
+          <p className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-2">Color</p>
           <div className="flex gap-2">
             {COLORS.map((c) => (
               <button
@@ -82,30 +80,30 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
         {/* Fields */}
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('goal_name') || 'Goal Name'}</label>
+            <label className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-1 block">Goal Name</label>
             <input
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-              placeholder={t('goal_name_placeholder') || 'e.g. Dream Vacation'}
+              className="w-full border border-[#EFEFED] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] bg-[#F7F6F3]"
+              placeholder="e.g. Dream Vacation"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('target_amount') || 'Target'} ({settings.currency})</label>
+              <label className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-1 block">Target ($)</label>
               <input
                 type="number"
-                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                className="w-full border border-[#EFEFED] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] bg-[#F7F6F3]"
                 placeholder="5000"
                 value={form.target_amount}
                 onChange={(e) => setForm({ ...form, target_amount: e.target.value })}
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('current_saved') || 'Saved'} ({settings.currency})</label>
+              <label className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-1 block">Already saved ($)</label>
               <input
                 type="number"
-                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                className="w-full border border-[#EFEFED] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] bg-[#F7F6F3]"
                 placeholder="0"
                 value={form.current_amount}
                 onChange={(e) => setForm({ ...form, current_amount: e.target.value })}
@@ -113,20 +111,20 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
             </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('deadline_optional') || 'Deadline (optional)'}</label>
+            <label className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-1 block">Deadline (optional)</label>
             <input
               type="date"
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+              className="w-full border border-[#EFEFED] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] bg-[#F7F6F3]"
               value={form.deadline}
               onChange={(e) => setForm({ ...form, deadline: e.target.value })}
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('description_optional') || 'Description (optional)'}</label>
+            <label className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-1 block">Description (optional)</label>
             <textarea
               rows={2}
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] resize-none"
-              placeholder={t('goal_desc_placeholder') || 'Why are you saving for this?'}
+              className="w-full border border-[#EFEFED] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] bg-[#F7F6F3] resize-none"
+              placeholder="Why are you saving for this?"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
@@ -136,9 +134,9 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
         <button
           onClick={handleSave}
           disabled={saving || !form.name || !form.target_amount}
-          className="mt-6 w-full bg-[#FF6A00] text-white py-3.5 rounded-xl font-semibold text-sm disabled:opacity-40 hover:bg-[#e05e00] transition-colors"
+          className="mt-6 w-full bg-[#1A1A1A] text-white py-3.5 rounded-xl font-semibold text-sm disabled:opacity-40 hover:bg-[#333] transition-colors"
         >
-          {saving ? t('saving') : goal ? (t('update_goal') || 'Update Goal') : (t('create_goal') || 'Create Goal')}
+          {saving ? "Creating..." : "Create Goal"}
         </button>
       </div>
     </div>

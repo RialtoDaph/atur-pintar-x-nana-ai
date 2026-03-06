@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function AddTransactionModal({ type, onClose, onSave, maxWithdrawal }) {
-  const { t, settings } = useAppSettings();
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
@@ -25,7 +23,7 @@ export default function AddTransactionModal({ type, onClose, onSave, maxWithdraw
       <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-[#1A1A1A]">
-            {isDeposit ? t('add_money') || 'Add Money' : t('withdraw') || 'Withdraw'}
+            {isDeposit ? "Add Money" : "Withdraw"}
           </h2>
           <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A] transition-colors">
             <X className="w-5 h-5" />
@@ -34,30 +32,30 @@ export default function AddTransactionModal({ type, onClose, onSave, maxWithdraw
 
         {/* Amount input */}
         <div className="mb-4">
-          <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('amount') || 'Amount'} ({settings.currency})</label>
+          <label className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-2 block">Amount ($)</label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium">{settings.currency_symbol}</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9B9B9B] font-medium">$</span>
             <input
               autoFocus
               type="number"
               min="0"
               max={!isDeposit ? maxWithdrawal : undefined}
-              className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3.5 text-xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+              className="w-full border border-[#EFEFED] rounded-xl pl-8 pr-4 py-3.5 text-xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] bg-[#F7F6F3]"
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
           {!isDeposit && (
-            <p className="text-xs text-[#8FA4C8] mt-1">{t('available') || 'Available'}: {settings.currency_symbol} {maxWithdrawal.toLocaleString(settings.language === 'id' ? "id-ID" : "en-US")}</p>
+            <p className="text-xs text-[#9B9B9B] mt-1">Available: ${maxWithdrawal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           )}
         </div>
 
         <div className="mb-6">
-          <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('note_optional') || 'Note (optional)'}</label>
+          <label className="text-xs font-semibold text-[#9B9B9B] uppercase tracking-widest mb-2 block">Note (optional)</label>
           <input
-            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-            placeholder={isDeposit ? t('note_deposit_placeholder') || 'e.g. Monthly savings' : t('note_withdraw_placeholder') || 'e.g. Emergency expense'}
+            className="w-full border border-[#EFEFED] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] bg-[#F7F6F3]"
+            placeholder={isDeposit ? "e.g. Monthly savings" : "e.g. Emergency expense"}
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
@@ -68,11 +66,11 @@ export default function AddTransactionModal({ type, onClose, onSave, maxWithdraw
           disabled={saving || !amount || parseFloat(amount) <= 0 || (!isDeposit && parseFloat(amount) > max)}
           className="w-full py-3.5 rounded-xl font-semibold text-sm disabled:opacity-40 transition-colors"
           style={{
-            backgroundColor: isDeposit ? "#FF6A00" : "#FF5252",
+            backgroundColor: isDeposit ? "#1A1A1A" : "#FF5252",
             color: "white",
           }}
         >
-          {saving ? t('saving') || 'Saving...' : isDeposit ? (t('add_money') || 'Add Money') : (t('withdraw') || 'Withdraw')}
+          {saving ? "Saving..." : isDeposit ? "Add Money" : "Withdraw"}
         </button>
       </div>
     </div>

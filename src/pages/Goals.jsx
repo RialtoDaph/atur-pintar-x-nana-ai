@@ -83,11 +83,7 @@ export default function Goals() {
   }
 
   async function handleAddGoal(data) {
-    if (goal?.id) {
-      await base44.entities.SavingsGoal.update(goal.id, data);
-    } else {
-      await base44.entities.SavingsGoal.create(data);
-    }
+    await base44.entities.SavingsGoal.create(data);
     setShowAddGoal(false);
     loadData();
   }
@@ -177,24 +173,18 @@ export default function Goals() {
             <div className="grid grid-cols-2 gap-3 mt-2">
               <button
                 onClick={() => setShowTxModal("deposit")}
-                className="flex items-center justify-center gap-2 bg-[#FF6A00] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#e05e00] transition-colors"
+                className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors"
               >
                 <Plus className="w-4 h-4" /> {t('goals_add_money')}
               </button>
               <button
                 onClick={() => setShowTxModal("withdrawal")}
-                className="flex items-center justify-center gap-2 bg-[#F2F4F7] text-[#1A1A1A] py-3 rounded-xl text-sm font-semibold hover:bg-[#E2E8F0] transition-colors border border-[#E2E8F0]"
+                className="flex items-center justify-center gap-2 bg-[#F7F6F3] text-[#1A1A1A] py-3 rounded-xl text-sm font-semibold hover:bg-[#EFEFED] transition-colors border border-[#EFEFED]"
               >
                 <Minus className="w-4 h-4" /> {t('goals_withdraw')}
               </button>
             </div>
           )}
-          <button
-            onClick={() => setShowAddGoal(true)}
-            className="w-full mt-3 py-2.5 rounded-xl text-sm font-semibold text-[#FF6A00] border border-[#FF6A00] hover:bg-[#FF6A00]/5 transition-colors"
-          >
-            ✏️ {t('edit_goal') || 'Edit Goal'}
-          </button>
         </div>
 
         {/* Transactions */}
@@ -364,7 +354,6 @@ export default function Goals() {
 
     {showAddGoal && (
      <AddGoalModal
-       goal={goalId ? goal : null}
        onClose={() => setShowAddGoal(false)}
        onSave={handleAddGoal}
      />

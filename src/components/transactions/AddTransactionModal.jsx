@@ -138,7 +138,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-        <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto scroll-smooth border border-[#E2E8F0]">
+        <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto scroll-smooth">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-[#1A1A1A]">{t('add_transaction')}</h2>
             <div className="flex items-center gap-2">
@@ -211,7 +211,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
              <button key={tabKey} onClick={() => { setTab(tabKey); setForm(f => ({ ...f, category: "" })); }}
                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                  tab === tabKey
-                   ? tabKey === "expense" ? "bg-[#FF5252] text-white shadow-sm" : "bg-[#00C9A7] text-white shadow-sm"
+                   ? tabKey === "expense" ? "bg-[#FF6B6B] text-white shadow-sm" : "bg-[#00C9A7] text-white shadow-sm"
                    : "text-[#8FA4C8]"
                }`}>
                {tabKey === "expense" ? t('expense') : t('income')}
@@ -317,7 +317,7 @@ export default function AddTransactionModal({ onClose, onSave }) {
 
           <button onClick={handleSave} disabled={saving || !form.amount || !form.category}
             className="w-full py-3.5 rounded-xl font-bold text-sm text-white disabled:opacity-40 transition-colors"
-            style={{ backgroundColor: tab === "expense" ? "#FF5252" : "#00C9A7" }}>
+            style={{ backgroundColor: tab === "expense" ? "#FF6B6B" : "#00C9A7" }}>
             {saving ? t('saving') : `${t('add')} ${tab === "expense" ? t('expense') : t('income')}`}
           </button>
         </div>

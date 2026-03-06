@@ -81,7 +81,7 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
       <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-[#1A1A1A]">{investment ? t('edit_investment') : t('add_investment')}</h2>
-          <button onClick={onClose} className="text-[#8FA4C8] hover:text-[#1A1A1A] transition-colors"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A]"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="mb-4">
@@ -187,7 +187,7 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
 
         <button onClick={handleSave} disabled={saving || !form.name || !form.initial_amount}
           className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] disabled:opacity-40 hover:bg-[#e05e00] transition-colors">
-          {saving ? t('saving') || 'Saving...' : investment ? (t('update_investment') || 'Update') : (t('add_investment') || 'Add Investment')}
+          {saving ? t('saving') : investment ? t('update_investment') : t('add_investment')}
         </button>
       </div>
     </div>

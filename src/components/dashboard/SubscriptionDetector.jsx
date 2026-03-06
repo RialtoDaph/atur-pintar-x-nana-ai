@@ -5,13 +5,7 @@ export default function SubscriptionDetector({ transactions, loading }) {
   const { formatCurrency, t } = useAppSettings();
   if (loading) return null;
 
-  // Only count actual transactions (not recurring templates)
-  // If it's a recurring child, count it; if it's a recurring template that hasn't fired yet, skip it
-  const subs = transactions.filter(t => 
-    t.category === "subscriptions" && 
-    t.type === "expense" &&
-    (!t.is_recurring || t.is_recurring_child) // Include only actual transactions or recurring children
-  );
+  const subs = transactions.filter(t => t.category === "subscriptions" && t.type === "expense");
   const totalSubs = subs.reduce((s, t) => s + t.amount, 0);
 
   // Group by note/name
