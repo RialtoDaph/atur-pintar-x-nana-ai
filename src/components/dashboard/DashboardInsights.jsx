@@ -33,6 +33,7 @@ export default function DashboardInsights({ transactions, goals }) {
   if (lastExpense > 0) {
     if (expenseChange > 20) {
       insights.push({
+        id: "expense_increase",
         icon: <AlertTriangle className="w-4 h-4 text-[#FF6B6B]" />,
         color: "bg-[#FF6B6B]/10 border-[#FF6B6B]/20",
         textColor: "text-[#FF6B6B]",
@@ -40,6 +41,7 @@ export default function DashboardInsights({ transactions, goals }) {
       });
     } else if (expenseChange < -10) {
       insights.push({
+        id: "expense_decrease",
         icon: <TrendingDown className="w-4 h-4 text-[#00C9A7]" />,
         color: "bg-[#00C9A7]/10 border-[#00C9A7]/20",
         textColor: "text-[#00C9A7]",
@@ -52,6 +54,7 @@ export default function DashboardInsights({ transactions, goals }) {
   if (thisIncome > 0) {
     if (savingsRate >= 20) {
       insights.push({
+        id: "savings_good",
         icon: <CheckCircle className="w-4 h-4 text-[#00C9A7]" />,
         color: "bg-[#00C9A7]/10 border-[#00C9A7]/20",
         textColor: "text-[#00C9A7]",
@@ -59,6 +62,7 @@ export default function DashboardInsights({ transactions, goals }) {
       });
     } else if (savingsRate < 10 && savingsRate > 0) {
       insights.push({
+        id: "savings_low",
         icon: <Lightbulb className="w-4 h-4 text-[#F5A623]" />,
         color: "bg-[#F5A623]/10 border-[#F5A623]/20",
         textColor: "text-[#F5A623]",
@@ -76,6 +80,7 @@ export default function DashboardInsights({ transactions, goals }) {
 
   if (urgentGoals.length > 0) {
     insights.push({
+      id: "urgent_goals",
       icon: <AlertTriangle className="w-4 h-4 text-[#FF6A00]" />,
       color: "bg-[#FF6A00]/10 border-[#FF6A00]/20",
       textColor: "text-[#FF6A00]",
@@ -83,7 +88,15 @@ export default function DashboardInsights({ transactions, goals }) {
     });
   }
 
-  if (insights.length === 0) return null;
+  const filteredInsights = insights.filter(ins => !dismissedInsights.includes(ins.id));
+
+  const handleDismiss = (id) => {
+    const updated = [...dismissedInsights, id];
+    setDismissedInsights(updated);
+    localStorage.setItem("dismissedInsights", JSON.stringify(updated));
+  };
+
+  if (filteredInsights.length === 0) return null;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
