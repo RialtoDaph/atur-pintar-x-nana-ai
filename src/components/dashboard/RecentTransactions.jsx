@@ -27,7 +27,7 @@ export default function RecentTransactions({ transactions, loading }) {
   if (transactions.length === 0) {
     return (
       <div className="px-5 pb-5 text-center py-8 text-[#8FA4C8] text-sm">
-        Belum ada transaksi. Tambahkan yang pertama!
+        {t('no_transactions')}
       </div>
     );
   }

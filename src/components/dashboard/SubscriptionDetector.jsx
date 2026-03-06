@@ -22,13 +22,13 @@ export default function SubscriptionDetector({ transactions, loading }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-bold text-[#0A0A0A] text-sm">🔁 Langganan Terdeteksi</h2>
+        <h2 className="font-bold text-[#0A0A0A] text-sm">{t('subscriptions_detected')}</h2>
         <span className="text-xs font-semibold text-[#FF6A00] bg-orange-50 px-2 py-1 rounded-full">
-          {formatCurrency(totalSubs)} / bulan
+          {formatCurrency(totalSubs)} {t('per_month')}
         </span>
       </div>
       {list.length === 0 ? (
-        <p className="text-xs text-[#9B9B9B] py-1">Belum ada langganan terdeteksi.</p>
+        <p className="text-xs text-[#9B9B9B] py-1">{t('no_subscriptions')}</p>
       ) : (
         <div className="space-y-1">
           {list.map((s, i) => (

@@ -20,7 +20,7 @@ export default function GoalsMiniList({ goals, loading }) {
   if (goals.length === 0) {
     return (
       <div className="px-5 pb-5 text-center py-6 text-[#8FA4C8] text-sm">
-        Belum ada tujuan. Mulai menabung sekarang!
+        {t('no_goals')}
       </div>
     );
   }

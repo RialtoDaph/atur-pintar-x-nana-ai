@@ -1,6 +1,8 @@
 import { AlertTriangle, TrendingUp, Info } from "lucide-react";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function SmartAlerts({ transactions, loading }) {
+  const { t } = useAppSettings();
   if (loading) return null;
 
   const now = new Date();
@@ -57,7 +59,7 @@ export default function SmartAlerts({ transactions, loading }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 space-y-1.5">
-      <h2 className="font-bold text-[#0A0A0A] text-sm mb-2">🔔 Peringatan Cerdas</h2>
+      <h2 className="font-bold text-[#0A0A0A] text-sm mb-2">{t('smart_alerts_title')}</h2>
       {alerts.map((a, i) => (
         <div key={i} className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 border ${a.bg} ${a.border}`}>
           <a.icon className={`w-3.5 h-3.5 flex-shrink-0 ${a.color}`} />
