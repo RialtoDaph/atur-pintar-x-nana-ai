@@ -21,13 +21,15 @@ const DEFAULT_CATEGORIES = {
   ],
 };
 
-export default function EditTransactionModal({ transaction, onClose, onSave }) {
+export default function EditTransactionModal({ transaction, goals = [], onClose, onSave }) {
+  const { t } = useAppSettings();
   const [tab, setTab] = useState(transaction.type === "income" ? "income" : "expense");
   const [form, setForm] = useState({
     amount: String(transaction.amount || ""),
     category: transaction.category || "",
     note: transaction.note || "",
     date: transaction.date || new Date().toISOString().split("T")[0],
+    goal_id: transaction.goal_id || "",
   });
   const [saving, setSaving] = useState(false);
   const [customCats, setCustomCats] = useState([]);
