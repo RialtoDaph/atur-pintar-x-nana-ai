@@ -79,9 +79,9 @@ export function useFinancialContext() {
 
       // Non-recurring expense average
       const nonRecurringExpense = thisTx.filter((t) => t.type === "expense" && !t.is_recurring_child).reduce((s, t) => s + t.amount, 0);
-      const daysElapsed = Math.max(15, dayOfMonth - 1);
-      const dailyExpenseAvg = nonRecurringExpense / daysElapsed;
-      const projectedExtraExpense = dailyExpenseAvg * daysLeft + scheduledFutureExpense;
+      const daysElapsed = Math.max(1, dayOfMonth - 1);
+      const dailyExpenseAvg = daysElapsed > 0 ? nonRecurringExpense / daysElapsed : 0;
+      const projectedExtraExpense = dailyExpenseAvg * Math.max(0, daysLeft) + scheduledFutureExpense;
       const projectedTotalExpense = thisExpense + projectedExtraExpense;
 
       // Category breakdown this month
