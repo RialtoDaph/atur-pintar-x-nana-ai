@@ -156,7 +156,8 @@ export default function Transactions() {
       const cat = customCategories.find(c => c.id === customId);
       if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color || "#888" };
     }
-    return DEFAULT_CATEGORIES[key] || DEFAULT_CATEGORIES.other;
+    const defaultCat = DEFAULT_CATEGORIES[key] || DEFAULT_CATEGORIES.other;
+    return { ...defaultCat, label: t(defaultCat.key) };
   };
 
   // Filter logic
