@@ -100,6 +100,16 @@ export default function Analytics() {
   // Format Y-axis tick values
   const formatYAxisTick = useCallback((value) => formatShortNumber(value), [formatShortNumber]);
 
+  // Format period label for summary cards
+  const formatPeriodLabel = (period) => {
+    const months = parseInt(period);
+    if (months === 1) return t('this_month') || 'This month';
+    if (months === 3) return 'Last 3 months';
+    if (months === 6) return 'Last 6 months';
+    if (months === 12) return 'Last 12 months';
+    return `Last ${months} months`;
+  };
+
   // Build trend data based on selected period
   const now = new Date();
   const getMonthRange = () => {
@@ -205,6 +215,12 @@ export default function Analytics() {
     );
   }
 
+  // Calculate summary stats
+  const totalIncome = trendData.reduce((sum, month) => sum + month.Income, 0);
+  const totalExpenses = trendData.reduce((sum, month) => sum + month.Expenses, 0);
+  const netCashflow = totalIncome - totalExpenses;
+  const savingsRate = totalIncome > 0 ? ((netCashflow / totalIncome) * 100).toFixed(1) : 0;
+
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-10">
       {/* Header */}
@@ -216,6 +232,39 @@ export default function Analytics() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 mt-6 space-y-5">
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* Total Income */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#00C9A7]">
+            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_income_label')}</p>
+            <p className="text-lg sm:text-xl font-bold text-[#00C9A7]">{formatShortNumber(totalIncome)}</p>
+            <p className="text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
+          </div>
+
+          {/* Total Expenses */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#FF6B6B]">
+            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_expense_label')}</p>
+            <p className="text-lg sm:text-xl font-bold text-[#FF6B6B]">{formatShortNumber(totalExpenses)}</p>
+            <p className="text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
+          </div>
+
+          {/* Net Cashflow */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4" style={{ borderLeftColor: netCashflow >= 0 ? "#00C9A7" : "#FF6B6B" }}>
+            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_cashflow') || 'Net Cashflow'}</p>
+            <p className="text-lg sm:text-xl font-bold" style={{ color: netCashflow >= 0 ? "#00C9A7" : "#FF6B6B" }}>
+              {netCashflow >= 0 ? "+" : ""}{formatShortNumber(netCashflow)}
+            </p>
+            <p className="text-[10px] text-[#8FA4C8] mt-1">{formatPeriodLabel(filterPeriod)}</p>
+          </div>
+
+          {/* Savings Rate */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-[#4F7CFF]">
+            <p className="text-[10px] text-[#8FA4C8] font-medium uppercase tracking-widest mb-1.5">{t('analytics_savings_rate') || 'Savings Rate'}</p>
+            <p className="text-lg sm:text-xl font-bold text-[#4F7CFF]">{savingsRate}%</p>
+            <p className="text-[10px] text-[#8FA4C8] mt-1">{t('analytics_of_income') || 'of income'}</p>
+          </div>
+        </div>
 
         {/* Date Range Filter */}
         <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
