@@ -143,7 +143,28 @@ export default function Transactions() {
     }
   }
 
-  const filtered = filter === "all" ? transactions : transactions.filter(tx => tx.type === filter);
+  // Get category config (default + custom)
+  const getCategoryConfig = (key) => {
+    if (key && key.startsWith('custom_')) {
+      const customId = key.substring(7);
+      const cat = customCategories.find(c => c.id === customId);
+      if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color || "#888" };
+    }
+    return DEFAULT_CATEGORIES[key] || DEFAULT_CATEGORIES.other;
+  };
+
+  // Filter logic
+  let filtered = filter === "all" ? transactions : transactions.filter(tx => tx.type === filter);
+  if (goalFilter) {
+    filtered = filtered.filter(tx => tx.goal_id === goalFilter);
+  }
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(tx => 
+      (tx.note || "").toLowerCase().includes(q) ||
+      getCategoryConfig(tx.category).label.toLowerCase().includes(q)
+    );
+  }
 
   // Group by month
   const grouped = {};
