@@ -45,14 +45,27 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
   const [receiptData, setReceiptData] = useState(null); // extracted receipt
   const [showSplitBill, setShowSplitBill] = useState(false);
   const [catOrder, setCatOrder] = useState([]); // Category drag order
+  const [appSettings, setAppSettings] = useState(null);
   const fileRef = useRef(null);
 
-  useEffect(() => { loadCustomCats(); }, []);
+  useEffect(() => { 
+    loadCustomCats();
+    loadAppSettings();
+  }, []);
+  
   useEffect(() => {
     base44.entities.CustomCategory.subscribe((event) => {
       loadCustomCats();
     });
   }, []);
+
+  async function loadAppSettings() {
+    const settings = await base44.entities.AppSettings.list();
+    if (settings.length > 0) {
+      setAppSettings(settings[0]);
+      setCatOrder(settings[0].category_order || []);
+    }
+  }
 
   async function loadCustomCats() {
     const cats = await base44.entities.CustomCategory.list("-created_date");
@@ -157,14 +170,20 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
     ? catOrder.map(key => mainCats.find(c => c.key === key)).filter(Boolean)
     : mainCats;
   
-  const handleDragEnd = (result) => {
+  const handleDragEnd = async (result) => {
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
     
     const newOrder = Array.from(orderedCats);
     const [moved] = newOrder.splice(source.index, 1);
     newOrder.splice(destination.index, 0, moved);
-    setCatOrder(newOrder.map(c => c.key));
+    const newOrderKeys = newOrder.map(c => c.key);
+    setCatOrder(newOrderKeys);
+    
+    // Save to AppSettings
+    if (appSettings) {
+      await base44.entities.AppSettings.update(appSettings.id, { category_order: newOrderKeys });
+    }
   };
 
   // Format currency input helper
