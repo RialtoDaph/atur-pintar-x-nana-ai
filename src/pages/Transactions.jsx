@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Trash2, Pencil, CheckSquare, Square, X } from "lucide-react";
-import { formatRupiah } from "@/components/utils/formatRupiah";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import EditTransactionModal from "@/components/transactions/EditTransactionModal";
 
