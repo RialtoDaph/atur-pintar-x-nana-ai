@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { formatRupiah } from "@/components/utils/formatRupiah";
 import { Plus, Bell, Trash2, ToggleLeft, ToggleRight, Edit2, Check } from "lucide-react";
 import AddReminderModal from "@/components/reminders/AddReminderModal";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const TYPE_CONFIG = {
   tagihan:   { label: "Tagihan",   emoji: "🧾", color: "#FF6B6B" },
@@ -23,6 +24,7 @@ function getDaysUntilDue(dueDay) {
 }
 
 export default function Reminders() {
+  const { t, formatCurrency } = useAppSettings();
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -78,8 +80,8 @@ export default function Reminders() {
       <div className="bg-[#0A0A0A] px-5 pt-8 pb-10">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div>
-            <p className="text-[#8FA4C8] text-xs font-medium">Kelola</p>
-            <h1 className="text-white text-xl font-bold mt-0.5">Pengingat</h1>
+            <p className="text-[#8FA4C8] text-xs font-medium">{t('reminders_manage')}</p>
+            <h1 className="text-white text-xl font-bold mt-0.5">{t('reminders_title')}</h1>
           </div>
           <button
             onClick={() => { setEditing(null); setShowAdd(true); }}
@@ -95,9 +97,9 @@ export default function Reminders() {
         {/* Summary */}
         {activeReminders.length > 0 && (
           <div className="bg-[#FF6A00] rounded-2xl p-4 text-white">
-            <p className="text-xs opacity-80 font-medium">Total tagihan aktif bulan ini</p>
-            <p className="text-2xl font-bold mt-0.5">{formatRupiah(totalDue)}</p>
-            <p className="text-xs opacity-70 mt-1">{activeReminders.length} pengingat aktif</p>
+            <p className="text-xs opacity-80 font-medium">{t('reminders_total_active')}</p>
+            <p className="text-2xl font-bold mt-0.5">{formatCurrency(totalDue)}</p>
+            <p className="text-xs opacity-70 mt-1">{activeReminders.length} {t('reminders_active_count')}</p>
           </div>
         )}
 
@@ -110,9 +112,9 @@ export default function Reminders() {
         {!loading && reminders.length === 0 && (
           <div className="bg-white rounded-2xl p-10 text-center">
             <Bell className="w-10 h-10 text-[#E2E8F0] mx-auto mb-3" />
-            <p className="text-[#8FA4C8] text-sm">Belum ada pengingat</p>
+            <p className="text-[#8FA4C8] text-sm">{t('reminders_empty')}</p>
             <button onClick={() => setShowAdd(true)} className="mt-3 text-sm font-semibold text-[#FF6A00]">
-              + Tambah pengingat pertama
+              {t('reminders_add_first')}
             </button>
           </div>
         )}
@@ -120,7 +122,7 @@ export default function Reminders() {
         {/* Active & upcoming */}
         {upcomingReminders.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 px-1">Akan Datang</p>
+            <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 px-1">{t('reminders_upcoming')}</p>
             <div className="space-y-2">
               {upcomingReminders.map(r => {
                 const daysLeft = getDaysUntilDue(r.due_day);
@@ -136,11 +138,11 @@ export default function Reminders() {
                         <div className="flex items-center justify-between gap-2">
                           <p className="font-semibold text-[#0A0A0A] text-sm truncate">{r.title}</p>
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${urgent ? "bg-[#FF6B6B]/10 text-[#FF6B6B]" : "bg-[#F2F4F7] text-[#8FA4C8]"}`}>
-                            {daysLeft === 0 ? "Hari ini!" : daysLeft === 1 ? "Besok!" : `${daysLeft} hari lagi`}
+                            {daysLeft === 0 ? t('today') : daysLeft === 1 ? t('tomorrow') : `${daysLeft} ${t('days_left')}`}
                           </span>
                         </div>
                         <p className="text-xs text-[#8FA4C8] mt-0.5">
-                          {cfg.label} · Tgl {r.due_day} tiap bulan
+                          {cfg.label} · {t('reminders_due_day')} {r.due_day} {t('reminders_every_month')}
                           {r.amount ? ` · ${formatRupiah(r.amount)}` : ""}
                         </p>
                         {r.notes && <p className="text-xs text-[#8FA4C8] mt-0.5 truncate">{r.notes}</p>}
@@ -148,10 +150,10 @@ export default function Reminders() {
                     </div>
                     <div className="flex items-center gap-2 mt-3">
                       <button onClick={() => dismissThisMonth(r)} className="flex items-center gap-1 text-xs text-[#00C9A7] font-semibold bg-[#00C9A7]/10 px-3 py-1.5 rounded-lg hover:bg-[#00C9A7]/20 transition-colors">
-                        <Check className="w-3 h-3" /> Sudah bayar
+                        <Check className="w-3 h-3" /> {t('reminders_mark_paid')}
                       </button>
                       <button onClick={() => { setEditing(r); setShowAdd(true); }} className="flex items-center gap-1 text-xs text-[#8FA4C8] font-medium px-3 py-1.5 rounded-lg hover:bg-[#F2F4F7] transition-colors">
-                        <Edit2 className="w-3 h-3" /> Edit
+                        <Edit2 className="w-3 h-3" /> {t('reminders_edit')}
                       </button>
                       <button onClick={() => deleteReminder(r.id)} className="flex items-center gap-1 text-xs text-[#FF6B6B] font-medium px-3 py-1.5 rounded-lg hover:bg-[#FF6B6B]/10 transition-colors ml-auto">
                         <Trash2 className="w-3 h-3" />
@@ -167,7 +169,7 @@ export default function Reminders() {
         {/* Dismissed this month */}
         {dismissedThisMonth.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 px-1">Sudah Dibayar Bulan Ini</p>
+            <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 px-1">{t('reminders_paid_this_month')}</p>
             <div className="space-y-2">
               {dismissedThisMonth.map(r => {
                 const cfg = TYPE_CONFIG[r.type] || TYPE_CONFIG.lainnya;
@@ -193,7 +195,7 @@ export default function Reminders() {
         {/* Inactive */}
         {inactive.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 px-1">Nonaktif</p>
+            <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 px-1">{t('reminders_inactive')}</p>
             <div className="space-y-2">
               {inactive.map(r => {
                 const cfg = TYPE_CONFIG[r.type] || TYPE_CONFIG.lainnya;
@@ -204,7 +206,7 @@ export default function Reminders() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-[#0A0A0A] text-sm truncate">{r.title}</p>
-                      <p className="text-xs text-[#8FA4C8]">Tgl {r.due_day} · {r.amount ? formatRupiah(r.amount) : cfg.label}</p>
+                      <p className="text-xs text-[#8FA4C8]">{t('reminders_due_day')} {r.due_day} · {r.amount ? formatCurrency(r.amount) : cfg.label}</p>
                     </div>
                     <button onClick={() => toggleActive(r)} className="text-[#8FA4C8] hover:text-[#FF6A00] transition-colors">
                       <ToggleLeft className="w-6 h-6" />
