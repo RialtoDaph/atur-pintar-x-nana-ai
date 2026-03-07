@@ -10,7 +10,8 @@ export default function DailySpendingCard({
   transactions,
   filterPeriod,
   customDateRange,
-  onNavigateToDetail
+  onNavigateToDetail,
+  onOpenSettings
 }) {
   const navigate = useNavigate();
   const { formatShortNumber } = useAppSettings();

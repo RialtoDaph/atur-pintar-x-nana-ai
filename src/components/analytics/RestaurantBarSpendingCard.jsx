@@ -11,7 +11,8 @@ export default function RestaurantBarSpendingCard({
   customCategories,
   filterPeriod,
   customDateRange,
-  onNavigateToDetail
+  onNavigateToDetail,
+  onOpenSettings
 }) {
   const navigate = useNavigate();
   const { formatShortNumber } = useAppSettings();
