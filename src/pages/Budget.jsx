@@ -195,6 +195,14 @@ export default function BudgetPage() {
 
       {/* Budget list */}
       <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-3">
+        {/* Nana AI Savings Recommendation */}
+        {!loading && Object.keys(spendingByCategory).length > 0 && (
+          <SavingsRecommendationWidget
+            spendingByCategory={spendingByCategory}
+            budgets={budgets}
+            transactions3M={transactions3M}
+          />
+        )}
         {loading ? (
           [...Array(3)].map((_, i) => (
             <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />
