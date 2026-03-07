@@ -204,18 +204,35 @@ export default function Goals() {
           </div>
 
         {/* Transactions */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-3 flex items-center justify-between">
           <h2 className="font-semibold text-[#1A1A1A]">{t('goals_activity')}</h2>
           <button onClick={handleDelete} className="text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1">
             <Trash2 className="w-3.5 h-3.5" /> {t('goals_delete_goal')}
           </button>
         </div>
 
-        {transactions.length === 0 ? (
+        {/* Filter tabs */}
+        {transactions.length > 0 && (
+          <div className="flex gap-2 mb-3">
+            {["all", "deposit", "withdrawal"].map((f) => (
+              <button
+                key={f}
+                onClick={() => setTxFilter(f)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  txFilter === f ? "bg-[#1A1A1A] text-white" : "bg-[#F2F4F7] text-[#8FA4C8] hover:bg-[#E2E8F0]"
+                }`}
+              >
+                {f === "all" ? "Semua" : f === "deposit" ? "💰 Setor" : "📤 Tarik"}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {transactions.filter(tx => txFilter === "all" || tx.type === txFilter).length === 0 ? (
           <div className="text-center py-12 text-[#9B9B9B] text-sm">{t('goals_no_tx')}</div>
         ) : (
           <div className="space-y-2">
-            {transactions.map((tx) => (
+            {transactions.filter(tx => txFilter === "all" || tx.type === txFilter).map((tx) => (
               <div key={tx.id} className="bg-white rounded-2xl px-4 py-3.5 flex items-center justify-between shadow-sm border border-[#EFEFED]">
                 <div className="flex items-center gap-3">
                   <div
