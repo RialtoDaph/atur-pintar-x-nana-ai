@@ -40,7 +40,8 @@ export default function InvestmentDetail() {
   }
 
   async function handleDelete() {
-    if (window.confirm("Hapus investasi ini?")) {
+    const msg = lang === 'en' ? 'Delete this investment?' : 'Hapus investasi ini?';
+    if (window.confirm(msg)) {
       await base44.entities.Investment.delete(investmentId);
       window.location.href = createPageUrl("Investments");
     }
@@ -58,9 +59,11 @@ export default function InvestmentDetail() {
     return (
       <div className="min-h-screen bg-[#F2F4F7] p-5">
         <Link to={createPageUrl("Investments")} className="text-[#FF6A00] font-medium flex items-center gap-1">
-          <ArrowLeft className="w-4 h-4" /> Kembali
+          <ArrowLeft className="w-4 h-4" /> {lang === 'en' ? 'Back' : 'Kembali'}
         </Link>
-        <p className="text-center text-[#8FA4C8] mt-10">Investasi tidak ditemukan</p>
+        <p className="text-center text-[#8FA4C8] mt-10">
+          {lang === 'en' ? 'Investment not found' : 'Investasi tidak ditemukan'}
+        </p>
       </div>
     );
   }
