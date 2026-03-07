@@ -71,7 +71,7 @@ export default function InvestmentsPage() {
 
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
-      <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
+      <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -86,28 +86,38 @@ export default function InvestmentsPage() {
             </button>
           </div>
 
-          <div className="bg-white/10 rounded-2xl p-5 mb-4">
-            <p className="text-white/60 text-sm mb-1">{t('total_portfolio')}</p>
-            <p className="text-white font-bold text-3xl mb-2">{formatCurrency(totalValue)}</p>
-            <div className="flex items-center gap-1">
-              {totalGain >= 0 ? <TrendingUp className="w-4 h-4 text-[#00C9A7]" /> : <TrendingDown className="w-4 h-4 text-[#FF6B6B]" />}
-              <span className={`text-sm font-semibold ${totalGain >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                {totalGain >= 0 ? "+" : ""}{formatCurrency(totalGain)} ({gainPercent}%)
-              </span>
-              <span className="text-white/40 text-xs ml-1">{t('investments_from_capital')} {formatCurrency(totalInvested)}</span>
+          {/* Mini summary strip in header */}
+          {investments.length > 0 && (
+            <div className="flex items-center gap-3">
+              <div className="flex-1 bg-white/10 rounded-xl px-4 py-3">
+                <p className="text-white/50 text-[10px] uppercase tracking-widest font-medium">{t('total_portfolio')}</p>
+                <p className="text-white font-bold text-lg">{formatCurrency(totalValue)}</p>
+              </div>
+              <div className="flex-1 bg-white/10 rounded-xl px-4 py-3">
+                <p className="text-white/50 text-[10px] uppercase tracking-widest font-medium">{t('profit_loss')}</p>
+                <p className={`font-bold text-lg ${totalGain >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+                  {totalGain >= 0 ? "+" : ""}{gainPercent}%
+                </p>
+              </div>
+              <div className="flex-1 bg-white/10 rounded-xl px-4 py-3">
+                <p className="text-white/50 text-[10px] uppercase tracking-widest font-medium">{t('initial_amount')}</p>
+                <p className="text-white font-bold text-lg">{formatCurrency(totalInvested)}</p>
+              </div>
             </div>
-          </div>
-
-          <PerformanceMetrics investments={investments} totalValue={totalValue} totalInvested={totalInvested} formatCurrency={formatCurrency} />
+          )}
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-4">
+      <div className="max-w-2xl mx-auto px-5 mt-4 space-y-4">
+        {/* Trend chart — Trade Republic style */}
+        <PortfolioTrendChart investments={investments} totalValue={totalValue} totalInvested={totalInvested} />
+
+        {/* Diversification pie */}
         <DiversificationChart investments={investments} totalValue={totalValue} formatCurrency={formatCurrency} />
 
-        <RiskProfileRecommendation investments={investments} />
+        <PerformanceMetrics investments={investments} totalValue={totalValue} totalInvested={totalInvested} formatCurrency={formatCurrency} />
 
-        <EducationResources />
+        <RiskProfileRecommendation investments={investments} />
         {loading ? (
           [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
         ) : investments.length === 0 ? (
