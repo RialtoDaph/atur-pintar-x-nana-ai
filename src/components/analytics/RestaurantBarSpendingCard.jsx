@@ -130,12 +130,9 @@ export default function RestaurantBarSpendingCard({
     return monthTx.reduce((s, t) => s + t.amount, 0);
   });
 
-  const prevTotalDays = Math.max(
-    Math.ceil((prevMonthRange.end - prevMonthRange.start) / (1000 * 60 * 60 * 24)) + 1,
-    1
-  );
+  const prevTotalDays = Math.max(Math.round((prevMonthRange.end - prevMonthRange.start) / msPerDay) + 1, 1);
   const prevTotal = prevMonthlyData.reduce((s, m) => s + m, 0);
-  const prevDailyAvg = prevTotal / prevTotalDays;
+  const prevDailyAvg = Math.round(prevTotal / prevTotalDays);
 
   const trendDiff = currentDailyAvg - prevDailyAvg;
   const isTrendPositive = trendDiff >= 0;
