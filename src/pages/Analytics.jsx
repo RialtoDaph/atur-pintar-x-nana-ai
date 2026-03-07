@@ -440,7 +440,7 @@ export default function Analytics() {
               </div>
             </>
           )}
-        </div>}
+        </div>)}
 
         {/* Budget Section */}
         {isCardVisible("budget_chart") && budgetData.length > 0 && (
