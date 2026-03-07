@@ -457,7 +457,7 @@ export default function Analytics() {
         )}
 
         {/* Goals Progress */}
-        {goalsData.length > 0 && (
+        {isCardVisible("goals_progress") && goalsData.length > 0 && (
           <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_goals_progress')}</h2>
             <div className="space-y-4">
