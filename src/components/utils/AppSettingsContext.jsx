@@ -549,6 +549,13 @@ const TRANSLATIONS = {
     budget_empty_title: 'No budgets yet',
     budget_empty_desc: 'Tap + to add a budget per category',
     budget_over: 'Over budget',
+    budget_add_title: 'Add Budget',
+    budget_edit_title: 'Edit Budget',
+    budget_limit_label: 'Budget Limit (Rp)',
+    budget_all_set: 'All categories are already budgeted',
+    budget_save_new: 'Save Budget',
+    budget_save_edit: 'Update Budget',
+    budget_delete_confirm: 'Delete this budget?',
 
     // Pages - Debts
     debts_management: 'Management',
