@@ -308,26 +308,47 @@ export default function Analytics() {
         {/* Calendar Section */}
         <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
 
-        {/* Daily Spending Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <DailySpendingCard
-            transactions={transactions}
-            filterPeriod={filterPeriod}
-            customDateRange={customDateRange}
-          />
-          <RestaurantBarSpendingCard
-            transactions={transactions}
-            customCategories={customCategories}
-            filterPeriod={filterPeriod}
-            customDateRange={customDateRange}
-          />
-        </div>
+        {/* Daily Spending Cards Grid - ordered & toggled by user prefs */}
+        {(() => {
+          const orderedCards = analyticsCards.length > 0 ? analyticsCards : DEFAULT_ANALYTICS_CARDS;
+          const dailyVisible = orderedCards.find(c => c.id === "daily_spending")?.visible !== false;
+          const restVisible = orderedCards.find(c => c.id === "restaurant_bar")?.visible !== false;
+          const dailyFirst = orderedCards.findIndex(c => c.id === "daily_spending") <= orderedCards.findIndex(c => c.id === "restaurant_bar");
+
+          if (!dailyVisible && !restVisible) return null;
+
+          const dailyCard = dailyVisible ? (
+            <DailySpendingCard
+              key="daily_spending"
+              transactions={transactions}
+              filterPeriod={filterPeriod}
+              customDateRange={customDateRange}
+            />
+          ) : null;
+
+          const restCard = restVisible ? (
+            <RestaurantBarSpendingCard
+              key="restaurant_bar"
+              transactions={transactions}
+              customCategories={customCategories}
+              filterPeriod={filterPeriod}
+              customDateRange={customDateRange}
+            />
+          ) : null;
+
+          const cards = dailyFirst ? [dailyCard, restCard] : [restCard, dailyCard];
+          return (
+            <div className={`grid grid-cols-1 ${dailyVisible && restVisible ? "lg:grid-cols-2" : ""} gap-5`}>
+              {cards}
+            </div>
+          );
+        })()}
 
         {/* Charts Grid - 1 on mobile, 2 on desktop */}
         <div className="space-y-5 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
 
           {/* Income vs Expense Bar Chart */}
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+          {isCardVisible("income_expense_chart") && <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_income_vs_expense')}</h2>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={trendData} barCategoryGap="30%">
