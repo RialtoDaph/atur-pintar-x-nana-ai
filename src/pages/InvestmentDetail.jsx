@@ -158,7 +158,7 @@ export default function InvestmentDetail() {
 
       <div className="max-w-2xl mx-auto px-5 -mt-6 space-y-4">
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <InvestmentHistory investmentId={investmentId} formatCurrency={formatCurrency} />
+          <InvestmentHistory key={investmentId} investmentId={investmentId} formatCurrency={formatCurrency} />
         </div>
 
         <div className="bg-white rounded-2xl p-5 shadow-sm">
