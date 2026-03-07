@@ -8,7 +8,6 @@ import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSetti
 import GlobalSearch from "@/components/search/GlobalSearch";
 
 function LayoutInner({ children, currentPageName }) {
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
   const [user, setUser] = useState(null);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -17,16 +16,6 @@ function LayoutInner({ children, currentPageName }) {
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark-app");
-      localStorage.setItem("darkMode", "true");
-    } else {
-      document.documentElement.classList.remove("dark-app");
-      localStorage.setItem("darkMode", "false");
-    }
-  }, [darkMode]);
 
   const navItems = [
   { name: "Dashboard", label: t('nav_home'), icon: LayoutDashboard, page: "Dashboard" },
