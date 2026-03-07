@@ -105,6 +105,31 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
     setFetchingPrice(false);
   }
 
+  // Fetch historical price when purchase_date changes (for saham, crypto, emas)
+  async function fetchHistoricalPrice(date) {
+    if (!date || !form.name) return;
+    if (!["saham", "crypto", "emas"].includes(form.type)) return;
+    setFetchingHistorical(true);
+    try {
+      const response = await base44.functions.invoke("getHistoricalPrice", {
+        symbol: form.name,
+        type: form.type,
+        date,
+      });
+      if (response.data?.price) {
+        const price = response.data.price.toString();
+        setForm(f => ({
+          ...f,
+          price_per_unit: price,
+          ...(isGold ? { price_per_gram: price } : {}),
+        }));
+      }
+    } catch (e) {
+      // silently fail, user can enter manually
+    }
+    setFetchingHistorical(false);
+  }
+
   function handleTypeChange(key) {
     setForm(f => ({
       ...f,
