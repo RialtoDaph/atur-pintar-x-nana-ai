@@ -388,7 +388,7 @@ export default function Analytics() {
                 <Area type="monotone" dataKey="Expense" stroke="#FF6B6B" fill="url(#colorExpense)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
-          </div>}
+          </div>)}
 
         </div>
 
