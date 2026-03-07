@@ -403,7 +403,7 @@ export default function Analytics() {
         {isCardVisible("category_breakdown") && (
         <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
           <h2 className="font-bold text-[#0A0A0A] text-base mb-1">{t('analytics_category_breakdown')}</h2>
-          <p className="text-xs text-[#8FA4C8] mb-4">{t('analytics_this_month')}</p>
+          <p className="text-xs text-[#8FA4C8] mb-4">{formatPeriodLabel(filterPeriod)}</p>
 
           {pieData.length === 0 ? (
             <p className="text-center text-[#8FA4C8] text-sm py-8">{t('analytics_no_expense_data')}</p>
