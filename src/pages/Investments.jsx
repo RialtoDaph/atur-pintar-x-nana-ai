@@ -85,24 +85,14 @@ export default function InvestmentsPage() {
             </button>
           </div>
 
-          {/* Mini summary strip in header */}
+          {/* Portfolio trend chart embedded in dark header */}
           {investments.length > 0 && (
-            <div className="flex items-center gap-3">
-              <div className="flex-1 bg-white/10 rounded-xl px-4 py-3">
-                <p className="text-white/50 text-[10px] uppercase tracking-widest font-medium">{t('total_portfolio')}</p>
-                <p className="text-white font-bold text-lg">{formatCurrency(totalValue)}</p>
-              </div>
-              <div className="flex-1 bg-white/10 rounded-xl px-4 py-3">
-                <p className="text-white/50 text-[10px] uppercase tracking-widest font-medium">{t('profit_loss')}</p>
-                <p className={`font-bold text-lg ${totalGain >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                  {totalGain >= 0 ? "+" : ""}{gainPercent}%
-                </p>
-              </div>
-              <div className="flex-1 bg-white/10 rounded-xl px-4 py-3">
-                <p className="text-white/50 text-[10px] uppercase tracking-widest font-medium">{t('initial_amount')}</p>
-                <p className="text-white font-bold text-lg">{formatCurrency(totalInvested)}</p>
-              </div>
-            </div>
+            <PortfolioTrendChart
+              investments={investments}
+              totalValue={totalValue}
+              totalInvested={totalInvested}
+              darkMode={true}
+            />
           )}
         </div>
       </div>
