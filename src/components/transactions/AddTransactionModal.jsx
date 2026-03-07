@@ -460,6 +460,50 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
           onConfirm={handleSplitConfirm}
         />
       )}
+
+      {/* Sub-category popup */}
+      {subCatPopup && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl w-full max-w-xs shadow-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{subCatPopup.parentEmoji}</span>
+                <div>
+                  <p className="text-xs text-[#8FA4C8] font-medium">Pilih sub-kategori</p>
+                  <p className="text-sm font-bold text-[#1A1A1A]">{subCatPopup.parentLabel}</p>
+                </div>
+              </div>
+              <button onClick={() => setSubCatPopup(null)} className="text-[#9B9B9B] hover:text-[#1A1A1A]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {subCatPopup.subs.map(sub => (
+                <button
+                  key={sub.key}
+                  onClick={() => {
+                    setForm(f => ({ ...f, category: sub.key }));
+                    setSubCatPopup(null);
+                  }}
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 transition-all"
+                >
+                  <span className="text-2xl">{sub.emoji}</span>
+                  <span className="text-[10px] font-semibold text-[#4A5568] text-center leading-tight">{sub.label}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                setForm(f => ({ ...f, category: subCatPopup.parentKey }));
+                setSubCatPopup(null);
+              }}
+              className="mt-3 w-full py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-[#8FA4C8] hover:border-[#CBD5E0] transition-colors"
+            >
+              Pilih "{subCatPopup.parentLabel}" saja (tanpa sub-kategori)
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
