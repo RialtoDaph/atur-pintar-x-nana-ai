@@ -46,6 +46,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
   const [showSplitBill, setShowSplitBill] = useState(false);
   const [catOrder, setCatOrder] = useState([]); // Category drag order
   const [appSettings, setAppSettings] = useState(null);
+  const [subCatPopup, setSubCatPopup] = useState(null); // { parentKey, parentLabel, subs }
   const fileRef = useRef(null);
 
   useEffect(() => { 
