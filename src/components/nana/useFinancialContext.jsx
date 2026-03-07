@@ -34,6 +34,12 @@ export function useFinancialContext() {
           base44.entities.NanaPreferences.filter({ created_by: user.email }),
         ]);
 
+      // Build last 3 months keys
+      const prev3Months = [0, 1, 2].map((offset) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - 1 - offset, 1);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      });
+
       // This month transactions
       const thisTx = transactions.filter((t) => t.date?.startsWith(thisMonth));
       const lastTx = transactions.filter((t) => t.date?.startsWith(lastMonth));
