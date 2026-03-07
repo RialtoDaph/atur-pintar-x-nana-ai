@@ -53,12 +53,19 @@ export default function RestaurantBarSpendingCard({
     (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
     (monthRange.end.getMonth() - monthRange.start.getMonth());
 
-  // Filter for restaurant + bar only
-  const isRestaurantBar = (tx) => {
-    if (restaurantCatId && tx.category === `custom_${restaurantCatId}`) return true;
-    if (barCatId && tx.category === `custom_${barCatId}`) return true;
-    return false;
-  };
+  // All relevant category keys
+  const restaurantKeys = new Set([
+    ...restaurantCats.map(c => `custom_${c.id}`),
+    ...foodSubCats.filter(c => c.name?.toLowerCase().match(/makan|restoran|restaurant/)).map(c => `custom_${c.id}`),
+  ]);
+  const barKeys = new Set([
+    ...barCats.map(c => `custom_${c.id}`),
+    ...foodSubCats.filter(c => c.name?.toLowerCase().match(/bar|minum|kafe|cafe|coffee/)).map(c => `custom_${c.id}`),
+  ]);
+
+  const isRestaurant = (tx) => restaurantKeys.has(tx.category);
+  const isBar = (tx) => barKeys.has(tx.category);
+  const isRestaurantBar = (tx) => isRestaurant(tx) || isBar(tx);
 
   // Calculate monthly expenses for current period (with sub-category breakdown)
   const currentMonthlyData = Array.from({ length: monthDiff + 1 }, (_, i) => {
