@@ -23,10 +23,10 @@ export default function InvestmentDetail() {
   }, []);
 
   useEffect(() => {
-    if (investmentId && user) {
+    if (investmentId) {
       loadInvestment();
     }
-  }, [investmentId, user]);
+  }, [investmentId]);
 
   async function loadInvestment() {
     try {

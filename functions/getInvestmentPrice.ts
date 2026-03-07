@@ -20,7 +20,7 @@ async function fetchCryptoPrice(symbol) {
     const data = await res.json();
     const id = symbol.toLowerCase();
     if (data[id]) {
-      return { price: data[id].usd || data[id].idr, source: 'coingecko' };
+      return { price: data[id].idr || data[id].usd, source: 'coingecko' };
     }
   } catch (e) {
     return null;

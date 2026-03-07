@@ -31,7 +31,18 @@ async function searchCrypto(query) {
   }
 }
 
-// Search stocks via Finnhub
+// Fetch USD to IDR exchange rate
+async function getUsdToIdr() {
+  try {
+    const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const data = await res.json();
+    return data?.rates?.IDR || 16000;
+  } catch (_) {
+    return 16000; // static fallback
+  }
+}
+
+// Search stocks via Finnhub (prices converted to IDR)
 async function searchStocks(query) {
   try {
     const apiKey = Deno.env.get('FINNHUB_API_KEY');
@@ -42,23 +53,28 @@ async function searchStocks(query) {
     if (!data.result || data.result.length === 0) return [];
 
     const topResults = data.result.slice(0, 5);
-    const prices = await Promise.all(
-      topResults.map(item =>
-        fetch(`https://finnhub.io/api/v1/quote?symbol=${item.symbol}&token=${apiKey}`)
-          .then(r => r.json())
-          .catch(() => null)
-      )
-    );
+    const [prices, usdToIdr] = await Promise.all([
+      Promise.all(
+        topResults.map(item =>
+          fetch(`https://finnhub.io/api/v1/quote?symbol=${item.symbol}&token=${apiKey}`)
+            .then(r => r.json())
+            .catch(() => null)
+        )
+      ),
+      getUsdToIdr(),
+    ]);
 
     return topResults
       .map((item, idx) => {
         const priceData = prices[idx];
-        const price = priceData?.c || 0;
+        const priceUsd = priceData?.c || 0;
+        const priceIdr = Math.round(priceUsd * usdToIdr);
         return {
           name: item.description || item.symbol,
           symbol: item.symbol,
-          price,
-          priceFormatted: `$${price.toFixed(2)}`,
+          price: priceIdr,
+          priceUsd,
+          priceFormatted: `Rp ${priceIdr.toLocaleString('id-ID')}`,
           change24h: priceData?.d || 0,
           changePercent: priceData?.dp || 0,
           type: 'saham',
