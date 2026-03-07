@@ -8,6 +8,15 @@ import AddTransactionModal from "@/components/goals/AddTransactionModal";
 import AddGoalModal from "@/components/goals/AddGoalModal";
 import GoalCard from "@/components/goals/GoalCard";
 
+const COLORS = {
+  blue: "#4F7CFF",
+  green: "#34C87A",
+  orange: "#F5A623",
+  purple: "#9B59B6",
+  pink: "#E91E8C",
+  teal: "#1ABC9C",
+};
+
 
 
 export default function Goals() {
