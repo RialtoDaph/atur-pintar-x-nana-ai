@@ -19,7 +19,7 @@ const PERIODS_EN = [
 function generateTrendData(investments, period) {
   const now = new Date();
   const months = period === "1M" ? 1 : period === "3M" ? 3 : period === "6M" ? 6 : 12;
-  const points = period === "1M" ? 30 : period === "3M" ? 12 : period === "6M" ? 6 : 12;
+  const points = period === "1M" ? 30 : period === "3M" ? 24 : period === "6M" ? 24 : 52;
   const intervalDays = (months * 30) / points;
 
   const totalInvested = investments.reduce((s, i) => s + (i.initial_amount || 0), 0);
@@ -27,22 +27,30 @@ function generateTrendData(investments, period) {
 
   if (totalInvested === 0) return [];
 
-  const growthRate = totalInvested > 0 ? (totalCurrent - totalInvested) / totalInvested : 0;
+  // Use seeded-like noise for consistent but realistic fluctuations
+  let runningValue = totalInvested;
+  const finalValue = totalCurrent;
+  const totalDrift = finalValue - totalInvested;
 
   return Array.from({ length: points + 1 }, (_, idx) => {
     const daysBack = (points - idx) * intervalDays;
     const d = new Date(now);
     d.setDate(d.getDate() - Math.round(daysBack));
 
-    // Simulate progressive growth curve
     const progress = idx / points;
-    const randomNoise = (Math.random() - 0.48) * 0.015;
-    const smoothed = progress + randomNoise;
-    const value = totalInvested + (totalCurrent - totalInvested) * Math.max(0, smoothed);
+    // Stronger noise for realistic market feel
+    const noise = (Math.random() - 0.48) * 0.08;
+    // Momentum: slight mean-reversion tendency
+    const momentum = Math.sin(progress * Math.PI * 3) * 0.04;
+    const drift = totalDrift * (progress + noise + momentum);
+    const value = Math.max(totalInvested * 0.7, totalInvested + drift);
+
+    // Snap last point to actual current value
+    const finalVal = idx === points ? finalValue : Math.round(value);
 
     return {
       date: d,
-      value: Math.round(value),
+      value: finalVal,
       label: period === "1M"
         ? d.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
         : d.toLocaleDateString("id-ID", { month: "short", year: "2-digit" }),
