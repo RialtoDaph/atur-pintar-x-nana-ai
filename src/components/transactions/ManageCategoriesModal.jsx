@@ -5,9 +5,22 @@ import { base44 } from "@/api/base44Client";
 const PALETTE = ["#FF6A00","#4F7CFF","#00C9A7","#FF6B6B","#9B59B6","#E91E8C","#F5A623","#1ABC9C","#27AE60","#3498DB","#E67E22","#2C3E50"];
 const EMOJIS = ["📦","🏠","🍔","🚗","❤️","🎬","🛍️","📱","💼","💻","✈️","🎓","🐾","🧴","🎁","⚡","🍕","☕","🏋️","🎮"];
 
+const DEFAULT_CATEGORIES = [
+  { key: "housing", label: "🏠 Rumah" },
+  { key: "food", label: "🍔 Makanan" },
+  { key: "transport", label: "🚗 Transport" },
+  { key: "health", label: "❤️ Kesehatan" },
+  { key: "entertainment", label: "🎬 Hiburan" },
+  { key: "shopping", label: "🛍️ Belanja" },
+  { key: "subscriptions", label: "📱 Langganan" },
+  { key: "other", label: "📦 Lainnya" },
+  { key: "salary", label: "💼 Gaji" },
+  { key: "freelance", label: "💻 Freelance" },
+];
+
 export default function ManageCategoriesModal({ onClose, onUpdated }) {
   const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState({ name: "", emoji: "📦", color: "#FF6A00", type: "expense" });
+  const [form, setForm] = useState({ name: "", emoji: "📦", color: "#FF6A00", type: "expense", parent_category_key: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
