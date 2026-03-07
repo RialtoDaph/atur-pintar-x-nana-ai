@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, TrendingUp, TrendingDown, Star } from "lucide-react";
+import { Plus, Trash2, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import AddInvestmentModal from "@/components/investments/AddInvestmentModal.jsx";
