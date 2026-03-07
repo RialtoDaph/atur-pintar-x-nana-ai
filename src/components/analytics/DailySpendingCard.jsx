@@ -108,7 +108,14 @@ export default function DailySpendingCard({
 
   return (
     <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
-      <h2 className="font-bold text-[#0A0A0A] text-base mb-4">Pengeluaran Harian</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-bold text-[#0A0A0A] text-base">Pengeluaran Harian</h2>
+        {onOpenSettings && (
+          <button onClick={onOpenSettings} className="text-[#8FA4C8] hover:text-[#0A0A0A] transition-colors" title="Kelola kartu analitik">
+            <Settings className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
       {/* Chart */}
       <ResponsiveContainer width="100%" height={180}>
