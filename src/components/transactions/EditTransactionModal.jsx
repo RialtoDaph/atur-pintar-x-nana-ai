@@ -201,32 +201,28 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
                           >
                             <div>
                               <button
-                                {...provided.dragHandleProps}
-                                onClick={() => setForm({ ...form, category: c.key })}
-                                className={`w-full flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
-                                  form.category === c.key ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"
-                                }`}
-                              >
-                                <span className="text-lg sm:text-xl">{c.emoji}</span>
-                                <span className="text-[9px] sm:text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
-                              </button>
-                              {/* Sub-categories */}
-                              {subCatsByParent[c.key]?.length > 0 && (
-                                <div className="mt-1.5 pl-1 space-y-1">
-                                  {subCatsByParent[c.key].map(sub => (
-                                    <button
-                                      key={sub.key}
-                                      onClick={() => setForm({ ...form, category: sub.key })}
-                                      className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-[8px] sm:text-[9px] font-medium transition-all ${
-                                        form.category === sub.key ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]" : "border-[#E2E8F0] bg-white text-[#4A5568] hover:border-[#CBD5E0]"
-                                      }`}
-                                    >
-                                      <span>{sub.emoji}</span>
-                                      <span className="truncate">{sub.label}</span>
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
+                                  {...provided.dragHandleProps}
+                                  onClick={() => handleCategoryClick(c)}
+                                  className={`w-full flex flex-col items-center gap-1 p-2 rounded-xl border transition-all relative ${
+                                    form.category === c.key || subCatsByParent[c.key]?.some(s => s.key === form.category)
+                                      ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                                      : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"
+                                  }`}
+                                >
+                                  <span className="text-lg sm:text-xl">{c.emoji}</span>
+                                  <span className="text-[9px] sm:text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
+                                  {subCatsByParent[c.key]?.length > 0 && (
+                                    <span className="absolute top-1 right-1 w-3 h-3 bg-[#FF6A00] rounded-full flex items-center justify-center">
+                                      <span className="text-white text-[7px] font-bold">▾</span>
+                                    </span>
+                                  )}
+                                  {subCatsByParent[c.key]?.some(s => s.key === form.category) && (
+                                    <span className="text-[8px] text-[#FF6A00] font-semibold truncate w-full text-center">
+                                      {subCatsByParent[c.key].find(s => s.key === form.category)?.emoji}{" "}
+                                      {subCatsByParent[c.key].find(s => s.key === form.category)?.label}
+                                    </span>
+                                  )}
+                                </button>
                             </div>
                             {snapshot.isDragging && (
                               <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl">
