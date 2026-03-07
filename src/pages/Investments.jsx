@@ -205,6 +205,8 @@ export default function InvestmentsPage() {
           </div>
         )}
 
+        <RiskProfileRecommendation investments={investments} />
+
         {/* Education resources — minimized at the bottom */}
         <EducationResources />
       </div>
