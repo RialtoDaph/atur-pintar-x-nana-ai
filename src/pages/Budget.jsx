@@ -55,19 +55,27 @@ export default function BudgetPage() {
     const lastDay = new Date(year, month, 0).getDate();
     const monthEnd = `${currentMonth}-${String(lastDay).padStart(2, "0")}`;
 
+    // Build 3-month range for context
+    const threeMonthsAgo = (() => {
+      const d = new Date(year, month - 4, 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+    })();
+
     const [b, txAll, cats] = await Promise.all([
       base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }),
       base44.entities.Transaction.filter({ created_by: user.email }, "-date", 500),
       base44.entities.CustomCategory.list("-created_date"),
     ]);
 
-    // Filter transactions to selected month client-side (date range filtering)
-    const monthTx = txAll.filter(tx => {
-      return tx.date >= monthStart && tx.date <= monthEnd && tx.type === "expense";
-    });
+    // Filter transactions to selected month client-side
+    const monthTx = txAll.filter(tx => tx.date >= monthStart && tx.date <= monthEnd && tx.type === "expense");
+
+    // Transactions from 3 months before currentMonth (for trend analysis)
+    const prev3Tx = txAll.filter(tx => tx.date >= threeMonthsAgo && tx.date < monthStart);
 
     setBudgets(b);
     setTransactions(monthTx);
+    setTransactions3M(prev3Tx);
     setCustomCategories(cats);
     setLoading(false);
   }
