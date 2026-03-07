@@ -27,6 +27,7 @@ export default function Goals() {
   const [loading, setLoading] = useState(true);
   const [showTxModal, setShowTxModal] = useState(null); // 'deposit' | 'withdrawal'
   const [showAddGoal, setShowAddGoal] = useState(false);
+  const [txFilter, setTxFilter] = useState("all"); // 'all' | 'deposit' | 'withdrawal'
 
   const goal = goals.find((g) => g.id === goalId) || null;
 
