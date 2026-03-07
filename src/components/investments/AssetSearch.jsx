@@ -13,16 +13,19 @@ export default function AssetSearch({ type, onSelect, placeholder }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [searchError, setSearchError] = useState(false);
   const searchRef = useRef(null);
 
   useEffect(() => {
     const handler = setTimeout(async () => {
       if (searchTerm.trim().length < 1) {
         setResults([]);
+        setShowResults(false);
         return;
       }
       
       setLoading(true);
+      setSearchError(false);
       try {
         const response = await base44.functions.invoke('searchAssets', {
           query: searchTerm,
@@ -31,8 +34,10 @@ export default function AssetSearch({ type, onSelect, placeholder }) {
         setResults(response.data?.results || []);
         setShowResults(true);
       } catch (e) {
-        console.log('Search failed:', e.message);
+        console.error('Search failed:', e.message);
         setResults([]);
+        setSearchError(true);
+        setShowResults(true);
       }
       setLoading(false);
     }, 500);
@@ -64,7 +69,7 @@ export default function AssetSearch({ type, onSelect, placeholder }) {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8FA4C8]" />
         <input
           type="text"
-          placeholder={placeholder}
+          placeholder={defaultPlaceholder}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           onFocus={() => searchTerm && setShowResults(true)}
@@ -75,9 +80,9 @@ export default function AssetSearch({ type, onSelect, placeholder }) {
 
       {showResults && results.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
-          {results.map((asset, idx) => (
+          {results.map((asset) => (
             <button
-              key={idx}
+              key={asset.symbol || asset.name}
               onClick={() => handleSelect(asset)}
               className="w-full px-4 py-3 text-left hover:bg-[#F8FAFC] border-b border-[#E2E8F0] last:border-b-0 transition-colors"
             >
@@ -87,12 +92,12 @@ export default function AssetSearch({ type, onSelect, placeholder }) {
                   <p className="text-xs text-[#8FA4C8]">{asset.symbol} · {asset.priceFormatted || `$${asset.price?.toFixed(2)}`}</p>
                 </div>
                 <div className="text-right">
-                  {asset.changePercent && (
+                  {asset.changePercent != null && (
                     <p className={`text-xs font-semibold ${asset.changePercent >= 0 ? 'text-[#00C9A7]' : 'text-[#FF6B6B]'}`}>
                       {asset.changePercent >= 0 ? '+' : ''}{asset.changePercent.toFixed(2)}%
                     </p>
                   )}
-                  {asset.change24h && !asset.changePercent && (
+                  {asset.change24h != null && asset.changePercent == null && (
                     <p className={`text-xs ${asset.change24h >= 0 ? 'text-[#00C9A7]' : 'text-[#FF6B6B]'}`}>
                       {asset.change24h >= 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                     </p>
@@ -106,7 +111,7 @@ export default function AssetSearch({ type, onSelect, placeholder }) {
 
       {showResults && searchTerm && results.length === 0 && !loading && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-50 p-4 text-center">
-          <p className="text-sm text-[#8FA4C8]">Aset tidak ditemukan</p>
+          <p className="text-sm text-[#8FA4C8]">{searchError ? errorText : notFoundText}</p>
         </div>
       )}
     </div>
