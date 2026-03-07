@@ -93,10 +93,10 @@ export default function InvestmentDetail() {
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 rounded-full bg-[#FF6A00]/20 flex items-center justify-center text-2xl">
                   {investment.icon || type.emoji}
-                </div>
-                <div>
+                  </div>
+                  <div>
                   <h1 className="text-white text-2xl font-bold">{investment.name}</h1>
-                  <p className="text-[#8FA4C8] text-sm">{type.label}</p>
+                  <p className="text-[#8FA4C8] text-sm">{typeLabel}</p>
                 </div>
               </div>
             </div>
@@ -109,7 +109,7 @@ export default function InvestmentDetail() {
           </div>
 
           <div className="bg-white/10 rounded-2xl p-5">
-            <p className="text-white/60 text-sm mb-1">Nilai Sekarang</p>
+            <p className="text-white/60 text-sm mb-1">{lang === 'en' ? 'Current Value' : 'Nilai Sekarang'}</p>
             <p className="text-white font-bold text-3xl mb-3">{formatCurrency(investment.current_value)}</p>
             <div className="flex items-center gap-2 mb-4">
               {isPositive ? <TrendingUp className="w-4 h-4 text-[#00C9A7]" /> : <TrendingDown className="w-4 h-4 text-[#FF6B6B]" />}
