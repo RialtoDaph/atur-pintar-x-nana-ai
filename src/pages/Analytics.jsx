@@ -367,10 +367,11 @@ export default function Analytics() {
               <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#00C9A7]"/><span className="text-[#8FA4C8]">{t('analytics_income_label')}</span></div>
               <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#FF6B6B]"/><span className="text-[#8FA4C8]">{t('analytics_expense_label')}</span></div>
             </div>
-          </div>}
+          </div>)}
 
           {/* Spending Trend Area Chart */}
-          {isCardVisible("spending_trend") && <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+          {isCardVisible("spending_trend") && (
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_spending_trend')}</h2>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={last12Months}>
