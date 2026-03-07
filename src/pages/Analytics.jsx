@@ -121,6 +121,21 @@ export default function Analytics() {
 
   const formatYAxisTick = useCallback((value) => formatShortNumber(value), [formatShortNumber]);
 
+  const isCardVisible = (id) => {
+    const card = analyticsCards.find(c => c.id === id);
+    return card ? card.visible : true;
+  };
+
+  const handleSaveCards = async (newCards) => {
+    setAnalyticsCards(newCards);
+    if (appSettings) {
+      await base44.entities.AppSettings.update(appSettings.id, { analytics_cards: newCards });
+    } else {
+      const created = await base44.entities.AppSettings.create({ analytics_cards: newCards });
+      setAppSettings(created);
+    }
+  };
+
   const formatPeriodLabel = (period) => {
     const months = parseInt(period);
     if (months === 1) return t('this_month') || 'This month';
