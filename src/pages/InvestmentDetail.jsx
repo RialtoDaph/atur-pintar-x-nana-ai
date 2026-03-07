@@ -7,16 +7,7 @@ import { Link } from "react-router-dom";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import InvestmentHistory from "@/components/investments/InvestmentHistory";
 import TaxCalculator from "@/components/investments/TaxCalculator";
-
-const INVESTMENT_TYPES = {
-  saham: { label: "Saham", emoji: "📈" },
-  reksa_dana: { label: "Reksa Dana", emoji: "💰" },
-  crypto: { label: "Crypto", emoji: "₿" },
-  deposito: { label: "Deposito", emoji: "🏦" },
-  obligasi: { label: "Obligasi", emoji: "📄" },
-  emas: { label: "Emas", emoji: "🥇" },
-  lainnya: { label: "Lainnya", emoji: "💼" },
-};
+import { INVESTMENT_TYPES_MAP, UNIT_LABELS } from "@/components/investments/investmentConstants";
 
 export default function InvestmentDetail() {
   const { formatCurrency } = useAppSettings();

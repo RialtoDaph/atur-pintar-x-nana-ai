@@ -9,16 +9,8 @@ import DiversificationChart from "@/components/investments/DiversificationChart"
 import RiskProfileRecommendation from "@/components/investments/RiskProfileRecommendation";
 import EducationResources from "@/components/investments/EducationResources";
 import { useAppSettings } from "@/components/utils/useAppSettings";
-
-const INVESTMENT_TYPES = {
-  saham: { label: "Saham", emoji: "📈" },
-  reksa_dana: { label: "Reksa Dana", emoji: "💰" },
-  crypto: { label: "Crypto", emoji: "₿" },
-  deposito: { label: "Deposito", emoji: "🏦" },
-  obligasi: { label: "Obligasi", emoji: "📄" },
-  emas: { label: "Emas", emoji: "🥇" },
-  lainnya: { label: "Lainnya", emoji: "💼" },
-};
+import { INVESTMENT_TYPES_MAP } from "@/components/investments/investmentConstants";
+import { Pencil } from "lucide-react";
 
 export default function InvestmentsPage() {
   const { formatCurrency, t } = useAppSettings();
