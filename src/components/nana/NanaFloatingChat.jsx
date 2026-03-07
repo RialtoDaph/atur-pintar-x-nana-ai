@@ -191,8 +191,10 @@ export default function NanaFloatingChat() {
                   <p className="text-[10px] text-[#8FA4C8] font-medium text-left">💬 Mulai dari sini</p>
                   {[
                     "Prioritaskan utangku berdasarkan bunga",
-                    "Analisis pola pengeluaranku bulan ini",
-                    context?.debts?.length >= 2 ? "Apakah aku bisa konsolidasikan utangku?" : "Bantu optimalkan anggaranku"
+                    context?.thisMonth?.spendingSpikes?.length > 0
+                      ? `Pengeluaran ${context.thisMonth.spendingSpikes[0].category}ku melonjak. Apa yang bisa aku hemat?`
+                      : "Analisis pola pengeluaranku bulan ini",
+                    "Rekomendasikan kategori mana yang paling bisa dikurangi bulan ini"
                   ].map((s) =>
                 <button key={s} onClick={() => setInput(s)}
                 className="text-left text-xs bg-[#2D2D2D] border border-[#3D3D3D] rounded-xl px-3 py-2 text-white hover:border-[#FF6A00] hover:bg-[#FF6A00]/10 transition-colors">
