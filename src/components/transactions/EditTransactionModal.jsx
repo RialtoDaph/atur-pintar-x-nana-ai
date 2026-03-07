@@ -98,6 +98,15 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
     ? catOrder.map(key => mainCats.find(c => c.key === key)).filter(Boolean)
     : mainCats;
 
+  const handleCategoryClick = (cat) => {
+    const subs = subCatsByParent[cat.key];
+    if (subs && subs.length > 0) {
+      setSubCatPopup({ parentKey: cat.key, parentLabel: cat.label, parentEmoji: cat.emoji, subs });
+    } else {
+      setForm({ ...form, category: cat.key });
+    }
+  };
+
   const handleDragEnd = async (result) => {
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
