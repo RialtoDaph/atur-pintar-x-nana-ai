@@ -36,8 +36,10 @@ export default function ManageCategoriesModal({ onClose, onUpdated }) {
   async function handleAdd() {
     if (!form.name.trim()) return;
     setSaving(true);
-    await base44.entities.CustomCategory.create(form);
-    setForm({ name: "", emoji: "📦", color: "#FF6A00", type: "expense" });
+    const data = { ...form };
+    if (!data.parent_category_key) delete data.parent_category_key;
+    await base44.entities.CustomCategory.create(data);
+    setForm({ name: "", emoji: "📦", color: "#FF6A00", type: "expense", parent_category_key: "" });
     await load();
     onUpdated();
     setSaving(false);
