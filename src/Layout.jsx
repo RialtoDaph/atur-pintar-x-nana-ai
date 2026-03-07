@@ -151,25 +151,27 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Mobile top header */}
-      <div className="sm:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A] flex items-center justify-between px-5 py-3 border-b border-white/10">
-        <p className="text-white font-bold text-lg tracking-tight">Atur Pintar</p>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowSearch(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
-            <Search className="w-4 h-4" />
-          </button>
-          <Link to={createPageUrl("Settings")} className="w-8 h-8 rounded-full bg-[#FF6A00] flex items-center justify-center text-white text-xs font-bold">
-            {initials}
-          </Link>
+      <div className="sm:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A] border-b border-white/10" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <div className="flex items-center justify-between px-5 py-3">
+          <p className="text-white font-bold text-lg tracking-tight">Atur Pintar</p>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowSearch(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+              <Search className="w-4 h-4" />
+            </button>
+            <Link to={createPageUrl("Settings")} className="w-8 h-8 rounded-full bg-[#FF6A00] flex items-center justify-center text-white text-xs font-bold">
+              {initials}
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Main content — add top padding on mobile for header */}
-      <div className="sm:ml-60 pt-14 sm:pt-0">
+      <div className="sm:ml-60 sm:pt-0" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)' }}>
         {children}
       </div>
 
       {/* Mobile bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-40 border-t border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-40 border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {mobileMainNav.map((item) => {
           const active = currentPageName === item.page;
           return (
