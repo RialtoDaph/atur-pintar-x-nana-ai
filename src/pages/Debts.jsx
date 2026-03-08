@@ -20,9 +20,11 @@ export default function DebtsPage() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [editDebt, setEditDebt] = useState(null);
   const [user, setUser] = useState(null);
   const [paymentModal, setPaymentModal] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [markPaidConfirm, setMarkPaidConfirm] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(u => {
