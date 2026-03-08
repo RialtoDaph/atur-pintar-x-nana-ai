@@ -40,6 +40,7 @@ export default function Settings() {
     return { smartAlerts: true, cashflowForecast: true, subscriptionDetector: true, spendingChart: true, recentTransactions: true, savingsGoals: true };
   });
   const [saving, setSaving] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
