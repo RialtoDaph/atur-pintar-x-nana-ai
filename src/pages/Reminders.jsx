@@ -167,7 +167,7 @@ export default function Reminders() {
                       <button onClick={() => { setEditing(r); setShowAdd(true); }} className="flex items-center gap-1 text-xs text-[#8FA4C8] font-medium px-3 py-1.5 rounded-lg hover:bg-[#F2F4F7] transition-colors">
                         <Edit2 className="w-3 h-3" /> {t('reminders_edit')}
                       </button>
-                      <button onClick={() => deleteReminder(r.id)} className="flex items-center gap-1 text-xs text-[#FF6B6B] font-medium px-3 py-1.5 rounded-lg hover:bg-[#FF6B6B]/10 transition-colors ml-auto">
+                      <button onClick={() => setDeleteConfirm(r.id)} className="flex items-center gap-1 text-xs text-[#FF6B6B] font-medium px-3 py-1.5 rounded-lg hover:bg-[#FF6B6B]/10 transition-colors ml-auto">
                         <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
