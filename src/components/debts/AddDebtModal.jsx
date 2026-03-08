@@ -77,7 +77,7 @@ export default function AddDebtModal({ onClose, onSave, debt }) {
 
         <button onClick={handleSave} disabled={saving || !form.name || !form.total_amount || !form.remaining_amount}
           className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] disabled:opacity-40 hover:bg-[#e05e00] transition-colors">
-          {saving ? "Menyimpan..." : "Simpan Utang"}
+          {saving ? "Menyimpan..." : isEdit ? "Perbarui Utang" : "Simpan Utang"}
         </button>
       </div>
     </div>
