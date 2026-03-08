@@ -65,7 +65,7 @@ function LayoutInner({ children, currentPageName }) {
           <p className="text-xs text-[#8FA4C8] mt-0.5">{t('nav_manage')}</p>
         </div>
 
-        <nav className="flex flex-col gap-1 flex-1">
+        <nav className="flex flex-col gap-1 flex-1" aria-label="Main navigation">
           {navItems.map((item) => {
             const active = currentPageName === item.page;
             return (
@@ -150,7 +150,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Mobile bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-40 border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <nav className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-40 border-t border-white/10" aria-label="Mobile navigation" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {mobileMainNav.map((item) => {
           const active = currentPageName === item.page;
           return (
