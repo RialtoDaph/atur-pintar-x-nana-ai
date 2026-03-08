@@ -152,7 +152,7 @@ export default function RestaurantBarSpendingCard({
 
       {/* Chart */}
       <ResponsiveContainer width="100%" height={180}>
-        <BarChart data={currentMonthlyData}>
+        <ComposedChart data={currentMonthlyData}>
           <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
           <Tooltip
@@ -161,7 +161,8 @@ export default function RestaurantBarSpendingCard({
           />
           <Bar dataKey="restaurant" fill="#FF6A00" radius={[6, 6, 0, 0]} stackId="a" />
           <Bar dataKey="bar" fill="#FF8C42" radius={[0, 0, 0, 0]} stackId="a" />
-        </BarChart>
+          <Line type="monotone" dataKey="total" stroke="#00C9A7" strokeWidth={2} dot={false} />
+        </ComposedChart>
       </ResponsiveContainer>
 
       {/* Summary */}
