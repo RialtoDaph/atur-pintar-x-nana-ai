@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart } from "recharts";
 import { ChevronRight, TrendingUp, TrendingDown } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
@@ -152,7 +152,7 @@ export default function RestaurantBarSpendingCard({
 
       {/* Chart */}
       <ResponsiveContainer width="100%" height={180}>
-        <ComposedChart data={currentMonthlyData}>
+        <BarChart data={currentMonthlyData}>
           <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
           <Tooltip
