@@ -1055,7 +1055,7 @@ export function AppSettingsProvider({ children }) {
 
   const t = (key, params) => {
     const lang = settings.language in TRANSLATIONS ? settings.language : 'id';
-    let str = TRANSLATIONS[lang]?.[key] || TRANSLATIONS['id']?.[key] || key;
+    let str = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS['id']?.[key] ?? key;
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         str = str.replace(`{${k}}`, v);
