@@ -314,10 +314,16 @@ export default function Goals() {
       {loading ? (
         [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
       ) : goals.length === 0 ? (
-        <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-          <TrendingUp className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
+        <div className="bg-white rounded-2xl p-8 text-center shadow-sm" role="status" aria-live="polite">
+          <TrendingUp className="w-12 h-12 text-[#8FA4C8] mx-auto mb-3" aria-hidden="true" />
           <p className="text-[#4A5568] font-semibold">{t('goals_empty_title')}</p>
-          <p className="text-[#8FA4C8] text-sm mt-1">{t('goals_empty_desc')}</p>
+          <p className="text-[#8FA4C8] text-sm mt-1 mb-4">{t('goals_empty_desc')}</p>
+          <button
+            onClick={() => setShowAddGoal(true)}
+            className="px-5 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-semibold hover:bg-[#e05e00] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:ring-offset-2"
+          >
+            + Buat Tujuan Pertama
+          </button>
         </div>
       ) : (
         goals.map((g) => (
