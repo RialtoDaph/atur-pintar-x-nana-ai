@@ -44,10 +44,16 @@ export default function Reminders() {
 
   useEffect(() => { if (user) load(); }, [user]);
 
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
   async function load() {
     setLoading(true);
-    const data = await base44.entities.Reminder.filter({ created_by: user.email }, "-created_date");
-    setReminders(data);
+    try {
+      const data = await base44.entities.Reminder.filter({ created_by: user.email }, "-created_date");
+      setReminders(data);
+    } catch (e) {
+      console.error("Failed to load reminders", e);
+    }
     setLoading(false);
   }
 
@@ -58,6 +64,7 @@ export default function Reminders() {
 
   async function deleteReminder(id) {
     await base44.entities.Reminder.delete(id);
+    setDeleteConfirm(null);
     load();
   }
 
