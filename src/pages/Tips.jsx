@@ -210,12 +210,12 @@ export default function Tips() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
-        {/* Quick links */}
+        {/* Quick links — derived dynamically from TIPS categories */}
         {!searchQ && (
           <div className="grid grid-cols-3 gap-3">
-            {["🚀 Mulai", "🤖 Nana AI", "📊 Analitik"].map((label, i) => (
+            {TIPS.slice(0, 3).map((cat, i) => (
               <div key={i} className="bg-white rounded-2xl p-4 shadow-sm text-center">
-                <p className="text-sm font-semibold text-[#1A1A1A]">{label}</p>
+                <p className="text-sm font-semibold text-[#1A1A1A]">{cat.category}</p>
               </div>
             ))}
           </div>
