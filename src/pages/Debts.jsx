@@ -26,6 +26,7 @@ export default function DebtsPage() {
   const [paymentModal, setPaymentModal] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [markPaidConfirm, setMarkPaidConfirm] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -37,7 +38,11 @@ export default function DebtsPage() {
 
   async function loadData() {
     setLoading(true);
-    const d = await base44.entities.Debt.filter({ created_by: user.email }, "-created_date");
+    setError(null);
+    const d = await base44.entities.Debt.filter({ created_by: user.email }, "-created_date").catch(() => {
+      setError(true);
+      return [];
+    });
     setDebts(d);
     setLoading(false);
   }
@@ -112,13 +117,22 @@ export default function DebtsPage() {
 
       <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-3">
         <IOUSection />
-        {loading ? (
-          [...Array(2)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" />)
+        {error ? (
+          <ErrorState onRetry={loadData} />
+        ) : loading ? (
+          [...Array(2)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" aria-hidden="true" />)
         ) : activeDebts.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-            <CreditCard className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm" role="status">
+            <CreditCard className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" aria-hidden="true" />
             <p className="text-[#4A5568] font-semibold">{t('debts_empty_title')}</p>
             <p className="text-[#8FA4C8] text-sm mt-1">{t('debts_empty_desc')}</p>
+            <button
+              onClick={() => setShowAdd(true)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#FF6A00] text-white rounded-xl text-sm font-semibold hover:bg-[#e05e00] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6A00] focus-visible:ring-offset-2"
+            >
+              <Plus className="w-4 h-4" aria-hidden="true" />
+              {t('debts_empty_desc')}
+            </button>
           </div>
         ) : (
           activeDebts.map(debt => {
