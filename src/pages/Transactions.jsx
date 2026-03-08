@@ -187,7 +187,7 @@ export default function Transactions() {
   // Group by month
   const grouped = {};
   const locale = settings.locale || "id-ID";
-  filtered.forEach(tx => {
+  paginatedFiltered.forEach(tx => {
     const d = new Date(tx.date);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     const label = d.toLocaleDateString(locale, { month: "long", year: "numeric" });
