@@ -252,6 +252,8 @@ export default function Settings() {
 
         <p className="text-center text-xs text-[#8FA4C8] pb-4">{t('settings_version')}</p>
       </div>
+
+      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
     </div>
   );
 }
