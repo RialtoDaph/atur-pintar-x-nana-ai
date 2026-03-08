@@ -55,8 +55,8 @@ export default function Settings() {
     const next = !darkMode;
     setDarkMode(next);
     localStorage.setItem("darkMode", String(next));
-    if (next) document.documentElement.classList.add("dark-app");
-    else document.documentElement.classList.remove("dark-app");
+    if (next) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
   }
 
   const CURRENCY_MAP = {

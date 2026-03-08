@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, Plus, Minus, Trash2, CheckCircle, TrendingUp } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import AddTransactionModal from "@/components/goals/AddTransactionModal";
 import AddGoalModal from "@/components/goals/AddGoalModal";
