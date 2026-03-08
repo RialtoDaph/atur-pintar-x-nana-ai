@@ -43,7 +43,7 @@ export default function IOUSection() {
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-white text-lg font-bold">💸 Tagihan Split Bill</h2>
+          <h2 className="text-white text-lg font-bold flex items-center gap-1.5"><span>💸</span><span>Tagihan Split Bill</span></h2>
           <p className="text-[#8FA4C8] text-xs">Orang yang belum bayar ke kamu</p>
         </div>
         {totalUnpaid > 0 && (

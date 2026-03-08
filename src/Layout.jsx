@@ -144,7 +144,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Main content — add top padding on mobile for header */}
-      <div className="sm:ml-60 sm:pt-0" style={{ paddingTop: '56px' }}>
+      <div className="sm:ml-60 pt-14 sm:pt-0">
         {children}
       </div>
 
