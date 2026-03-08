@@ -26,8 +26,16 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
   });
   const [saving, setSaving] = useState(false);
 
+  const [errors, setErrors] = useState({});
+
   async function handleSave() {
-    if (!form.name || !form.target_amount) return;
+    const newErrors = {};
+    if (!form.name?.trim()) newErrors.name = "Nama tujuan wajib diisi";
+    if (!form.target_amount || parseRupiah(form.target_amount) <= 0) newErrors.target_amount = "Target jumlah wajib diisi";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
     setSaving(true);
     await onSave({
       ...form,
