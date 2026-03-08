@@ -1036,7 +1036,16 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
-  const t = (key) => TRANSLATIONS[settings.language]?.[key] || key;
+  const t = (key, params) => {
+    const lang = settings.language in TRANSLATIONS ? settings.language : 'id';
+    let str = TRANSLATIONS[lang]?.[key] || TRANSLATIONS['id']?.[key] || key;
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        str = str.replace(`{${k}}`, v);
+      });
+    }
+    return str;
+  };
 
   const formatCurrency = (value) => {
     if (typeof value !== 'number') value = parseFloat(value) || 0;
