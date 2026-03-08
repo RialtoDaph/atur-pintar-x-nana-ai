@@ -185,15 +185,17 @@ export default function Goals() {
                <>
                  <button
                    onClick={() => setShowTxModal("deposit")}
-                   className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl text-xs font-semibold hover:bg-[#333] transition-colors"
+                   aria-label="Tambah uang ke tujuan"
+                   className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl text-xs font-semibold hover:bg-[#333] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] focus:ring-offset-2"
                  >
-                   <Plus className="w-4 h-4" /> {t('goals_add_money')}
+                   <Plus className="w-4 h-4" aria-hidden="true" /> {t('goals_add_money')}
                  </button>
                  <button
                    onClick={() => setShowTxModal("withdrawal")}
-                   className="flex items-center justify-center gap-2 bg-[#F7F6F3] text-[#1A1A1A] py-3 rounded-xl text-xs font-semibold hover:bg-[#EFEFED] transition-colors border border-[#EFEFED]"
+                   aria-label="Tarik uang dari tujuan"
+                   className="flex items-center justify-center gap-2 bg-[#F7F6F3] text-[#1A1A1A] py-3 rounded-xl text-xs font-semibold hover:bg-[#EFEFED] transition-colors border border-[#EFEFED] focus:outline-none focus:ring-2 focus:ring-[#EFEFED] focus:ring-offset-2"
                  >
-                   <Minus className="w-4 h-4" /> {t('goals_withdraw')}
+                   <Minus className="w-4 h-4" aria-hidden="true" /> {t('goals_withdraw')}
                  </button>
                </>
              )}
