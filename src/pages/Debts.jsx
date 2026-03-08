@@ -64,6 +64,7 @@ export default function DebtsPage() {
 
   async function markPaid(debt) {
     await base44.entities.Debt.update(debt.id, { status: "paid", remaining_amount: 0 });
+    setMarkPaidConfirm(null);
     loadData();
   }
 
