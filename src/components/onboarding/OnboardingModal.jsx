@@ -4,7 +4,7 @@ import { X, ArrowRight, PlusCircle, Target, BarChart2, CreditCard, Settings } fr
 const STEPS = [
   {
     icon: "👋",
-    title: "Selamat datang di SaveWise!",
+    title: "Selamat datang di Atur.in!",
     desc: "Aplikasi keuangan pribadi yang membantu kamu mencatat, menganalisis, dan merencanakan keuangan lebih cerdas.",
   },
   {
