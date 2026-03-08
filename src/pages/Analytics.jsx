@@ -39,7 +39,7 @@ const DEFAULT_CATEGORIES_FLAT = [
 ];
 
 export default function Analytics() {
-  const { t, formatShortNumber } = useAppSettings();
+  const { t, formatShortNumber, formatCurrency } = useAppSettings();
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState([]);
   const [budgets, setBudgets] = useState([]);

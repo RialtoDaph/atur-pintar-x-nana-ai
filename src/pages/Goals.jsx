@@ -20,6 +20,7 @@ const COLORS = {
 
 
 export default function Goals() {
+  const navigate = useNavigate();
   const { t, formatCurrency } = useAppSettings();
   const urlParams = new URLSearchParams(window.location.search);
   const goalId = urlParams.get("id");
