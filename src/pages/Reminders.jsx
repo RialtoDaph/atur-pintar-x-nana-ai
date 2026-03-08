@@ -223,7 +223,7 @@ export default function Reminders() {
                     <button onClick={() => toggleActive(r)} className="text-[#8FA4C8] hover:text-[#FF6A00] transition-colors">
                       <ToggleLeft className="w-6 h-6" />
                     </button>
-                    <button onClick={() => deleteReminder(r.id)} className="text-[#FF6B6B]">
+                    <button onClick={() => setDeleteConfirm(r.id)} className="text-[#FF6B6B]">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
