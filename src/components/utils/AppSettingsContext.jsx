@@ -699,7 +699,7 @@ export function AppSettingsProvider({ children }) {
           setSettings({ ...DEFAULT_SETTINGS, ...newSettings });
           setSettingsId(newSettings.id);
         } else {
-          const appSettings = await base44.entities.AppSettings.list();
+          const appSettings = await base44.entities.AppSettings.filter({ created_by: user.email });
           const userSettings = appSettings.find(s => s.id === user.settings_id);
           if (userSettings) {
             setSettings({ ...DEFAULT_SETTINGS, ...userSettings });
