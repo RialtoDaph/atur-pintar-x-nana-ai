@@ -490,8 +490,8 @@ export default function Analytics() {
                     <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(goal.progress, 100)}%`, backgroundColor: goal.color }}/>
                   </div>
                   <div className="flex justify-between text-xs text-[#8FA4C8]">
-                    <span>{formatRupiah(goal.current)}</span>
-                    <span>{formatRupiah(goal.target)}</span>
+                    <span>{formatCurrency(goal.current)}</span>
+                    <span>{formatCurrency(goal.target)}</span>
                   </div>
                 </div>
               ))}
@@ -515,7 +515,7 @@ export default function Analytics() {
               <div className={`rounded-xl p-3 ${investmentReturn >= 0 ? "bg-[#00C9A7]/10" : "bg-[#FF6B6B]/10"}`}>
                 <p className="text-[9px] sm:text-[10px] text-[#8FA4C8] font-medium mb-1">{t('analytics_return')}</p>
                 <p className={`text-sm sm:text-base font-bold ${investmentReturn >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                  {investmentReturn >= 0 ? "+" : ""}{formatRupiah(investmentReturn)}
+                  {investmentReturn >= 0 ? "+" : ""}{formatCurrency(investmentReturn)}
                 </p>
               </div>
             </div>
@@ -527,9 +527,9 @@ export default function Analytics() {
                     <p className="text-[10px] text-[#8FA4C8]">{inv.type}</p>
                   </div>
                   <div className="text-right flex-shrink-0 ml-2">
-                    <p className="font-bold text-[#0A0A0A]">{formatRupiah(inv.current_value)}</p>
+                    <p className="font-bold text-[#0A0A0A]">{formatCurrency(inv.current_value)}</p>
                     <p className={`text-[10px] font-medium ${inv.current_value >= inv.initial_amount ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                      {inv.current_value >= inv.initial_amount ? "+" : ""}{formatRupiah(inv.current_value - inv.initial_amount)}
+                       {inv.current_value >= inv.initial_amount ? "+" : ""}{formatCurrency(inv.current_value - inv.initial_amount)}
                     </p>
                   </div>
                 </div>
