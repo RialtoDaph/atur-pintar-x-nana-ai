@@ -119,7 +119,9 @@ export default function Settings() {
           </div>
           <button
             onClick={toggleDark}
-            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors"
+            aria-pressed={darkMode}
+            aria-label={darkMode ? "Nonaktifkan mode gelap" : "Aktifkan mode gelap"}
+            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00]"
           >
             <div className="flex items-center gap-3">
               {darkMode ? <Moon className="w-5 h-5 text-[#FF6A00]" /> : <Sun className="w-5 h-5 text-[#FF6A00]" />}
