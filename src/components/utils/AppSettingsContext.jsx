@@ -1030,6 +1030,24 @@ const TRANSLATIONS = {
     menu_finance: 'Finanzen',
     menu_notifications: 'Benachrichtigungen & Info',
     menu_account: 'Konto',
+
+    // Feedback
+    feedback_title: 'Feedback senden',
+    feedback_subtitle: 'Hilf uns, die App zu verbessern',
+    feedback_rating_label: 'Bewerte deine Erfahrung',
+    feedback_message_label: 'Erzähl uns von deiner Erfahrung',
+    feedback_message_placeholder: 'Was können wir besser machen?',
+    feedback_send: 'Feedback senden',
+    feedback_sending: 'Senden...',
+    feedback_success_title: 'Danke! 🙏',
+    feedback_success_desc: 'Dein Feedback bedeutet uns sehr viel',
+    feedback_required: 'Bitte schreibe Feedback bevor du sendest',
+    close: 'Schließen',
+
+    // Error states
+    error_title: 'Daten konnten nicht geladen werden',
+    error_desc: 'Etwas ist schiefgelaufen. Bitte versuche es erneut.',
+    error_retry: 'Erneut versuchen',
   },
 };
 
