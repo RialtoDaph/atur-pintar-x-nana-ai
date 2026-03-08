@@ -48,6 +48,7 @@ function LayoutInner({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen font-sans bg-[#F2F4F7] sm:pb-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 64px)' }}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -144,7 +145,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Main content — add top padding on mobile for header */}
-      <div className="sm:ml-60 pt-14 sm:pt-0">
+      <div id="main-content" className="sm:ml-60 pt-14 sm:pt-0">
         {children}
       </div>
 
