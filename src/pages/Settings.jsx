@@ -215,6 +215,26 @@ export default function Settings() {
           ))}
         </div>
 
+        {/* Feedback */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">{t('feedback_title')}</p>
+          </div>
+          <button
+            onClick={() => setShowFeedback(true)}
+            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6A00] focus-visible:ring-inset"
+            aria-haspopup="dialog"
+          >
+            <div className="flex items-center gap-3">
+              <MessageSquarePlus className="w-5 h-5 text-[#FF6A00]" aria-hidden="true" />
+              <div className="text-left">
+                <p className="font-medium text-[#1A1A1A] text-sm">{t('feedback_send')}</p>
+                <p className="text-xs text-[#8FA4C8]">{t('feedback_subtitle')}</p>
+              </div>
+            </div>
+          </button>
+        </div>
+
         {/* Akun */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-5 pt-4 pb-2">
@@ -222,9 +242,10 @@ export default function Settings() {
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#FFF5F5] transition-colors border-t border-[#F2F4F7] text-[#FF6B6B]"
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#FFF5F5] transition-colors border-t border-[#F2F4F7] text-[#FF6B6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B6B] focus-visible:ring-inset"
+            aria-label={t('settings_logout')}
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5" aria-hidden="true" />
             <span className="font-medium text-sm">{t('settings_logout')}</span>
           </button>
         </div>
