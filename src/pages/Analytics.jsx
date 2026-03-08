@@ -77,10 +77,11 @@ export default function Analytics() {
         setInvestments(i);
         setDebts(d);
         setCustomCategories(cc);
-        if (settings.length > 0) {
-          setAppSettings(settings[0]);
-          if (settings[0].analytics_cards && settings[0].analytics_cards.length > 0) {
-            setAnalyticsCards(settings[0].analytics_cards);
+        const userSettings = settings.find(s => s.id === user.settings_id);
+        if (userSettings) {
+          setAppSettings(userSettings);
+          if (userSettings.analytics_cards && userSettings.analytics_cards.length > 0) {
+            setAnalyticsCards(userSettings.analytics_cards);
           }
         }
         setLoading(false);

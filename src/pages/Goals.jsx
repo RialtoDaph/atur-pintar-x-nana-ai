@@ -84,7 +84,7 @@ export default function Goals() {
   async function handleDelete() {
     if (!window.confirm(t('goals_delete_confirm'))) return;
     await base44.entities.SavingsGoal.delete(goalId);
-    window.location.href = createPageUrl("Dashboard");
+    navigate(createPageUrl("Dashboard"));
   }
 
   async function handleAddGoal(data) {
