@@ -594,6 +594,8 @@ const TRANSLATIONS = {
     debts_remaining: 'Remaining',
     debts_installment: 'Installment',
     debts_mark_paid_title: 'Mark as paid',
+    debts_mark_paid_confirm_msg: 'Mark {name} as paid off?',
+    debts_delete_confirm: 'Delete this debt?',
 
     // Pages - Analytics
     analytics_overview: 'Overview',
