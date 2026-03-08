@@ -222,6 +222,15 @@ const TRANSLATIONS = {
     budget_save_edit: 'Perbarui Anggaran',
     budget_delete_confirm: 'Hapus anggaran ini?',
 
+    // Common
+    cancel: 'Batal',
+    edit: 'Edit',
+
+    // Goals extra
+    goals_of: 'dari',
+    goals_target_label: 'Target',
+    goals_deposit: 'Setor',
+
     // Pages - Debts
     debts_management: 'Manajemen',
     debts_title: 'Utang & Kredit',
