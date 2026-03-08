@@ -156,7 +156,33 @@ export default function SmartAlerts({ transactions, loading }) {
 
   if (loading || alerts.length === 0) return null;
 
-  return null;
+  return (
+    <div className="space-y-2 mb-4">
+      {alerts.map((alert) => {
+        const Icon = alert.icon;
+        return (
+          <div
+            key={alert.id}
+            className={`flex items-start gap-3 rounded-2xl p-4 border ${alert.bg} ${alert.border}`}
+          >
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-white`}>
+              <Icon className={`w-4 h-4 ${alert.color}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-[#1A1A1A]">{alert.title}</p>
+              <p className="text-xs text-[#4A5568] mt-0.5">{alert.text}</p>
+            </div>
+            <button
+              onClick={() => handleDismiss(alert.id)}
+              className="text-[#CBD5E0] hover:text-[#8FA4C8] transition-colors flex-shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
 
 
 
