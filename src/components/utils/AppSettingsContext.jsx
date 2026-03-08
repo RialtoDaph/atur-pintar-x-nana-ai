@@ -537,6 +537,15 @@ const TRANSLATIONS = {
     search_transactions: 'Search transactions...',
     error_loading_data: 'Failed to load data',
 
+    // Common
+    cancel: 'Cancel',
+    edit: 'Edit',
+
+    // Goals extra
+    goals_of: 'of',
+    goals_target_label: 'Target',
+    goals_deposit: 'Deposit',
+
     // Pages - Goals
     goals_plan: 'Planning',
     goals_title: 'Financial Goals',
