@@ -158,7 +158,7 @@ export default function Goals() {
               <span className="font-bold text-[#1A1A1A] text-2xl">
                 {formatCurrency(goal.current_amount || 0)}
               </span>
-              <span className="text-[#9B9B9B] self-end text-sm">dari {formatCurrency(goal.target_amount)}</span>
+              <span className="text-[#9B9B9B] self-end text-sm">{t('goals_of')} {formatCurrency(goal.target_amount)}</span>
             </div>
             <div className="h-2 bg-[#F0F0EE] rounded-full overflow-hidden">
               <div
@@ -175,7 +175,7 @@ export default function Goals() {
           {/* Deadline */}
           {goal.deadline && (
             <p className="text-xs text-[#9B9B9B] mb-4">
-              🗓 Target: {new Date(goal.deadline).toLocaleDateString("id-ID", { month: "long", day: "numeric", year: "numeric" })}
+              🗓 {t('goals_target_label')}: {new Date(goal.deadline).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
             </p>
           )}
 
@@ -225,7 +225,7 @@ export default function Goals() {
                   txFilter === f ? "bg-[#1A1A1A] text-white" : "bg-[#F2F4F7] text-[#8FA4C8] hover:bg-[#E2E8F0]"
                 }`}
               >
-                {f === "all" ? "Semua" : f === "deposit" ? "💰 Setor" : "📤 Tarik"}
+                {f === "all" ? t('tx_filter_all') : f === "deposit" ? `💰 ${t('goals_deposit')}` : `📤 ${t('goals_withdraw')}`}
               </button>
             ))}
           </div>
