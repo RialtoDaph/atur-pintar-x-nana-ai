@@ -215,16 +215,17 @@ export default function Transactions() {
             </button>
             <button
               onClick={() => setShowCSVImport(true)}
-              title="Import CSV"
-              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+              aria-label="Import dari file CSV"
+              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
             >
-              <Upload className="w-4 h-4 text-white" />
+              <Upload className="w-4 h-4 text-white" aria-hidden="true" />
             </button>
             <button
               onClick={() => setShowAddTx(true)}
-              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+              aria-label="Tambah transaksi baru"
+              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
             >
-              <Plus className="w-5 h-5 text-white" />
+              <Plus className="w-5 h-5 text-white" aria-hidden="true" />
             </button>
           </div>
         </div>
