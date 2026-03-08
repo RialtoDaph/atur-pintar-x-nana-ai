@@ -78,7 +78,7 @@ export default function AlertsPage() {
   }
 
   async function handleResendEmail(alert) {
-    if (!alert.email_sent) {
+    try {
       const user = await base44.auth.me();
       await base44.integrations.Core.SendEmail({
         to: user.email,
@@ -87,6 +87,8 @@ export default function AlertsPage() {
       });
       await base44.entities.Alert.update(alert.id, { email_sent: true });
       loadAlerts();
+    } catch (e) {
+      console.error("Failed to send email", e);
     }
   }
 
