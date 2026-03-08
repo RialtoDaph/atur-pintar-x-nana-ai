@@ -597,6 +597,11 @@ const TRANSLATIONS = {
     debts_mark_paid_confirm_msg: 'Mark {name} as paid off?',
     debts_delete_confirm: 'Delete this debt?',
 
+    // Analytics extra
+    net_flow: 'Net Flow',
+    savings_rate: 'Savings Rate',
+    of_income: 'of income',
+
     // Pages - Analytics
     analytics_overview: 'Overview',
     analytics_title: 'Analytics',
