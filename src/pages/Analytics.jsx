@@ -467,6 +467,14 @@ export default function Analytics() {
           </div>
         )}
 
+        {/* Net Worth Card */}
+        <NetWorthCard
+          goals={goals}
+          investments={investments}
+          debts={debts}
+          transactions={transactions}
+        />
+
         {/* Goals Progress */}
         {isCardVisible("goals_progress") && goalsData.length > 0 && (
           <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">

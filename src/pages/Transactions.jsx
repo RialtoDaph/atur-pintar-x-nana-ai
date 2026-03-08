@@ -205,6 +205,13 @@ export default function Transactions() {
               {selectMode ? t('tx_cancel') : t('tx_select')}
             </button>
             <button
+              onClick={() => setShowCSVImport(true)}
+              title="Import CSV"
+              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+            >
+              <Upload className="w-4 h-4 text-white" />
+            </button>
+            <button
               onClick={() => setShowAddTx(true)}
               className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
             >
