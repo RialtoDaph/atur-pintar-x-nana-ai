@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Moon, Sun, DollarSign, Globe, LayoutDashboard, Bell, User, LogOut, ChevronRight, Check } from "lucide-react";
+import { Moon, Sun, LogOut, Check, MessageSquare } from "lucide-react";
 import NanaPreferencesSettings from "@/components/settings/NanaPreferencesSettings";
 import RiskProfileAssessment from "@/components/settings/RiskProfileAssessment";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
+import FeedbackModal from "@/components/settings/FeedbackModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const LANGUAGES = [
