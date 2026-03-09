@@ -46,23 +46,23 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout currentPage="AdminDashboard">
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-8">
+      <div className="p-4 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#1A1A1A]">Admin Dashboard</h1>
-            <p className="text-sm text-[#8FA4C8] mt-1">Overview sistem Atur Pintar</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">Admin Dashboard</h1>
+            <p className="text-sm text-[#8FA4C8] mt-0.5">Overview sistem Atur Pintar</p>
           </div>
           <button
             onClick={loadStats}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E2E8F0] rounded-xl text-sm font-medium text-[#1A1A1A] hover:bg-[#F8FAFC] transition-colors shadow-sm"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-[#E2E8F0] rounded-xl text-sm font-medium text-[#1A1A1A] hover:bg-[#F8FAFC] transition-colors shadow-sm"
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </button>
         </div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <AdminStatCard icon={Users} label="Total Pengguna" value={fmt(stats?.totalUsers)} color="orange" />
           <AdminStatCard icon={UserCheck} label="Aktif (Bulan ini)" value={fmt(stats?.activeUsersMonthly)} sub={`${stats?.activeUsersDaily ?? 0} aktif hari ini`} color="blue" />
           <AdminStatCard icon={ArrowLeftRight} label="Total Transaksi" value={fmt(stats?.totalTransactions)} color="purple" />
