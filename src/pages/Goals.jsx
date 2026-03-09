@@ -291,9 +291,9 @@ export default function Goals() {
         );
         }
 
-  // All goals list view
-  return (
-  <PullToRefresh onRefresh={loadData}>
+        // All goals list view
+        return (
+        <PullToRefresh onRefresh={loadData}>
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
       <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
       <div className="max-w-2xl mx-auto">
