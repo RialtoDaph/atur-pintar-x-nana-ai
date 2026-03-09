@@ -195,3 +195,12 @@ body {
   overscroll-behavior: none;
   -webkit-overscroll-behavior: none;
 }
+
+/* Remove tap highlight on interactive elements */
+.tap-highlight-fix {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, [role="button"], [role="tab"], [role="menuitem"] {
+  -webkit-tap-highlight-color: transparent;
+}
