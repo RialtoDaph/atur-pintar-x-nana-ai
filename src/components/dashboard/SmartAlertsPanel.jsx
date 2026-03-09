@@ -54,7 +54,7 @@ export default function SmartAlertsPanel({ user }) {
     setLoading(true);
     try {
       const allAlerts = await base44.entities.Alert.filter(
-        { status: { $in: ["unread", "read"] }, created_by: user.email },
+        { status: { $in: ["unread", "read"] }, created_by: user?.email },
         "-created_date",
         20
       );
