@@ -136,51 +136,31 @@ export default function Settings() {
           </button>
         </div>
 
-        {/* Bahasa */}
+        {/* Bahasa & Mata Uang — terkunci setelah onboarding */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-5 pt-4 pb-2">
-            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">{t('settings_language')}</p>
+          <div className="px-5 pt-4 pb-3 flex items-center justify-between">
+            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">{t('settings_language')} & {t('settings_currency')}</p>
+            <span className="text-[10px] font-semibold text-white bg-[#FF6A00] px-2 py-0.5 rounded-full">🔒 Terkunci</span>
           </div>
-          {LANGUAGES.map(lang => (
-            <button
-              key={lang.code}
-              onClick={() => selectLanguage(lang.code)}
-              aria-pressed={language === lang.code}
-              aria-label={`Pilih bahasa ${lang.label}`}
-              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7] first:border-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00]"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{lang.flag}</span>
-                <p className="font-medium text-[#1A1A1A] text-sm">{lang.label}</p>
+          <div className="px-5 pb-4 space-y-3">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="text-xl">{LANGUAGES.find(l => l.code === language)?.flag}</span>
+              <div>
+                <p className="text-sm font-semibold text-[#1A1A1A]">{LANGUAGES.find(l => l.code === language)?.label}</p>
+                <p className="text-xs text-[#8FA4C8]">{t('settings_language')}</p>
               </div>
-              {language === lang.code && <Check className="w-4 h-4 text-[#FF6A00]" />}
-            </button>
-          ))}
-        </div>
-
-        {/* Mata Uang */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-5 pt-4 pb-2">
-            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">{t('settings_currency')}</p>
+              <Check className="w-4 h-4 text-[#FF6A00] ml-auto" />
+            </div>
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="text-xl">{CURRENCIES.find(c => c.code === currency)?.flag}</span>
+              <div>
+                <p className="text-sm font-semibold text-[#1A1A1A]">{CURRENCIES.find(c => c.code === currency)?.label}</p>
+                <p className="text-xs text-[#8FA4C8]">{CURRENCIES.find(c => c.code === currency)?.symbol} · {currency}</p>
+              </div>
+              <Check className="w-4 h-4 text-[#FF6A00] ml-auto" />
+            </div>
+            <p className="text-xs text-[#8FA4C8]">Bahasa dan mata uang ditetapkan saat setup awal untuk menjaga konsistensi data keuanganmu.</p>
           </div>
-          {CURRENCIES.map(cur => (
-            <button
-              key={cur.code}
-              onClick={() => selectCurrency(cur.code)}
-              aria-pressed={currency === cur.code}
-              aria-label={`Pilih mata uang ${cur.label} (${cur.symbol})`}
-              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7] first:border-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00]"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{cur.flag}</span>
-                <div className="text-left">
-                  <p className="font-medium text-[#1A1A1A] text-sm">{cur.label}</p>
-                  <p className="text-xs text-[#8FA4C8]">{cur.symbol} · {cur.code}</p>
-                </div>
-              </div>
-              {currency === cur.code && <Check className="w-4 h-4 text-[#FF6A00]" />}
-            </button>
-          ))}
         </div>
 
         {/* Nana AI Preferences */}
