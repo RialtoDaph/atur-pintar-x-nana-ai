@@ -37,7 +37,24 @@ export default function NanaChatBoxInline({ user }) {
     }
   }
 
+  async function sendFromModal(text) {
+    const convs = await base44.agents.listConversations({ agent_name: "nana" });
+    let conv;
+    if (convs && convs.length > 0) {
+      conv = convs[0];
+    } else {
+      conv = await base44.agents.createConversation({
+        agent_name: "nana",
+        metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` }
+      });
+    }
+    const contextBlock = formatContextForMessage(context);
+    await base44.agents.addMessage(conv, { role: "user", content: text + contextBlock });
+  }
+
   return (
+    <>
+    {showEntryModal && <NanaQuickEntryModal onClose={() => setShowEntryModal(false)} onSend={sendFromModal} />}
     <div className="bg-[#0A0A0A] rounded-2xl overflow-hidden px-4 py-3 flex items-center gap-3" style={{ boxShadow: '0 0 0 1.5px #FF6A00, 0 8px 32px rgba(255,106,0,0.35)' }}>
       {/* Avatar */}
       <div className="w-9 h-9 rounded-full bg-black border-2 border-[#2D2D2D] overflow-hidden flex-shrink-0">
