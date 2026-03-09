@@ -10,24 +10,30 @@ export default function NanaChatBoxInline({ user }) {
   const [showEntryModal, setShowEntryModal] = useState(false);
   const { context, formatContextForMessage } = useFinancialContext();
 
+  async function getOrCreateConv() {
+    const convs = await base44.agents.listConversations({ agent_name: "nana" });
+    if (convs && convs.length > 0) return convs[0];
+    return base44.agents.createConversation({
+      agent_name: "nana",
+      metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` }
+    });
+  }
+
   async function sendMessage() {
     if (!input.trim() || sending) return;
     setSending(true);
     const text = input;
     setInput("");
-    const convs = await base44.agents.listConversations({ agent_name: "nana" });
-    let conv;
-    if (convs && convs.length > 0) {
-      conv = convs[0];
-    } else {
-      conv = await base44.agents.createConversation({
-        agent_name: "nana",
-        metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` }
-      });
-    }
+    const conv = await getOrCreateConv();
     const contextBlock = formatContextForMessage(context);
     await base44.agents.addMessage(conv, { role: "user", content: text + contextBlock });
     setSending(false);
+  }
+
+  async function sendFromModal(text) {
+    const conv = await getOrCreateConv();
+    const contextBlock = formatContextForMessage(context);
+    await base44.agents.addMessage(conv, { role: "user", content: text + contextBlock });
   }
 
   function handleKey(e) {
@@ -37,25 +43,12 @@ export default function NanaChatBoxInline({ user }) {
     }
   }
 
-  async function sendFromModal(text) {
-    const convs = await base44.agents.listConversations({ agent_name: "nana" });
-    let conv;
-    if (convs && convs.length > 0) {
-      conv = convs[0];
-    } else {
-      conv = await base44.agents.createConversation({
-        agent_name: "nana",
-        metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` }
-      });
-    }
-    const contextBlock = formatContextForMessage(context);
-    await base44.agents.addMessage(conv, { role: "user", content: text + contextBlock });
-  }
-
   return (
-    <>
-    {showEntryModal && <NanaQuickEntryModal onClose={() => setShowEntryModal(false)} onSend={sendFromModal} />}
     <div className="bg-[#0A0A0A] rounded-2xl overflow-hidden px-4 py-3 flex items-center gap-3" style={{ boxShadow: '0 0 0 1.5px #FF6A00, 0 8px 32px rgba(255,106,0,0.35)' }}>
+      {showEntryModal && (
+        <NanaQuickEntryModal onClose={() => setShowEntryModal(false)} onSend={sendFromModal} />
+      )}
+
       {/* Avatar */}
       <div className="w-9 h-9 rounded-full bg-black border-2 border-[#2D2D2D] overflow-hidden flex-shrink-0">
         <img
@@ -74,7 +67,7 @@ export default function NanaChatBoxInline({ user }) {
           <textarea
             className="flex-1 text-xs text-white resize-none outline-none bg-transparent placeholder:text-[#8FA4C8] max-h-16"
             rows={1}
-            placeholder='Tanya atau catat transaksi...'
+            placeholder="Tanya atau catat transaksi..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKey}
@@ -91,14 +84,14 @@ export default function NanaChatBoxInline({ user }) {
             disabled={!input.trim() || sending}
             className="w-7 h-7 rounded-full bg-[#FF6A00] flex items-center justify-center flex-shrink-0 disabled:opacity-40 hover:bg-[#e05e00] transition-colors self-end"
           >
-            {sending
-              ? <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
-              : <Send className="w-3 h-3 text-white" />
-            }
+            {sending ? (
+              <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Send className="w-3 h-3 text-white" />
+            )}
           </button>
         </div>
       </div>
     </div>
-    </>
   );
 }
