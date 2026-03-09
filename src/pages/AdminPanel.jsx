@@ -232,6 +232,15 @@ export default function AdminPanel() {
                         )}
                       </div>
                     )}
+                    {!hasSettings && (
+                      <Link
+                        to={`${createPageUrl("AdminUserSupport")}?email=${encodeURIComponent(u.email)}`}
+                        className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 transition-colors"
+                      >
+                        <Headphones className="w-3 h-3" />
+                        Support
+                      </Link>
+                    )}
                   </div>
                 );
               })}
