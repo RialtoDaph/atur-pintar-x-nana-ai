@@ -7,6 +7,7 @@ import NanaQuickEntryModal from "./NanaQuickEntryModal";
 export default function NanaChatBoxInline({ user }) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [showEntryModal, setShowEntryModal] = useState(false);
   const { context, formatContextForMessage } = useFinancialContext();
 
   async function sendMessage() {
