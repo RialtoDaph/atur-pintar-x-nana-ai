@@ -19,15 +19,14 @@ const TYPE_EMOJI = {
   tagihan: "🧾", cicilan: "🏦", tabungan: "🐷", langganan: "📱", lainnya: "📌",
 };
 
-export default function ReminderWidget() {
+export default function ReminderWidget({ user }) {
   const { formatCurrency, t } = useAppSettings();
   const [reminders, setReminders] = useState([]);
 
   useEffect(() => {
-    base44.auth.me().then(u => {
-      base44.entities.Reminder.filter({ is_active: true, created_by: u.email }).then(setReminders).catch(() => {});
-    }).catch(() => {});
-  }, []);
+    if (!user?.email) return;
+    base44.entities.Reminder.filter({ is_active: true, created_by: user.email }).then(setReminders).catch(() => {});
+  }, [user?.email]);
 
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
