@@ -59,6 +59,20 @@ export default function NanaFloatingChat() {
     setMessages([]);
   }
 
+  async function sendFromModal(text) {
+    let conv = activeConv;
+    if (!conv) {
+      conv = await base44.agents.createConversation({
+        agent_name: "nana",
+        metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}`, preferences }
+      });
+      setActiveConv(conv);
+    }
+    if (!open) setOpen(true);
+    const contextBlock = formatContextForMessage(context);
+    await base44.agents.addMessage(conv, { role: "user", content: text + contextBlock });
+  }
+
   async function sendMessage() {
     if (!input.trim() || sending) return;
     let conv = activeConv;
