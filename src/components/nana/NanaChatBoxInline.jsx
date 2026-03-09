@@ -99,5 +99,6 @@ export default function NanaChatBoxInline({ user }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
