@@ -68,6 +68,11 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import AdminTransactions from './pages/AdminTransactions';
 import AdminCategories from './pages/AdminCategories';
+import AdminAIInsights from './pages/AdminAIInsights';
+import AdminSubscriptions from './pages/AdminSubscriptions';
+import AdminNotifications from './pages/AdminNotifications';
+import AdminAnomalies from './pages/AdminAnomalies';
+import AdminLogs from './pages/AdminLogs';
 import __Layout from './Layout.jsx';
 
 
@@ -93,6 +98,11 @@ export const PAGES = {
     "AdminUsers": AdminUsers,
     "AdminTransactions": AdminTransactions,
     "AdminCategories": AdminCategories,
+    "AdminAIInsights": AdminAIInsights,
+    "AdminSubscriptions": AdminSubscriptions,
+    "AdminNotifications": AdminNotifications,
+    "AdminAnomalies": AdminAnomalies,
+    "AdminLogs": AdminLogs,
 }
 
 export const pagesConfig = {
