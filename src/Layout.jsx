@@ -68,6 +68,17 @@ function LayoutInner({ children, currentPageName }) {
   const mainPages = ["Dashboard", "Transactions", "Goals", "Budget", "Debts", "Investments", "Analytics", "Tips", "Reminders", "Alerts", "Settings", "Menu"];
   const isNestedPage = !mainPages.includes(currentPageName);
 
+  // Handle browser back button (hardware back on Android, swipe-back on iOS)
+  useEffect(() => {
+    const handlePopState = (e) => {
+      if (isNestedPage) {
+        window.history.back();
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isNestedPage]);
+
   // Update tab history when navigating to a main page
   useEffect(() => {
     const mobileMainNav = ["Dashboard", "Transactions", "Analytics", "Investments"];
@@ -80,10 +91,16 @@ function LayoutInner({ children, currentPageName }) {
     }
   }, [currentPageName]);
 
-  // Handle tab clicks - reset to root if clicking active tab
+  // Handle tab clicks - navigate with history state for better back-button handling
   const handleTabClick = (tabName) => {
-    if (currentPageName === tabName || currentPageName === tabHistory.current[tabName]) {
-      // Already on this tab, reset to root
+    const targetPage = tabHistory.current[tabName];
+    if (currentPageName === targetPage) {
+      // Already on this tab, scroll to top
+      if (mainContentRef.current) {
+        mainContentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } else {
+      // Navigate to tab, clearing nested pages
       window.location.href = createPageUrl(tabName);
     }
   };
@@ -243,6 +260,7 @@ function LayoutInner({ children, currentPageName }) {
         })}
         {/* More button → goes to Menu page */}
         <button
+          key="menu"
           onClick={() => handleTabClick("Menu")}
           className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
           mobileMorePages.includes(currentPageName) ? "text-[#FF6A00]" : "text-[#888]"}`}
