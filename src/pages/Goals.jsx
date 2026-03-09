@@ -7,6 +7,7 @@ import { createPageUrl } from "@/utils";
 import AddTransactionModal from "@/components/goals/AddTransactionModal";
 import AddGoalModal from "@/components/goals/AddGoalModal";
 import GoalCard from "@/components/goals/GoalCard";
+import PullToRefresh from "@/components/utils/PullToRefresh";
 
 const COLORS = {
   blue: "#4F7CFF",
@@ -71,15 +72,19 @@ export default function Goals() {
         ? (goal.current_amount || 0) + amount
         : Math.max((goal.current_amount || 0) - amount, 0);
 
-    await Promise.all([
-      base44.entities.Transaction.create(tx),
-      base44.entities.SavingsGoal.update(goalId, {
-        current_amount: newAmount,
-        status: newAmount >= goal.target_amount ? "completed" : "active",
-      }),
-    ]);
-    setShowTxModal(null);
-    loadData();
+    setGoals(prev => prev.map(g => g.id === goalId ? { ...g, current_amount: newAmount, status: newAmount >= g.target_amount ? "completed" : "active" } : g));
+    try {
+      await Promise.all([
+        base44.entities.Transaction.create(tx),
+        base44.entities.SavingsGoal.update(goalId, {
+          current_amount: newAmount,
+          status: newAmount >= goal.target_amount ? "completed" : "active",
+        }),
+      ]);
+      setShowTxModal(null);
+    } catch (error) {
+      loadData();
+    }
   }
 
   async function handleDelete() {
@@ -288,8 +293,9 @@ export default function Goals() {
 
   // All goals list view
   return (
-  <div className="min-h-screen bg-[#F2F4F7] pb-8">
-    <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
+  <PullToRefresh onRefresh={loadData}>
+    <div className="min-h-screen bg-[#F2F4F7] pb-8">
+      <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>

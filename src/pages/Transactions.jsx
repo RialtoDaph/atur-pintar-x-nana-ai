@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import EditTransactionModal from "@/components/transactions/EditTransactionModal";
 import CSVImportModal from "@/components/transactions/CSVImportModal";
+import PullToRefresh from "@/components/utils/PullToRefresh";
 
 const DEFAULT_CATEGORIES = {
   housing: { emoji: "🏠", key: "cat_housing", color: "#4F7CFF" },
@@ -80,27 +81,29 @@ export default function Transactions() {
   async function handleDelete(id) {
     if (!confirm(t('tx_confirm_delete'))) return;
     setDeleting(true);
+    setTransactions(prev => prev.filter(t => t.id !== id));
     try {
       await base44.entities.Transaction.delete(id);
       toast.success(t('tx_delete_success'));
-      loadData();
     } catch (error) {
       console.error("Delete failed:", error);
       toast.error(t('tx_delete_error'));
+      loadData();
     } finally {
       setDeleting(false);
     }
   }
 
   async function handleEdit(id, data) {
+    setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...data } : t));
     try {
       await base44.entities.Transaction.update(id, data);
       toast.success(t('tx_update_success'));
       setEditingTx(null);
-      loadData();
     } catch (error) {
       console.error("Update failed:", error);
       toast.error(t('tx_update_error'));
+      loadData();
     }
   }
 
@@ -198,9 +201,10 @@ export default function Transactions() {
   const sortedGroups = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="min-h-screen bg-[#F2F4F7] pb-8">
-      {/* Header */}
-      <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+    <PullToRefresh onRefresh={loadData}>
+      <div className="min-h-screen bg-[#F2F4F7] pb-8">
+        {/* Header */}
+        <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div>
             <p className="text-[#8FA4C8] text-sm font-medium">{t('tx_history')}</p>
@@ -471,6 +475,7 @@ export default function Transactions() {
           onSuccess={loadData}
         />
       )}
-    </div>
+      </div>
+    </PullToRefresh>
   );
 }

@@ -6,6 +6,7 @@ import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import IOUSection from "@/components/splitbill/IOUSection";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { parseRupiah } from "@/components/utils/parseRupiah";
+import PullToRefresh from "@/components/utils/PullToRefresh";
 
 const DEBT_TYPES = {
   kpr: { label: "KPR", emoji: "🏠" },
@@ -45,21 +46,26 @@ export default function DebtsPage() {
     const debt = debts.find(d => d.id === paymentModal);
     if (!debt) return;
     
-    await Promise.all([
-      base44.entities.Transaction.create({
-        amount,
-        type: "expense",
-        category: "other",
-        note: `Payment for ${debt.name}`,
-        date: new Date().toISOString().split("T")[0],
-      }),
-      base44.entities.Debt.update(debt.id, {
-        remaining_amount: Math.max(debt.remaining_amount - amount, 0),
-        status: debt.remaining_amount - amount <= 0 ? "paid" : "active",
-      }),
-    ]);
-    setPaymentModal(null);
-    loadData();
+    const newRemaining = Math.max(debt.remaining_amount - amount, 0);
+    setDebts(prev => prev.map(d => d.id === debt.id ? { ...d, remaining_amount: newRemaining, status: newRemaining <= 0 ? "paid" : "active" } : d));
+    try {
+      await Promise.all([
+        base44.entities.Transaction.create({
+          amount,
+          type: "expense",
+          category: "other",
+          note: `Payment for ${debt.name}`,
+          date: new Date().toISOString().split("T")[0],
+        }),
+        base44.entities.Debt.update(debt.id, {
+          remaining_amount: newRemaining,
+          status: newRemaining <= 0 ? "paid" : "active",
+        }),
+      ]);
+      setPaymentModal(null);
+    } catch (error) {
+      loadData();
+    }
   }
 
   async function markPaid(debt) {
@@ -80,8 +86,9 @@ export default function DebtsPage() {
   const totalMonthly = activeDebts.reduce((s, d) => s + (d.monthly_payment || 0), 0);
 
   return (
-    <div className="min-h-screen bg-[#F2F4F7] pb-8">
-      <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
+    <PullToRefresh onRefresh={loadData}>
+      <div className="min-h-screen bg-[#F2F4F7] pb-8">
+        <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>

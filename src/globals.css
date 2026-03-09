@@ -182,3 +182,16 @@ html.dark .bg-gray-50 {
 html.dark .bg-\[\#0A0A0A\] {
   background-color: #0F1114 !important;
 }
+
+/* Mobile optimization */
+button, a, [role="button"], nav, [role="navigation"], [role="tablist"], [role="tab"] {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+body {
+  overscroll-behavior: none;
+  -webkit-overscroll-behavior: none;
+}

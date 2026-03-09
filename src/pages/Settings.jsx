@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Moon, Sun, LogOut, Check, MessageSquare, ShieldCheck } from "lucide-react";
+import { Moon, Sun, LogOut, Check, MessageSquare, ShieldCheck, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import NanaPreferencesSettings from "@/components/settings/NanaPreferencesSettings";
 import RiskProfileAssessment from "@/components/settings/RiskProfileAssessment";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
@@ -43,6 +44,8 @@ export default function Settings() {
   });
   const [saving, setSaving] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -88,6 +91,15 @@ export default function Settings() {
 
   async function handleLogout() {
     base44.auth.logout();
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    try {
+      await base44.auth.deleteAccount();
+    } catch (error) {
+      console.error("Delete account failed:", error);
+    }
   }
 
   return (
@@ -299,26 +311,52 @@ export default function Settings() {
         }
 
         {/* Akun */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-5 pt-4 pb-2">
-            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">{t('settings_account')}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#FFF5F5] transition-colors border-t border-[#F2F4F7] text-[#FF6B6B]"
-            aria-label="Keluar dari akun">
+         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-5 pt-4 pb-2">
+              <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">{t('settings_account')}</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#FFF5F5] transition-colors border-t border-[#F2F4F7] text-[#FF6B6B]"
+              aria-label="Keluar dari akun">
 
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium text-sm">{t('settings_logout')}</span>
-          </button>
-        </div>
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium text-sm">{t('settings_logout')}</span>
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#FFF5F5] transition-colors border-t border-[#F2F4F7] text-[#FF6B6B]"
+              aria-label="Hapus akun">
+
+              <Trash2 className="w-5 h-5" />
+              <span className="font-medium text-sm">Hapus Akun Selamanya</span>
+            </button>
+          </div>
 
         <p className="text-center text-xs text-[#8FA4C8] pb-4">{t('settings_version')}</p>
       </div>
 
       {showFeedback &&
-      <FeedbackModal user={user} onClose={() => setShowFeedback(false)} />
-      }
-    </div>);
+       <FeedbackModal user={user} onClose={() => setShowFeedback(false)} />
+       }
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Hapus Akun Selamanya?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Tindakan ini tidak dapat dibatalkan. Semua data akun Anda akan dihapus secara permanen dari sistem.
+          </AlertDialogDescription>
+          <div className="flex gap-2 justify-end">
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={deleting}
+              className="bg-[#FF6B6B] hover:bg-[#FF5252]">
+              {deleting ? "Menghapus..." : "Hapus Akun"}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+      </div>);
 
 }
