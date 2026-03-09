@@ -6,6 +6,8 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import ManageCategoriesModal from "./ManageCategoriesModal";
 import SplitBillModal from "./SplitBillModal";
 import ReceiptCorrectionForm from "./ReceiptCorrectionForm";
+import BottomSheetSelect from "@/components/ui/BottomSheetSelect";
+import DateInput from "@/components/utils/DateInput";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const DEFAULT_CATEGORIES = {
@@ -47,6 +49,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
   const [catOrder, setCatOrder] = useState([]); // Category drag order
   const [appSettings, setAppSettings] = useState(null);
   const [subCatPopup, setSubCatPopup] = useState(null); // { parentKey, parentLabel, subs }
+  const [showGoalSelect, setShowGoalSelect] = useState(false);
   const fileRef = useRef(null);
 
   useEffect(() => { 
@@ -378,20 +381,17 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
             <div>
               <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{t('note_optional')}</label>
               <input
-                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
                 placeholder={t('note_placeholder')}
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
               />
             </div>
-            <div>
-              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{t('date')}</label>
-              <input type="date"
-                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-              />
-            </div>
+            <DateInput
+              value={form.date}
+              onChange={(date) => setForm({ ...form, date })}
+              label={t('date')}
+            />
           </div>
 
           {/* Recurring */}
@@ -425,16 +425,13 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
           {goals && goals.length > 0 && (
             <div className="mb-5">
               <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">{t('link_to_goal')}</label>
-              <select
-                value={form.goal_id || ""}
-                onChange={(e) => setForm({ ...form, goal_id: e.target.value })}
-                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+              <button
+                onClick={() => setShowGoalSelect(true)}
+                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] text-left transition-colors hover:border-[#CBD5E0] tap-highlight-fix flex items-center justify-between"
               >
-                <option value="">{t('no_goal')}</option>
-                {goals.map(goal => (
-                  <option key={goal.id} value={goal.id}>{goal.icon} {goal.name}</option>
-                ))}
-              </select>
+                <span>{form.goal_id ? goals.find(g => g.id === form.goal_id)?.name || t('no_goal') : t('no_goal')}</span>
+                <span className="text-[#8FA4C8]">›</span>
+              </button>
             </div>
           )}
 
@@ -473,7 +470,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
                   <p className="text-sm font-bold text-[#1A1A1A]">{subCatPopup.parentLabel}</p>
                 </div>
               </div>
-              <button onClick={() => setSubCatPopup(null)} className="text-[#9B9B9B] hover:text-[#1A1A1A]">
+              <button onClick={() => setSubCatPopup(null)} className="text-[#9B9B9B] hover:text-[#1A1A1A] tap-highlight-fix">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -485,7 +482,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
                     setForm(f => ({ ...f, category: sub.key }));
                     setSubCatPopup(null);
                   }}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 transition-all"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 transition-all tap-highlight-fix"
                 >
                   <span className="text-2xl">{sub.emoji}</span>
                   <span className="text-[10px] font-semibold text-[#4A5568] text-center leading-tight">{sub.label}</span>
@@ -497,13 +494,25 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
                 setForm(f => ({ ...f, category: subCatPopup.parentKey }));
                 setSubCatPopup(null);
               }}
-              className="mt-3 w-full py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-[#8FA4C8] hover:border-[#CBD5E0] transition-colors"
+              className="mt-3 w-full py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-[#8FA4C8] hover:border-[#CBD5E0] transition-colors tap-highlight-fix"
             >
               Pilih "{subCatPopup.parentLabel}" saja (tanpa sub-kategori)
             </button>
           </div>
         </div>
       )}
+
+      <BottomSheetSelect
+        isOpen={showGoalSelect}
+        onClose={() => setShowGoalSelect(false)}
+        title={t('link_to_goal')}
+        options={[
+          { key: "", label: t('no_goal'), emoji: "❌" },
+          ...goals.map(g => ({ key: g.id, label: g.name, emoji: g.icon }))
+        ]}
+        onSelect={(goalId) => setForm({ ...form, goal_id: goalId })}
+        selectedValue={form.goal_id}
+      />
     </>
   );
 }
