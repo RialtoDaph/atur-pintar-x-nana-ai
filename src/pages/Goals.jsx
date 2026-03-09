@@ -289,7 +289,6 @@ export default function Goals() {
           />
         )}
         </div>
-        </div>
         </PullToRefresh>
         );
         }
