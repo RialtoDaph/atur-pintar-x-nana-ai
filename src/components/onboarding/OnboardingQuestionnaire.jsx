@@ -6,12 +6,25 @@ const TODAY = new Date().toISOString().split("T")[0];
 
 const STEPS = [
   { id: "welcome" },
+  { id: "locale" },
   { id: "income" },
   { id: "savings_goal" },
   { id: "debt" },
   { id: "risk" },
   { id: "reminder" },
   { id: "done" },
+];
+
+const LANGUAGES = [
+  { code: "id", label: "Indonesia", flag: "🇮🇩" },
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+];
+
+const CURRENCIES = [
+  { code: "IDR", label: "Rupiah", symbol: "Rp", flag: "🇮🇩" },
+  { code: "USD", label: "US Dollar", symbol: "$", flag: "🇺🇸" },
+  { code: "EUR", label: "Euro", symbol: "€", flag: "🇪🇺" },
 ];
 
 export default function OnboardingQuestionnaire({ onClose }) {
@@ -32,6 +45,9 @@ export default function OnboardingQuestionnaire({ onClose }) {
   const [debtType, setDebtType] = useState("lainnya");
   const [debtRemaining, setDebtRemaining] = useState("");
   const [debtMonthly, setDebtMonthly] = useState("");
+
+  const [selectedLanguage, setSelectedLanguage] = useState("id");
+  const [selectedCurrency, setSelectedCurrency] = useState("IDR");
 
   const [riskTolerance, setRiskTolerance] = useState("");
   const [financialGoal, setFinancialGoal] = useState("");
@@ -121,6 +137,23 @@ export default function OnboardingQuestionnaire({ onClose }) {
       }));
     }
 
+    // Save language & currency settings
+    const CURRENCY_MAP = { IDR: "Rp", USD: "$", EUR: "€" };
+    promises.push(base44.entities.AppSettings.list().then(async (list) => {
+      const payload = {
+        language: selectedLanguage,
+        currency: selectedCurrency,
+        currency_symbol: CURRENCY_MAP[selectedCurrency],
+        decimal_separator: selectedCurrency === "IDR" ? "," : ".",
+        thousand_separator: selectedCurrency === "IDR" ? "." : ",",
+      };
+      if (list.length > 0) {
+        await base44.entities.AppSettings.update(list[0].id, payload);
+      } else {
+        await base44.entities.AppSettings.create(payload);
+      }
+    }));
+
     // Mark onboarding done on user
     promises.push(base44.auth.updateMe({ onboarding_completed: true }));
 
@@ -167,6 +200,46 @@ export default function OnboardingQuestionnaire({ onClose }) {
                   Mulai <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* STEP: Locale */}
+          {currentStep.id === "locale" && (
+            <div>
+              <div className="text-3xl mb-3">🌐</div>
+              <h2 className="text-lg font-bold text-[#1A1A1A] mb-1">Bahasa & Mata Uang</h2>
+              <p className="text-sm text-[#8FA4C8] mb-5">Pilih preferensimu. Pengaturan ini <span className="font-semibold text-[#FF6A00]">tidak bisa diubah</span> setelah ini.</p>
+
+              <div className="mb-5">
+                <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">Bahasa</label>
+                <div className="space-y-2">
+                  {LANGUAGES.map(lang => (
+                    <button key={lang.code} onClick={() => setSelectedLanguage(lang.code)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${selectedLanguage === lang.code ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0] hover:border-[#CBD5E0]"}`}>
+                      <span className="text-xl">{lang.flag}</span>
+                      <span className={`text-sm font-semibold ${selectedLanguage === lang.code ? "text-[#FF6A00]" : "text-[#1A1A1A]"}`}>{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">Mata Uang</label>
+                <div className="space-y-2">
+                  {CURRENCIES.map(cur => (
+                    <button key={cur.code} onClick={() => setSelectedCurrency(cur.code)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${selectedCurrency === cur.code ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0] hover:border-[#CBD5E0]"}`}>
+                      <span className="text-xl">{cur.flag}</span>
+                      <div className="text-left">
+                        <p className={`text-sm font-semibold ${selectedCurrency === cur.code ? "text-[#FF6A00]" : "text-[#1A1A1A]"}`}>{cur.label}</p>
+                        <p className="text-xs text-[#8FA4C8]">{cur.symbol} · {cur.code}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <NavButtons onPrev={prev} onNext={next} />
             </div>
           )}
 
