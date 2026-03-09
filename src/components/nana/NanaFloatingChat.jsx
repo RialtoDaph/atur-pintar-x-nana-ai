@@ -291,6 +291,12 @@ export default function NanaFloatingChat() {
           </div>
         </div>
       }
+      {showEntryModal && (
+        <NanaQuickEntryModal
+          onClose={() => setShowEntryModal(false)}
+          onSend={sendFromModal}
+        />
+      )}
     </>);
 
 }
