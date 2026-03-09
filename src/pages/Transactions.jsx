@@ -213,21 +213,21 @@ export default function Transactions() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${selectMode ? "bg-white text-[#0A0A0A]" : "bg-white/10 text-white hover:bg-white/20"}`}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-white text-[#0A0A0A]" : "bg-white/10 text-white hover:bg-white/20"}`}
             >
               {selectMode ? t('tx_cancel') : t('tx_select')}
             </button>
             <button
               onClick={() => setShowCSVImport(true)}
               aria-label="Import dari file CSV"
-              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 tap-highlight-fix"
             >
               <Upload className="w-4 h-4 text-white" aria-hidden="true" />
             </button>
             <button
               onClick={() => setShowAddTx(true)}
               aria-label="Tambah transaksi baru"
-              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:ring-offset-2 focus:ring-offset-[#0A0A0A] tap-highlight-fix"
             >
               <Plus className="w-5 h-5 text-white" aria-hidden="true" />
             </button>
@@ -273,9 +273,9 @@ export default function Transactions() {
                 role="tab"
                 aria-selected={filter === tab.key}
                 onClick={() => setFilter(tab.key)}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold capitalize transition-all focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00] ${
-                  filter === tab.key ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8] hover:text-[#0A0A0A]"
-                }`}
+                className={`flex-1 py-2 rounded-lg text-sm font-semibold capitalize transition-all focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00] tap-highlight-fix ${
+                    filter === tab.key ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8] hover:text-[#0A0A0A]"
+                  }`}
               >
                 {tab.label}
               </button>
@@ -291,7 +291,7 @@ export default function Transactions() {
               placeholder={t('search_transactions')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-white"
+              className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-white tap-highlight-fix"
             />
           </div>
 
@@ -300,7 +300,7 @@ export default function Transactions() {
             <div className="flex gap-2 overflow-x-auto pb-2">
               <button
                 onClick={() => setGoalFilter(null)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${
                   !goalFilter ? "bg-[#0A0A0A] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
                 }`}
               >
@@ -310,7 +310,7 @@ export default function Transactions() {
                 <button
                   key={goal.id}
                   onClick={() => setGoalFilter(goal.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${
                     goalFilter === goal.id ? "bg-[#FF6A00] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
                   }`}
                 >
@@ -333,7 +333,7 @@ export default function Transactions() {
             {!searchQuery && (
               <button
                 onClick={() => setShowAddTx(true)}
-                className="px-5 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-semibold hover:bg-[#e05e00] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:ring-offset-2"
+                className="px-5 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-semibold hover:bg-[#e05e00] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:ring-offset-2 tap-highlight-fix"
               >
                 + Tambah Transaksi
               </button>
@@ -434,7 +434,7 @@ export default function Transactions() {
           <div className="text-center py-2">
             <button
               onClick={() => setPage(p => p + 1)}
-              className="px-6 py-2.5 rounded-xl bg-white border border-[#E2E8F0] text-sm font-semibold text-[#4A5568] hover:bg-[#F2F4F7] transition-colors shadow-sm"
+              className="px-6 py-2.5 rounded-xl bg-white border border-[#E2E8F0] text-sm font-semibold text-[#4A5568] hover:bg-[#F2F4F7] transition-colors shadow-sm tap-highlight-fix"
             >
               Muat lebih banyak ({filtered.length - paginatedFiltered.length} lagi)
             </button>
@@ -447,14 +447,19 @@ export default function Transactions() {
           goals={goals}
           onClose={() => setShowAddTx(false)}
           onSave={async (data) => {
+            const tempId = `temp_${Date.now()}`;
+            const optimisticTx = { ...data, id: tempId, created_date: new Date().toISOString() };
+            setTransactions(prev => [optimisticTx, ...prev]);
+            setShowAddTx(false);
             try {
               await base44.entities.Transaction.create(data);
               toast.success(t('tx_create_success'));
-              setShowAddTx(false);
+              setTransactions(prev => prev.filter(t => t.id !== tempId));
               loadData();
             } catch (error) {
               console.error("Create failed:", error);
               toast.error(t('tx_create_error'));
+              setTransactions(prev => prev.filter(t => t.id !== tempId));
             }
           }}
         />
