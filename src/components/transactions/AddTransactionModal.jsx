@@ -82,76 +82,102 @@ export default function AddTransactionModal({ goals = [], onClose, onSave }) {
     setScanning(true);
     setReceiptData(null);
 
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
 
-    // Call backend to extract receipt data (detailed)
-    const response = await base44.functions.invoke("extractReceiptData", { file_url });
-    const extracted = response.data?.data;
+      // Call backend to extract receipt data (detailed)
+      const response = await base44.functions.invoke("extractReceiptData", { file_url });
+      const extracted = response.data?.data;
 
-    if (extracted) {
-      setReceiptData(extracted);
-      setTab("expense");
-      setForm(f => ({
-        ...f,
-        amount: extracted.total_amount ? String(Math.round(extracted.total_amount)) : f.amount,
-        date: extracted.date || f.date,
-        note: extracted.store_name || f.note,
-        category: "food",
-      }));
+      if (extracted && extracted.total_amount) {
+        setReceiptData(extracted);
+        setTab("expense");
+        setForm(f => ({
+          ...f,
+          amount: extracted.total_amount ? String(Math.round(extracted.total_amount)) : f.amount,
+          date: extracted.date || f.date,
+          note: extracted.store_name || f.note,
+          category: "food",
+        }));
+      }
+    } catch (error) {
+      console.error("Receipt scan failed:", error);
+    } finally {
+      setScanning(false);
+      e.target.value = "";
     }
-
-    setScanning(false);
-    e.target.value = "";
   }
 
   async function handleSplitConfirm({ splitMode, participants, shares, items }) {
     setShowSplitBill(false);
     setSaving(true);
 
-    const myShare = shares.find(s => s.name === "Saya");
+    try {
+      if (!receiptData?.total_amount || !Array.isArray(shares) || shares.length === 0) {
+        throw new Error("Invalid split bill data");
+      }
 
-    // Save my own transaction (full amount — I paid upfront)
-    await onSave({
-      type: "expense",
-      amount: receiptData.total_amount,
-      category: form.category || "food",
-      note: `${receiptData.store_name} (split bill)`,
-      date: form.date,
-      is_recurring: false,
-    });
-
-    // Create IOU records for each non-"Saya" participant
-    for (const share of shares) {
-      if (share.name === "Saya" || share.amount <= 0) continue;
-      await base44.entities.SplitIOU.create({
-        store_name: receiptData.store_name,
+      // Save my own transaction (full amount — I paid upfront)
+      await onSave({
+        type: "expense",
+        amount: receiptData.total_amount,
+        category: form.category || "food",
+        note: `${receiptData.store_name} (split bill)`,
         date: form.date,
-        debtor_name: share.name,
-        debtor_email: share.email || "",
-        creditor_name: "Saya",
-        amount: share.amount,
-        status: "unpaid",
-        receipt_image_url: receiptData.receipt_image_url || "",
-        notes: `Split bill ${splitMode === "equal" ? "bagi rata" : "per item"}`,
+        is_recurring: false,
       });
-    }
 
-    setSaving(false);
+      // Create IOU records for each non-"Saya" participant
+      const iouPromises = shares
+        .filter(share => share.name !== "Saya" && share.amount > 0)
+        .map(share =>
+          base44.entities.SplitIOU.create({
+            store_name: receiptData.store_name,
+            date: form.date,
+            debtor_name: share.name,
+            debtor_email: share.email || "",
+            creditor_name: "Saya",
+            amount: share.amount,
+            status: "unpaid",
+            receipt_image_url: receiptData.receipt_image_url || "",
+            notes: `Split bill ${splitMode === "equal" ? "bagi rata" : "per item"}`,
+          })
+        );
+
+      if (iouPromises.length > 0) {
+        await Promise.all(iouPromises);
+      }
+    } catch (error) {
+      console.error("Split bill failed:", error);
+      throw error;
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleSave() {
     if (!form.amount || !form.category) return;
+
+    const amount = parseRupiah(form.amount);
+    if (amount <= 0) return;
+
     setSaving(true);
-    await onSave({
-      ...form,
-      type: tab,
-      amount: parseRupiah(form.amount),
-      is_recurring: recurring,
-      recurring_interval: recurring ? recurringInterval : undefined,
-      recurring_last_generated: recurring ? form.date : undefined,
-      goal_id: form.goal_id || undefined,
-    });
-    setSaving(false);
+    try {
+      await onSave({
+        ...form,
+        type: tab,
+        amount,
+        is_recurring: recurring,
+        recurring_interval: recurring ? recurringInterval : undefined,
+        recurring_last_generated: recurring ? form.date : undefined,
+        goal_id: form.goal_id || undefined,
+      });
+    } catch (error) {
+      console.error("Save transaction failed:", error);
+      throw error;
+    } finally {
+      setSaving(false);
+    }
   }
 
   const defaultCats = DEFAULT_CATEGORIES[tab] || [];
