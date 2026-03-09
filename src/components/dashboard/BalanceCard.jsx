@@ -1,9 +1,16 @@
 import { TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
+const NANA_HAPPY = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/6ccd082df_generated_image.png";
+const NANA_WORRIED = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/82d111ad6_generated_image.png";
+const NANA_CRYING = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7453847d8_generated_image.png";
+
 export default function BalanceCard({ income, expense, savings, loading }) {
   const { formatCurrency, t } = useAppSettings();
   const balance = income - expense;
+
+  const nanaAvatar = balance > 0 ? NANA_HAPPY : balance === 0 ? NANA_WORRIED : NANA_CRYING;
+  const nanaMood = balance > 0 ? "Keuanganmu sehat! 🎉" : balance === 0 ? "Hati-hati pengeluaranmu 😟" : "Pengeluaran melebihi pemasukan 😢";
 
   if (loading) {
     return (
@@ -13,7 +20,13 @@ export default function BalanceCard({ income, expense, savings, loading }) {
 
   return (
     <div className="bg-[#161616] rounded-2xl p-4 border border-[#222]">
-      <p className="text-[#8FA4C8] text-xs font-semibold uppercase tracking-widest mb-1">{t('balance_card_title')}</p>
+      <div className="flex items-center gap-3 mb-3">
+        <img src={nanaAvatar} alt="Nana" className="w-12 h-12 rounded-full object-cover border-2 border-[#FF6A00] flex-shrink-0" />
+        <div>
+          <p className="text-[#8FA4C8] text-xs font-semibold uppercase tracking-widest">{t('balance_card_title')}</p>
+          <p className="text-[#FF6A00] text-[10px] mt-0.5">{nanaMood}</p>
+        </div>
+      </div>
       <p className={`text-3xl font-bold mb-4 ${balance >= 0 ? "text-white" : "text-red-400"}`}>
         {balance >= 0 ? "" : "-"}{formatCurrency(Math.abs(balance))}
       </p>
