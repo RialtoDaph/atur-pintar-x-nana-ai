@@ -41,19 +41,32 @@ export default function AddReminderModal({ reminder, onClose, onSave }) {
   }, [reminder]);
 
   async function handleSave() {
-    if (!form.title || !form.due_day) return;
-    setSaving(true);
-    await onSave({
-      title: form.title,
-      type: form.type,
-      amount: form.amount ? parseFloat(form.amount) : undefined,
-      due_day: parseInt(form.due_day),
-      icon: form.icon || undefined,
-      notes: form.notes || undefined,
-      is_active: form.is_active,
-    });
-    setSaving(false);
-  }
+     if (!form.title?.trim()) return;
+
+     const dueDay = parseInt(form.due_day);
+     if (dueDay < 1 || dueDay > 31) return;
+
+     const amount = form.amount ? parseFloat(form.amount) : 0;
+     if (amount < 0) return;
+
+     setSaving(true);
+     try {
+       await onSave({
+         title: form.title.trim(),
+         type: form.type,
+         amount: amount > 0 ? amount : undefined,
+         due_day: dueDay,
+         icon: form.icon || undefined,
+         notes: form.notes?.trim() || undefined,
+         is_active: form.is_active,
+       });
+     } catch (error) {
+       console.error("Save reminder failed:", error);
+       throw error;
+     } finally {
+       setSaving(false);
+     }
+   }
 
   return (
     <>

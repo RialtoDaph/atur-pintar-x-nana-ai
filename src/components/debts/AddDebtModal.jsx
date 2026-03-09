@@ -23,17 +23,33 @@ export default function AddDebtModal({ onClose, onSave, debt }) {
   const isEdit = !!debt;
 
   async function handleSave() {
-    if (!form.name || !form.total_amount || !form.remaining_amount) return;
-    setSaving(true);
-    await onSave({
-      ...form,
-      total_amount: parseFloat(form.total_amount),
-      remaining_amount: parseFloat(form.remaining_amount),
-      interest_rate: form.interest_rate ? parseFloat(form.interest_rate) : undefined,
-      monthly_payment: form.monthly_payment ? parseFloat(form.monthly_payment) : undefined,
-    });
-    setSaving(false);
-  }
+     if (!form.name?.trim()) return;
+
+     const totalAmount = parseFloat(form.total_amount) || 0;
+     const remainingAmount = parseFloat(form.remaining_amount) || 0;
+     const monthlyPayment = parseFloat(form.monthly_payment) || 0;
+     const interestRate = parseFloat(form.interest_rate) || 0;
+
+     if (totalAmount <= 0 || remainingAmount <= 0) return;
+     if (remainingAmount > totalAmount) return;
+     if (monthlyPayment < 0 || interestRate < 0 || interestRate > 100) return;
+
+     setSaving(true);
+     try {
+       await onSave({
+         ...form,
+         total_amount: totalAmount,
+         remaining_amount: remainingAmount,
+         interest_rate: interestRate > 0 ? interestRate : undefined,
+         monthly_payment: monthlyPayment > 0 ? monthlyPayment : undefined,
+       });
+     } catch (error) {
+       console.error("Save debt failed:", error);
+       throw error;
+     } finally {
+       setSaving(false);
+     }
+   }
 
   return (
     <>
