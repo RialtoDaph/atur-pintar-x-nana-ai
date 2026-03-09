@@ -52,8 +52,8 @@ function LayoutInner({ children, currentPageName }) {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         * { -webkit-font-smoothing: antialiased; }
-        html { color-scheme: light !important; }
-        html.dark { color-scheme: light !important; }
+        html { color-scheme: light; }
+        html.dark { color-scheme: dark; }
       `}</style>
 
       {/* Desktop sidebar */}

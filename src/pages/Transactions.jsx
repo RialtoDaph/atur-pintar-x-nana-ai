@@ -186,7 +186,7 @@ export default function Transactions() {
 
   // Group by month
   const grouped = {};
-  const locale = settings.locale || "id-ID";
+  const locale = settings.language === 'en' ? 'en-US' : settings.language === 'de' ? 'de-DE' : 'id-ID';
   paginatedFiltered.forEach(tx => {
     const d = new Date(tx.date);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;

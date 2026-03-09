@@ -58,10 +58,11 @@ export default function Goals() {
   }
 
   async function handleTransaction(amount, type, note) {
+    const txType = type === "deposit" ? "savings" : "expense";
     const tx = {
       goal_id: goalId,
       amount,
-      type,
+      type: txType,
       note,
       date: new Date().toISOString().split("T")[0],
     };

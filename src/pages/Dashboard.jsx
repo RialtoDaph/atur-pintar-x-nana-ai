@@ -180,9 +180,10 @@ export default function Dashboard() {
       )}
 
       {showOnboarding && (
-        <OnboardingQuestionnaire onClose={() => {
+        <OnboardingQuestionnaire onClose={async () => {
           setShowOnboarding(false);
           localStorage.setItem("onboarding_done", "true");
+          await base44.auth.updateMe({ onboarding_completed: true });
           loadData();
         }} />
       )}

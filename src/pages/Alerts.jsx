@@ -49,15 +49,22 @@ export default function AlertsPage() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("unread"); // unread | all
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    loadAlerts();
-  }, [filter]); // eslint-disable-line react-hooks/exhaustive-deps
+    base44.auth.me().then(u => setUser(u)).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (user) loadAlerts();
+  }, [user, filter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadAlerts() {
     setLoading(true);
     try {
-      const query = filter === "unread" ? { status: "unread" } : {};
+      const query = filter === "unread"
+        ? { status: "unread", created_by: user.email }
+        : { created_by: user.email };
       const data = await base44.entities.Alert.filter(query, "-created_date");
       setAlerts(data);
     } catch (error) {

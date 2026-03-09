@@ -237,10 +237,10 @@ export default function Reminders() {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
-            <p className="text-sm font-semibold text-[#1A1A1A] mb-4">Hapus pengingat ini?</p>
+            <p className="text-sm font-semibold text-[#1A1A1A] mb-4">{t('reminders_delete_confirm')}</p>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setDeleteConfirm(null)} className="px-4 py-2 rounded-lg text-sm font-semibold text-[#8FA4C8] hover:bg-[#F2F4F7] transition-colors">Batal</button>
-              <button onClick={() => deleteReminder(deleteConfirm)} className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#FF6B6B] hover:bg-[#FF5252] transition-colors">Hapus</button>
+              <button onClick={() => setDeleteConfirm(null)} className="px-4 py-2 rounded-lg text-sm font-semibold text-[#8FA4C8] hover:bg-[#F2F4F7] transition-colors">{t('cancel')}</button>
+              <button onClick={() => deleteReminder(deleteConfirm)} className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#FF6B6B] hover:bg-[#FF5252] transition-colors">{t('alerts_delete')}</button>
             </div>
           </div>
         </div>

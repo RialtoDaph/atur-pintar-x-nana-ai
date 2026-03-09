@@ -250,7 +250,7 @@ export default function DebtsPage() {
                 onClick={() => handleDelete(deleteConfirm)}
                 className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#FF6B6B] hover:bg-[#FF5252] transition-colors"
               >
-                Hapus
+                {t('alerts_delete')}
               </button>
             </div>
           </div>

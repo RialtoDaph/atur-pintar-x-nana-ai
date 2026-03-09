@@ -54,13 +54,16 @@ export default function Nana() {
 
   async function sendMessage() {
     if (!input.trim() || sending) return;
-    if (!activeConv) await newConversation();
 
-    const conv = activeConv || (await base44.agents.createConversation({
-      agent_name: "nana",
-      metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` },
-    }));
-    if (!activeConv) setActiveConv(conv);
+    let conv = activeConv;
+    if (!conv) {
+      conv = await base44.agents.createConversation({
+        agent_name: "nana",
+        metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` },
+      });
+      setActiveConv(conv);
+      setConversations(prev => [conv, ...prev]);
+    }
 
     setSending(true);
     const text = input;

@@ -51,17 +51,17 @@ import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
 import Budget from './pages/Budget';
 import Dashboard from './pages/Dashboard';
+import Debts from './pages/Debts';
+import Goals from './pages/Goals';
 import InvestmentDetail from './pages/InvestmentDetail';
+import Investments from './pages/Investments';
 import Menu from './pages/Menu';
 import Nana from './pages/Nana';
 import Reminders from './pages/Reminders';
+import Settings from './pages/Settings';
 import SpendingDetail from './pages/SpendingDetail';
 import Tips from './pages/Tips';
 import Transactions from './pages/Transactions';
-import Debts from './pages/Debts';
-import Goals from './pages/Goals';
-import Investments from './pages/Investments';
-import Settings from './pages/Settings';
 import __Layout from './Layout.jsx';
 
 
@@ -70,17 +70,17 @@ export const PAGES = {
     "Analytics": Analytics,
     "Budget": Budget,
     "Dashboard": Dashboard,
+    "Debts": Debts,
+    "Goals": Goals,
     "InvestmentDetail": InvestmentDetail,
+    "Investments": Investments,
     "Menu": Menu,
     "Nana": Nana,
     "Reminders": Reminders,
+    "Settings": Settings,
     "SpendingDetail": SpendingDetail,
     "Tips": Tips,
     "Transactions": Transactions,
-    "Debts": Debts,
-    "Goals": Goals,
-    "Investments": Investments,
-    "Settings": Settings,
 }
 
 export const pagesConfig = {
