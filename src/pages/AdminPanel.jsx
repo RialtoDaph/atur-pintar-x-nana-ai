@@ -197,7 +197,14 @@ export default function AdminPanel() {
 
                     {/* Action */}
                     {hasSettings && (
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 flex flex-col gap-1 items-end">
+                        <Link
+                          to={`${createPageUrl("AdminUserSupport")}?email=${encodeURIComponent(u.email)}`}
+                          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 transition-colors"
+                        >
+                          <Headphones className="w-3 h-3" />
+                          Support
+                        </Link>
                         {msg ? (
                           <div className="flex items-center gap-1 text-green-600 text-xs font-semibold">
                             <Check className="w-3.5 h-3.5" />
