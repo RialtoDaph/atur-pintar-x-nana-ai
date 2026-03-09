@@ -205,14 +205,26 @@ button, a, [role="button"], [role="tab"], [role="menuitem"] {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Consistent scroll behavior for all scroll containers */
-main, [role="main"], .overflow-y-auto, .overflow-auto {
+/* Explicit overscroll-behavior for all scrollable containers */
+main,
+[role="main"],
+.overflow-y-auto,
+.overflow-auto {
   overscroll-behavior: auto;
   -webkit-overscroll-behavior: auto;
 }
 
 /* Prevent rubber-banding on modal and dialog containers */
-[role="dialog"], dialog, .modal, .sheet {
+[role="dialog"],
+dialog,
+.modal,
+.sheet {
   overscroll-behavior: contain;
   -webkit-overscroll-behavior: contain;
+}
+
+/* Ensure PullToRefresh can function without scroll conflicts */
+.overflow-y-auto {
+  overscroll-behavior: auto !important;
+  -webkit-overscroll-behavior: auto !important;
 }
