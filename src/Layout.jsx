@@ -160,7 +160,7 @@ function LayoutInner({ children, currentPageName }) {
         {/* Search */}
         <button
           onClick={() => setShowSearch(true)}
-          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#888] hover:text-white hover:bg-white/10 transition-colors w-full">
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#888] hover:text-white hover:bg-white/10 transition-colors w-full tap-highlight-fix">
 
           <Search className="w-4 h-4" />
           {t('search_placeholder')}
@@ -207,7 +207,7 @@ function LayoutInner({ children, currentPageName }) {
           {isNestedPage ? (
             <button
               onClick={() => window.history.back()}
-              className="flex items-center gap-2 text-white hover:bg-white/10 px-2 py-1 rounded-lg transition-colors"
+              className="flex items-center gap-2 text-white hover:bg-white/10 px-2 py-1 rounded-lg transition-colors tap-highlight-fix"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="text-sm font-medium">{t('back')}</span>
@@ -245,11 +245,11 @@ function LayoutInner({ children, currentPageName }) {
       {/* Mobile bottom nav */}
       <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-40 border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {mobileMainNav.map((item) => {
-          const active = currentPageName === item.page;
-          return (
-            <button
-              key={item.page}
-              onClick={() => handleTabClick(item.page)}
+           const active = currentPageName === item.page;
+           return (
+             <button
+               key={`tab-${item.page}`}
+               onClick={() => handleTabClick(item.page)}
               className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
               active ? "text-[#FF6A00]" : "text-[#888]"}`}
             >
