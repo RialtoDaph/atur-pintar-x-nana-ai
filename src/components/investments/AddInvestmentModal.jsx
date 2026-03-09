@@ -92,17 +92,20 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
       });
       if (response.data?.results?.[0]) {
         const asset = response.data.results[0];
-        const price = asset.price?.toString() || "";
-        setForm(f => ({
-          ...f,
-          price_per_unit: price,
-          current_value: price,
-        }));
+        const price = parseFloat(asset.price) || 0;
+        if (price > 0) {
+          setForm(f => ({
+            ...f,
+            price_per_unit: price.toString(),
+            current_value: price.toString(),
+          }));
+        }
       }
-    } catch (e) {
-      console.error("Price fetch failed:", e.message);
+    } catch (error) {
+      console.error("Price fetch failed:", error);
+    } finally {
+      setFetchingPrice(false);
     }
-    setFetchingPrice(false);
   }
 
   // Fetch historical price when purchase_date changes (for saham, crypto, emas)
@@ -117,17 +120,20 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
         date,
       });
       if (response.data?.price) {
-        const price = response.data.price.toString();
-        setForm(f => ({
-          ...f,
-          price_per_unit: price,
-          ...(isGold ? { price_per_gram: price } : {}),
-        }));
+        const price = parseFloat(response.data.price);
+        if (price > 0) {
+          setForm(f => ({
+            ...f,
+            price_per_unit: price.toString(),
+            ...(isGold ? { price_per_gram: price.toString() } : {}),
+          }));
+        }
       }
-    } catch (e) {
-      // silently fail, user can enter manually
+    } catch (error) {
+      console.error("Historical price fetch failed:", error);
+    } finally {
+      setFetchingHistorical(false);
     }
-    setFetchingHistorical(false);
   }
 
   function handleTypeChange(key) {
@@ -149,29 +155,38 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
   async function handleSave() {
     const name = form.name.trim();
     const initial = parseFloat(form.initial_amount) || 0;
+    const current = parseFloat(form.current_value) || 0;
+
     if (!name || initial <= 0) return;
+    if (current <= 0) return;
 
     setSaving(true);
-    const payload = {
-      name,
-      type: form.type,
-      initial_amount: initial,
-      current_value: parseFloat(form.current_value) || initial,
-      purchase_date: form.purchase_date || undefined,
-      notes: form.notes || undefined,
-    };
+    try {
+      const payload = {
+        name,
+        type: form.type,
+        initial_amount: initial,
+        current_value: current,
+        purchase_date: form.purchase_date || undefined,
+        notes: form.notes || undefined,
+      };
 
-    // Quantity & price_per_unit
-    if (isGold) {
-      payload.quantity = parseFloat(form.weight_grams) || undefined;
-      payload.price_per_unit = parseFloat(form.price_per_gram) || undefined;
-    } else {
-      payload.quantity = parseFloat(form.quantity) || undefined;
-      payload.price_per_unit = parseFloat(form.price_per_unit) || undefined;
+      // Quantity & price_per_unit
+      if (isGold) {
+        payload.quantity = parseFloat(form.weight_grams) || undefined;
+        payload.price_per_unit = parseFloat(form.price_per_gram) || undefined;
+      } else {
+        payload.quantity = parseFloat(form.quantity) || undefined;
+        payload.price_per_unit = parseFloat(form.price_per_unit) || undefined;
+      }
+
+      await onSave(payload);
+    } catch (error) {
+      console.error("Save investment failed:", error);
+      throw error;
+    } finally {
+      setSaving(false);
     }
-
-    await onSave(payload);
-    setSaving(false);
   }
 
   const unitLabel = getUnitLabel(form.type, lang);
