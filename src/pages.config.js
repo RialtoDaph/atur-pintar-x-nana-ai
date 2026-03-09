@@ -62,6 +62,7 @@ import Settings from './pages/Settings';
 import SpendingDetail from './pages/SpendingDetail';
 import Tips from './pages/Tips';
 import Transactions from './pages/Transactions';
+import AdminPanel from './pages/AdminPanel';
 import __Layout from './Layout.jsx';
 
 
@@ -81,6 +82,7 @@ export const PAGES = {
     "SpendingDetail": SpendingDetail,
     "Tips": Tips,
     "Transactions": Transactions,
+    "AdminPanel": AdminPanel,
 }
 
 export const pagesConfig = {
