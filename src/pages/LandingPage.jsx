@@ -175,12 +175,12 @@ export default function LandingPage() {
       {/* Social Proof */}
       <section className="px-6 pb-24 text-center">
         <div className="card-dark rounded-3xl max-w-lg mx-auto p-8 glow-orange">
-          <p className="text-5xl font-black gradient-text mb-2">{slotsLeft !== null ? Math.min(count, 100) : "..."}</p>
-          <p className="text-white/50 text-sm">dari 100 slot sudah terisi</p>
+          <p className="text-5xl font-black gradient-text mb-2">{slotsLeft !== null ? Math.min(count, 500) : "..."}</p>
+          <p className="text-white/50 text-sm">dari 500 slot sudah terisi</p>
           <div className="mt-4 w-full bg-white/10 rounded-full h-2">
             <div
               className="bg-gradient-to-r from-[#FF6A00] to-[#FFB347] h-2 rounded-full transition-all"
-              style={{ width: `${count !== null ? Math.min((count / 100) * 100, 100) : 0}%` }}
+              style={{ width: `${count !== null ? Math.min((count / 500) * 500, 500) : 0}%` }}
             />
           </div>
           <button
