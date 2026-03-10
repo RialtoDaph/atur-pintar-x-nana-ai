@@ -128,7 +128,7 @@ export default function LandingPage() {
         <p className="text-base sm:text-lg text-white/50 max-w-xl mx-auto mb-10 leading-relaxed">
           Kami sedang membuka akses terbatas. Daftar ke waiting list untuk mendapatkan akses pertama saat aplikasi diluncurkan secara{" "}
           <span className="text-white font-semibold">GRATIS</span>{" "}
-          <span className="text-[#FF6A00]">*hanya 100 orang pertama.</span>
+          <span className="text-[#FF6A00]">*hanya 500 orang pertama.</span>
         </p>
 
         {/* CTA */}
@@ -180,7 +180,7 @@ export default function LandingPage() {
           <div className="mt-4 w-full bg-white/10 rounded-full h-2">
             <div
               className="bg-gradient-to-r from-[#FF6A00] to-[#FFB347] h-2 rounded-full transition-all"
-              style={{ width: `${count !== null ? Math.min((count / 500) * 500, 500) : 0}%` }}
+              style={{ width: `${count !== null ? Math.min((count / 500) * 100, 100) : 0}%` }}
             />
           </div>
           <button
