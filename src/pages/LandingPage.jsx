@@ -382,7 +382,7 @@ export default function LandingPage() {
             <div className="card-dark rounded-2xl p-4 mb-5">
               <p className="text-xs text-white/40 mb-1">Total yang sudah bergabung</p>
               <p className="text-3xl font-black gradient-text">{count}</p>
-              <p className="text-xs text-white/40 mt-1">dari 500 slot</p>
+              <p className="text-xs text-white/40 mt-1">dari 100 slot</p>
             </div>
             <button
               onClick={() => { setShowForm(false); setSubmitted(false); }}
