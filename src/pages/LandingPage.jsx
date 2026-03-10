@@ -121,7 +121,7 @@ export default function LandingPage() {
         {/* Headline */}
         <h1 className="text-4xl sm:text-6xl font-black leading-tight mb-6 max-w-3xl mx-auto">
           AI Financial Tracker yang Membantu Kamu Mengatur Uang{" "}
-          <span className="gradient-text">Semudah Chat</span>
+          <span className="gradient-text">Semudah Chat Nana AI</span>
         </h1>
 
         {/* Subheadline */}
