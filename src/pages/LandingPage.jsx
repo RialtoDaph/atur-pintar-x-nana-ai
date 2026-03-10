@@ -14,9 +14,9 @@ const TRACKING_OPTIONS = ["Tidak mencatat", "Notes di HP", "Excel / Spreadsheet"
 const INTEREST_OPTIONS = ["Ya", "Mungkin", "Belum yakin"];
 
 const FEATURES = [
-  { icon: "💬", title: "Catat via Chat dengan Nana AI", desc: "Ketik 'Martabak 20rb' dan Nana langsung mencatatnya otomatis" },
-  { icon: "📊", title: "Analisis Cerdas", desc: "Lihat pola pengeluaran dan rekomendasi personal tiap bulan" },
-  { icon: "🎯", title: "Goals & Budget", desc: "Buat tujuan tabungan dan pantau anggaran dengan mudah" },
+  { icon: "💬", title: "Catat via Chat dengan Nana AI", desc: "Ketik 'BArusan beli Martabak 20rb' dan Nana langsung mencatatnya otomatis" },
+  { icon: "📊", title: "Analisis Cerdas AI", desc: "Lihat pola pengeluaran dan rekomendasi personal tiap bulan, Minggu, bahkan Harian" },
+  { icon: "🎯", title: "Goals, Budget & Hutang Piutang", desc: "Buat tujuan tabungan dan pantau anggaran dengan mudah" },
   { icon: "🤖", title: "AI Financial Advisor", desc: "Tanya apa saja soal keuangan, Nana siap membantu 24/7" },
 ];
 
