@@ -111,9 +111,16 @@ export default function NanaChatBoxInline({ user }) {
       const msgs = updated?.messages || [];
       const last = msgs[msgs.length - 1];
       if (last?.role === "assistant") {
-        let content = last.content;
-        try { const p = JSON.parse(content); if (p.content) content = p.content; } catch {}
-        setLastReply(content);
+        let content = last.content || "";
+        let interactivePrompt = last.metadata?.interactive_prompt || null;
+        if (content.trim().startsWith("{")) {
+          try {
+            const p = JSON.parse(content);
+            if (p.content) content = p.content;
+            if (p.interactive_prompt) interactivePrompt = p.interactive_prompt;
+          } catch {}
+        }
+        setLastReply({ content, interactivePrompt });
         stopPolling();
         setSending(false);
       }
