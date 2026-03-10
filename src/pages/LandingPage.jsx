@@ -129,7 +129,7 @@ export default function LandingPage() {
           Kami sedang membuka akses terbatas. Daftar ke waiting list untuk mendapatkan akses pertama saat aplikasi diluncurkan secara{" "}
           <span className="text-white font-semibold">GRATIS</span>{" "}
           <br />
-         <span className="text-[#FF6A00]">*hanya 500 orang pertama.</span>
+         <span className="text-[#FF6A00] text- sm">*hanya 500 orang pertama.</span>
         </p>
 
         {/* CTA */}
