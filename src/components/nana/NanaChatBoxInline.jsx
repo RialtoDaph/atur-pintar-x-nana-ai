@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Send, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useFinancialContext } from "./useFinancialContext";
@@ -8,56 +8,84 @@ export default function NanaChatBoxInline({ user }) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [conversationId, setConversationId] = useState(null);
   const convRef = useRef(null);
+  const pollingRef = useRef(null);
   const { context, formatContextForMessage } = useFinancialContext();
 
-  // Initialize conversation on mount
-  useEffect(() => {
-    async function init() {
-      const conv = await getOrCreateConv();
-      convRef.current = conv;
-      setConversationId(conv.id);
-      if (conv.messages) setMessages(conv.messages);
-    }
-    init();
+  async function getOrCreateConv() {
+    if (convRef.current) return convRef.current;
+    const convs = await base44.agents.listConversations({ agent_name: "nana" });
+    const conv = (convs && convs.length > 0)
+      ? convs[0]
+      : await base44.agents.createConversation({
+          agent_name: "nana",
+          metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` }
+        });
+    convRef.current = conv;
+    return conv;
+  }
+
+  const fetchMessages = useCallback(async () => {
+    const conv = await getOrCreateConv();
+    const updated = await base44.agents.getConversation(conv.id);
+    if (updated?.messages) setMessages(updated.messages);
   }, []);
 
-  // Subscribe to real-time conversation updates
+  // Load messages on mount
   useEffect(() => {
-    if (!conversationId) return;
-    const unsubscribe = base44.agents.subscribeToConversation(conversationId, (data) => {
-      setMessages(data.messages || []);
-    });
-    return () => unsubscribe();
-  }, [conversationId]);
+    fetchMessages();
+  }, []);
 
-  async function getOrCreateConv() {
-    const convs = await base44.agents.listConversations({ agent_name: "nana" });
-    if (convs && convs.length > 0) return convs[0];
-    return base44.agents.createConversation({
-      agent_name: "nana",
-      metadata: { name: `Obrolan ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short" })}` }
-    });
+  // Poll for new messages when sending
+  function startPolling() {
+    stopPolling();
+    pollingRef.current = setInterval(async () => {
+      const conv = convRef.current;
+      if (!conv) return;
+      const updated = await base44.agents.getConversation(conv.id);
+      if (updated?.messages) {
+        setMessages(updated.messages);
+        // Stop polling once we get an assistant reply after the last user message
+        const msgs = updated.messages;
+        const lastMsg = msgs[msgs.length - 1];
+        if (lastMsg?.role === "assistant") {
+          stopPolling();
+          setSending(false);
+        }
+      }
+    }, 2000);
   }
+
+  function stopPolling() {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  }
+
+  useEffect(() => () => stopPolling(), []);
 
   async function sendMessage() {
     if (!input.trim() || sending) return;
     setSending(true);
     const text = input;
     setInput("");
-    const conv = convRef.current || await getOrCreateConv();
-    convRef.current = conv;
+    const conv = await getOrCreateConv();
     const contextBlock = formatContextForMessage(context);
+    // Optimistically add user message
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
     await base44.agents.addMessage(conv, { role: "user", content: text + contextBlock });
-    setSending(false);
+    startPolling();
   }
 
-  async function sendInteractiveResponse(displayText, responseValue) {
-    const conv = convRef.current || await getOrCreateConv();
-    convRef.current = conv;
+  async function sendInteractiveResponse(displayText) {
+    if (sending) return;
+    setSending(true);
+    const conv = await getOrCreateConv();
     const contextBlock = formatContextForMessage(context);
+    setMessages((prev) => [...prev, { role: "user", content: displayText }]);
     await base44.agents.addMessage(conv, { role: "user", content: displayText + contextBlock });
+    startPolling();
   }
 
   function handleKey(e) {
@@ -70,7 +98,7 @@ export default function NanaChatBoxInline({ user }) {
   // Find last assistant message
   const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant");
 
-  // Extract interactive_prompt: check metadata first, then parse JSON from content
+  // Extract interactive_prompt from metadata or JSON content
   let interactivePrompt = lastAssistantMsg?.metadata?.interactive_prompt;
   if (!interactivePrompt && lastAssistantMsg?.content) {
     try {
@@ -78,6 +106,9 @@ export default function NanaChatBoxInline({ user }) {
       if (parsed?.interactive_prompt) interactivePrompt = parsed.interactive_prompt;
     } catch {}
   }
+
+  // Check if last message is from user (still waiting for reply)
+  const isWaiting = sending || (messages.length > 0 && messages[messages.length - 1]?.role === "user");
 
   return (
     <div className="bg-[#0A0A0A] rounded-2xl overflow-hidden px-4 py-3 flex flex-col gap-3" style={{ boxShadow: '0 0 0 1.5px #FF6A00, 0 8px 32px rgba(255,106,0,0.35)' }}>
@@ -94,11 +125,14 @@ export default function NanaChatBoxInline({ user }) {
           <p className="text-white text-xs font-bold flex items-center gap-1">
             Nana AI <Sparkles className="w-3 h-3 text-[#FF6A00]" />
           </p>
+          {isWaiting && (
+            <p className="text-[#8FA4C8] text-[10px]">Nana sedang mengetik...</p>
+          )}
         </div>
       </div>
 
       {/* Interactive Prompt if present */}
-      {interactivePrompt && (
+      {interactivePrompt && !isWaiting && (
         <div className="bg-[#1A1A1A] rounded-xl p-3">
           <InteractivePrompt
             prompt={interactivePrompt}
