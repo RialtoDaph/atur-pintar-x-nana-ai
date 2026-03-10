@@ -307,7 +307,7 @@ export default function LandingPage() {
 
               {/* Tracking method */}
               <div>
-                <label className="text-xs font-semibold text-white/60 mb-2 block">Saat ini kamu mencatat keuangan menggunakan apa? <span className="text-white/30">(opsional)</span></label>
+                <label className="text-xs font-semibold text-white/60 mb-2 block">Saat ini kamu mencatat keuangan menggunakan apa? <span className="text-white/30"></span></label>
                 <div className="grid grid-cols-2 gap-2">
                   {TRACKING_OPTIONS.map((opt) => (
                     <button
