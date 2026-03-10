@@ -115,7 +115,7 @@ export default function LandingPage() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-4 py-1.5 mb-6">
           <Sparkles className="w-3.5 h-3.5 text-[#FF6A00]" />
-          <span className="text-xs text-[#FF6A00] font-semibold">Early Access — Gratis untuk 100 Orang Pertama</span>
+          <span className="text-xs text-[#FF6A00] font-semibold">Early Access — Gratis untuk 500 Orang Pertama</span>
         </div>
 
         {/* Headline */}
