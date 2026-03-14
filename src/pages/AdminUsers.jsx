@@ -159,22 +159,15 @@ export default function AdminUsers() {
                       <span className="text-sm font-semibold text-[#1A1A1A]">{txCounts[u.email] || 0}</span>
                     </td>
                     <td className="px-5 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          to={`${createPageUrl("AdminUserSupport")}?email=${encodeURIComponent(u.email)}`}
-                          className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-                          title="View Profile"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </Link>
-                        <button
-                          onClick={() => setDeleteConfirm(u)}
-                          className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
-                          title="Deactivate"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                     <div className="flex items-center justify-end gap-2">
+                       <Link
+                         to={`${createPageUrl("AdminUserSupport")}?email=${encodeURIComponent(u.email)}`}
+                         className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                         title="Lihat Detail"
+                       >
+                         <Eye className="w-3.5 h-3.5" />
+                       </Link>
+                     </div>
                     </td>
                   </tr>
                 ))}
