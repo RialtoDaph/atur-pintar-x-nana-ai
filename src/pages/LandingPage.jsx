@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { CheckCircle, Users, Sparkles, TrendingUp, Shield, Zap, ChevronDown, X } from "lucide-react";
+import NanaDemoChat from "@/components/landing/NanaDemoChat";
 
 const SALARY_OPTIONS = [
   "< Rp 3.000.000",
