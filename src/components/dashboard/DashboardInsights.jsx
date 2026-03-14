@@ -32,7 +32,7 @@ export default function DashboardInsights({ transactions, goals }) {
       insights.push({
         id: "expense_increase",
         icon: <AlertTriangle className="w-4 h-4 text-[#FF6B6B]" />,
-        color: "bg-[#FF6B6B]/10 border-[#FF6B6B]/20",
+        color: "bg-[#FF6B6B]/15 border-[#FF6B6B]/50",
         textColor: "text-[#FF6B6B]",
         text: `Pengeluaran bulan ini naik ${expenseChange.toFixed(0)}% dibanding bulan lalu (${formatCurrency(lastExpense)} → ${formatCurrency(thisExpense)}).`,
       });
