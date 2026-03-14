@@ -79,6 +79,12 @@ export default function InvestmentsPage() {
      }
    }
 
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+
+  if (!loading && !isPremium) {
+    return <PremiumGate feature="Manajemen Investasi" />;
+  }
+
   const totalInvested = investments.reduce((s, i) => s + i.initial_amount, 0);
   const totalValue = investments.reduce((s, i) => s + i.current_value, 0);
   const totalGain = totalValue - totalInvested;

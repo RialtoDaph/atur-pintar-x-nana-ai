@@ -245,12 +245,18 @@ export default function Analytics() {
   const totalCurrentValue = investments.reduce((s, inv) => s + inv.current_value, 0);
   const investmentReturn = totalCurrentValue - totalInvested;
 
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F2F4F7] flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-[#00C9A7] border-t-transparent animate-spin" />
       </div>
     );
+  }
+
+  if (!isPremium) {
+    return <PremiumGate feature="Analitik lanjutan" />;
   }
 
   const totalIncome = trendData.reduce((sum, month) => sum + month.Income, 0);
