@@ -83,8 +83,10 @@ export default function DebtsPage() {
     loadData();
   }
 
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
   const activeDebts = debts.filter(d => d.status === "active");
   const paidDebts = debts.filter(d => d.status === "paid");
+  const debtLimitReached = !isPremium && activeDebts.length >= FREE_DEBTS_LIMIT;
   const totalDebt = activeDebts.reduce((s, d) => s + d.remaining_amount, 0);
   const totalMonthly = activeDebts.reduce((s, d) => s + (d.monthly_payment || 0), 0);
 
