@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import EditTransactionModal from "@/components/transactions/EditTransactionModal";
 import CSVImportModal from "@/components/transactions/CSVImportModal";
+import RecurringTransactionManager from "@/components/transactions/RecurringTransactionManager";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 
@@ -44,6 +45,7 @@ export default function Transactions() {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
+  const [showRecurringManager, setShowRecurringManager] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 50;
 
@@ -217,6 +219,14 @@ export default function Transactions() {
               className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-white text-[#0A0A0A]" : "bg-white/10 text-white hover:bg-white/20"}`}
             >
               {selectMode ? t('tx_cancel') : t('tx_select')}
+            </button>
+            <button
+              onClick={() => setShowRecurringManager(true)}
+              aria-label="Kelola transaksi berulang"
+              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 tap-highlight-fix"
+              title="Transaksi berulang"
+            >
+              <Repeat2 className="w-4 h-4 text-white" aria-hidden="true" />
             </button>
             <button
               onClick={() => setShowCSVImport(true)}
@@ -487,6 +497,13 @@ export default function Transactions() {
         <CSVImportModal
           onClose={() => setShowCSVImport(false)}
           onSuccess={loadData}
+        />
+      )}
+
+      {showRecurringManager && (
+        <RecurringTransactionManager
+          onClose={() => setShowRecurringManager(false)}
+          onRefresh={loadData}
         />
       )}
       </div>
