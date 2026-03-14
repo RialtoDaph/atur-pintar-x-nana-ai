@@ -4,10 +4,7 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function DashboardInsights({ transactions, goals }) {
   const { formatCurrency, t } = useAppSettings();
-  const [dismissedInsights, setDismissedInsights] = useState(() => {
-    const saved = localStorage.getItem("dismissedInsights");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [dismissedInsights, setDismissedInsights] = useState([]);
 
   const now = new Date();
   const thisMonth = transactions.filter(t => {
