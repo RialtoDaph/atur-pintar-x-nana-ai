@@ -19,6 +19,7 @@ export default function Nana() {
   const bottomRef = useRef(null);
 
   useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
     loadConversations();
   }, []);
 
