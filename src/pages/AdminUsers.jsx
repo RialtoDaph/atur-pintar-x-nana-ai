@@ -126,11 +126,11 @@ export default function AdminUsers() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#F2F4F7]">
-                  <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">User</th>
-                  <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Role</th>
-                  <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Terdaftar</th>
-                  <th className="text-right px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Transaksi</th>
-                  <th className="text-right px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Aksi</th>
+                 <th className="text-left px-4 py-2.5 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">User</th>
+                 <th className="text-left px-4 py-2.5 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Role</th>
+                 <th className="text-left px-4 py-2.5 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Terdaftar</th>
+                 <th className="text-right px-4 py-2.5 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Tx</th>
+                 <th className="text-right px-4 py-2.5 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F2F4F7]">
