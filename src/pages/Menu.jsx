@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import { Target, PiggyBank, CreditCard, TrendingUp, Lightbulb, ChevronRight, Bell, Settings } from "lucide-react";
+import { Target, CreditCard, TrendingUp, Lightbulb, ChevronRight, Bell, Settings, User } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function Menu() {
@@ -10,7 +10,6 @@ export default function Menu() {
       title: t('menu_finance'),
       items: [
         { label: t('nav_goals'), desc: "Pantau dan capai target keuanganmu", icon: Target, emoji: "🎯", page: "Goals", color: "#FF6A00" },
-        { label: t('nav_budget'), desc: "Kelola batas pengeluaran bulanan", icon: PiggyBank, emoji: "🐷", page: "Budget", color: "#00C9A7" },
         { label: t('nav_debts'), desc: "Lacak cicilan dan sisa hutang", icon: CreditCard, emoji: "💳", page: "Debts", color: "#FF6B6B" },
         { label: t('nav_investments'), desc: "Monitor portofolio investasimu", icon: TrendingUp, emoji: "📈", page: "Investments", color: "#4F7CFF" },
       ],
@@ -26,7 +25,8 @@ export default function Menu() {
     {
       title: t('menu_account'),
       items: [
-        { label: t('nav_settings'), desc: "Profil, preferensi, dan pengaturan aplikasi", icon: Settings, emoji: "⚙️", page: "Settings", color: "#888" },
+        { label: "Profil Saya", desc: "Kelola profil dan akun Anda", icon: User, emoji: "👤", page: "ProfileSettings", color: "#FF6A00" },
+        { label: t('nav_settings'), desc: "Preferensi dan pengaturan aplikasi", icon: Settings, emoji: "⚙️", page: "Settings", color: "#888" },
       ],
     },
   ];
