@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Pencil, CheckSquare, Square, X, Repeat2, Target, Search, Upload, ChevronDown } from "lucide-react";
+import { Plus, Trash2, Pencil, CheckSquare, Square, X, Repeat2, Target, Search, Upload } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
@@ -46,7 +46,6 @@ export default function Transactions() {
   const [deleting, setDeleting] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [showRecurringManager, setShowRecurringManager] = useState(false);
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 50;
 
@@ -302,74 +301,62 @@ export default function Transactions() {
           </div>
         )}
 
-        {/* Filter Dropdown */}
-        <button
-          onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-          className="w-full bg-white rounded-xl shadow-sm px-4 py-2.5 hover:shadow-md transition-shadow text-left flex items-center justify-between tap-highlight-fix"
-        >
-          <span className="text-sm font-semibold text-[#1A1A1A]">{t('tx_title')}</span>
-          <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
-        </button>
+        {/* Filter tabs */}
+        <div className="space-y-2">
+          <div className="flex bg-white rounded-xl p-0.5 shadow-sm" role="tablist" aria-label="Filter transaksi">
+            {FILTER_TABS.map(tab => (
+              <button
+                key={tab.key}
+                role="tab"
+                aria-selected={filter === tab.key}
+                onClick={() => setFilter(tab.key)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00] tap-highlight-fix ${
+                    filter === tab.key ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8] hover:text-[#0A0A0A]"
+                  }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-        {/* Filter Content - Dropdown */}
-        {showFilterDropdown && (
-          <div className="space-y-2 bg-white rounded-xl shadow-sm p-3">
-            {/* Filter tabs */}
-            <div className="flex bg-[#F8FAFC] rounded-xl p-0.5" role="tablist" aria-label="Filter transaksi">
-               {FILTER_TABS.map(tab => (
-                 <button
-                   key={tab.key}
-                   role="tab"
-                   aria-selected={filter === tab.key}
-                   onClick={() => setFilter(tab.key)}
-                   className={`flex-1 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00] tap-highlight-fix ${
-                       filter === tab.key ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8] hover:text-[#0A0A0A]"
-                     }`}
-                 >
-                   {tab.label}
-                 </button>
-               ))}
-             </div>
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8FA4C8]" aria-hidden="true" />
+            <input
+              type="search"
+              aria-label={t('search_transactions')}
+              placeholder={t('search_transactions')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-white tap-highlight-fix"
+            />
+          </div>
 
-             {/* Search */}
-             <div className="relative">
-               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8FA4C8]" aria-hidden="true" />
-               <input
-                 type="search"
-                 aria-label={t('search_transactions')}
-                 placeholder={t('search_transactions')}
-                 value={searchQuery}
-                 onChange={(e) => setSearchQuery(e.target.value)}
-                 className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
-               />
-             </div>
-
-             {/* Goal filter */}
-             {goals.length > 0 && (
-               <div className="flex gap-1.5 overflow-x-auto pb-1">
-                 <button
-                   onClick={() => setGoalFilter(null)}
-                   className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${
-                     !goalFilter ? "bg-[#0A0A0A] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
-                   }`}
-                 >
-                   {t('all_goals')}
-                 </button>
-                 {goals.map(goal => (
-                   <button
-                     key={goal.id}
-                     onClick={() => setGoalFilter(goal.id)}
-                     className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${
-                       goalFilter === goal.id ? "bg-[#FF6A00] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
-                     }`}
-                   >
-                     {goal.icon} {goal.name}
-                   </button>
-                 ))}
-               </div>
-             )}
-           </div>
-        )}
+          {/* Goal filter */}
+          {goals.length > 0 && (
+            <div className="flex gap-1.5 overflow-x-auto pb-1">
+              <button
+                onClick={() => setGoalFilter(null)}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${
+                  !goalFilter ? "bg-[#0A0A0A] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
+                }`}
+              >
+                {t('all_goals')}
+              </button>
+              {goals.map(goal => (
+                <button
+                  key={goal.id}
+                  onClick={() => setGoalFilter(goal.id)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${
+                    goalFilter === goal.id ? "bg-[#FF6A00] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
+                  }`}
+                >
+                  {goal.icon} {goal.name}
+                </button>
+              ))}
+            </div>
+          )}
+          </div>
 
         {loading ? (
           <div className="space-y-3">
