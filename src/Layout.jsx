@@ -270,8 +270,8 @@ function LayoutInner({ children, currentPageName }) {
              <button
                key={`tab-${item.page}`}
                onClick={() => handleTabClick(item.page)}
-              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
-              active ? "text-[#FF6A00]" : "text-[#888]"}`}
+              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix rounded-full border-none cursor-pointer ${
+              active ? "text-white bg-white/10" : "text-[#888] bg-transparent"}`}
             >
               <item.icon className="w-5 h-5" />
               {item.label}
