@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Pencil, CheckSquare, Square, X, Repeat2, Target, Search, Upload } from "lucide-react";
+import { Plus, Trash2, Pencil, CheckSquare, Square, X, Repeat2, Target, Search, Upload, ChevronDown } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
@@ -46,6 +46,7 @@ export default function Transactions() {
   const [deleting, setDeleting] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [showRecurringManager, setShowRecurringManager] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 50;
 
@@ -247,7 +248,7 @@ export default function Transactions() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 mt-4 space-y-3">
-        {/* AI Insights - di atas filter */}
+        {/* AI Insights */}
         {!loading && transactions.length > 0 && (
           <DashboardInsights transactions={transactions} goals={goals} />
         )}
@@ -273,90 +274,102 @@ export default function Transactions() {
           </div>
         </button>
 
-        {/* Select mode action bar */}
-        {selectMode && (
-          <div className="bg-white rounded-xl shadow-sm px-4 py-2.5 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button onClick={selectAll} className="text-xs font-semibold text-[#FF6A00]">{t('tx_select_all')}</button>
-              {selectedIds.size > 0 && <span className="text-xs text-[#8FA4C8]">({selectedIds.size} {t('tx_selected')})</span>}
-            </div>
-            <div className="flex items-center gap-2">
-              {selectedIds.size > 0 && (
+        {/* Collapsible Filters Section */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="w-full bg-white rounded-xl shadow-sm px-4 py-3 hover:shadow-md transition-all text-left flex items-center justify-between tap-highlight-fix"
+        >
+          <p className="text-sm font-semibold text-[#1A1A1A]">{t('tx_title')}</p>
+          <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+        </button>
+
+        {/* Filters - Collapsible */}
+        {showFilters && (
+          <div className="bg-white rounded-xl shadow-sm p-4 space-y-3">
+            {/* Select mode action bar */}
+            {selectMode && (
+              <div className="px-2 py-2 flex items-center justify-between border-b border-[#E2E8F0]">
+                <div className="flex items-center gap-2">
+                  <button onClick={selectAll} className="text-xs font-semibold text-[#FF6A00]">{t('tx_select_all')}</button>
+                  {selectedIds.size > 0 && <span className="text-xs text-[#8FA4C8]">({selectedIds.size} {t('tx_selected')})</span>}
+                </div>
+                <div className="flex items-center gap-2">
+                  {selectedIds.size > 0 && (
+                    <button
+                      onClick={handleDeleteSelected}
+                      disabled={deleting}
+                      className="px-3 py-1.5 rounded-lg bg-[#FF6B6B] text-white text-xs font-bold disabled:opacity-50"
+                    >
+                      {deleting ? t('tx_deleting') : `${t('tx_delete_selected')} (${selectedIds.size})`}
+                    </button>
+                  )}
+                  <button
+                    onClick={handleDeleteAll}
+                    disabled={deleting || filtered.length === 0}
+                    className="px-3 py-1.5 rounded-lg bg-[#0A0A0A] text-white text-xs font-bold disabled:opacity-50"
+                  >
+                    {t('tx_delete_all')}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Filter tabs */}
+            <div className="flex bg-[#F8FAFC] rounded-lg p-0.5" role="tablist" aria-label="Filter transaksi">
+              {FILTER_TABS.map(tab => (
                 <button
-                  onClick={handleDeleteSelected}
-                  disabled={deleting}
-                  className="px-3 py-1.5 rounded-lg bg-[#FF6B6B] text-white text-xs font-bold disabled:opacity-50"
+                  key={tab.key}
+                  role="tab"
+                  aria-selected={filter === tab.key}
+                  onClick={() => setFilter(tab.key)}
+                  className={`flex-1 py-1.5 rounded text-xs font-semibold capitalize transition-all focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00] tap-highlight-fix ${
+                      filter === tab.key ? "bg-white text-[#0A0A0A] shadow-sm" : "text-[#8FA4C8] hover:text-[#0A0A0A]"
+                    }`}
                 >
-                  {deleting ? t('tx_deleting') : `${t('tx_delete_selected')} (${selectedIds.size})`}
-                </button>
-              )}
-              <button
-                onClick={handleDeleteAll}
-                disabled={deleting || filtered.length === 0}
-                className="px-3 py-1.5 rounded-lg bg-[#0A0A0A] text-white text-xs font-bold disabled:opacity-50"
-              >
-                {t('tx_delete_all')}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Filter tabs */}
-        <div className="space-y-2">
-          <div className="flex bg-white rounded-xl p-0.5 shadow-sm" role="tablist" aria-label="Filter transaksi">
-            {FILTER_TABS.map(tab => (
-              <button
-                key={tab.key}
-                role="tab"
-                aria-selected={filter === tab.key}
-                onClick={() => setFilter(tab.key)}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00] tap-highlight-fix ${
-                    filter === tab.key ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8] hover:text-[#0A0A0A]"
-                  }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8FA4C8]" aria-hidden="true" />
-            <input
-              type="search"
-              aria-label={t('search_transactions')}
-              placeholder={t('search_transactions')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-white tap-highlight-fix"
-            />
-          </div>
-
-          {/* Goal filter */}
-          {goals.length > 0 && (
-            <div className="flex gap-1.5 overflow-x-auto pb-1">
-              <button
-                onClick={() => setGoalFilter(null)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${
-                  !goalFilter ? "bg-[#0A0A0A] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
-                }`}
-              >
-                {t('all_goals')}
-              </button>
-              {goals.map(goal => (
-                <button
-                  key={goal.id}
-                  onClick={() => setGoalFilter(goal.id)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${
-                    goalFilter === goal.id ? "bg-[#FF6A00] text-white" : "bg-white border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
-                  }`}
-                >
-                  {goal.icon} {goal.name}
+                  {tab.label}
                 </button>
               ))}
             </div>
-          )}
+
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8FA4C8]" aria-hidden="true" />
+              <input
+                type="search"
+                aria-label={t('search_transactions')}
+                placeholder={t('search_transactions')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border border-[#E2E8F0] rounded-lg pl-10 pr-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-white tap-highlight-fix"
+              />
+            </div>
+
+            {/* Goal filter */}
+            {goals.length > 0 && (
+              <div className="flex gap-1.5 overflow-x-auto pb-1">
+                <button
+                  onClick={() => setGoalFilter(null)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${
+                    !goalFilter ? "bg-[#0A0A0A] text-white" : "bg-[#F8FAFC] border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
+                  }`}
+                >
+                  {t('all_goals')}
+                </button>
+                {goals.map(goal => (
+                  <button
+                    key={goal.id}
+                    onClick={() => setGoalFilter(goal.id)}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${
+                      goalFilter === goal.id ? "bg-[#FF6A00] text-white" : "bg-[#F8FAFC] border border-[#E2E8F0] text-[#8FA4C8] hover:border-[#CBD5E0]"
+                    }`}
+                  >
+                    {goal.icon} {goal.name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+        )}
 
         {loading ? (
           <div className="space-y-3">
