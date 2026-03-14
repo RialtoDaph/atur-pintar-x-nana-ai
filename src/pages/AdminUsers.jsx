@@ -12,7 +12,6 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(u => {
