@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Send, Sparkles, Plus } from "lucide-react";
+import { Send, Sparkles, Plus, Crown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useAppSettings } from "@/components/utils/useAppSettings";
+import { Link } from "react-router-dom";
+
+const FREE_MSG_LIMIT = 30;
 
 export default function Nana() {
   const { t } = useAppSettings();
@@ -12,6 +15,7 @@ export default function Nana() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const bottomRef = useRef(null);
 
   useEffect(() => {
