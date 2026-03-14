@@ -56,8 +56,8 @@ const PLANS = [
 
 const BANK_INFO = {
   bank: "BCA",
-  account_number: "1234567890",
-  account_name: "Atur Pintar Indonesia",
+  account_number: "0850064971",
+  account_name: "Rialto Daphino Effendy",
 };
 
 export default function Subscription() {
