@@ -264,30 +264,30 @@ function LayoutInner({ children, currentPageName }) {
 
       {/* Mobile bottom nav */}
       <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-40 border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        {mobileMainNav.map((item) => {
-           const active = currentPageName === item.page;
-           return (
-             <button
-               key={`tab-${item.page}`}
-               onClick={() => handleTabClick(item.page)}
-              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
-              active ? "text-[#FF6A00]" : "text-[#888]"}`}
-            >
+       {mobileMainNav.map((item) => {
+          const active = currentPageName === item.page;
+          return (
+            <button
+              key={`tab-${item.page}`}
+              onClick={() => handleTabClick(item.page)}
+             className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix border-none cursor-pointer rounded-full mx-1 ${
+             active ? "text-[#00E0C7] bg-white/10" : "text-[#888] bg-transparent"}`}
+           >
               <item.icon className="w-5 h-5" />
               {item.label}
             </button>
           );
         })}
-        {/* More button → goes to Menu page */}
-        <button
-          key="menu"
-          onClick={() => handleTabClick("Menu")}
-          className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
-          mobileMorePages.includes(currentPageName) ? "text-[#FF6A00]" : "text-[#888]"}`}
-        >
-          <Grid3x3 className="w-5 h-5" />
-          {t('nav_more')}
-        </button>
+       {/* More button → goes to Menu page */}
+       <button
+         key="menu"
+         onClick={() => handleTabClick("Menu")}
+         className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix border-none cursor-pointer rounded-full mx-1 ${
+         mobileMorePages.includes(currentPageName) ? "text-[#00E0C7] bg-white/10" : "text-[#888] bg-transparent"}`}
+       >
+         <Grid3x3 className="w-5 h-5" />
+         {t('nav_more')}
+       </button>
       </div>
 
       {/* Nana Floating Chat */}
