@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Moon, Sun, Check, MessageSquare, ShieldCheck, Crown } from "lucide-react";
-import NanaPreferencesSettings from "@/components/settings/NanaPreferencesSettings";
-import RiskProfileAssessment from "@/components/settings/RiskProfileAssessment";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
 import FeedbackModal from "@/components/settings/FeedbackModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
@@ -21,26 +19,12 @@ const CURRENCIES = [
 { code: "EUR", label: "Euro", symbol: "€", flag: "🇪🇺" }];
 
 
-const WIDGETS = [
-{ key: "smartAlerts", label: "Smart Alerts", desc: "Peringatan keuangan otomatis" },
-{ key: "cashflowForecast", label: "Cashflow Forecast", desc: "Prediksi akhir bulan" },
-{ key: "subscriptionDetector", label: "Subscription Detector", desc: "Deteksi langganan aktif" },
-{ key: "spendingChart", label: "Spending Chart", desc: "Grafik pengeluaran kategori" },
-{ key: "recentTransactions", label: "Transaksi Terbaru", desc: "5 transaksi terakhir" },
-{ key: "savingsGoals", label: "Savings Goals", desc: "Daftar tujuan tabungan" }];
-
-
 export default function Settings() {
   const [user, setUser] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
   const { settings, updateSettings, t } = useAppSettings();
   const [currency, setCurrency] = useState("IDR");
   const [language, setLanguage] = useState("id");
-  const [widgets, setWidgets] = useState(() => {
-    const saved = localStorage.getItem("widgets");
-    if (saved) return JSON.parse(saved);
-    return { smartAlerts: true, cashflowForecast: true, subscriptionDetector: true, spendingChart: true, recentTransactions: true, savingsGoals: true };
-  });
   const [saving, setSaving] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -219,16 +203,6 @@ export default function Settings() {
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FF6A00]/10 text-[#FF6A00]">Premium</span>
             )}
           </Link>
-        </div>
-
-        {/* Nana AI Preferences */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
-          <NanaPreferencesSettings />
-        </div>
-
-        {/* Risk Profile Assessment */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
-          <RiskProfileAssessment />
         </div>
 
         {/* Integrasi & Export */}
