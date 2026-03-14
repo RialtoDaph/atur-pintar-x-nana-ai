@@ -43,6 +43,7 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/Dashboard" replace />} />
+      <Route path="/LandingPage" element={<Navigate to="/Dashboard" replace />} />
       <Route path="/Dashboard" element={
         <LayoutWrapper currentPageName="Dashboard">
           <Dashboard />
