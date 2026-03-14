@@ -216,20 +216,6 @@ export default function Transactions() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-white text-[#0A0A0A]" : "bg-white/10 text-white hover:bg-white/20"}`}
-            >
-              {selectMode ? t('tx_cancel') : t('tx_select')}
-            </button>
-            <button
-              onClick={() => setShowRecurringManager(true)}
-              aria-label="Kelola transaksi berulang"
-              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 tap-highlight-fix"
-              title="Transaksi berulang"
-            >
-              <Repeat2 className="w-4 h-4 text-white" aria-hidden="true" />
-            </button>
-            <button
               onClick={() => setShowCSVImport(true)}
               aria-label="Import dari file CSV"
               className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 tap-highlight-fix"
@@ -253,34 +239,21 @@ export default function Transactions() {
           <DashboardInsights transactions={transactions} goals={goals} />
         )}
 
-        {/* Recurring Transactions Card */}
-        <button
-          onClick={() => setShowRecurringManager(true)}
-          className="w-full bg-white rounded-xl shadow-sm p-3 hover:shadow-md transition-shadow text-left tap-highlight-fix"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#4F7CFF]/10 flex items-center justify-center flex-shrink-0">
-                <Repeat2 className="w-4 h-4 text-[#4F7CFF]" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#1A1A1A]">{t('recurring_transactions')}</p>
-                <p className="text-xs text-[#8FA4C8]">{t('manage_income_expenses')}</p>
-              </div>
-            </div>
-            <div className="text-[#8FA4C8] hover:text-[#4F7CFF] transition-colors">
-              <Plus className="w-4 h-4" />
-            </div>
-          </div>
-        </button>
-
-        {/* Collapsible Filters Section */}
+        {/* Collapsible All Transactions Section */}
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="w-full bg-white rounded-xl shadow-sm px-4 py-3 hover:shadow-md transition-all text-left flex items-center justify-between tap-highlight-fix"
         >
           <p className="text-sm font-semibold text-[#1A1A1A]">{t('tx_title')}</p>
-          <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); setSelectMode(s => !s); setSelectedIds(new Set()); }}
+              className={`px-2 py-1 rounded-lg text-xs font-semibold transition-colors ${selectMode ? "bg-[#FF6A00] text-white" : "bg-[#F2F4F7] text-[#8FA4C8] hover:text-[#0A0A0A]"}`}
+            >
+              {selectMode ? t('tx_cancel') : t('tx_select')}
+            </button>
+            <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          </div>
         </button>
 
         {/* Filters - Collapsible */}
