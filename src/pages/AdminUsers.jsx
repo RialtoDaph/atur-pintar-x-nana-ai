@@ -144,7 +144,6 @@ export default function AdminUsers() {
                         <div>
                           <p className="text-sm font-semibold text-[#1A1A1A]">{u.full_name || "—"}</p>
                           <p className="text-xs text-[#8FA4C8]">{u.email}</p>
-                          <p className="text-[10px] text-[#8FA4C8] font-mono">{u.id}</p>
                         </div>
                       </div>
                     </td>
