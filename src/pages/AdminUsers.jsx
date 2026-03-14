@@ -179,25 +179,7 @@ export default function AdminUsers() {
           )}
         </div>
 
-        {/* Delete confirm modal */}
-        {deleteConfirm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
-              <h3 className="text-lg font-bold text-[#1A1A1A] mb-2">Deactivate User?</h3>
-              <p className="text-sm text-[#8FA4C8] mb-4">
-                User <strong>{deleteConfirm.email}</strong> akan dinonaktifkan. Aksi ini tidak dapat dibatalkan dari sini.
-              </p>
-              <div className="flex gap-3">
-                <button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-medium hover:bg-[#F8FAFC]">
-                  Batal
-                </button>
-                <button onClick={() => handleDelete(deleteConfirm.id)} className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600">
-                  Deactivate
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+
       </div>
     </AdminLayout>
   );
