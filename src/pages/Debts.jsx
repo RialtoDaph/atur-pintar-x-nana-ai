@@ -9,6 +9,8 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import { parseRupiah } from "@/components/utils/parseRupiah";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
+const FREE_DEBTS_LIMIT = 2;
+
 const DEBT_TYPES = {
   kpr: { label: "KPR", emoji: "🏠" },
   kendaraan: { label: "Kendaraan", emoji: "🚗" },
