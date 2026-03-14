@@ -53,7 +53,7 @@ export default function DashboardInsights({ transactions, goals }) {
       insights.push({
         id: "savings_good",
         icon: <CheckCircle className="w-4 h-4 text-[#00C9A7]" />,
-        color: "bg-[#00C9A7]/10 border-[#00C9A7]/20",
+        color: "bg-[#00C9A7]/15 border-[#00C9A7]/50",
         textColor: "text-[#00C9A7]",
         text: `Tingkat tabungan bulan ini ${savingsRate.toFixed(0)}% — di atas standar 20%. Pertahankan!`,
       });
