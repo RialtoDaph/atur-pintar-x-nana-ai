@@ -224,6 +224,28 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* Subscription */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Langganan</p>
+          </div>
+          <Link
+            to={createPageUrl("Subscription")}
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+          >
+            <Crown className="w-5 h-5 text-[#FF6A00]" />
+            <div className="text-left flex-1">
+              <p className="font-medium text-[#1A1A1A] text-sm">Kelola Langganan</p>
+              <p className="text-xs text-[#8FA4C8]">
+                {user?.subscription_status === "active" ? `Premium aktif` : user?.subscription_status === "pending" ? "Menunggu konfirmasi" : "Paket Free"}
+              </p>
+            </div>
+            {(user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly") && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FF6A00]/10 text-[#FF6A00]">Premium</span>
+            )}
+          </Link>
+        </div>
+
         {/* Nana AI Preferences */}
         <div className="bg-white rounded-2xl shadow-sm p-5">
           <NanaPreferencesSettings />
