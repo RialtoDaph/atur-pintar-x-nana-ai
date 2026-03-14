@@ -9,7 +9,7 @@ import GlobalSearch from "@/components/search/GlobalSearch";
 import { AnimatePresence, motion } from "framer-motion";
 import LandingPage from "@/pages/LandingPage";
 
-const WAITING_LIST_MODE = true;
+const WAITING_LIST_MODE = false;
 
 function LayoutInner({ children, currentPageName }) {
   if (WAITING_LIST_MODE) {
