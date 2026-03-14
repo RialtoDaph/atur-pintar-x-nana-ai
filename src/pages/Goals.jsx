@@ -39,6 +39,8 @@ export default function Goals() {
   const goal = goals.find((g) => g.id === goalId) || null;
 
   const [user, setUser] = useState(null);
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  const goalsLimitReached = !isPremium && goals.length >= FREE_GOALS_LIMIT;
 
   useEffect(() => {
     base44.auth.me().then(u => {
