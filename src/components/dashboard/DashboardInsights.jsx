@@ -61,7 +61,7 @@ export default function DashboardInsights({ transactions, goals }) {
       insights.push({
         id: "savings_low",
         icon: <Lightbulb className="w-4 h-4 text-[#F5A623]" />,
-        color: "bg-[#F5A623]/10 border-[#F5A623]/20",
+        color: "bg-[#F5A623]/15 border-[#F5A623]/50",
         textColor: "text-[#F5A623]",
         text: `Tingkat tabungan ${savingsRate.toFixed(0)}%. Idealnya minimal 20% dari pemasukan — coba kurangi 1-2 kategori pengeluaran.`,
       });
