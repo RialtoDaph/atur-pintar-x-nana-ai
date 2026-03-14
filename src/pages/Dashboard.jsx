@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 import { base44 } from "@/api/base44Client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Plus, ChevronRight } from "lucide-react";
@@ -9,19 +10,23 @@ import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import OnboardingQuestionnaire from "@/components/onboarding/OnboardingQuestionnaire";
 import BalanceCard from "@/components/dashboard/BalanceCard";
-import SpendingChart from "@/components/dashboard/SpendingChart";
-import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import GoalsMiniList from "@/components/dashboard/GoalsMiniList";
-import SmartAlerts from "@/components/dashboard/SmartAlerts";
 import SmartAlertsPanel from "@/components/dashboard/SmartAlertsPanel";
-import SubscriptionDetector from "@/components/dashboard/SubscriptionDetector";
-import CashflowForecast from "@/components/dashboard/CashflowForecast";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
-import DashboardInsights from "@/components/dashboard/DashboardInsights";
-import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
-import BudgetAlertWidget from "@/components/dashboard/BudgetAlertWidget";
 import NanaChatBoxInline from "@/components/nana/NanaChatBoxInline";
+
+// Lazy load heavy components
+const SpendingChart = lazy(() => import("@/components/dashboard/SpendingChart"));
+const CashflowForecast = lazy(() => import("@/components/dashboard/CashflowForecast"));
+const SubscriptionDetector = lazy(() => import("@/components/dashboard/SubscriptionDetector"));
+const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
+const PortfolioSummary = lazy(() => import("@/components/dashboard/PortfolioSummary"));
+const BudgetAlertWidget = lazy(() => import("@/components/dashboard/BudgetAlertWidget"));
+
+const LazyFallback = () => (
+  <div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />
+);
 
 
 function getWidgets() {
