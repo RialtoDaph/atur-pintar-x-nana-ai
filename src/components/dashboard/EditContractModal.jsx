@@ -21,9 +21,9 @@ export default function EditContractModal({ contract, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-black rounded-t-2xl sm:rounded-2xl w-full sm:w-96 max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="sticky top-0 bg-black border-b border-[#333] px-5 py-4 flex items-center justify-between rounded-t-2xl">
-          <h2 className="font-bold text-white">Edit Kontrak</h2>
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:w-96 max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 bg-white border-b border-[#F2F4F7] px-5 py-4 flex items-center justify-between rounded-t-2xl">
+          <h2 className="font-bold text-[#1A1A1A]">Edit Kontrak</h2>
           <button onClick={onClose} className="p-1 hover:bg-[#F2F4F7] rounded-lg transition-colors">
             <X className="w-5 h-5" />
           </button>
@@ -31,8 +31,8 @@ export default function EditContractModal({ contract, onClose, onSave }) {
 
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-white mb-2">Jenis</label>
-            <div className="flex gap-2 bg-[#1A1A1A] rounded-lg p-1 mb-4">
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Jenis</label>
+            <div className="flex gap-2 bg-[#F2F4F7] rounded-lg p-1 mb-4">
               {["expense", "income"].map((type) =>
               <button
                 key={type}
@@ -52,33 +52,33 @@ export default function EditContractModal({ contract, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-white mb-2">Nama</label>
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Nama</label>
             <input
               type="text"
               value={data.note || ""}
-              onChange={(e) => setData({ ...data, note: e.target.value })} className="bg-[#1A1A1A] text-white px-3 py-2 text-sm rounded-lg w-full border border-[#333] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
+              onChange={(e) => setData({ ...data, note: e.target.value })} className="bg-slate-50 text-slate-950 px-3 py-2 text-sm rounded-lg w-full border border-[#E2E8F0] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
 
               placeholder="Nama kontrak/tagihan" />
 
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-white mb-2">Nominal</label>
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Nominal</label>
             <input
               type="number"
               value={data.amount || 0}
-              onChange={(e) => setData({ ...data, amount: parseFloat(e.target.value) || 0 })} className="bg-[#1A1A1A] text-white px-3 py-2 text-sm rounded-lg w-full border border-[#333] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
+              onChange={(e) => setData({ ...data, amount: parseFloat(e.target.value) || 0 })} className="bg-slate-50 text-slate-950 px-3 py-2 text-sm rounded-lg w-full border border-[#E2E8F0] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
 
               placeholder="0" />
 
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-white mb-2">Interval</label>
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Interval</label>
             <select
               value={data.recurring_interval || "monthly"}
               onChange={(e) => setData({ ...data, recurring_interval: e.target.value })}
-              className="w-full border border-[#333] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF6A00] capitalize bg-[#1A1A1A] text-white">
+              className="w-full border border-[#E2E8F0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#FF6A00] capitalize">
 
               {INTERVALS.map((i) =>
               <option key={i} value={i} className="capitalize">
@@ -91,7 +91,7 @@ export default function EditContractModal({ contract, onClose, onSave }) {
           <div className="flex gap-2 pt-4">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 rounded-lg bg-[#333] text-white font-semibold text-sm hover:bg-[#444] transition-colors">
+              className="flex-1 px-4 py-2 rounded-lg bg-[#F2F4F7] text-[#1A1A1A] font-semibold text-sm hover:bg-[#E2E8F0] transition-colors">
 
               Batal
             </button>
