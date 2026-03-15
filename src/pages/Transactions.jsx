@@ -438,7 +438,7 @@ export default function Transactions() {
                 </div>
               )}
             </>
-          )}
+          ) : null}
         </div>
       </div>
 
