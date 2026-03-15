@@ -83,9 +83,11 @@ export default function Dashboard() {
   const loading = goalsLoading || txLoading || budgetsLoading;
 
   async function loadData() {
-    await queryClient.invalidateQueries({ queryKey: ["goals", user?.email] });
-    await queryClient.invalidateQueries({ queryKey: ["transactions_dashboard", user?.email] });
-    await queryClient.invalidateQueries({ queryKey: ["budgets", user?.email] });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["goals", user?.email] }),
+      queryClient.invalidateQueries({ queryKey: ["transactions_dashboard", user?.email] }),
+      queryClient.invalidateQueries({ queryKey: ["budgets", user?.email] }),
+    ]);
   }
 
   const now = new Date();
