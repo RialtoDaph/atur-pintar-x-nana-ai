@@ -57,10 +57,14 @@ export async function processRecurringTransactions(userEmail) {
   }
 }
 
-// Silent background component that runs on mount
+// Silent background component that runs on mount — once per day per session
 export default function RecurringManager({ userEmail }) {
   useEffect(() => {
     if (!userEmail) return;
+    const today = new Date().toISOString().split("T")[0];
+    const key = `recurring_processed_${userEmail}_${today}`;
+    if (sessionStorage.getItem(key)) return; // already ran today in this session
+    sessionStorage.setItem(key, "1");
     processRecurringTransactions(userEmail).catch(console.error);
   }, [userEmail]);
   return null;
