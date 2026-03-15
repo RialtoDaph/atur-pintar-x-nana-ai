@@ -8,6 +8,8 @@ import EditTransactionModal from "@/components/transactions/EditTransactionModal
 import CSVImportModal from "@/components/transactions/CSVImportModal";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
+import ContractPaymentsCard from "@/components/dashboard/ContractPaymentsCard";
+import SubscriptionDetector from "@/components/dashboard/SubscriptionDetector";
 
 const DEFAULT_CATEGORIES = {
   housing: { emoji: "🏠", key: "cat_housing", color: "#4F7CFF" },
