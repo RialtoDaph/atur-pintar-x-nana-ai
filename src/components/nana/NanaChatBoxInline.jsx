@@ -90,6 +90,7 @@ export default function NanaChatBoxInline({ user }) {
   async function sendToNana(text) {
     setSending(true);
     setLastReply(null);
+    setInput("");
     const conv = await getOrCreateConv();
     await base44.agents.addMessage(conv, { role: "user", content: text + formatContextForMessage(context) });
     startPolling();
