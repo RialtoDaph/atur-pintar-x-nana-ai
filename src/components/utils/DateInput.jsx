@@ -26,13 +26,13 @@ export default function DateInput({ value, onChange, label, required = false }) 
       )}
       <div className="relative">
         <button
-          type="button"
-          onClick={() => setShowPicker(true)}
-          className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] flex items-center gap-2 justify-between tap-highlight-fix"
-        >
-          <span>{value ? formatDate(value) : "Pilih tanggal"}</span>
-          <Calendar className="w-4 h-4 text-[#8FA4C8] flex-shrink-0" />
-        </button>
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] flex items-center gap-2 justify-between tap-highlight-fix"
+          >
+            <span>{value ? formatDate(value) : "Pilih tanggal"}</span>
+            <Calendar className="w-4 h-4 text-[#8FA4C8] flex-shrink-0" />
+          </button>
 
         <input
           ref={inputRef}
