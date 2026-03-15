@@ -155,8 +155,9 @@ export default function Transactions() {
       const cat = customCategories.find(c => c.id === customId);
       if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color || "#888" };
     }
-    const defaultCat = DEFAULT_CATEGORIES[key] || DEFAULT_CATEGORIES.other;
-    return { ...defaultCat, label: t(defaultCat.key) };
+    const allCats = [...DEFAULT_CATEGORIES.expense, ...DEFAULT_CATEGORIES.income];
+    const defaultCat = allCats.find(c => c.key === key) || { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" };
+    return { ...defaultCat, label: t(defaultCat.i18nKey) };
   }, [customCategories, t]);
 
   const locale = useMemo(() =>
