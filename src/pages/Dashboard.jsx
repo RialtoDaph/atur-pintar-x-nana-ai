@@ -142,10 +142,6 @@ export default function Dashboard() {
           </Suspense>
         )}
 
-        {/* Kontrak & Tagihan + Langganan */}
-        <ContractPaymentsCard user={user} />
-        <SubscriptionDetector user={user} />
-
         {/* Smart Alerts Panel */}
         <SmartAlertsPanel user={user} />
 

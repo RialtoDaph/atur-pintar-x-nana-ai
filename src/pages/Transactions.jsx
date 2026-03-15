@@ -273,6 +273,14 @@ export default function Transactions() {
           <DashboardInsights transactions={transactions} goals={goals} />
         )}
 
+        {/* Kontrak & Tagihan + Langganan */}
+        {user && (
+          <>
+            <ContractPaymentsCard user={user} />
+            <SubscriptionDetector user={user} />
+          </>
+        )}
+
         {/* Filter + History — satu card */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* Clickable header to toggle */}
