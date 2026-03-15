@@ -187,7 +187,8 @@ Deno.serve(async (req) => {
     // Build chart data: for each date point, sum portfolio value
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const isLatestPoint = (date) => date.getTime() === today.getTime();
+    const todayStr = dateToStr(today);
+    const isLatestPoint = (date) => dateToStr(date) === todayStr;
 
     const chartData = datePoints.map((date) => {
       const targetTs = date.getTime();
