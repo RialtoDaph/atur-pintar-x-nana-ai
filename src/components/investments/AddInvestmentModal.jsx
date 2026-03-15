@@ -83,28 +83,55 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
   }, [form.initial_amount, form.interest_rate, form.tenor_months, isDeposit]);
 
   async function fetchLivePrice() {
-    if (!form.name) return;
-    setFetchingPrice(true);
-    try {
-      const response = await base44.functions.invoke("searchAssets", {
-        query: form.name,
-        type: form.type,
-      });
-      if (response.data?.results?.[0]) {
-        const asset = response.data.results[0];
-        const price = parseFloat(asset.price) || 0;
-        if (price > 0) {
-          setForm(f => ({
-            ...f,
-            price_per_unit: price.toString(),
-            current_value: price.toString(),
-          }));
+    if (isGold) {
+      // For gold, fetch current spot price per gram
+      setFetchingPrice(true);
+      try {
+        const response = await base44.functions.invoke("searchAssets", {
+          query: "gold",
+          type: "emas",
+        });
+        if (response.data?.results?.[0]) {
+          const asset = response.data.results[0];
+          const price = parseFloat(asset.price) || 0;
+          if (price > 0) {
+            setForm(f => ({
+              ...f,
+              price_per_gram: price.toString(),
+            }));
+          }
         }
+      } catch (error) {
+        console.error("Gold price fetch failed:", error);
+      } finally {
+        setFetchingPrice(false);
       }
-    } catch (error) {
-      console.error("Price fetch failed:", error);
-    } finally {
-      setFetchingPrice(false);
+    } else if (!form.name) {
+      return;
+    } else {
+      // For other assets
+      setFetchingPrice(true);
+      try {
+        const response = await base44.functions.invoke("searchAssets", {
+          query: form.name,
+          type: form.type,
+        });
+        if (response.data?.results?.[0]) {
+          const asset = response.data.results[0];
+          const price = parseFloat(asset.price) || 0;
+          if (price > 0) {
+            setForm(f => ({
+              ...f,
+              price_per_unit: price.toString(),
+              current_value: price.toString(),
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Price fetch failed:", error);
+      } finally {
+        setFetchingPrice(false);
+      }
     }
   }
 
