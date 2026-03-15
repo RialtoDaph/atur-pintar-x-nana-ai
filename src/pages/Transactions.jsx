@@ -431,14 +431,36 @@ export default function Transactions() {
                         </div>
                       );
                     })}
-                    {hasMore && (
-                      <div className="p-3 text-center border-t border-[#F2F4F7]">
+                    {totalPages > 1 && (
+                      <div className="p-3 flex items-center justify-center gap-1 border-t border-[#F2F4F7]">
                         <button
-                          onClick={() => setPage(p => p + 1)}
-                          className="px-5 py-2 rounded-xl bg-[#F2F4F7] text-xs font-semibold text-[#4A5568] hover:bg-[#E2E8F0] transition-colors tap-highlight-fix"
-                        >
-                          {t('tx_load_more') || `Muat lebih banyak`} ({remainingCount})
-                        </button>
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          disabled={page === 1}
+                          className="px-3 py-1.5 rounded-lg bg-[#F2F4F7] text-xs font-semibold text-[#4A5568] hover:bg-[#E2E8F0] disabled:opacity-40 transition-colors tap-highlight-fix"
+                        >‹</button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                          .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                          .reduce((acc, p, idx, arr) => {
+                            if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');
+                            acc.push(p);
+                            return acc;
+                          }, [])
+                          .map((p, idx) =>
+                            p === '...' ? (
+                              <span key={`ellipsis-${idx}`} className="px-1 text-xs text-[#8FA4C8]">…</span>
+                            ) : (
+                              <button
+                                key={p}
+                                onClick={() => setPage(p)}
+                                className={`w-7 h-7 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix ${page === p ? "bg-[#0A0A0A] text-white" : "bg-[#F2F4F7] text-[#4A5568] hover:bg-[#E2E8F0]"}`}
+                              >{p}</button>
+                            )
+                          )}
+                        <button
+                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          disabled={page === totalPages}
+                          className="px-3 py-1.5 rounded-lg bg-[#F2F4F7] text-xs font-semibold text-[#4A5568] hover:bg-[#E2E8F0] disabled:opacity-40 transition-colors tap-highlight-fix"
+                        >›</button>
                       </div>
                     )}
                   </>
