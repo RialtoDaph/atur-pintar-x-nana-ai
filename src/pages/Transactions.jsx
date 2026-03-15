@@ -273,8 +273,17 @@ export default function Transactions() {
 
         {/* Filter + History — satu card */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          {/* Clickable header to toggle */}
+          <button
+            onClick={() => setHistoryOpen(o => !o)}
+            className="w-full flex items-center justify-between px-4 py-3.5 tap-highlight-fix"
+          >
+            <p className="text-sm font-bold text-[#1A1A1A]">Riwayat Transaksi</p>
+            <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${historyOpen ? "rotate-180" : ""}`} />
+          </button>
+
           {/* Filter bar */}
-          <div className="px-4 pt-3 pb-2 space-y-2 border-b border-[#F2F4F7]">
+          {historyOpen && <div className="px-4 pt-0 pb-2 space-y-2 border-t border-[#F2F4F7]">
             <div className="flex bg-[#F2F4F7] rounded-lg p-0.5" role="tablist" aria-label="Filter transaksi">
               {FILTER_TABS.map(tab => (
                 <button
