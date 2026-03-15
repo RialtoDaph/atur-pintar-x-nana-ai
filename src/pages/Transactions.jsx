@@ -147,7 +147,7 @@ export default function Transactions() {
     }
   }
 
-  const getCategoryConfig = (key) => {
+  const getCategoryConfig = useCallback((key) => {
     if (key && key.startsWith('custom_')) {
       const customId = key.substring(7);
       const cat = customCategories.find(c => c.id === customId);
@@ -155,7 +155,7 @@ export default function Transactions() {
     }
     const defaultCat = DEFAULT_CATEGORIES[key] || DEFAULT_CATEGORIES.other;
     return { ...defaultCat, label: t(defaultCat.key) };
-  };
+  }, [customCategories, t]);
 
   const locale = useMemo(() =>
     settings.language === 'en' ? 'en-US' : settings.language === 'de' ? 'de-DE' : 'id-ID',
