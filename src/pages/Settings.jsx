@@ -8,16 +8,22 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const LANGUAGES = [
-{ code: "id", label: "Indonesia", flag: "🇮🇩" },
-{ code: "en", label: "English", flag: "🇺🇸" },
-{ code: "de", label: "Deutsch", flag: "🇩🇪" }];
-
+  { code: "id", label: "Indonesia", flag: "🇮🇩" },
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+];
 
 const CURRENCIES = [
-{ code: "IDR", label: "Rupiah", symbol: "Rp", flag: "🇮🇩" },
-{ code: "USD", label: "US Dollar", symbol: "$", flag: "🇺🇸" },
-{ code: "EUR", label: "Euro", symbol: "€", flag: "🇪🇺" }];
+  { code: "IDR", label: "Rupiah", symbol: "Rp", flag: "🇮🇩" },
+  { code: "USD", label: "US Dollar", symbol: "$", flag: "🇺🇸" },
+  { code: "EUR", label: "Euro", symbol: "€", flag: "🇪🇺" },
+];
 
+const CURRENCY_MAP = {
+  IDR: { symbol: "Rp" },
+  USD: { symbol: "$" },
+  EUR: { symbol: "€" },
+};
 
 export default function Settings() {
   const [user, setUser] = useState(null);
@@ -25,7 +31,6 @@ export default function Settings() {
   const { settings, updateSettings, t } = useAppSettings();
   const [currency, setCurrency] = useState("IDR");
   const [language, setLanguage] = useState("id");
-  const [saving, setSaving] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
@@ -43,15 +48,9 @@ export default function Settings() {
     const next = !darkMode;
     setDarkMode(next);
     localStorage.setItem("darkMode", String(next));
-    if (next) document.documentElement.classList.add("dark");else
-    document.documentElement.classList.remove("dark");
+    if (next) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
   }
-
-  const CURRENCY_MAP = {
-    IDR: { symbol: "Rp", code: "IDR" },
-    USD: { symbol: "$", code: "USD" },
-    EUR: { symbol: "€", code: "EUR" }
-  };
 
   async function selectCurrency(code) {
     setCurrency(code);
@@ -75,8 +74,6 @@ export default function Settings() {
 
       <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
 
-
-
         {/* Tampilan */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-5 pt-4 pb-2">
@@ -86,8 +83,8 @@ export default function Settings() {
             onClick={toggleDark}
             aria-pressed={darkMode}
             aria-label={darkMode ? "Nonaktifkan mode gelap" : "Aktifkan mode gelap"}
-            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#FF6A00]">
-
+            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+          >
             <div className="flex items-center gap-3">
               {darkMode ? <Moon className="w-5 h-5 text-[#FF6A00]" /> : <Sun className="w-5 h-5 text-[#FF6A00]" />}
               <div className="text-left">
@@ -105,32 +102,33 @@ export default function Settings() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-5 pt-4 pb-3 flex items-center justify-between">
             <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">{t('settings_language')} & {t('settings_currency')}</p>
-            {settings?.settings_unlocked ?
-            <span className="text-[10px] font-semibold text-white bg-green-500 px-2 py-0.5 rounded-full">🔓 Terbuka</span> :
-            <span className="text-[10px] font-semibold text-white bg-[#FF6A00] px-2 py-0.5 rounded-full">🔒 Terkunci</span>
-            }
+            {settings?.settings_unlocked ? (
+              <span className="text-[10px] font-semibold text-white bg-green-500 px-2 py-0.5 rounded-full">🔓 Terbuka</span>
+            ) : (
+              <span className="text-[10px] font-semibold text-white bg-[#FF6A00] px-2 py-0.5 rounded-full">🔒 Terkunci</span>
+            )}
           </div>
           <div className="px-5 pb-4 space-y-3">
             {/* Language */}
-            {settings?.settings_unlocked ?
-            <div className="flex flex-wrap gap-2">
-                {LANGUAGES.map((l) =>
-              <button
-                key={l.code}
-                onClick={() => selectLanguage(l.code)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-sm font-medium ${
-                language === l.code ?
-                'border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00]' :
-                'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#FF6A00]/50'}`
-                }>
-
+            {settings?.settings_unlocked ? (
+              <div className="flex flex-wrap gap-2">
+                {LANGUAGES.map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => selectLanguage(l.code)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-sm font-medium ${
+                      language === l.code
+                        ? 'border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00]'
+                        : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#FF6A00]/50'
+                    }`}
+                  >
                     <span>{l.flag}</span> {l.label}
                     {language === l.code && <Check className="w-3.5 h-3.5" />}
                   </button>
-              )}
-              </div> :
-
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <span className="text-xl">{LANGUAGES.find((l) => l.code === language)?.flag}</span>
                 <div>
                   <p className="text-sm font-semibold text-[#1A1A1A]">{LANGUAGES.find((l) => l.code === language)?.label}</p>
@@ -138,28 +136,28 @@ export default function Settings() {
                 </div>
                 <Check className="w-4 h-4 text-[#FF6A00] ml-auto" />
               </div>
-            }
+            )}
 
             {/* Currency */}
-            {settings?.settings_unlocked ?
-            <div className="flex flex-wrap gap-2">
-                {CURRENCIES.map((c) =>
-              <button
-                key={c.code}
-                onClick={() => selectCurrency(c.code)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-sm font-medium ${
-                currency === c.code ?
-                'border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00]' :
-                'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#FF6A00]/50'}`
-                }>
-
+            {settings?.settings_unlocked ? (
+              <div className="flex flex-wrap gap-2">
+                {CURRENCIES.map((c) => (
+                  <button
+                    key={c.code}
+                    onClick={() => selectCurrency(c.code)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-sm font-medium ${
+                      currency === c.code
+                        ? 'border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00]'
+                        : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#FF6A00]/50'
+                    }`}
+                  >
                     <span>{c.flag}</span> {c.label}
                     {currency === c.code && <Check className="w-3.5 h-3.5" />}
                   </button>
-              )}
-              </div> :
-
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <span className="text-xl">{CURRENCIES.find((c) => c.code === currency)?.flag}</span>
                 <div>
                   <p className="text-sm font-semibold text-[#1A1A1A]">{CURRENCIES.find((c) => c.code === currency)?.label}</p>
@@ -167,11 +165,11 @@ export default function Settings() {
                 </div>
                 <Check className="w-4 h-4 text-[#FF6A00] ml-auto" />
               </div>
-            }
+            )}
 
-            {!settings?.settings_unlocked &&
-            <p className="text-xs text-[#8FA4C8]">Bahasa dan mata uang ditetapkan saat setup awal. Hubungi admin untuk mengubah.</p>
-            }
+            {!settings?.settings_unlocked && (
+              <p className="text-xs text-[#8FA4C8]">Bahasa dan mata uang ditetapkan saat setup awal. Hubungi admin untuk mengubah.</p>
+            )}
           </div>
         </div>
 
@@ -188,8 +186,8 @@ export default function Settings() {
           <button
             onClick={() => setShowFeedback(true)}
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
-            aria-label="Buka form feedback">
-
+            aria-label="Buka form feedback"
+          >
             <MessageSquare className="w-5 h-5 text-[#FF6A00]" />
             <div className="text-left">
               <p className="font-medium text-[#1A1A1A] text-sm">Kirim Feedback</p>
@@ -199,44 +197,30 @@ export default function Settings() {
         </div>
 
         {/* Admin Panel - hanya untuk admin */}
-        {user?.role === 'admin' &&
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-5 pt-4 pb-2">
-            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Admin</p>
-          </div>
-          <Link
-            to={createPageUrl("AdminDashboard")}
-            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]">
-            <ShieldCheck className="w-5 h-5 text-[#FF6A00]" />
-            <div className="text-left">
-              <p className="font-medium text-[#1A1A1A] text-sm">Admin Dashboard</p>
-              <p className="text-xs text-[#8FA4C8]">Kelola pengguna, kategori & sistem</p>
+        {user?.role === 'admin' && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-5 pt-4 pb-2">
+              <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Admin</p>
             </div>
-          </Link>
-
-
-            
-
-
-
-
-
-
-
-
-
+            <Link
+              to={createPageUrl("AdminDashboard")}
+              className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+            >
+              <ShieldCheck className="w-5 h-5 text-[#FF6A00]" />
+              <div className="text-left">
+                <p className="font-medium text-[#1A1A1A] text-sm">Admin Dashboard</p>
+                <p className="text-xs text-[#8FA4C8]">Kelola pengguna, kategori & sistem</p>
+              </div>
+            </Link>
           </div>
-        }
-
-
+        )}
 
         <p className="text-center text-xs text-[#8FA4C8] pb-4">{t('settings_version')}</p>
       </div>
 
-      {showFeedback &&
-      <FeedbackModal user={user} onClose={() => setShowFeedback(false)} />
-      }
-      </div>
-      );
-
+      {showFeedback && (
+        <FeedbackModal user={user} onClose={() => setShowFeedback(false)} />
+      )}
+    </div>
+  );
 }
