@@ -7,7 +7,7 @@ export default function IOUSection() {
   const [ious, setIous] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { loadIOUs(); }, []);
+  useEffect(() => {loadIOUs();}, []);
 
   async function loadIOUs() {
     setLoading(true);
@@ -26,44 +26,44 @@ export default function IOUSection() {
     loadIOUs();
   }
 
-  const unpaid = ious.filter(i => i.status === "unpaid");
-  const paid = ious.filter(i => i.status === "paid");
+  const unpaid = ious.filter((i) => i.status === "unpaid");
+  const paid = ious.filter((i) => i.status === "paid");
   const totalUnpaid = unpaid.reduce((s, i) => s + i.amount, 0);
 
   if (loading) {
     return (
       <div className="space-y-2 mt-4">
-        {[1, 2].map(i => <div key={i} className="bg-white rounded-2xl h-20 animate-pulse" />)}
-      </div>
-    );
+        {[1, 2].map((i) => <div key={i} className="bg-white rounded-2xl h-20 animate-pulse" />)}
+      </div>);
+
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-16">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-white text-lg font-bold flex items-center gap-1.5"><span>💸</span><span>Tagihan Split Bill</span></h2>
+          <h2 className="text-white text-lg font-bold flex items-center gap-1.5"><span>💸</span><span className="text-slate-950">Tagihan Split Bill</span></h2>
           <p className="text-[#8FA4C8] text-xs">Orang yang belum bayar ke kamu</p>
         </div>
-        {totalUnpaid > 0 && (
-          <div className="bg-[#FF6A00]/20 rounded-xl px-3 py-1.5 text-right">
+        {totalUnpaid > 0 &&
+        <div className="bg-[#FF6A00]/20 rounded-xl px-3 py-1.5 text-right">
             <p className="text-[#FF6A00] text-xs font-medium">Belum diterima</p>
             <p className="text-white text-sm font-bold">{formatRupiah(totalUnpaid)}</p>
           </div>
-        )}
+        }
       </div>
 
-      {unpaid.length === 0 ? (
-        <div className="bg-white rounded-2xl p-6 text-center shadow-sm">
+      {unpaid.length === 0 ?
+      <div className="bg-white rounded-2xl p-6 text-center shadow-sm">
           <HandCoins className="w-10 h-10 text-[#8FA4C8] mx-auto mb-2" />
           <p className="text-[#4A5568] font-semibold text-sm">Semua sudah lunas!</p>
           <p className="text-[#8FA4C8] text-xs mt-1">Tidak ada tagihan split bill yang tertunda</p>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {unpaid.map(iou => (
-            <div key={iou.id} className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        </div> :
+
+      <div className="space-y-2">
+          {unpaid.map((iou) =>
+        <div key={iou.id} className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#FF6A00]/10 flex items-center justify-center text-lg flex-shrink-0">
                 🤝
               </div>
@@ -84,15 +84,15 @@ export default function IOUSection() {
                 </button>
               </div>
             </div>
-          ))}
+        )}
         </div>
-      )}
+      }
 
-      {paid.length > 0 && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm mt-3">
+      {paid.length > 0 &&
+      <div className="bg-white rounded-2xl p-4 shadow-sm mt-3">
           <p className="text-sm font-semibold text-[#8FA4C8] mb-2">✅ Sudah Dibayar ({paid.length})</p>
-          {paid.map(iou => (
-            <div key={iou.id} className="flex items-center justify-between py-2 border-t border-[#F2F4F7] first:border-0">
+          {paid.map((iou) =>
+        <div key={iou.id} className="flex items-center justify-between py-2 border-t border-[#F2F4F7] first:border-0">
               <div>
                 <span className="text-sm text-[#4A5568] line-through">{iou.debtor_name}</span>
                 <span className="text-xs text-[#8FA4C8] ml-2">{iou.store_name}</span>
@@ -104,9 +104,9 @@ export default function IOUSection() {
                 </button>
               </div>
             </div>
-          ))}
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
