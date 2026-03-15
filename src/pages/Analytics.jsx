@@ -5,7 +5,7 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import FinancialCalendar from "@/components/analytics/FinancialCalendar";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
 import DailySpendingCard from "@/components/analytics/DailySpendingCard";
-import RestaurantBarSpendingCard from "@/components/analytics/RestaurantBarSpendingCard";
+
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Area, AreaChart, CartesianGrid
@@ -16,7 +16,6 @@ import NetWorthCard from "@/components/analytics/NetWorthCard";
 
 const DEFAULT_ANALYTICS_CARDS = [
   { id: "daily_spending", visible: true },
-  { id: "restaurant_bar", visible: true },
   { id: "income_expense_chart", visible: true },
   { id: "spending_trend", visible: true },
   { id: "category_breakdown", visible: true },
@@ -323,38 +322,21 @@ export default function Analytics() {
         {/* Calendar Section */}
         <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
 
-        {/* Daily Spending Cards Grid - ordered & toggled by user prefs */}
+        {/* Daily Spending Card */}
         {(() => {
           const orderedCards = analyticsCards.length > 0 ? analyticsCards : DEFAULT_ANALYTICS_CARDS;
           const dailyVisible = orderedCards.find(c => c.id === "daily_spending")?.visible !== false;
-          const restVisible = orderedCards.find(c => c.id === "restaurant_bar")?.visible !== false;
-          const dailyFirst = orderedCards.findIndex(c => c.id === "daily_spending") <= orderedCards.findIndex(c => c.id === "restaurant_bar");
 
-          if (!dailyVisible && !restVisible) return null;
+          if (!dailyVisible) return null;
 
-          const dailyCard = dailyVisible ? (
-            <DailySpendingCard
-              key="daily_spending"
-              transactions={transactions}
-              filterPeriod={filterPeriod}
-              customDateRange={customDateRange}
-            />
-          ) : null;
-
-          const restCard = restVisible ? (
-            <RestaurantBarSpendingCard
-              key="restaurant_bar"
-              transactions={transactions}
-              customCategories={customCategories}
-              filterPeriod={filterPeriod}
-              customDateRange={customDateRange}
-            />
-          ) : null;
-
-          const cards = dailyFirst ? [dailyCard, restCard] : [restCard, dailyCard];
           return (
-            <div className={`grid grid-cols-1 ${dailyVisible && restVisible ? "lg:grid-cols-2" : ""} gap-5`}>
-              {cards}
+            <div className="grid grid-cols-1 gap-5">
+              <DailySpendingCard
+                key="daily_spending"
+                transactions={transactions}
+                filterPeriod={filterPeriod}
+                customDateRange={customDateRange}
+              />
             </div>
           );
         })()}
