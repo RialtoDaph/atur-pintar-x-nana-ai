@@ -335,10 +335,10 @@ export default function Transactions() {
                 ))}
               </div>
             )}
-          </div>
+          </div>}
 
           {/* History */}
-          {loading ? (
+          {historyOpen && loading ? (
             <div className="p-4 space-y-2">
               {[1,2,3,4,5].map(i => <div key={i} className="h-12 bg-[#F2F4F7] rounded-xl animate-pulse" />)}
             </div>
