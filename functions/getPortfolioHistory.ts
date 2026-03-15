@@ -175,8 +175,9 @@ Deno.serve(async (req) => {
             } catch { /* ignore */ }
           }
         } else if (type === 'emas') {
-          // For gold, price history is per gram — multiply by quantity (grams)
-          priceHistory = await getGoldHistory(fromDate, toDate, usdToIdr);
+          // For gold, don't fetch history—use fallback as gold prices are volatile
+          // History will fallback to current_value in the chart calculation
+          priceHistory = null;
         }
 
         return { inv, priceHistory, quantity, current_value, type };
