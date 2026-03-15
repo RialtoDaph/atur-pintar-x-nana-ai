@@ -42,9 +42,9 @@ export default function IOUSection() {
     <div className="mt-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <div>
-          <h2 className="text-white text-lg font-bold flex items-center gap-1.5"><span>💸</span><span>Tagihan Split Bill</span></h2>
-          <p className="text-[#8FA4C8] text-xs">Orang yang belum bayar ke kamu</p>
+        <div className="flex-1">
+          <h2 className="text-white text-lg font-bold flex items-center gap-2"><span>💸</span><span>Tagihan Split Bill</span></h2>
+          <p className="text-[#8FA4C8] text-xs mt-0.5">Orang yang belum bayar ke kamu</p>
         </div>
         {totalUnpaid > 0 && (
           <div className="bg-[#FF6A00]/20 rounded-xl px-3 py-1.5 text-right">
