@@ -342,7 +342,7 @@ export default function Transactions() {
             <div className="p-4 space-y-2">
               {[1,2,3,4,5].map(i => <div key={i} className="h-12 bg-[#F2F4F7] rounded-xl animate-pulse" />)}
             </div>
-          ) : sortedGroups.length === 0 ? (
+          ) : historyOpen && sortedGroups.length === 0 ? (
             <div className="p-10 text-center">
               <p className="text-3xl mb-2">📭</p>
               <p className="text-[#1A1A1A] font-semibold text-sm mb-1">{t('tx_empty_title')}</p>
