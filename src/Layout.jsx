@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, TrendingUp, Settings, MoreHorizontal, Bell, Lightbulb, Search, Grid3x3, ArrowLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import NanaFloatingChat from "@/components/nana/NanaFloatingChat";
 import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSettingsContext";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { AnimatePresence, motion } from "framer-motion";
