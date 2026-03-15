@@ -203,8 +203,8 @@ export default function Transactions() {
     <PullToRefresh onRefresh={loadData}>
       <div className="min-h-screen bg-[#F2F4F7] pb-8">
         {/* Header */}
-        <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
-          <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="bg-[#0A0A0A] px-4 sm:px-5 pt-4 sm:pt-10 pb-4 sm:pb-6">
+          <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
             <div>
               <p className="text-[#8FA4C8] text-sm font-medium">{t('tx_history')}</p>
               <h1 className="text-white text-2xl font-bold mt-0.5">{t('tx_title')}</h1>

@@ -87,7 +87,7 @@ export default function LandingPage() {
       `}</style>
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[#FF6A00] flex items-center justify-center">
             <TrendingUp className="w-4 h-4 text-white" />
@@ -120,7 +120,7 @@ export default function LandingPage() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-4xl sm:text-6xl font-black leading-tight mb-6 max-w-3xl mx-auto">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight mb-6 max-w-3xl mx-auto">
           AI Financial Tracker yang Membantu Kamu Mengatur Uang{" "}
           <span className="gradient-text">Semudah Chat Nana AI</span>
         </h1>

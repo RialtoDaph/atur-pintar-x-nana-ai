@@ -226,7 +226,7 @@ function LayoutInner({ children, currentPageName }) {
 
       {/* Mobile top header */}
       <div className="sm:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A] border-b border-white/10" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-        <div className="flex items-center justify-between px-5 py-3">
+        <div className="flex items-center justify-between px-4 py-3 min-h-[50px]">
           {isNestedPage ? (
             <button
               onClick={() => window.history.back()}
@@ -236,7 +236,7 @@ function LayoutInner({ children, currentPageName }) {
               <span className="text-sm font-medium">{t('back')}</span>
             </button>
           ) : (
-            <p className="text-white font-bold text-lg tracking-tight">Atur Pintar</p>
+            <p className="text-white font-bold text-base tracking-tight">Atur Pintar</p>
           )}
 
           <div className="flex items-center gap-2">
