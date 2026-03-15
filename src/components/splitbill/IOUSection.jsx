@@ -41,11 +41,13 @@ export default function IOUSection() {
   return (
     <div className="mt-6">
       {/* Header */}
-      <div className="text-center mb-3">
-        <h2 className="text-white text-lg font-bold flex items-center justify-center gap-2"><span>💸</span><span>Tagihan Split Bill</span></h2>
-        <p className="text-[#8FA4C8] text-xs mt-0.5">Orang yang belum bayar ke kamu</p>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-white text-lg font-bold flex items-center gap-1.5"><span>💸</span><span>Tagihan Split Bill</span></h2>
+          <p className="text-[#8FA4C8] text-xs">Orang yang belum bayar ke kamu</p>
+        </div>
         {totalUnpaid > 0 && (
-          <div className="bg-[#FF6A00]/20 rounded-xl px-3 py-1.5 text-center mt-2 mx-auto inline-block">
+          <div className="bg-[#FF6A00]/20 rounded-xl px-3 py-1.5 text-right">
             <p className="text-[#FF6A00] text-xs font-medium">Belum diterima</p>
             <p className="text-white text-sm font-bold">{formatRupiah(totalUnpaid)}</p>
           </div>
