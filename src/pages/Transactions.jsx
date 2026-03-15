@@ -327,11 +327,6 @@ export default function Transactions() {
           )}
         </div>
 
-        {/* AI Insights */}
-        {!loading && transactions.length > 0 && (
-          <DashboardInsights transactions={transactions} goals={goals} />
-        )}
-
         {loading ? (
           <div className="space-y-3">
             {[1,2,3,4,5].map(i => <div key={i} className="h-16 bg-white rounded-2xl animate-pulse" />)}
