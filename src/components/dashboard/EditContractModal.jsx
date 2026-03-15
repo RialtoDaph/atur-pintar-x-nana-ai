@@ -6,7 +6,7 @@ const INTERVALS = ["daily", "weekly", "monthly", "yearly"];
 
 export default function EditContractModal({ contract, onClose, onSave }) {
   const { t } = useAppSettings();
-  const [data, setData] = useState(contract || {});
+  const [data, setData] = useState(contract || { type: contract?.type || "expense" });
   const [saving, setSaving] = useState(false);
 
   async function handleSave() {
@@ -30,6 +30,27 @@ export default function EditContractModal({ contract, onClose, onSave }) {
         </div>
 
         <div className="p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Jenis</label>
+            <div className="flex gap-2 bg-[#F2F4F7] rounded-lg p-1 mb-4">
+              {["expense", "income"].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setData({ ...data, type })}
+                  className={`flex-1 py-2 rounded-md text-sm font-semibold transition-all ${
+                    data.type === type
+                      ? type === "expense"
+                        ? "bg-[#FF6B6B] text-white"
+                        : "bg-[#00C9A7] text-white"
+                      : "text-[#8FA4C8]"
+                  }`}
+                >
+                  {type === "expense" ? "- Pengeluaran" : "+ Pemasukan"}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Nama</label>
             <input
