@@ -112,12 +112,22 @@ export default function InvestmentsPage() {
               <p className="text-[#8FA4C8] text-sm font-medium">{t('investments_portfolio')}</p>
               <h1 className="text-white text-2xl font-bold mt-0.5">{t('investments_title')}</h1>
             </div>
-            <button
-              onClick={() => setShowAdd(true)}
-              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
-            >
-              <Plus className="w-5 h-5 text-white" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleRefreshPrices}
+                disabled={refreshingPrices}
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-50"
+                title="Refresh live prices"
+              >
+                <RefreshCw className={`w-4 h-4 text-white ${refreshingPrices ? "animate-spin" : ""}`} />
+              </button>
+              <button
+                onClick={() => setShowAdd(true)}
+                className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+              >
+                <Plus className="w-5 h-5 text-white" />
+              </button>
+            </div>
           </div>
 
           {/* Portfolio trend chart embedded in dark header */}
