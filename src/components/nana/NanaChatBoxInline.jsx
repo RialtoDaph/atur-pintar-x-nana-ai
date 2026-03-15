@@ -3,7 +3,6 @@ import { Send, Sparkles, X, ChevronRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useFinancialContext } from "./useFinancialContext";
 import { useCategoryManager } from "@/components/utils/useCategoryManager";
-import { BUILTIN_SUBCATEGORIES } from "@/components/utils/categoryConfig";
 
 export default function NanaChatBoxInline({ user }) {
   const [input, setInput] = useState("");
@@ -104,10 +103,8 @@ export default function NanaChatBoxInline({ user }) {
 
     if (parsed) {
       setPendingTx(parsed);
-      // Combine custom and built-in subcategories
-      const customSubs = subCatsByParent[parsed.category] || [];
-      const builtinSubs = BUILTIN_SUBCATEGORIES[parsed.category] || [];
-      const subs = [...customSubs, ...builtinSubs];
+      // Check custom subcategories only
+      const subs = subCatsByParent[parsed.category] || [];
       if (subs.length > 0) {
         const { emoji, label } = formatCategory(parsed.category);
         setSubCatPopup({
