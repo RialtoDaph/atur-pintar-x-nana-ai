@@ -89,14 +89,39 @@ export function useCategoryManager() {
   }, [allCatsMap]);
 
   /**
-   * Detect category from text using keywords
+   * Detect category from text using keywords with scoring system
+   * Prioritizes specific matches over generic ones
    */
   const detectCategory = useCallback((text) => {
     const lower = text.toLowerCase();
+    let bestMatch = null;
+    let bestScore = 0;
+
     for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-      if (keywords.some((kw) => lower.includes(kw))) return cat;
+      let score = 0;
+      
+      // Check each keyword
+      for (const kw of keywords) {
+        if (lower.includes(kw)) {
+          // Longer keywords = higher priority (more specific)
+          score += kw.length * 10;
+          // Multiple matches boost score
+          score += 5;
+        }
+      }
+
+      // Prioritize custom categories over defaults
+      if (cat.startsWith("custom_")) {
+        score *= 1.5;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = cat;
+      }
     }
-    return null;
+
+    return bestMatch;
   }, []);
 
   /**
