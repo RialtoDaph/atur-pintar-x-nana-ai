@@ -53,34 +53,43 @@ export default function BudgetPage() {
 
   async function loadData() {
     setLoading(true);
-    const monthStart = `${currentMonth}-01`;
-    const [year, month] = currentMonth.split("-").map(Number);
-    const lastDay = new Date(year, month, 0).getDate();
-    const monthEnd = `${currentMonth}-${String(lastDay).padStart(2, "0")}`;
+    try {
+      const monthStart = `${currentMonth}-01`;
+      const [year, month] = currentMonth.split("-").map(Number);
+      const lastDay = new Date(year, month, 0).getDate();
+      const monthEnd = `${currentMonth}-${String(lastDay).padStart(2, "0")}`;
 
-    // Build 3-month range for context
-    const threeMonthsAgo = (() => {
-      const d = new Date(year, month - 4, 1);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
-    })();
+      // Build 3-month range for context
+      const threeMonthsAgo = (() => {
+        const d = new Date(year, month - 4, 1);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+      })();
 
-    const [b, txAll, cats] = await Promise.all([
-      base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }),
-      base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300),
-      base44.entities.CustomCategory.list("-created_date"),
-    ]);
+      const [b, txAll, cats] = await Promise.all([
+        base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }).catch(() => []),
+        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300).catch(() => []),
+        base44.entities.CustomCategory.list("-created_date").catch(() => []),
+      ]);
 
-    // Filter transactions to selected month client-side
-    const monthTx = txAll.filter(tx => tx.date >= monthStart && tx.date <= monthEnd && tx.type === "expense");
+      // Filter transactions to selected month client-side
+      const monthTx = (txAll || []).filter(tx => tx.date >= monthStart && tx.date <= monthEnd && tx.type === "expense");
 
-    // Transactions from 3 months before currentMonth (for trend analysis)
-    const prev3Tx = txAll.filter(tx => tx.date >= threeMonthsAgo && tx.date < monthStart);
+      // Transactions from 3 months before currentMonth (for trend analysis)
+      const prev3Tx = (txAll || []).filter(tx => tx.date >= threeMonthsAgo && tx.date < monthStart);
 
-    setBudgets(b);
-    setTransactions(monthTx);
-    setTransactions3M(prev3Tx);
-    setCustomCategories(cats);
-    setLoading(false);
+      setBudgets(b || []);
+      setTransactions(monthTx);
+      setTransactions3M(prev3Tx);
+      setCustomCategories(cats || []);
+    } catch (error) {
+      console.error("Failed to load budget data:", error);
+      setBudgets([]);
+      setTransactions([]);
+      setTransactions3M([]);
+      setCustomCategories([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   // Merge default + custom category metadata

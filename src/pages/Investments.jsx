@@ -36,13 +36,15 @@ export default function InvestmentsPage() {
      setLoading(true);
      try {
        const [inv, watch] = await Promise.all([
-         base44.entities.Investment.filter({ created_by: user.email }, "-created_date"),
+         base44.entities.Investment.filter({ created_by: user.email }, "-created_date").catch(() => []),
          base44.entities.InvestmentWatchlist.filter({ created_by: user.email }, "-created_date").catch(() => []),
        ]);
-       setInvestments(inv);
-       setWatchlist(watch);
+       setInvestments(inv || []);
+       setWatchlist(watch || []);
      } catch (error) {
        console.error("Failed to load investments:", error);
+       setInvestments([]);
+       setWatchlist([]);
      } finally {
        setLoading(false);
      }

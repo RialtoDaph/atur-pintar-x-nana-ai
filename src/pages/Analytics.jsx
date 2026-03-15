@@ -63,27 +63,30 @@ export default function Analytics() {
   useEffect(() => {
     if (user) {
       Promise.all([
-        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300),
-        base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
-        base44.entities.Budget.filter({ created_by: user.email }),
-        base44.entities.Investment.filter({ created_by: user.email }),
-        base44.entities.Debt.filter({ created_by: user.email }),
-        base44.entities.CustomCategory.list("-created_date"),
-        base44.entities.AppSettings.list()
+        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300).catch(() => []),
+        base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date").catch(() => []),
+        base44.entities.Budget.filter({ created_by: user.email }).catch(() => []),
+        base44.entities.Investment.filter({ created_by: user.email }).catch(() => []),
+        base44.entities.Debt.filter({ created_by: user.email }).catch(() => []),
+        base44.entities.CustomCategory.list("-created_date").catch(() => []),
+        base44.entities.AppSettings.list().catch(() => [])
       ]).then(([t, g, b, i, d, cc, settings]) => {
-        setTransactions(t);
-        setGoals(g);
-        setBudgets(b);
-        setInvestments(i);
-        setDebts(d);
-        setCustomCategories(cc);
-        const userSettings = settings.find(s => s.id === user.settings_id);
+        setTransactions(t || []);
+        setGoals(g || []);
+        setBudgets(b || []);
+        setInvestments(i || []);
+        setDebts(d || []);
+        setCustomCategories(cc || []);
+        const userSettings = settings?.find(s => s.id === user.settings_id);
         if (userSettings) {
           setAppSettings(userSettings);
           if (userSettings.analytics_cards && userSettings.analytics_cards.length > 0) {
             setAnalyticsCards(userSettings.analytics_cards);
           }
         }
+        setLoading(false);
+      }).catch(error => {
+        console.error("Failed to load analytics data:", error);
         setLoading(false);
       });
     }
