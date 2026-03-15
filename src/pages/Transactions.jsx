@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Pencil, CheckSquare, Square, X, Repeat2, Target, Search, Upload } from "lucide-react";
+import { Plus, Trash2, Pencil, CheckSquare, Square, X, Repeat2, Target, Search, Upload, ChevronDown } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
