@@ -89,15 +89,25 @@ export function useCategoryManager() {
   }, [allCatsMap]);
 
   /**
-   * Detect category from text using keywords
-   */
+    * Detect category from text using keywords
+    */
   const detectCategory = useCallback((text) => {
     const lower = text.toLowerCase();
+
+    // Check custom categories first for more specific matches
+    for (const customCat of customCats) {
+      const keywords = [customCat.name.toLowerCase(), ...CATEGORY_KEYWORDS[`custom_${customCat.id}`] || []];
+      if (keywords.some((kw) => lower.includes(kw))) {
+        return `custom_${customCat.id}`;
+      }
+    }
+
+    // Then check default categories
     for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
       if (keywords.some((kw) => lower.includes(kw))) return cat;
     }
     return null;
-  }, []);
+  }, [customCats]);
 
   /**
    * Parse transaction from natural language text

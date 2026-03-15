@@ -88,6 +88,8 @@ export const CATEGORY_KEYWORDS = {
     "gulai ayam", "gulai daging", "gulai ikan", "gulai tahu",
     "tongseng ayam", "tongseng sapi", "tongseng kambing", "tongseng ampela",
   ],
+  restaurant: ["restoran", "restaurant", "makan", "warung", "rumah makan", "resto"],
+  bar: ["bar", "kopi", "coffee", "teh", "minuman", "cafe"],
   transport: ["gojek", "grab", "taxi", "taksi", "ojek", "bensin", "bbm", "parkir", "tol", "busway", "mrt", "lrt", "kereta", "angkot", "bus", "commuter", "transjakarta", "maxim"],
   shopping: ["shopee", "tokopedia", "lazada", "baju", "sepatu", "tas", "pakaian", "fashion", "belanja"],
   health: ["dokter", "rumah sakit", "obat", "apotek", "klinik", "periksa", "gym", "fitness"],
