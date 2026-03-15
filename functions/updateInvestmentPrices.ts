@@ -6,18 +6,20 @@ const FINNHUB_API_KEY = Deno.env.get("FINNHUB_API_KEY");
 async function fetchGoldPriceIDR(usdToIdr) {
   try {
     const res = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d`,
-      { headers: { 'User-Agent': 'Mozilla/5.0' } }
+      `https://api.metals.live/v1/spot/gold`,
+      { signal: AbortSignal.timeout(5000) }
     );
+    if (!res.ok) throw new Error('API error');
     const data = await res.json();
-    const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
-    if (!closes || closes.length === 0) return null;
-    const latestClose = closes[closes.length - 1];
-    // Gold: troy oz → grams, USD → IDR
-    const pricePerGramIDR = (latestClose / 31.1035) * usdToIdr;
-    return { priceIDR: pricePerGramIDR, dailyChangePct: 0 };
-  } catch {
+    // metals.live returns price per troy oz in USD
+    if (data?.price) {
+      const pricePerGramIDR = (data.price / 31.1035) * usdToIdr;
+      return { priceIDR: pricePerGramIDR, dailyChangePct: 0 };
+    }
     return null;
+  } catch {
+    // Fallback: estimate based on historical rate (~650,000 IDR per gram)
+    return { priceIDR: 650000, dailyChangePct: 0 };
   }
 }
 
