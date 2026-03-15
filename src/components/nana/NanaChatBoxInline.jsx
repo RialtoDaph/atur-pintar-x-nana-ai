@@ -14,7 +14,7 @@ export default function NanaChatBoxInline({ user }) {
   const convRef = useRef(null);
   const pollingRef = useRef(null);
   const { context, formatContextForMessage } = useFinancialContext();
-  const { parseTransaction, createTransaction, formatCategory, subCatsByParent } = useCategoryManager();
+  const { parseTransaction, createTransaction: createTxFromHook, formatCategory, subCatsByParent } = useCategoryManager();
 
   async function getOrCreateConv() {
     if (convRef.current) return convRef.current;
