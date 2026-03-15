@@ -282,163 +282,165 @@ export default function Transactions() {
             <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${historyOpen ? "rotate-180" : ""}`} />
           </button>
 
-          {/* Filter bar */}
-          {historyOpen && <div className="px-4 pt-0 pb-2 space-y-2 border-t border-[#F2F4F7]">
-            <div className="flex bg-[#F2F4F7] rounded-lg p-0.5" role="tablist" aria-label="Filter transaksi">
-              {FILTER_TABS.map(tab => (
-                <button
-                  key={tab.key}
-                  role="tab"
-                  aria-selected={filter === tab.key}
-                  onClick={() => setFilter(tab.key)}
-                  className={`flex-1 py-1.5 rounded-md text-xs font-semibold capitalize transition-all tap-highlight-fix ${
-                    filter === tab.key ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8]"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" aria-hidden="true" />
-              <input
-                type="search"
-                aria-label={t('search_transactions')}
-                placeholder={t('search_transactions')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full border border-[#E2E8F0] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
-              />
-            </div>
-
-            {goals.length > 0 && (
-              <div className="flex gap-1.5 overflow-x-auto pb-1">
-                <button
-                  onClick={() => setGoalFilter(null)}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${
-                    !goalFilter ? "bg-[#0A0A0A] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"
-                  }`}
-                >
-                  {t('all_goals')}
-                </button>
-                {goals.map(goal => (
-                  <button
-                    key={goal.id}
-                    onClick={() => setGoalFilter(goal.id)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${
-                      goalFilter === goal.id ? "bg-[#FF6A00] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"
-                    }`}
-                  >
-                    {goal.icon} {goal.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>}
-
-          {/* History */}
-          {historyOpen && loading ? (
-            <div className="p-4 space-y-2">
-              {[1,2,3,4,5].map(i => <div key={i} className="h-12 bg-[#F2F4F7] rounded-xl animate-pulse" />)}
-            </div>
-          ) : historyOpen && sortedGroups.length === 0 ? (
-            <div className="p-10 text-center">
-              <p className="text-3xl mb-2">📭</p>
-              <p className="text-[#1A1A1A] font-semibold text-sm mb-1">{t('tx_empty_title')}</p>
-              <p className="text-[#8FA4C8] text-xs mb-4">{t('tx_empty_desc')}</p>
-              {!searchQuery && (
-                <button
-                  onClick={() => setShowAddTx(true)}
-                  className="px-4 py-2 rounded-xl bg-[#FF6A00] text-white text-xs font-semibold hover:bg-[#e05e00] transition-colors tap-highlight-fix"
-                >
-                  + Tambah Transaksi
-                </button>
-              )}
-            </div>
-          ) : historyOpen ? (
+          {historyOpen && (
             <>
-              {sortedGroups.map(key => {
-                const group = grouped[key];
-                const monthIncome = group.items.filter(t => t.type === "income").reduce((s,t) => s + t.amount, 0);
-                const monthExpense = group.items.filter(t => t.type === "expense").reduce((s,t) => s + t.amount, 0);
-                return (
-                  <div key={key}>
-                    <div className="px-4 py-2 bg-[#F8FAFC] border-b border-[#F2F4F7] flex items-center justify-between">
-                      <p className="text-xs font-bold text-[#1A1A1A]">{group.label}</p>
-                      <div className="flex gap-2 text-[11px]">
-                        {monthIncome > 0 && <span className="text-[#00C9A7] font-semibold">+{formatCurrency(monthIncome)}</span>}
-                        {monthExpense > 0 && <span className="text-[#FF6B6B] font-semibold">−{formatCurrency(monthExpense)}</span>}
-                      </div>
-                    </div>
-                    {group.items.map(tx => {
-                      const cat = getCategoryConfig(tx.category);
-                      const isIncome = tx.type === "income";
-                      const linkedGoal = goals.find(g => g.id === tx.goal_id);
-                      return (
-                        <div
-                          key={tx.id}
-                          className={`flex items-center gap-3 px-4 py-2.5 hover:bg-[#F8FAFC] transition-colors group border-b border-[#F2F4F7] last:border-b-0 ${selectMode ? "cursor-pointer" : ""} ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
-                          onClick={selectMode ? () => toggleSelect(tx.id) : undefined}
-                        >
-                          {selectMode && (
-                            <div className="flex-shrink-0">
-                              {selectedIds.has(tx.id)
-                                ? <CheckSquare className="w-4 h-4 text-[#FF6A00]" />
-                                : <Square className="w-4 h-4 text-[#CBD5E0]" />}
-                            </div>
-                          )}
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0"
-                            style={{ backgroundColor: cat.color + "18" }}
-                          >
-                            {cat.emoji}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-xs font-medium text-[#1A1A1A] truncate">
-                                {tx.note || cat.label}
-                              </p>
-                              {tx.is_recurring && <Repeat2 className="w-3 h-3 text-[#4F7CFF] flex-shrink-0" />}
-                              {linkedGoal && <Target className="w-3 h-3 text-[#FF6A00] flex-shrink-0" />}
-                            </div>
-                            <p className="text-[11px] text-[#8FA4C8]">
-                              {new Date(tx.date).toLocaleDateString(locale, { month: "short", day: "numeric" })} · {cat.label}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
-                              {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
-                            </span>
-                            {!selectMode && (
-                              <>
-                                <button onClick={() => setEditingTx(tx)} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#4F7CFF]">
-                                  <Pencil className="w-3 h-3" />
-                                </button>
-                                <button onClick={() => handleDelete(tx.id)} disabled={deleting} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#FF6B6B] disabled:opacity-50">
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
-                              </>
-                            )}
+              {/* Filter bar */}
+              <div className="px-4 pt-2 pb-2 space-y-2 border-t border-[#F2F4F7]">
+                <div className="flex bg-[#F2F4F7] rounded-lg p-0.5" role="tablist" aria-label="Filter transaksi">
+                  {FILTER_TABS.map(tab => (
+                    <button
+                      key={tab.key}
+                      role="tab"
+                      aria-selected={filter === tab.key}
+                      onClick={() => setFilter(tab.key)}
+                      className={`flex-1 py-1.5 rounded-md text-xs font-semibold capitalize transition-all tap-highlight-fix ${
+                        filter === tab.key ? "bg-[#0A0A0A] text-white shadow-sm" : "text-[#8FA4C8]"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" aria-hidden="true" />
+                  <input
+                    type="search"
+                    aria-label={t('search_transactions')}
+                    placeholder={t('search_transactions')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full border border-[#E2E8F0] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
+                  />
+                </div>
+                {goals.length > 0 && (
+                  <div className="flex gap-1.5 overflow-x-auto pb-1">
+                    <button
+                      onClick={() => setGoalFilter(null)}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${
+                        !goalFilter ? "bg-[#0A0A0A] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"
+                      }`}
+                    >
+                      {t('all_goals')}
+                    </button>
+                    {goals.map(goal => (
+                      <button
+                        key={goal.id}
+                        onClick={() => setGoalFilter(goal.id)}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${
+                          goalFilter === goal.id ? "bg-[#FF6A00] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"
+                        }`}
+                      >
+                        {goal.icon} {goal.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* History */}
+              {loading ? (
+                <div className="p-4 space-y-2">
+                  {[1,2,3,4,5].map(i => <div key={i} className="h-12 bg-[#F2F4F7] rounded-xl animate-pulse" />)}
+                </div>
+              ) : sortedGroups.length === 0 ? (
+                <div className="p-10 text-center">
+                  <p className="text-3xl mb-2">📭</p>
+                  <p className="text-[#1A1A1A] font-semibold text-sm mb-1">{t('tx_empty_title')}</p>
+                  <p className="text-[#8FA4C8] text-xs mb-4">{t('tx_empty_desc')}</p>
+                  {!searchQuery && (
+                    <button
+                      onClick={() => setShowAddTx(true)}
+                      className="px-4 py-2 rounded-xl bg-[#FF6A00] text-white text-xs font-semibold hover:bg-[#e05e00] transition-colors tap-highlight-fix"
+                    >
+                      + Tambah Transaksi
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {sortedGroups.map(key => {
+                    const group = grouped[key];
+                    const monthIncome = group.items.filter(t => t.type === "income").reduce((s,t) => s + t.amount, 0);
+                    const monthExpense = group.items.filter(t => t.type === "expense").reduce((s,t) => s + t.amount, 0);
+                    return (
+                      <div key={key}>
+                        <div className="px-4 py-2 bg-[#F8FAFC] border-b border-[#F2F4F7] flex items-center justify-between">
+                          <p className="text-xs font-bold text-[#1A1A1A]">{group.label}</p>
+                          <div className="flex gap-2 text-[11px]">
+                            {monthIncome > 0 && <span className="text-[#00C9A7] font-semibold">+{formatCurrency(monthIncome)}</span>}
+                            {monthExpense > 0 && <span className="text-[#FF6B6B] font-semibold">−{formatCurrency(monthExpense)}</span>}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-              {hasMore && (
-                <div className="p-3 text-center border-t border-[#F2F4F7]">
-                  <button
-                    onClick={() => setPage(p => p + 1)}
-                    className="px-5 py-2 rounded-xl bg-[#F2F4F7] text-xs font-semibold text-[#4A5568] hover:bg-[#E2E8F0] transition-colors tap-highlight-fix"
-                  >
-                    Muat lebih banyak ({filtered.length - paginatedFiltered.length} lagi)
-                  </button>
-                </div>
+                        {group.items.map(tx => {
+                          const cat = getCategoryConfig(tx.category);
+                          const isIncome = tx.type === "income";
+                          const linkedGoal = goals.find(g => g.id === tx.goal_id);
+                          return (
+                            <div
+                              key={tx.id}
+                              className={`flex items-center gap-3 px-4 py-2.5 hover:bg-[#F8FAFC] transition-colors group border-b border-[#F2F4F7] last:border-b-0 ${selectMode ? "cursor-pointer" : ""} ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
+                              onClick={selectMode ? () => toggleSelect(tx.id) : undefined}
+                            >
+                              {selectMode && (
+                                <div className="flex-shrink-0">
+                                  {selectedIds.has(tx.id)
+                                    ? <CheckSquare className="w-4 h-4 text-[#FF6A00]" />
+                                    : <Square className="w-4 h-4 text-[#CBD5E0]" />}
+                                </div>
+                              )}
+                              <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0"
+                                style={{ backgroundColor: cat.color + "18" }}
+                              >
+                                {cat.emoji}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <p className="text-xs font-medium text-[#1A1A1A] truncate">
+                                    {tx.note || cat.label}
+                                  </p>
+                                  {tx.is_recurring && <Repeat2 className="w-3 h-3 text-[#4F7CFF] flex-shrink-0" />}
+                                  {linkedGoal && <Target className="w-3 h-3 text-[#FF6A00] flex-shrink-0" />}
+                                </div>
+                                <p className="text-[11px] text-[#8FA4C8]">
+                                  {new Date(tx.date).toLocaleDateString(locale, { month: "short", day: "numeric" })} · {cat.label}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
+                                  {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
+                                </span>
+                                {!selectMode && (
+                                  <>
+                                    <button onClick={() => setEditingTx(tx)} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#4F7CFF]">
+                                      <Pencil className="w-3 h-3" />
+                                    </button>
+                                    <button onClick={() => handleDelete(tx.id)} disabled={deleting} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CBD5E0] hover:text-[#FF6B6B] disabled:opacity-50">
+                                      <Trash2 className="w-3 h-3" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                  {hasMore && (
+                    <div className="p-3 text-center border-t border-[#F2F4F7]">
+                      <button
+                        onClick={() => setPage(p => p + 1)}
+                        className="px-5 py-2 rounded-xl bg-[#F2F4F7] text-xs font-semibold text-[#4A5568] hover:bg-[#E2E8F0] transition-colors tap-highlight-fix"
+                      >
+                        Muat lebih banyak ({filtered.length - paginatedFiltered.length} lagi)
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </>
-          ) : null}
+          )}
         </div>
       </div>
 
