@@ -64,7 +64,7 @@ export default function NanaChatBoxInline({ user }) {
   async function handleCreateTransaction(txData) {
     setSending(true);
     try {
-      await createTransaction(txData);
+      await createTxFromHook(txData);
       const fmt = new Intl.NumberFormat("id-ID").format(txData.amount);
       const { emoji, label } = formatCategory(txData.category || "other");
       setLastReply({
