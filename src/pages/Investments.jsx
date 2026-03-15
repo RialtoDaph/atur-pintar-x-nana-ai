@@ -182,13 +182,21 @@ export default function InvestmentsPage() {
                       <p className="text-xs text-[#8FA4C8]">{typeLabel} · {portfolioWeight}{t('investments_portfolio_weight')}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2" onClick={(e) => e.preventDefault()}>
-                   <button onClick={() => handleEdit(inv)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors">
-                     <Pencil className="w-4 h-4" />
-                   </button>
-                   <button onClick={() => handleDelete(inv.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors">
-                     <Trash2 className="w-4 h-4" />
-                   </button>
+                  <div className="flex items-center gap-2" onClick={(e) => e.preventDefault()}>
+                   {hasDailyChange && (
+                     <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full ${
+                       dailyIsPositive ? "bg-[#00C9A7]/10 text-[#00C9A7]" : "bg-[#FF6B6B]/10 text-[#FF6B6B]"
+                     }`}>
+                       {dailyIsPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                       {dailyIsPositive ? "+" : ""}{inv.daily_change_pct}%
+                     </span>
+                   )}
+                  <button onClick={() => handleEdit(inv)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDelete(inv.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                   </div>
                 </div>
                 <div className="mt-3 flex justify-between items-end">
