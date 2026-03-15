@@ -267,7 +267,7 @@ export default function Goals() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-[#1A1A1A]">{tx.note || (tx.type === "deposit" ? "Deposit" : "Withdrawal")}</p>
-                    <p className="text-xs text-[#9B9B9B]">{new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric", year: "numeric" })}</p>
+                    <p className="text-xs text-[#9B9B9B]">{new Date(tx.date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p>
                   </div>
                 </div>
                 <span
