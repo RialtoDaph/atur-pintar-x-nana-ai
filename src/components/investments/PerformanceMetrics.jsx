@@ -31,7 +31,7 @@ export default function PerformanceMetrics({ investments, totalValue, totalInves
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3 hidden">
+      <div className="grid grid-cols-2 gap-3">
         <div className="bg-white/10 rounded-2xl p-4">
           <p className="text-white/60 text-xs font-medium mb-1">ROI</p>
           <div className="flex items-center gap-2">

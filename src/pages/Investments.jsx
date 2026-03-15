@@ -11,7 +11,6 @@ import RiskProfileRecommendation from "@/components/investments/RiskProfileRecom
 import EducationResources from "@/components/investments/EducationResources";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { INVESTMENT_TYPES_MAP } from "@/components/investments/investmentConstants";
-import PerformanceMetrics from "@/components/investments/PerformanceMetrics";
 import { Pencil } from "lucide-react";
 
 export default function InvestmentsPage() {
@@ -130,16 +129,6 @@ export default function InvestmentsPage() {
               </button>
             </div>
           </div>
-
-          {/* Performance metrics */}
-          {investments.length > 0 && (
-            <PerformanceMetrics
-              investments={investments}
-              totalValue={totalValue}
-              totalInvested={totalInvested}
-              formatCurrency={formatCurrency}
-            />
-          )}
 
           {/* Portfolio trend chart embedded in dark header */}
           {investments.length > 0 && (
