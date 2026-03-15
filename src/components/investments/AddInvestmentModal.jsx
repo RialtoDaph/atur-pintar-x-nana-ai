@@ -83,55 +83,28 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
   }, [form.initial_amount, form.interest_rate, form.tenor_months, isDeposit]);
 
   async function fetchLivePrice() {
-    if (isGold) {
-      // For gold, fetch current spot price per gram
-      setFetchingPrice(true);
-      try {
-        const response = await base44.functions.invoke("searchAssets", {
-          query: "gold",
-          type: "emas",
-        });
-        if (response.data?.results?.[0]) {
-          const asset = response.data.results[0];
-          const price = parseFloat(asset.price) || 0;
-          if (price > 0) {
-            setForm(f => ({
-              ...f,
-              price_per_gram: price.toString(),
-            }));
-          }
+    if (!form.name) return;
+    setFetchingPrice(true);
+    try {
+      const response = await base44.functions.invoke("searchAssets", {
+        query: form.name,
+        type: form.type,
+      });
+      if (response.data?.results?.[0]) {
+        const asset = response.data.results[0];
+        const price = parseFloat(asset.price) || 0;
+        if (price > 0) {
+          setForm(f => ({
+            ...f,
+            price_per_unit: price.toString(),
+            current_value: price.toString(),
+          }));
         }
-      } catch (error) {
-        console.error("Gold price fetch failed:", error);
-      } finally {
-        setFetchingPrice(false);
       }
-    } else if (!form.name) {
-      return;
-    } else {
-      // For other assets
-      setFetchingPrice(true);
-      try {
-        const response = await base44.functions.invoke("searchAssets", {
-          query: form.name,
-          type: form.type,
-        });
-        if (response.data?.results?.[0]) {
-          const asset = response.data.results[0];
-          const price = parseFloat(asset.price) || 0;
-          if (price > 0) {
-            setForm(f => ({
-              ...f,
-              price_per_unit: price.toString(),
-              current_value: price.toString(),
-            }));
-          }
-        }
-      } catch (error) {
-        console.error("Price fetch failed:", error);
-      } finally {
-        setFetchingPrice(false);
-      }
+    } catch (error) {
+      console.error("Price fetch failed:", error);
+    } finally {
+      setFetchingPrice(false);
     }
   }
 
@@ -319,24 +292,9 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
                 />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className={labelCls.replace(" mb-1.5", "")}>
-                    {lang === "en" ? "Price / Gram" : "Harga / Gram"}
-                  </label>
-                  <button
-                    type="button"
-                    onClick={fetchLivePrice}
-                    disabled={fetchingPrice}
-                    className="flex items-center gap-1 text-xs text-[#FF6A00] hover:text-[#e05e00] font-semibold disabled:opacity-40"
-                  >
-                    {fetchingPrice ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <RefreshCw className="w-3 h-3" />
-                    )}
-                    {lang === "en" ? "Fetch Now" : "Ambil Sekarang"}
-                  </button>
-                </div>
+                <label className={labelCls}>
+                  {lang === "en" ? "Price / Gram" : "Harga / Gram"}
+                </label>
                 <input
                   type="number" min="0" placeholder="0"
                   className={inputCls}
