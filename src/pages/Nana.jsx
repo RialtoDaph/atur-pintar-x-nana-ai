@@ -104,8 +104,8 @@ export default function Nana() {
       {/* Header */}
       <div className="bg-[#0A0A0A] px-5 pt-6 pb-4 flex items-center justify-between border-b border-[#E2E8F0] dark:border-[#2D2D2D]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden">
-            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png" alt="Nana" className="w-full h-full object-contain" />
+          <div className="w-14 h-14 rounded-lg overflow-hidden -mt-1 -mb-1">
+            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png" alt="Nana" className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="text-white font-bold text-sm">Nana AI</p>
