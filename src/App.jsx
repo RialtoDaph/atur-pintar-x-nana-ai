@@ -9,6 +9,7 @@ import Subscription from '@/pages/Subscription';
 import AdminSubscriptions from '@/pages/AdminSubscriptions';
 import Dashboard from '@/pages/Dashboard';
 import ProfileSettings from '@/pages/ProfileSettings';
+import Debts from '@/pages/Debts';
 import Layout from './Layout';
 
 const LayoutWrapper = ({ children, currentPageName }) => 
@@ -51,6 +52,7 @@ const AuthenticatedApp = () => {
       <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
       <Route path="/AdminSubscriptions" element={<LayoutWrapper currentPageName="AdminSubscriptions"><AdminSubscriptions /></LayoutWrapper>} />
       <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
+      <Route path="/Debts" element={<LayoutWrapper currentPageName="Debts"><Debts /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
