@@ -104,11 +104,12 @@ export default function NanaChatBoxInline({ user }) {
 
     if (parsed) {
       setPendingTx(parsed);
-      // Check custom subcategories first, then built-in
-      const hasSubs = subCatsByParent[parsed.category]?.length > 0 || BUILTIN_SUBCATEGORIES[parsed.category];
-      if (hasSubs) {
+      // Combine custom and built-in subcategories
+      const customSubs = subCatsByParent[parsed.category] || [];
+      const builtinSubs = BUILTIN_SUBCATEGORIES[parsed.category] || [];
+      const subs = [...customSubs, ...builtinSubs];
+      if (subs.length > 0) {
         const { emoji, label } = formatCategory(parsed.category);
-        const subs = subCatsByParent[parsed.category] || BUILTIN_SUBCATEGORIES[parsed.category] || [];
         setSubCatPopup({
           parentKey: parsed.category,
           parentLabel: label,
