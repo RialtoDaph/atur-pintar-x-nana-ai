@@ -11,6 +11,7 @@ import RiskProfileRecommendation from "@/components/investments/RiskProfileRecom
 import EducationResources from "@/components/investments/EducationResources";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { INVESTMENT_TYPES_MAP } from "@/components/investments/investmentConstants";
+import PerformanceMetrics from "@/components/investments/PerformanceMetrics";
 import { Pencil } from "lucide-react";
 
 export default function InvestmentsPage() {
