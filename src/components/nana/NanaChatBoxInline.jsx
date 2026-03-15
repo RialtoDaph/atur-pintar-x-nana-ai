@@ -9,23 +9,12 @@ export default function NanaChatBoxInline({ user }) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [lastReply, setLastReply] = useState(null);
-  const [customCats, setCustomCats] = useState([]);
   const [subCatPopup, setSubCatPopup] = useState(null);
   const [pendingTx, setPendingTx] = useState(null);
   const convRef = useRef(null);
   const pollingRef = useRef(null);
   const { context, formatContextForMessage } = useFinancialContext();
-
-  useEffect(() => {
-    base44.entities.CustomCategory.list("-created_date").then(setCustomCats).catch(() => {});
-  }, []);
-
-  // Build subcategory map
-  const subCatsByParent = {};
-  customCats.filter((c) => c.parent_category_key).forEach((c) => {
-    if (!subCatsByParent[c.parent_category_key]) subCatsByParent[c.parent_category_key] = [];
-    subCatsByParent[c.parent_category_key].push({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji });
-  });
+  const { parseTransaction, createTransaction, formatCategory, subCatsByParent } = useCategoryManager();
 
   async function getOrCreateConv() {
     if (convRef.current) return convRef.current;
