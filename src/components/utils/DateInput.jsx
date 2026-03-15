@@ -39,7 +39,7 @@ export default function DateInput({ value, onChange, label, required = false }) 
           type="date"
           value={value}
           onChange={handlePickerChange}
-          className="hidden"
+          className="absolute opacity-0 top-0 left-0 w-full h-full cursor-pointer"
           required={required}
         />
       </div>
