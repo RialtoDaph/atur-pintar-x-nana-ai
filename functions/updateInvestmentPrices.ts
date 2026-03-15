@@ -2,6 +2,25 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 const FINNHUB_API_KEY = Deno.env.get("FINNHUB_API_KEY");
 
+// Fetch gold price in IDR
+async function fetchGoldPriceIDR(usdToIdr) {
+  try {
+    const res = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d`,
+      { headers: { 'User-Agent': 'Mozilla/5.0' } }
+    );
+    const data = await res.json();
+    const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
+    if (!closes || closes.length === 0) return null;
+    const latestClose = closes[closes.length - 1];
+    // Gold: troy oz → grams, USD → IDR
+    const pricePerGramIDR = (latestClose / 31.1035) * usdToIdr;
+    return { priceIDR: pricePerGramIDR, dailyChangePct: 0 };
+  } catch {
+    return null;
+  }
+}
+
 // Common crypto name → CoinGecko ID mapping
 const CRYPTO_COINGECKO_MAP = {
   "bitcoin": "bitcoin", "btc": "bitcoin",
@@ -134,7 +153,7 @@ Deno.serve(async (req) => {
 
     // Only update types that have live market prices
     const toUpdate = investments.filter(inv =>
-      ["saham", "crypto"].includes(inv.type) &&
+      ["saham", "crypto", "emas"].includes(inv.type) &&
       inv.name &&
       inv.quantity != null
     );
@@ -151,6 +170,8 @@ Deno.serve(async (req) => {
         result = await fetchCryptoPriceIDR(inv.name);
       } else if (inv.type === "saham") {
         result = await fetchStockPriceIDR(inv.name, usdToIdr);
+      } else if (inv.type === "emas") {
+        result = await fetchGoldPriceIDR(usdToIdr);
       }
 
       if (result && result.priceIDR > 0) {
