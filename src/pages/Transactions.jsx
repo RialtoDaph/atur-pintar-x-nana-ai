@@ -107,8 +107,8 @@ export default function Transactions() {
   }
 
   function selectAll() {
-    if (filtered.length === 0) return;
-    setSelectedIds(new Set(filtered.map(t => t.id)));
+    if (paginatedFiltered.length === 0) return;
+    setSelectedIds(new Set(paginatedFiltered.map(t => t.id)));
   }
 
   function clearSelection() {
