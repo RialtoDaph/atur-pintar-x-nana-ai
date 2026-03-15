@@ -145,6 +145,10 @@ export default function Dashboard() {
           </Suspense>
         )}
 
+        {/* Kontrak & Tagihan + Langganan */}
+        <ContractPaymentsCard user={user} />
+        <SubscriptionDetector user={user} />
+
         {/* Smart Alerts Panel */}
         <SmartAlertsPanel user={user} />
 
@@ -152,13 +156,6 @@ export default function Dashboard() {
         {widgets.cashflowForecast && (
           <Suspense fallback={<LazyFallback />}>
             <CashflowForecast transactions={transactions} loading={loading} user={user} />
-          </Suspense>
-        )}
-
-        {/* Subscription Detector */}
-        {widgets.subscriptionDetector && (
-          <Suspense fallback={<LazyFallback />}>
-            <SubscriptionDetector transactions={transactions} loading={loading} />
           </Suspense>
         )}
 
