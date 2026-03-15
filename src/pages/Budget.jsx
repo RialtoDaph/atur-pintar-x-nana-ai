@@ -66,7 +66,7 @@ export default function BudgetPage() {
 
     const [b, txAll, cats] = await Promise.all([
       base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }),
-      base44.entities.Transaction.filter({ created_by: user.email }, "-date", 500),
+      base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300),
       base44.entities.CustomCategory.list("-created_date"),
     ]);
 
