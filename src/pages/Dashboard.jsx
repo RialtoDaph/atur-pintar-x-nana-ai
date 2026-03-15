@@ -14,7 +14,7 @@ import GoalsMiniList from "@/components/dashboard/GoalsMiniList";
 import SmartAlertsPanel from "@/components/dashboard/SmartAlertsPanel";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
-import NanaChatBoxInline from "@/components/nana/NanaChatBoxInline";
+
 // Lazy load heavy components
 const SpendingChart = lazy(() => import("@/components/dashboard/SpendingChart"));
 const CashflowForecast = lazy(() => import("@/components/dashboard/CashflowForecast"));
@@ -130,8 +130,7 @@ export default function Dashboard() {
 
       <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-3">
 
-        {/* Nana AI Chat Box */}
-        <NanaChatBoxInline user={user} />
+
 
         {/* Reminder Widget */}
         <ReminderWidget user={user} />
