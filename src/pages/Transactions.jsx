@@ -278,13 +278,21 @@ export default function Transactions() {
         {/* Filter + History — satu card */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* Clickable header to toggle */}
-          <button
-            onClick={() => setHistoryOpen(o => !o)}
-            className="w-full flex items-center justify-between px-4 py-3.5 tap-highlight-fix"
-          >
-            <p className="text-sm font-bold text-[#1A1A1A]">Riwayat Transaksi</p>
-            <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${historyOpen ? "rotate-180" : ""}`} />
-          </button>
+          <div className="flex items-center justify-between px-4 py-3.5">
+            <button
+              onClick={() => setHistoryOpen(o => !o)}
+              className="flex items-center gap-2 flex-1 tap-highlight-fix"
+            >
+              <p className="text-sm font-bold text-[#1A1A1A]">Riwayat Transaksi</p>
+              <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${historyOpen ? "rotate-180" : ""}`} />
+            </button>
+            <button
+              onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-[#0A0A0A] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}
+            >
+              {selectMode ? t('tx_cancel') : t('tx_select')}
+            </button>
+          </div>
 
           {historyOpen && (
             <>
