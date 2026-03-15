@@ -178,12 +178,18 @@ Deno.serve(async (req) => {
         const qty = inv.quantity || 1;
         const newCurrentValue = result.priceIDR * qty;
 
-        await base44.asServiceRole.entities.Investment.update(inv.id, {
+        const updateData = {
           current_value: Math.round(newCurrentValue),
           price_per_unit: Math.round(result.priceIDR),
           last_price_update: new Date().toISOString().split("T")[0],
-          daily_change_pct: Math.round(result.dailyChangePct * 100) / 100,
-        });
+        };
+
+        // Only set daily_change_pct for crypto and saham (emas doesn't track daily change)
+        if (["crypto", "saham"].includes(inv.type)) {
+          updateData.daily_change_pct = Math.round(result.dailyChangePct * 100) / 100;
+        }
+
+        await base44.asServiceRole.entities.Investment.update(inv.id, updateData);
         results.updated++;
         results.details.push({
           name: inv.name,
