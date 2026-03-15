@@ -64,7 +64,7 @@ export default function Analytics() {
   useEffect(() => {
     if (user) {
       Promise.all([
-        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 500),
+        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300),
         base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
         base44.entities.Budget.filter({ created_by: user.email }),
         base44.entities.Investment.filter({ created_by: user.email }),
