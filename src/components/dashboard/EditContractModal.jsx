@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
+import DateInput from "@/components/utils/DateInput";
 
 const INTERVALS = ["daily", "weekly", "monthly", "yearly"];
 
@@ -86,6 +87,15 @@ export default function EditContractModal({ contract, onClose, onSave }) {
                 </option>
               )}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Tanggal</label>
+            <DateInput
+              value={data.date || new Date().toISOString().split("T")[0]}
+              onChange={(date) => setData({ ...data, date })}
+              label=""
+            />
           </div>
 
           <div className="flex gap-2 pt-4">
