@@ -265,6 +265,11 @@ export default function Transactions() {
           </div>
         )}
 
+        {/* AI Insights */}
+        {!loading && transactions.length > 0 && (
+          <DashboardInsights transactions={transactions} goals={goals} />
+        )}
+
         {/* Filter tabs */}
         <div className="space-y-3">
           <div className="flex bg-white rounded-xl p-1 shadow-sm" role="tablist" aria-label="Filter transaksi">
