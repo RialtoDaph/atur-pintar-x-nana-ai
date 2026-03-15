@@ -216,12 +216,6 @@ export default function Transactions() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-white text-[#0A0A0A]" : "bg-white/10 text-white hover:bg-white/20"}`}
-            >
-              {selectMode ? t('tx_cancel') : t('tx_select')}
-            </button>
-            <button
               onClick={() => setShowCSVImport(true)}
               aria-label="Import dari file CSV"
               className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 tap-highlight-fix"
