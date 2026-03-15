@@ -178,7 +178,8 @@ export default function Transactions() {
   // Reset page when filter changes
   useEffect(() => { setPage(1); }, [filter, goalFilter, searchQuery]);
 
-  const paginatedFiltered = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginatedFiltered = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
   const hasMore = filtered.length > page * PAGE_SIZE;
 
   const { grouped, sortedGroups } = useMemo(() => {
