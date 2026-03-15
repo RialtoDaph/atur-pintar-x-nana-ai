@@ -225,7 +225,7 @@ export default function NanaChatBoxInline({ user }) {
               {subCatPopup.subs.map((sub) => (
                 <button
                   key={sub.key}
-                  onClick={() => createTransaction({ ...pendingTx, category: sub.key })}
+                  onClick={() => handleCreateTransaction({ ...pendingTx, category: sub.key })}
                   className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 transition-all tap-highlight-fix"
                 >
                   <span className="text-2xl">{sub.emoji}</span>
@@ -234,7 +234,7 @@ export default function NanaChatBoxInline({ user }) {
               ))}
             </div>
             <button
-              onClick={() => createTransaction({ ...pendingTx, category: subCatPopup.parentKey })}
+              onClick={() => handleCreateTransaction({ ...pendingTx, category: subCatPopup.parentKey })}
               className="mt-3 w-full py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-semibold text-[#8FA4C8] hover:border-[#CBD5E0] transition-colors tap-highlight-fix"
             >
               Pilih "{subCatPopup.parentLabel}" saja
