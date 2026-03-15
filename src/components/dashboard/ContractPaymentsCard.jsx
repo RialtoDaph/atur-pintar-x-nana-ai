@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { RefreshCw, Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 
-export default function SubscriptionDetector({ user }) {
+const CATEGORY_EMOJI = { housing: "🏠", transport: "🚗", health: "❤️", food: "🍔", shopping: "🛍️", entertainment: "🎬", other: "📦" };
+
+export default function ContractPaymentsCard({ user }) {
   const { formatCurrency } = useAppSettings();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ export default function SubscriptionDetector({ user }) {
   async function loadTemplates() {
     setLoading(true);
     const all = await base44.entities.Transaction.filter({ is_recurring: true, created_by: user.email });
-    setTemplates(all.filter(t => !t.is_recurring_child && t.category === "subscriptions"));
+    setTemplates(all.filter(t => !t.is_recurring_child && t.category !== "subscriptions"));
     setLoading(false);
   }
 
@@ -36,7 +38,7 @@ export default function SubscriptionDetector({ user }) {
       <div className="bg-white rounded-2xl shadow-sm p-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h2 className="font-bold text-[#0A0A0A] text-sm">📱 Langganan</h2>
+            <h2 className="font-bold text-[#0A0A0A] text-sm">🏠 Kontrak & Tagihan</h2>
             {templates.length > 0 && (
               <p className="text-xs text-[#8FA4C8] mt-0.5">{formatCurrency(totalMonthly)}/bulan</p>
             )}
@@ -50,17 +52,17 @@ export default function SubscriptionDetector({ user }) {
           </button>
         </div>
         {templates.length === 0 ? (
-          <p className="text-xs text-[#9B9B9B] py-2">Belum ada langganan. Tambahkan seperti Netflix, Spotify, dll.</p>
+          <p className="text-xs text-[#9B9B9B] py-2">Belum ada kontrak. Tambahkan seperti sewa rumah, listrik, internet, dll.</p>
         ) : (
           <div className="space-y-0">
             {templates.map((tx) => (
               <div key={tx.id} className="flex items-center justify-between py-2 border-b border-[#F5F5F5] last:border-0">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-purple-50 flex items-center justify-center">
-                    <RefreshCw className="w-3.5 h-3.5 text-purple-500" />
+                  <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-sm">
+                    {CATEGORY_EMOJI[tx.category] || "📄"}
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-[#1A1A1A]">{tx.note || "Langganan"}</p>
+                    <p className="text-xs font-medium text-[#1A1A1A]">{tx.note || "Tagihan"}</p>
                     <p className="text-[10px] text-[#8FA4C8] capitalize flex items-center gap-1">
                       <RefreshCw className="w-2.5 h-2.5" />
                       {tx.recurring_interval}
@@ -77,7 +79,7 @@ export default function SubscriptionDetector({ user }) {
       {showAdd && (
         <AddTransactionModal
           goals={[]}
-          initialValues={{ category: "subscriptions", recurring: true, recurringInterval: "monthly" }}
+          initialValues={{ category: "housing", recurring: true, recurringInterval: "monthly" }}
           onClose={() => setShowAdd(false)}
           onSave={async (data) => {
             await base44.entities.Transaction.create(data);

@@ -28,21 +28,21 @@ const DEFAULT_CATEGORIES = {
   ],
 };
 
-export default function AddTransactionModal({ goals = [], onClose, onSave }) {
+export default function AddTransactionModal({ goals = [], onClose, onSave, initialValues = {} }) {
   const { t, formatCurrency, settings } = useAppSettings();
   const [tab, setTab] = useState("expense");
   const [form, setForm] = useState({
-    amount: "",
-    category: "",
-    note: "",
+    amount: initialValues.amount || "",
+    category: initialValues.category || "",
+    note: initialValues.note || "",
     date: new Date().toISOString().split("T")[0],
     goal_id: "",
   });
   const [saving, setSaving] = useState(false);
   const [customCats, setCustomCats] = useState([]);
   const [showManage, setShowManage] = useState(false);
-  const [recurring, setRecurring] = useState(false);
-  const [recurringInterval, setRecurringInterval] = useState("monthly");
+  const [recurring, setRecurring] = useState(initialValues.recurring || false);
+  const [recurringInterval, setRecurringInterval] = useState(initialValues.recurringInterval || "monthly");
   const [scanning, setScanning] = useState(false);
   const [receiptData, setReceiptData] = useState(null); // extracted receipt
   const [showSplitBill, setShowSplitBill] = useState(false);
