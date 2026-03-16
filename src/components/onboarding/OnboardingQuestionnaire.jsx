@@ -161,11 +161,6 @@ export default function OnboardingQuestionnaire({ onClose }) {
     onClose();
   }
 
-  function handleSkip() {
-    base44.auth.updateMe({ onboarding_completed: true }).catch(() => {});
-    onClose();
-  }
-
   function next() {setStep((s) => Math.min(s + 1, totalSteps - 1));}
   function prev() {setStep((s) => Math.max(s - 1, 0));}
 
