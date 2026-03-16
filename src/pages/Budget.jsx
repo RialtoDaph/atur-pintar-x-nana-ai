@@ -67,10 +67,11 @@ export default function BudgetPage() {
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
     })();
 
-    const [b, txAll, cats] = await Promise.all([
+    const [b, txAll, cats, g] = await Promise.all([
       base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }),
       base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300),
       base44.entities.CustomCategory.list("-created_date"),
+      base44.entities.SavingsGoal.filter({ created_by: user.email, status: "active" }),
     ]);
 
     // Filter transactions to selected month client-side
@@ -83,6 +84,7 @@ export default function BudgetPage() {
     setTransactions(monthTx);
     setTransactions3M(prev3Tx);
     setCustomCategories(cats);
+    setGoals(g);
     setLoading(false);
   }
 
