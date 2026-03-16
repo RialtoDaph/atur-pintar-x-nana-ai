@@ -154,9 +154,9 @@ export function useFinancialContext() {
       const totalCurrentValue = investments.reduce((s, i) => s + (i.current_value || 0), 0);
 
       // Recurring transaction templates (contracts, bills, subscriptions)
-      const recurringTemplates = transactions.filter(t => t.is_recurring && !t.is_recurring_child);
-      const recurringExpenses = recurringTemplates.filter(t => t.type === "expense");
-      const recurringIncome = recurringTemplates.filter(t => t.type === "income" && t.category !== "opening_balance");
+      const allRecurringTemplates = transactions.filter(t => t.is_recurring && !t.is_recurring_child);
+      const recurringExpenses = allRecurringTemplates.filter(t => t.type === "expense");
+      const recurringIncome = allRecurringTemplates.filter(t => t.type === "income" && t.category !== "opening_balance");
       const totalMonthlyRecurringExpense = recurringExpenses.reduce((s, t) => {
         if (t.recurring_interval === "yearly") return s + t.amount / 12;
         if (t.recurring_interval === "weekly") return s + t.amount * 4.33;
