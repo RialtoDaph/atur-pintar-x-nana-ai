@@ -449,16 +449,23 @@ export default function OnboardingQuestionnaire({ onClose }) {
 
 }
 
-function NavButtons({ onPrev, onNext, canNext = true }) {
+function NavButtons({ onPrev, onNext, canNext = true, showSkip = false, onSkip }) {
   return (
-    <div className="flex gap-3">
-      <button onClick={onPrev} className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#E2E8F0] text-[#4A5568] hover:bg-[#F8FAFC] transition-colors flex-shrink-0">
-        <ArrowLeft className="w-4 h-4" />
-      </button>
-      <button onClick={onNext} disabled={!canNext}
-      className="flex-1 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-bold hover:bg-[#e05e00] transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
-        Lanjut <ArrowRight className="w-4 h-4" />
-      </button>
-    </div>);
-
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-3">
+        <button onClick={onPrev} className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#E2E8F0] text-[#4A5568] hover:bg-[#F8FAFC] transition-colors flex-shrink-0">
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <button onClick={onNext} disabled={!canNext}
+        className="flex-1 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-bold hover:bg-[#e05e00] transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+          Lanjut <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+      {showSkip && (
+        <button onClick={onSkip} className="text-xs text-[#8FA4C8] hover:text-[#4A5568] transition-colors text-center py-1">
+          Lewati langkah ini
+        </button>
+      )}
+    </div>
+  );
 }
