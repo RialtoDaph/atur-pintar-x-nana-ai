@@ -347,7 +347,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
                   </div>
                 </div>
             }
-              <NavButtons onPrev={prev} onNext={next} canNext={hasDebt === false || hasDebt && debtName && debtRemaining} />
+              <NavButtons onPrev={prev} onNext={next} onSkip={() => { setHasDebt(false); next(); }} canNext={hasDebt === false || hasDebt && debtName && debtRemaining} />
             </div>
           }
 
