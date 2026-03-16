@@ -148,7 +148,7 @@ export default function AddReminderModal({ reminder, onClose, onSave }) {
         </div>
 
         {/* Notes */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Catatan (opsional)</label>
           <input
             className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
@@ -157,6 +157,23 @@ export default function AddReminderModal({ reminder, onClose, onSave }) {
             onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
           />
         </div>
+
+        {/* Auto recurring transaction toggle — only for new reminders with amount */}
+        {!reminder && parseFloat(form.amount) > 0 && (
+          <div className="mb-6 flex items-center justify-between bg-[#F8FAFC] rounded-xl px-4 py-3 border border-[#E2E8F0]">
+            <div>
+              <p className="text-sm font-semibold text-[#1A1A1A]">Buat transaksi otomatis 🔄</p>
+              <p className="text-xs text-[#8FA4C8] mt-0.5">Catat sebagai pengeluaran berulang bulanan</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm(f => ({ ...f, create_recurring_tx: !f.create_recurring_tx }))}
+              className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 relative ${form.create_recurring_tx ? "bg-[#FF6A00]" : "bg-[#E2E8F0]"}`}
+            >
+              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.create_recurring_tx ? "translate-x-6" : "translate-x-0.5"}`} />
+            </button>
+          </div>
+        )}
 
         <button onClick={handleSave} disabled={saving || !form.title || !form.due_day}
           className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] hover:bg-[#e05e00] disabled:opacity-40 transition-colors tap-highlight-fix">
