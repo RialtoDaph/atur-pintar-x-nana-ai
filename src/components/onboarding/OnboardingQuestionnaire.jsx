@@ -439,7 +439,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
               disabled={saving}
               className="w-full py-3.5 rounded-xl bg-[#FF6A00] text-white text-sm font-bold hover:bg-[#e05e00] transition-colors disabled:opacity-50">
 
-                {saving ? "Menyimpan..." : "Mulai Menggunakan Atur.in 🎉"}
+                {saving ? "Menyimpan..." : "Mulai Menggunakan Atur Pintar 🎉"}
               </button>
             </div>
           }
