@@ -18,6 +18,10 @@ Deno.serve(async (req) => {
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #F2F4F7;">
         <div style="max-width: 600px; margin: 40px auto; background: #F2F4F7; padding: 24px; border-radius: 16px;">
           
+          <div style="text-align: center; margin-bottom: 8px;">
+            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/54148c256_85F10F30-6B5D-4EA2-865F-C1C5AC4C4170.PNG" alt="Atur Pintar" style="width: 48px; height: 48px; border-radius: 12px; margin-bottom: 8px;">
+            <p style="color: #0A0A0A; font-size: 18px; font-weight: bold; margin: 0 0 16px 0;">Atur Pintar</p>
+          </div>
           <div style="text-align: center; margin-bottom: 32px;">
             <h1 style="color: #0A0A0A; margin: 0; font-size: 28px;">Selamat Datang di Atur Pintar! 🎉</h1>
             <p style="color: #8FA4C8; margin-top: 8px; font-size: 14px;">Kelola keuanganmu lebih cerdas bersama Nana AI</p>
