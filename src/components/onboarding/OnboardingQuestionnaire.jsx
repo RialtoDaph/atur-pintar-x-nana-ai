@@ -454,14 +454,11 @@ export default function OnboardingQuestionnaire({ onClose }) {
 
 }
 
-function NavButtons({ onPrev, onNext, onSkip, canNext = true }) {
+function NavButtons({ onPrev, onNext, canNext = true }) {
   return (
     <div className="flex gap-3">
       <button onClick={onPrev} className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#E2E8F0] text-[#4A5568] hover:bg-[#F8FAFC] transition-colors flex-shrink-0">
         <ArrowLeft className="w-4 h-4" />
-      </button>
-      <button onClick={onSkip} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#8FA4C8] hover:bg-[#F8FAFC] transition-colors">
-        Lewati
       </button>
       <button onClick={onNext} disabled={!canNext}
       className="flex-1 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-bold hover:bg-[#e05e00] transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
