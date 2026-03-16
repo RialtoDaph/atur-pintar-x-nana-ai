@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import AddBudgetModal from "@/components/budget/AddBudgetModal";
 import BudgetCard from "@/components/budget/BudgetCard";
 import SavingsRecommendationWidget from "@/components/budget/SavingsRecommendationWidget";
+import BudgetNanaPanel from "@/components/budget/BudgetNanaPanel";
+import BudgetAlertChecker from "@/components/budget/BudgetAlertChecker";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const DEFAULT_CATEGORIES = [
@@ -42,6 +44,7 @@ export default function BudgetPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
   const [user, setUser] = useState(null);
+  const [goals, setGoals] = useState([]);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
