@@ -46,7 +46,7 @@ export default function Dashboard() {
     base44.auth.me().then(u => {
       setUser(u);
       if (!u?.onboarding_completed && !localStorage.getItem("onboarding_done")) {
-        setShowOnboarding(true);
+        setShowOnboarding(false);
       }
     }).catch(() => {});
   }, []);
