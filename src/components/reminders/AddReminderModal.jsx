@@ -37,6 +37,7 @@ export default function AddReminderModal({ reminder, onClose, onSave }) {
         icon: reminder.icon || "",
         notes: reminder.notes || "",
         is_active: reminder.is_active !== false,
+        create_recurring_tx: false, // editing existing — don't re-create
       });
     }
   }, [reminder]);
