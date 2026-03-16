@@ -210,11 +210,16 @@ export default function Dashboard() {
 
       {showOnboarding && (
         <OnboardingQuestionnaire onClose={async () => {
-          setShowOnboarding(true);
+          setShowOnboarding(false);
           localStorage.setItem("onboarding_done", "true");
           await base44.auth.updateMe({ onboarding_completed: true });
           loadData();
+          setShowNanaIntro(true);
         }} />
+      )}
+
+      {showNanaIntro && (
+        <NanaIntroModal onClose={() => setShowNanaIntro(false)} />
       )}
 
 
