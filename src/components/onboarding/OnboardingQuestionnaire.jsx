@@ -420,7 +420,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
               placeholder="Tanggal jatuh tempo (1-31)" value={reminderDay} onChange={(e) => setReminderDay(e.target.value)} />
                 </div>
             }
-              <NavButtons onPrev={prev} onNext={next} canNext={hasReminder === false || hasReminder && reminderTitle && reminderDay} />
+              <NavButtons onPrev={prev} onNext={next} onSkip={() => { setHasReminder(false); next(); }} canNext={hasReminder === false || hasReminder && reminderTitle && reminderDay} />
             </div>
           }
 
