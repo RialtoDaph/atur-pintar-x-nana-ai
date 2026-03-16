@@ -21,6 +21,7 @@ export default function AddReminderModal({ reminder, onClose, onSave }) {
     icon: "",
     notes: "",
     is_active: true,
+    create_recurring_tx: true,
   });
   const [saving, setSaving] = useState(false);
   const [showTypeSelect, setShowTypeSelect] = useState(false);
