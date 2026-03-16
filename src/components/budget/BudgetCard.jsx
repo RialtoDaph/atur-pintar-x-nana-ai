@@ -1,10 +1,13 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, AlertTriangle } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function BudgetCard({ budget, categoryMeta, spent, onEdit, onDelete }) {
   const { t, formatCurrency } = useAppSettings();
-  const percent = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : 0;
+  const rawPercent = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
+  const percent = Math.min(rawPercent, 100);
   const isOver = spent > budget.amount;
+  const isCritical = !isOver && rawPercent >= 85;
+  const isNear = !isOver && !isCritical && rawPercent >= 70;
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm">
