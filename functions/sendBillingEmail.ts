@@ -1,11 +1,81 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
+const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/54148c256_85F10F30-6B5D-4EA2-865F-C1C5AC4C4170.PNG';
+const APP_URL = 'https://app.aturpintar.id/Dashboard';
+const SUBSCRIPTION_URL = 'https://app.aturpintar.id/Subscription';
+
+function emailLayout({ previewText, content }) {
+  return `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Atur Pintar</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; background-color: #F2F4F7; font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; padding: 0 16px !important; }
+      .body-pad { padding: 32px 24px !important; }
+      .header-pad { padding: 28px 24px !important; }
+      .footer-pad { padding: 20px 24px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div style="display:none;max-height:0;overflow:hidden;font-size:1px;color:#F2F4F7;">${previewText}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F2F4F7;padding:48px 20px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+          <tr>
+            <td style="background-color:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+
+                <!-- Header -->
+                <tr>
+                  <td class="header-pad" style="background-color:#0A0A0A;padding:32px 40px;text-align:center;">
+                    <img src="${LOGO_URL}" alt="Atur Pintar" width="52" height="52" style="border-radius:14px;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;">
+                    <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:-0.3px;">Atur Pintar</p>
+                    <p style="margin:4px 0 0;color:#8FA4C8;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;">Financial Tracker</p>
+                  </td>
+                </tr>
+
+                <!-- Body -->
+                <tr>
+                  <td class="body-pad" style="padding:40px 40px 32px;">
+                    ${content}
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td class="footer-pad" style="background-color:#F8FAFC;padding:24px 40px;text-align:center;border-top:1px solid #E2E8F0;">
+                    <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#1A1A1A;">Atur Pintar</p>
+                    <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.7;">Ada pertanyaan soal tagihan? Hubungi <a href="mailto:support@aturpintar.id" style="color:#FF6A00;text-decoration:none;">support@aturpintar.id</a></p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+          <tr><td style="height:32px;"></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
 
-    // Called from entity automation when SubscriptionPayment is created/updated
     const paymentData = payload?.data;
     const userEmail = paymentData?.user_email || paymentData?.created_by;
 
@@ -13,94 +83,163 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'No user email in payload' }, { status: 400 });
     }
 
-    // Fetch user name
     let userName = 'Pengguna';
     try {
       const users = await base44.asServiceRole.entities.User.filter({ email: userEmail });
       if (users.length > 0) userName = users[0].full_name || 'Pengguna';
     } catch {}
 
-    const planName = paymentData?.plan_name || 'Premium';
+    const planLabel = paymentData?.plan === 'premium_monthly' ? 'Premium Bulanan' : paymentData?.plan === 'premium_yearly' ? 'Premium Tahunan' : (paymentData?.plan_name || 'Premium');
     const amount = paymentData?.amount ? `Rp ${Number(paymentData.amount).toLocaleString('id-ID')}` : '-';
-    const status = paymentData?.status || 'active';
+    const status = paymentData?.status || 'pending';
     const expiryDate = paymentData?.expires_at
       ? new Date(paymentData.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
       : '-';
 
-    const isSuccess = status === 'active' || status === 'paid';
+    const isSuccess = status === 'approved' || status === 'active' || status === 'paid';
 
-    const emailBody = `
-      <html>
-      <body style="font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #F2F4F7;">
-        <div style="max-width: 600px; margin: 40px auto; background: #F2F4F7; padding: 24px; border-radius: 16px;">
-          
-          <div style="text-align: center; margin-bottom: 8px;">
-            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/54148c256_85F10F30-6B5D-4EA2-865F-C1C5AC4C4170.PNG" alt="Atur Pintar" style="width: 48px; height: 48px; border-radius: 12px; margin-bottom: 8px;">
-            <p style="color: #0A0A0A; font-size: 18px; font-weight: bold; margin: 0 0 16px 0;">Atur Pintar</p>
-          </div>
-          <div style="text-align: center; margin-bottom: 32px;">
-            <h1 style="color: #0A0A0A; margin: 0; font-size: 24px;">${isSuccess ? '🎊 Pembayaran Berhasil!' : '⚠️ Pembayaran Gagal'}</h1>
-            <p style="color: #8FA4C8; margin-top: 8px; font-size: 14px;">Atur Pintar Premium</p>
-          </div>
+    const premiumFeatures = [
+      '💬 Chat Nana AI tanpa batas',
+      '📊 Analitik lanjutan & laporan bulanan',
+      '📤 Export ke Google Sheets & PDF',
+      '🔔 Smart alerts & budget notifications',
+      '🎯 Unlimited savings goals',
+    ];
 
-          <div style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 20px;">
-            <p style="color: #4A5568; margin: 0 0 4px 0; font-size: 14px;">Halo, <strong>${userName}</strong></p>
-            <p style="color: #4A5568; font-size: 14px;">${isSuccess
-              ? 'Terima kasih! Akun Premium kamu sudah aktif. Nikmati semua fitur Atur Pintar tanpa batas.'
-              : 'Pembayaran kamu tidak berhasil diproses. Silakan coba lagi atau hubungi support kami.'
-            }</p>
-          </div>
+    const featureList = premiumFeatures.map(f => `
+      <tr>
+        <td style="padding:7px 0;font-size:13px;color:#4A5568;border-bottom:1px solid #F2F4F7;">${f}</td>
+      </tr>
+    `).join('');
 
-          <div style="background: ${isSuccess ? '#0A0A0A' : '#FFF5F5'}; padding: 24px; border-radius: 12px; margin-bottom: 20px;">
-            <h3 style="color: ${isSuccess ? 'white' : '#FF6B6B'}; margin-top: 0;">Detail Langganan</h3>
-            <table style="width: 100%; color: ${isSuccess ? '#8FA4C8' : '#4A5568'}; font-size: 14px;">
+    const successContent = `
+      <!-- Status Icon -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+        <tr>
+          <td align="center">
+            <div style="display:inline-block;background-color:#F0FDF4;border-radius:50%;width:72px;height:72px;line-height:72px;text-align:center;font-size:32px;">✅</div>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0 0 8px;font-size:24px;font-weight:700;color:#1A1A1A;text-align:center;line-height:1.2;">Pembayaran Berhasil!</p>
+      <p style="margin:0 0 28px;font-size:15px;color:#64748B;text-align:center;line-height:1.6;">
+        Hei <strong style="color:#1A1A1A;">${userName}</strong>, akun Premium kamu sudah aktif. Selamat menikmati semua fiturnya!
+      </p>
+
+      <!-- Receipt Box -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0A0A0A;border-radius:16px;margin-bottom:28px;overflow:hidden;">
+        <tr>
+          <td style="padding:24px 28px;">
+            <p style="margin:0 0 16px;font-size:11px;font-weight:700;color:#8FA4C8;text-transform:uppercase;letter-spacing:1px;">📋 Ringkasan Pembayaran</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
-                <td style="padding: 6px 0;">Paket</td>
-                <td style="text-align: right; color: ${isSuccess ? 'white' : '#0A0A0A'}; font-weight: bold;">${planName}</td>
+                <td style="font-size:14px;color:#8FA4C8;padding:6px 0;">Paket</td>
+                <td style="font-size:14px;color:#ffffff;font-weight:600;text-align:right;">${planLabel}</td>
               </tr>
               <tr>
-                <td style="padding: 6px 0;">Jumlah</td>
-                <td style="text-align: right; color: ${isSuccess ? 'white' : '#0A0A0A'}; font-weight: bold;">${amount}</td>
+                <td style="font-size:14px;color:#8FA4C8;padding:6px 0;border-top:1px solid #1e1e1e;">Total Bayar</td>
+                <td style="font-size:16px;color:#FF6A00;font-weight:700;text-align:right;border-top:1px solid #1e1e1e;">${amount}</td>
               </tr>
               <tr>
-                <td style="padding: 6px 0;">Status</td>
-                <td style="text-align: right; color: ${isSuccess ? '#99ff80' : '#FF6B6B'}; font-weight: bold;">${isSuccess ? '✅ Aktif' : '❌ Gagal'}</td>
+                <td style="font-size:14px;color:#8FA4C8;padding:6px 0;border-top:1px solid #1e1e1e;">Status</td>
+                <td style="font-size:14px;color:#4ade80;font-weight:700;text-align:right;border-top:1px solid #1e1e1e;">✓ Aktif</td>
               </tr>
-              ${isSuccess ? `<tr>
-                <td style="padding: 6px 0;">Aktif hingga</td>
-                <td style="text-align: right; color: white; font-weight: bold;">${expiryDate}</td>
+              ${expiryDate !== '-' ? `<tr>
+                <td style="font-size:14px;color:#8FA4C8;padding:6px 0;border-top:1px solid #1e1e1e;">Aktif hingga</td>
+                <td style="font-size:14px;color:#ffffff;font-weight:600;text-align:right;border-top:1px solid #1e1e1e;">${expiryDate}</td>
               </tr>` : ''}
             </table>
-          </div>
+          </td>
+        </tr>
+      </table>
 
-          ${isSuccess ? `
-          <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-            <h4 style="color: #0A0A0A; margin-top: 0;">🌟 Fitur Premium yang kamu dapatkan:</h4>
-            <ul style="color: #4A5568; font-size: 14px; line-height: 2;">
-              <li>💬 Chat Nana AI tanpa batas</li>
-              <li>📊 Analitik mendalam & laporan lengkap</li>
-              <li>📤 Export data ke Google Sheets</li>
-              <li>🔔 Notifikasi cerdas & budget alerts</li>
-            </ul>
-          </div>` : ''}
+      <!-- Features -->
+      <p style="margin:0 0 12px;font-size:14px;font-weight:700;color:#1A1A1A;">🌟 Fitur yang kamu dapatkan:</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+        ${featureList}
+      </table>
 
-          <div style="text-align: center; padding-top: 16px; border-top: 1px solid #E2E8F0;">
-            <a href="https://app.base44.com" style="background: #FF6A00; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 14px;">
-              ${isSuccess ? 'Mulai Gunakan Premium →' : 'Coba Lagi →'}
+      <!-- CTA -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+            <a href="${APP_URL}" style="display:inline-block;background-color:#FF6A00;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 44px;border-radius:14px;letter-spacing:-0.2px;">
+              Mulai Gunakan Premium →
             </a>
-            <p style="color: #8FA4C8; font-size: 12px; margin-top: 16px;">Atur Pintar — Financial Tracker powered by Nana AI</p>
-          </div>
-
-        </div>
-      </body>
-      </html>
+          </td>
+        </tr>
+      </table>
     `;
+
+    const failedContent = `
+      <!-- Status Icon -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+        <tr>
+          <td align="center">
+            <div style="display:inline-block;background-color:#FEF2F2;border-radius:50%;width:72px;height:72px;line-height:72px;text-align:center;font-size:32px;">❌</div>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0 0 8px;font-size:24px;font-weight:700;color:#1A1A1A;text-align:center;line-height:1.2;">Pembayaran Gagal</p>
+      <p style="margin:0 0 28px;font-size:15px;color:#64748B;text-align:center;line-height:1.6;">
+        Hei <strong style="color:#1A1A1A;">${userName}</strong>, pembayaran kamu tidak berhasil diproses. Jangan khawatir, coba lagi kapan saja.
+      </p>
+
+      <!-- Detail Box -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FEF2F2;border:1.5px solid #FECACA;border-radius:14px;margin-bottom:24px;">
+        <tr>
+          <td style="padding:20px 24px;">
+            <p style="margin:0 0 10px;font-size:11px;font-weight:700;color:#EF4444;text-transform:uppercase;letter-spacing:1px;">⚠️ Detail Transaksi</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-size:14px;color:#64748B;padding:4px 0;">Paket</td>
+                <td style="font-size:14px;color:#1A1A1A;font-weight:600;text-align:right;">${planLabel}</td>
+              </tr>
+              <tr>
+                <td style="font-size:14px;color:#64748B;padding:4px 0;">Jumlah</td>
+                <td style="font-size:14px;color:#1A1A1A;font-weight:600;text-align:right;">${amount}</td>
+              </tr>
+              <tr>
+                <td style="font-size:14px;color:#64748B;padding:4px 0;">Status</td>
+                <td style="font-size:14px;color:#EF4444;font-weight:700;text-align:right;">✗ Gagal</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0 0 24px;font-size:14px;color:#64748B;line-height:1.7;text-align:center;">
+        Pastikan metode pembayaran kamu valid dan coba lagi. Jika masalah berlanjut, hubungi tim support kami.
+      </p>
+
+      <!-- CTA -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+            <a href="${SUBSCRIPTION_URL}" style="display:inline-block;background-color:#FF6A00;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 44px;border-radius:14px;letter-spacing:-0.2px;">
+              Coba Bayar Lagi →
+            </a>
+          </td>
+        </tr>
+      </table>
+    `;
+
+    const emailBody = emailLayout({
+      previewText: isSuccess
+        ? `Pembayaran berhasil! Akun Premium ${userName} sudah aktif.`
+        : `Pembayaran gagal diproses. Coba lagi untuk mengaktifkan Premium.`,
+      content: isSuccess ? successContent : failedContent,
+    });
 
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: userEmail,
-      subject: isSuccess ? `🎊 Premium aktif! Selamat, ${userName}` : `⚠️ Pembayaran Premium gagal — Atur Pintar`,
+      subject: isSuccess
+        ? `✅ Premium Aktif! Selamat, ${userName} — Atur Pintar`
+        : `❌ Pembayaran Gagal — Atur Pintar`,
       body: emailBody,
-      from_name: 'Atur Pintar'
+      from_name: 'Atur Pintar',
     });
 
     return Response.json({ success: true, message: `Billing email sent to ${userEmail}` });
