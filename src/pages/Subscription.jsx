@@ -228,7 +228,7 @@ export default function Subscription() {
         <div className="bg-white rounded-2xl shadow-sm p-5">
           <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest mb-3">Cara Berlangganan</p>
           <ol className="space-y-2">
-            {["Pilih paket Premium yang kamu inginkan.", `Transfer ke rekening ${BANK_INFO.bank} ${BANK_INFO.account_number} a.n. ${BANK_INFO.account_name}.`, "Upload foto/screenshot bukti transfer.", "Tunggu konfirmasi admin maksimal 1×24 jam."].map((step, i) => (
+            {["Pilih paket Premium yang kamu inginkan.", "Klik 'Bayar Sekarang' dan selesaikan pembayaran via Midtrans.", "Langganan aktif otomatis setelah pembayaran dikonfirmasi."].map((step, i) => (
               <li key={i} className="flex items-start gap-3 text-sm text-[#1A1A1A]">
                 <span className="w-5 h-5 rounded-full bg-[#FF6A00] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                 {step}
@@ -238,77 +238,19 @@ export default function Subscription() {
         </div>
       </div>
 
-      {/* Payment Modal */}
-      {showPaymentModal && selectedPlan && (
+      {/* Success Modal */}
+      {showPaymentModal && submitted && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
-            {submitted ? (
-              <div className="p-6 text-center">
-                <CheckCircle2 className="w-14 h-14 text-green-500 mx-auto mb-3" />
-                <p className="text-lg font-bold text-[#1A1A1A]">Bukti Terkirim!</p>
-                <p className="text-sm text-[#8FA4C8] mt-1">Admin akan memverifikasi dalam 1×24 jam. Kamu akan mendapatkan notifikasi segera setelah dikonfirmasi.</p>
-                <button
-                  onClick={() => { setShowPaymentModal(false); setSubmitted(false); }}
-                  className="mt-4 w-full py-3 bg-[#FF6A00] text-white rounded-xl font-semibold text-sm"
-                >
-                  Selesai
-                </button>
-              </div>
-            ) : (
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="font-bold text-[#1A1A1A]">Upload Bukti Transfer</p>
-                  <button onClick={() => setShowPaymentModal(false)} className="w-7 h-7 rounded-full bg-[#F2F4F7] flex items-center justify-center">
-                    <X className="w-4 h-4 text-[#8FA4C8]" />
-                  </button>
-                </div>
-
-                {/* Bank Info */}
-                <div className="bg-[#F8FAFC] rounded-xl p-4 mb-4 border border-[#E2E8F0]">
-                  <p className="text-xs text-[#8FA4C8] mb-2 font-semibold uppercase tracking-wider">Transfer ke</p>
-                  <p className="text-sm font-bold text-[#1A1A1A]">{BANK_INFO.bank} · {BANK_INFO.account_number}</p>
-                  <p className="text-xs text-[#8FA4C8]">a.n. {BANK_INFO.account_name}</p>
-                  <div className="mt-2 pt-2 border-t border-[#E2E8F0] flex items-center justify-between">
-                    <p className="text-xs text-[#8FA4C8]">Nominal</p>
-                    <p className="text-base font-bold text-[#FF6A00]">{selectedPlan.price}</p>
-                  </div>
-                </div>
-
-                {/* File Upload */}
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-wider mb-2">Bukti Transfer</p>
-                  {proofPreview ? (
-                    <div className="relative">
-                      <img src={proofPreview} alt="Bukti" className="w-full h-40 object-cover rounded-xl border border-[#E2E8F0]" />
-                      <button
-                        onClick={() => { setProofFile(null); setProofPreview(null); }}
-                        className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center"
-                      >
-                        <X className="w-3.5 h-3.5 text-white" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center gap-2 w-full h-32 border-2 border-dashed border-[#E2E8F0] rounded-xl cursor-pointer hover:border-[#FF6A00]/50 transition-colors">
-                      <Upload className="w-6 h-6 text-[#8FA4C8]" />
-                      <p className="text-xs text-[#8FA4C8]">Tap untuk upload foto bukti transfer</p>
-                      <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-                    </label>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleSubmit}
-                  disabled={!proofFile || uploading}
-                  className="w-full py-3 bg-[#FF6A00] text-white rounded-xl font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {uploading ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Mengupload...</>
-                  ) : (
-                    <><Zap className="w-4 h-4" /> Kirim Bukti Pembayaran</>
-                  )}
-                </button>
-              </div>
-            )}
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl p-6 text-center">
+            <CheckCircle2 className="w-14 h-14 text-green-500 mx-auto mb-3" />
+            <p className="text-lg font-bold text-[#1A1A1A]">Pembayaran Berhasil!</p>
+            <p className="text-sm text-[#8FA4C8] mt-1">Langganan kamu sedang diproses dan akan aktif dalam beberapa menit.</p>
+            <button
+              onClick={() => { setShowPaymentModal(false); setSubmitted(false); }}
+              className="mt-4 w-full py-3 bg-[#FF6A00] text-white rounded-xl font-semibold text-sm"
+            >
+              Selesai
+            </button>
           </div>
         </div>
       )}
