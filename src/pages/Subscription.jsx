@@ -64,9 +64,6 @@ export default function Subscription() {
   const [user, setUser] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [proofFile, setProofFile] = useState(null);
-  const [proofPreview, setProofPreview] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [existingPayment, setExistingPayment] = useState(null);
   const [loadingSnap, setLoadingSnap] = useState(false);
