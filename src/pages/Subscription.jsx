@@ -69,6 +69,7 @@ export default function Subscription() {
   const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [existingPayment, setExistingPayment] = useState(null);
+  const [loadingSnap, setLoadingSnap] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -82,35 +83,45 @@ export default function Subscription() {
     }
   }, [user]);
 
-  function handleSelectPlan(plan) {
+  // Load Midtrans Snap script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
+    script.setAttribute('data-client-key', 'Mid-client-DbRxTJwt9Fuh-xM6');
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
+
+  async function handleSelectPlan(plan) {
     if (plan.key === "free") return;
     setSelectedPlan(plan);
-    setShowPaymentModal(true);
-  }
+    setLoadingSnap(true);
 
-  function handleFileChange(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    setProofFile(file);
-    setProofPreview(URL.createObjectURL(file));
-  }
+    const res = await base44.functions.invoke('createMidtransTransaction', { plan: plan.key });
+    const { token } = res.data;
 
-  async function handleSubmit() {
-    if (!proofFile || !selectedPlan || !user) return;
-    setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file: proofFile });
-    await base44.entities.SubscriptionPayment.create({
-      user_email: user.email,
-      user_name: user.full_name,
-      plan: selectedPlan.key,
-      amount: selectedPlan.key === "premium_monthly" ? 39000 : 299000,
-      payment_proof_url: file_url,
-      status: "pending",
+    setLoadingSnap(false);
+
+    window.snap.pay(token, {
+      onSuccess: async (result) => {
+        await base44.auth.updateMe({ subscription_status: 'pending', subscription_plan: plan.key });
+        setUser((u) => ({ ...u, subscription_status: 'pending' }));
+        setSubmitted(true);
+        setShowPaymentModal(true);
+      },
+      onPending: async () => {
+        await base44.auth.updateMe({ subscription_status: 'pending', subscription_plan: plan.key });
+        setUser((u) => ({ ...u, subscription_status: 'pending' }));
+        setSubmitted(true);
+        setShowPaymentModal(true);
+      },
+      onError: (result) => {
+        console.error('Payment error', result);
+      },
+      onClose: () => {
+        // User menutup popup tanpa bayar
+      },
     });
-    await base44.auth.updateMe({ subscription_status: "pending", subscription_plan: selectedPlan.key });
-    setUploading(false);
-    setSubmitted(true);
-    setUser((u) => ({ ...u, subscription_status: "pending" }));
   }
 
   const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
