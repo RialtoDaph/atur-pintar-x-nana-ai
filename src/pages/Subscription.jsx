@@ -207,13 +207,18 @@ export default function Subscription() {
                   ) : (
                     <button
                       onClick={() => handleSelectPlan(plan)}
-                      className={`w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all ${
+                      disabled={loadingSnap}
+                      className={`w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
                         plan.key === "premium_monthly"
                           ? "bg-[#FF6A00] hover:bg-[#e05e00]"
                           : "bg-purple-500 hover:bg-purple-600"
                       }`}
                     >
-                      Pilih Paket
+                      {loadingSnap ? (
+                        <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Memuat...</>
+                      ) : (
+                        <><Zap className="w-4 h-4" /> Bayar Sekarang</>
+                      )}
                     </button>
                   )}
                 </div>
