@@ -83,7 +83,7 @@ export default function Subscription() {
   // Load Midtrans Snap script
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
+    script.src = 'https://app.midtrans.com/snap/snap.js';
     script.setAttribute('data-client-key', 'Mid-client-DbRxTJwt9Fuh-xM6');
     document.head.appendChild(script);
     return () => { document.head.removeChild(script); };
