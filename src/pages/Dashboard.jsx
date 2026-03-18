@@ -10,6 +10,7 @@ import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import OnboardingQuestionnaire from "@/components/onboarding/OnboardingQuestionnaire";
 import NanaIntroModal from "@/components/onboarding/NanaIntroModal";
+import TourGuide from "@/components/onboarding/TourGuide";
 import BalanceCard from "@/components/dashboard/BalanceCard";
 import GoalsMiniList from "@/components/dashboard/GoalsMiniList";
 import SmartAlertsPanel from "@/components/dashboard/SmartAlertsPanel";
