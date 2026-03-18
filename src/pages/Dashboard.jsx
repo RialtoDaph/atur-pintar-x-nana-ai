@@ -53,7 +53,7 @@ export default function Dashboard() {
         setShowOnboarding(true);
       } else if (
         u?.onboarding_completed &&
-        !localStorage.getItem("tour_completed") &&
+        !u?.tour_completed &&
         u?.subscription_plan !== "premium_monthly" &&
         u?.subscription_plan !== "premium_yearly"
       ) {
