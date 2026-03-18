@@ -7,6 +7,7 @@ import NanaFloatingChat from "@/components/nana/NanaFloatingChat";
 import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSettingsContext";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { AnimatePresence, motion } from "framer-motion";
+import TourGuide from "@/components/onboarding/TourGuide";
 function LayoutInner({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
