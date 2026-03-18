@@ -27,7 +27,17 @@ function LayoutInner({ children, currentPageName }) {
   });
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(u => {
+      setUser(u);
+      if (
+        u?.onboarding_completed &&
+        !u?.tour_completed &&
+        u?.subscription_plan !== "premium_monthly" &&
+        u?.subscription_plan !== "premium_yearly"
+      ) {
+        setTimeout(() => setShowTour(true), 1800);
+      }
+    }).catch(() => {});
   }, []);
 
   // Initialize dark mode with system preference detection and manual override support
