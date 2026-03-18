@@ -235,7 +235,7 @@ export default function Dashboard() {
           if (
             u?.subscription_plan !== "premium_monthly" &&
             u?.subscription_plan !== "premium_yearly" &&
-            !localStorage.getItem("tour_completed")
+            !u?.tour_completed
           ) {
             setTimeout(() => setShowTour(true), 600);
           }
@@ -243,9 +243,9 @@ export default function Dashboard() {
       )}
 
       {showTour && (
-        <TourGuide onComplete={() => {
+        <TourGuide onComplete={async () => {
           setShowTour(false);
-          localStorage.setItem("tour_completed", "true");
+          await base44.auth.updateMe({ tour_completed: true });
         }} />
       )}
 
