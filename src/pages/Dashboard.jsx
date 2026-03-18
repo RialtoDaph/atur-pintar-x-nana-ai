@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [widgets, setWidgets] = useState(getWidgets());
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showNanaIntro, setShowNanaIntro] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -50,6 +51,14 @@ export default function Dashboard() {
       setUser(u);
       if (!u?.onboarding_completed && !localStorage.getItem("onboarding_done")) {
         setShowOnboarding(true);
+      } else if (
+        u?.onboarding_completed &&
+        !localStorage.getItem("tour_completed") &&
+        u?.subscription_plan !== "premium_monthly" &&
+        u?.subscription_plan !== "premium_yearly"
+      ) {
+        // Delay slightly so layout renders first
+        setTimeout(() => setShowTour(true), 800);
       }
     }).catch(() => {});
   }, []);
