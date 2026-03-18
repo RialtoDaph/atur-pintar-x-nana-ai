@@ -221,24 +221,8 @@ export default function Dashboard() {
       {showNanaIntro && (
         <NanaIntroModal onClose={() => {
           setShowNanaIntro(false);
-          const u = user;
-          if (
-            u?.subscription_plan !== "premium_monthly" &&
-            u?.subscription_plan !== "premium_yearly" &&
-            !u?.tour_completed
-          ) {
-            setTimeout(() => setShowTour(true), 600);
-          }
         }} />
       )}
-
-      {showTour && (
-        <TourGuide onComplete={async () => {
-          setShowTour(false);
-          await base44.auth.updateMe({ tour_completed: true });
-        }} />
-      )}
-
 
       {showAddTx && (
         <AddTransactionModal
