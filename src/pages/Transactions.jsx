@@ -272,7 +272,7 @@ export default function Transactions() {
           )}
 
           {/* Filter + History — satu card */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div data-tour="tx-history-card" className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {/* Clickable header to toggle */}
             <div className="flex items-center justify-between px-4 py-3.5">
               <button

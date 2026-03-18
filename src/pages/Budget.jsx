@@ -177,6 +177,7 @@ export default function BudgetPage() {
                 </Link>
               ) : (
                 <button
+                  data-tour="add-budget-btn"
                   onClick={() => setShowAdd(true)}
                   className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
                 >
