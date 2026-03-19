@@ -20,6 +20,8 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
     note: initialValues.note || "",
     date: new Date().toISOString().split("T")[0],
     goal_id: "",
+    is_recurring: initialValues.is_recurring || false,
+    recurring_interval: initialValues.recurring_interval || "monthly",
   });
   const [saving, setSaving] = useState(false);
   const [customCats, setCustomCats] = useState([]);
