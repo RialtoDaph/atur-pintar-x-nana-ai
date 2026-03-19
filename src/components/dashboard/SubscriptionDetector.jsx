@@ -67,7 +67,7 @@ export default function SubscriptionDetector({ user }) {
             )}
           </div>
           <button
-            onClick={() => setShowAdd(true)}
+            onClick={() => setAddingNew(true)}
             className="flex items-center gap-1 text-xs text-[#FF6A00] font-semibold bg-orange-50 px-2.5 py-1.5 rounded-lg hover:bg-orange-100 transition-colors tap-highlight-fix"
           >
             <Plus className="w-3 h-3" />
