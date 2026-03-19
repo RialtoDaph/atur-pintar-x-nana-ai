@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import DateInput from "@/components/utils/DateInput";
+import { parseRupiah } from "@/components/utils/parseRupiah";
 
 const INTERVALS = ["daily", "weekly", "monthly", "yearly"];
 
