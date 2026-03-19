@@ -105,12 +105,15 @@ export default function ContractPaymentsCard({ user }) {
       </div>
 
       {showAdd && (
-        <AddTransactionModal
-          goals={[]}
-          initialValues={{ category: "housing", recurring: true, recurringInterval: "monthly" }}
+        <EditContractModal
+          contract={{ type: "expense", recurring_interval: "monthly", date: new Date().toISOString().split("T")[0] }}
           onClose={() => setShowAdd(false)}
           onSave={async (data) => {
-            await base44.entities.Transaction.create(data);
+            await base44.entities.Transaction.create({
+              ...data,
+              is_recurring: true,
+              is_recurring_child: false,
+            });
             setShowAdd(false);
             loadTemplates();
           }}
