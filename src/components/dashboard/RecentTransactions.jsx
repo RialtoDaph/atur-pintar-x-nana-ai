@@ -49,7 +49,7 @@ export default function RecentTransactions({ transactions, loading }) {
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-[#1B2559] truncate">{tx.note || (tx.category ? tx.category.charAt(0).toUpperCase() + tx.category.slice(1) : "Transaksi")}</p>
               <p className="text-[10px] text-[#8FA4C8] flex items-center gap-1">
-                {(tx.is_recurring || tx.is_recurring_child) && <RefreshCw className="w-2.5 h-2.5 text-[#FF6A00]" />}
+                {tx.is_recurring && <RefreshCw className="w-2.5 h-2.5 text-[#FF6A00]" />}
                 {new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric" })}
               </p>
             </div>
