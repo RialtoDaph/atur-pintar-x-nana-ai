@@ -46,7 +46,10 @@ export default function RecentTransactions({ transactions, loading }) {
               {cat.emoji}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-[#1B2559] truncate">{tx.note || (tx.category ? tx.category.charAt(0).toUpperCase() + tx.category.slice(1) : "Transaksi")}</p>
+              <p className="text-xs font-medium text-[#1B2559] truncate flex items-center gap-1">
+                {tx.is_recurring_child && <span title="Berulang" className="text-[#8FA4C8]">🔁</span>}
+                {tx.note || (tx.category ? tx.category.charAt(0).toUpperCase() + tx.category.slice(1) : "Transaksi")}
+              </p>
               <p className="text-[10px] text-[#8FA4C8]">{new Date(tx.date).toLocaleDateString("id-ID", { month: "short", day: "numeric" })}</p>
             </div>
             <span
