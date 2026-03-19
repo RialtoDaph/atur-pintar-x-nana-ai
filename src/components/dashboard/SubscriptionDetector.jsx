@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import EditContractModal from "./EditContractModal";
 
-export default function SubscriptionDetector({ user, onTransactionCreated }) {
+export default function SubscriptionDetector({ user }) {
   const { formatCurrency } = useAppSettings();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ export default function SubscriptionDetector({ user, onTransactionCreated }) {
   }
 
   async function handleUpdate(data) {
-    await base44.entities.Transaction.update(editingId, { ...data, is_recurring: true, category: "subscriptions" });
+    await base44.entities.Transaction.update(editingId, data);
     setEditingId(null);
     loadTemplates();
   }
@@ -45,7 +45,6 @@ export default function SubscriptionDetector({ user, onTransactionCreated }) {
     });
     setAddingNew(false);
     loadTemplates();
-    onTransactionCreated?.();
   }
 
   const totalMonthly = templates.reduce((s, t) => {
