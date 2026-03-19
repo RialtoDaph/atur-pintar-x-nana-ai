@@ -10,6 +10,7 @@ export default function SubscriptionDetector({ user }) {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [addingNew, setAddingNew] = useState(false);
 
   useEffect(() => {
     if (!user?.email) return;
