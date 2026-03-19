@@ -184,6 +184,16 @@ export default function Dashboard() {
           </Suspense>
         )}
 
+        {/* Kontrak & Tagihan */}
+        {widgets.subscriptionDetector && (
+          <ContractPaymentsCard user={user} />
+        )}
+
+        {/* Langganan */}
+        {widgets.subscriptionDetector && (
+          <SubscriptionDetector user={user} />
+        )}
+
         {/* Portfolio Summary */}
         <Suspense fallback={<LazyFallback />}>
           <PortfolioSummary user={user} />
