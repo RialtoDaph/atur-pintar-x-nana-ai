@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import EditContractModal from "./EditContractModal";
 
-export default function SubscriptionDetector({ user }) {
+export default function SubscriptionDetector({ user, onTransactionCreated }) {
   const { formatCurrency } = useAppSettings();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
