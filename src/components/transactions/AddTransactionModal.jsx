@@ -24,8 +24,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const [saving, setSaving] = useState(false);
   const [customCats, setCustomCats] = useState([]);
   const [showManage, setShowManage] = useState(false);
-  const [recurring, setRecurring] = useState(initialValues.recurring || false);
-  const [recurringInterval, setRecurringInterval] = useState(initialValues.recurringInterval || "monthly");
+
   const [scanning, setScanning] = useState(false);
   const [receiptData, setReceiptData] = useState(null); // extracted receipt
   const [showSplitBill, setShowSplitBill] = useState(false);
@@ -131,9 +130,6 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
         ...form,
         type: tab,
         amount,
-        is_recurring: recurring,
-        recurring_interval: recurring ? recurringInterval : undefined,
-        recurring_last_generated: recurring ? form.date : undefined,
         goal_id: form.goal_id || undefined,
       });
     } catch (error) {
@@ -275,10 +271,6 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
           <TransactionFormInputs 
             form={form} 
             setForm={setForm}
-            recurring={recurring}
-            setRecurring={setRecurring}
-            recurringInterval={recurringInterval}
-            setRecurringInterval={setRecurringInterval}
             t={t}
           />
 
