@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Plus, ChevronRight } from "lucide-react";
 import AddGoalModal from "@/components/goals/AddGoalModal";
+import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import OnboardingQuestionnaire from "@/components/onboarding/OnboardingQuestionnaire";
 import NanaIntroModal from "@/components/onboarding/NanaIntroModal";
