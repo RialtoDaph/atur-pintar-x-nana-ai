@@ -38,7 +38,6 @@ export default function Dashboard() {
   const { t } = useAppSettings();
   const queryClient = useQueryClient();
   const [showAddGoal, setShowAddGoal] = useState(false);
-  const [showAddTx, setShowAddTx] = useState(false);
   const [widgets, setWidgets] = useState(getWidgets());
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showNanaIntro, setShowNanaIntro] = useState(false);
