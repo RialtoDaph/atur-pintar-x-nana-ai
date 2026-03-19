@@ -224,6 +224,18 @@ export default function Dashboard() {
         />
       )}
 
+      {showAddTransaction && (
+        <AddTransactionModal
+          goals={goals}
+          onClose={() => setShowAddTransaction(false)}
+          onSave={async (data) => {
+            await base44.entities.Transaction.create(data);
+            setShowAddTransaction(false);
+            loadData();
+          }}
+        />
+      )}
+
       {showOnboarding && (
         <OnboardingQuestionnaire onClose={async () => {
           setShowOnboarding(false);
