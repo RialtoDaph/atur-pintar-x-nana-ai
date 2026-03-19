@@ -3,11 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { Plus, Trash2, CreditCard, CheckCircle, Pencil, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 import AddDebtModal from "@/components/debts/AddDebtModal.jsx";
-import AddTransactionModal from "@/components/transactions/AddTransactionModal";
+import PayDebtModal from "@/components/debts/PayDebtModal";
 import IOUSection from "@/components/splitbill/IOUSection";
 import { useAppSettings } from "@/components/utils/useAppSettings";
-import { parseRupiah } from "@/components/utils/parseRupiah";
 import PullToRefresh from "@/components/utils/PullToRefresh";
+import { toast } from "sonner";
 
 const FREE_DEBTS_LIMIT = 2;
 
