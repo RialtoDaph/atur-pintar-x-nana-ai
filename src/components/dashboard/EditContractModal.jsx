@@ -79,13 +79,17 @@ export default function EditContractModal({ contract, onClose, onSave }) {
 
           <div>
             <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Nominal</label>
-            <input
-              type="number"
-              value={data.amount || 0}
-              onChange={(e) => setData({ ...data, amount: parseFloat(e.target.value) || 0 })} className="bg-white text-black px-3 py-2 text-sm rounded-lg w-full border border-[#E2E8F0] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
-
-              placeholder="0" />
-
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#8FA4C8] font-medium">Rp</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={formatAmount(data.amount)}
+                onChange={handleAmountChange}
+                className="bg-white text-black pl-9 pr-3 py-2 text-sm rounded-lg w-full border border-[#E2E8F0] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
+                placeholder="0"
+              />
+            </div>
           </div>
 
           <div>
