@@ -113,16 +113,11 @@ export default function SubscriptionDetector({ user }) {
         )}
       </div>
 
-      {showAdd && (
-        <AddTransactionModal
-          goals={[]}
-          initialValues={{ category: "subscriptions", recurring: true, recurringInterval: "monthly" }}
-          onClose={() => setShowAdd(false)}
-          onSave={async (data) => {
-            await base44.entities.Transaction.create(data);
-            setShowAdd(false);
-            loadTemplates();
-          }}
+      {addingNew && (
+        <EditContractModal
+          contract={{ type: "expense", recurring_interval: "monthly", category: "subscriptions", is_recurring: true, date: new Date().toISOString().split("T")[0] }}
+          onClose={() => setAddingNew(false)}
+          onSave={handleCreate}
         />
       )}
 
