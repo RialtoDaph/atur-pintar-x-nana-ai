@@ -16,8 +16,6 @@ import GoalsMiniList from "@/components/dashboard/GoalsMiniList";
 import SmartAlertsPanel from "@/components/dashboard/SmartAlertsPanel";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
-import ContractPaymentsCard from "@/components/dashboard/ContractPaymentsCard";
-import SubscriptionDetector from "@/components/dashboard/SubscriptionDetector";
 
 // Lazy load heavy components
 const SpendingChart = lazy(() => import("@/components/dashboard/SpendingChart"));
@@ -182,16 +180,6 @@ export default function Dashboard() {
           <Suspense fallback={<LazyFallback />}>
             <SpendingChart transactions={thisMonthTx} loading={loading} />
           </Suspense>
-        )}
-
-        {/* Kontrak & Tagihan */}
-        {widgets.subscriptionDetector && (
-          <ContractPaymentsCard user={user} />
-        )}
-
-        {/* Langganan */}
-        {widgets.subscriptionDetector && (
-          <SubscriptionDetector user={user} />
         )}
 
         {/* Portfolio Summary */}

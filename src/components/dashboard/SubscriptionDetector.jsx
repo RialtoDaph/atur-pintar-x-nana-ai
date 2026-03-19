@@ -19,8 +19,8 @@ export default function SubscriptionDetector({ user }) {
 
   async function loadTemplates() {
     setLoading(true);
-    const all = await base44.entities.Transaction.filter({ created_by: user.email });
-    setTemplates(all.filter(t => t.is_recurring === true && t.is_recurring_child !== true && t.category === "subscriptions"));
+    const all = await base44.entities.Transaction.filter({ is_recurring: true, created_by: user.email });
+    setTemplates(all.filter(t => !t.is_recurring_child && t.category === "subscriptions"));
     setLoading(false);
   }
 
