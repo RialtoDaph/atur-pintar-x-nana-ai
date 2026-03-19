@@ -7,9 +7,22 @@ import { parseRupiah } from "@/components/utils/parseRupiah";
 const INTERVALS = ["daily", "weekly", "monthly", "yearly"];
 
 export default function EditContractModal({ contract, onClose, onSave }) {
-  const { t } = useAppSettings();
+  const { t, settings } = useAppSettings();
   const [data, setData] = useState(contract || { type: contract?.type || "expense" });
   const [saving, setSaving] = useState(false);
+
+  const sep = settings?.thousand_separator || ".";
+
+  function formatAmount(val) {
+    if (!val && val !== 0) return "";
+    const num = String(Math.round(Number(val)));
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+  }
+
+  function handleAmountChange(e) {
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    setData({ ...data, amount: raw ? parseFloat(raw) : 0 });
+  }
 
   async function handleSave() {
     setSaving(true);
