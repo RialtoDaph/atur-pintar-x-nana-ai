@@ -236,6 +236,20 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
             </div>
           )}
 
+          {/* Scanning overlay */}
+          {scanning && (
+            <div className="mb-5 bg-[#FF6A00]/5 border border-[#FF6A00]/20 rounded-2xl p-6 flex flex-col items-center gap-3">
+              <div className="relative">
+                <Camera className="w-10 h-10 text-[#FF6A00]/30" />
+                <Loader2 className="w-5 h-5 text-[#FF6A00] animate-spin absolute -top-1 -right-1" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-bold text-[#1A1A1A]">AI Memindai Struk...</p>
+                <p className="text-xs text-[#8FA4C8] mt-0.5">Mengekstrak merchant, total, tanggal & kategori</p>
+              </div>
+            </div>
+          )}
+
           {/* Type tabs */}
           <div className="flex bg-[#F2F4F7] rounded-xl p-1 mb-5">
             {["expense", "income"].map((tabKey) => (
