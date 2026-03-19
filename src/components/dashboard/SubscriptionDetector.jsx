@@ -37,6 +37,16 @@ export default function SubscriptionDetector({ user }) {
     loadTemplates();
   }
 
+  async function handleCreate(data) {
+    await base44.entities.Transaction.create({
+      ...data,
+      category: "subscriptions",
+      is_recurring: true,
+    });
+    setAddingNew(false);
+    loadTemplates();
+  }
+
   const totalMonthly = templates.reduce((s, t) => {
     if (t.recurring_interval === "yearly") return s + t.amount / 12;
     if (t.recurring_interval === "weekly") return s + t.amount * 4.33;
