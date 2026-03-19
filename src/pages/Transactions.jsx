@@ -267,7 +267,7 @@ export default function Transactions() {
           {user && (
             <>
               <ContractPaymentsCard user={user} />
-              <SubscriptionDetector user={user} />
+              <SubscriptionDetector user={user} onTransactionCreated={loadData} />
             </>
           )}
 
