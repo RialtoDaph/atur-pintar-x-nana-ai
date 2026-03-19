@@ -45,6 +45,7 @@ export default function SubscriptionDetector({ user, onTransactionCreated }) {
     });
     setAddingNew(false);
     loadTemplates();
+    onTransactionCreated?.();
   }
 
   const totalMonthly = templates.reduce((s, t) => {
