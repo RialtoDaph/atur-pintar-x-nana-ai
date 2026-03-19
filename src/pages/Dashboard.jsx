@@ -120,6 +120,12 @@ export default function Dashboard() {
               <p className="text-[#8FA4C8] text-xs font-medium">{t('dashboard_greeting')}</p>
               <h1 className="text-white text-xl font-bold mt-0.5">{t('dashboard_title')}</h1>
             </div>
+            <button
+              onClick={() => setShowAddTransaction(true)}
+              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors tap-highlight-fix"
+            >
+              <Plus className="w-5 h-5 text-white" />
+            </button>
           </div>
 
           {/* Balance Card */}
