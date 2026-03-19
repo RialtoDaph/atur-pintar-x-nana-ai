@@ -32,7 +32,7 @@ export default function SubscriptionDetector({ user }) {
   }
 
   async function handleUpdate(data) {
-    await base44.entities.Transaction.update(editingId, data);
+    await base44.entities.Transaction.update(editingId, { ...data, is_recurring: true, category: "subscriptions" });
     setEditingId(null);
     loadTemplates();
   }
