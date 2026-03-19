@@ -1,7 +1,7 @@
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import DateInput from "@/components/utils/DateInput";
 
-export default function TransactionFormInputs({ form, setForm, recurring, setRecurring, recurringInterval, setRecurringInterval, t }) {
+export default function TransactionFormInputs({ form, setForm, t }) {
   const { settings } = useAppSettings();
 
   const formatCurrencyInput = (val) => {
@@ -55,32 +55,7 @@ export default function TransactionFormInputs({ form, setForm, recurring, setRec
         />
       </div>
 
-      {/* Recurring */}
-      <div className="mb-5">
-        <button
-          type="button"
-          onClick={() => setRecurring(r => !r)}
-          className={`flex items-center gap-2 w-full px-4 py-3 rounded-xl border transition-all ${
-            recurring ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"
-          }`}
-        >
-          <span className="text-base">🔄</span>
-          <span className="text-sm font-semibold text-[#1A1A1A] flex-1 text-left">{t('recurring_transaction')}</span>
-          <div className={`w-4 h-4 rounded-full border-2 ${recurring ? "bg-[#FF6A00] border-[#FF6A00]" : "border-[#CBD5E0]"}`} />
-        </button>
-        {recurring && (
-          <div className="flex gap-2 mt-2">
-            {["daily","weekly","monthly","yearly"].map(interval => (
-              <button key={interval} onClick={() => setRecurringInterval(interval)}
-                className={`flex-1 py-2 rounded-xl text-xs font-semibold border capitalize transition-all ${
-                  recurringInterval === interval ? "bg-[#0A0A0A] text-white border-[#0A0A0A]" : "text-[#4A5568] border-[#E2E8F0] bg-white hover:border-[#CBD5E0]"
-                }`}>
-                {t(interval)}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+
     </div>
   );
 }
