@@ -306,6 +306,9 @@ function LayoutInner({ children, currentPageName }) {
         </button>
       </div>
 
+      {/* Reminder Notification Popup */}
+      <ReminderNotificationPopup user={user} />
+
       {/* Nana Floating Chat */}
       {currentPageName !== "Nana" && <NanaFloatingChat />}
 
