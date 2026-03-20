@@ -9,37 +9,33 @@ Deno.serve(async (req) => {
 
     const { accessToken } = await base44.asServiceRole.connectors.getConnection("notion");
 
-    // Fetch database schema to check property names
-    if (payload._check_schema) {
-      const dbRes = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}`, {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Notion-Version": "2022-06-28"
-        }
-      });
-      const dbData = await dbRes.json();
-      return Response.json({ properties: Object.keys(dbData.properties || {}), raw: dbData.properties });
-    }
-
     const { rating, message, userName, userEmail } = payload;
+
+    // Map rating to priority
+    let priority = "MEDIUM";
+    if (rating >= 4) priority = "LOW";
+    else if (rating <= 2) priority = "HIGH";
+
+    const userLabel = userName ? `${userName}${userEmail ? ` (${userEmail})` : ""}` : (userEmail || "Anonymous");
+    const feedbackContent = `${rating ? `⭐ Rating: ${rating}/5\n\n` : ""}${message}`;
 
     const body = {
       parent: { database_id: NOTION_DATABASE_ID },
       properties: {
-        Name: {
-          title: [{ text: { content: userName || "Anonymous" } }]
+        User: {
+          title: [{ text: { content: userLabel } }]
         },
-        Email: {
-          email: userEmail || null
+        Feedback: {
+          rich_text: [{ text: { content: feedbackContent } }]
         },
-        Rating: {
-          number: rating || null
+        Status: {
+          select: { name: "New" }
         },
-        Pesan: {
-          rich_text: [{ text: { content: message } }]
+        Priority: {
+          select: { name: priority }
         },
-        Tanggal: {
-          date: { start: new Date().toISOString().split("T")[0] }
+        Type: {
+          select: { name: "Feature request" }
         }
       }
     };
