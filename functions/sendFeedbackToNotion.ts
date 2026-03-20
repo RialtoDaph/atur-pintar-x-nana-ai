@@ -9,18 +9,6 @@ Deno.serve(async (req) => {
 
     const { accessToken } = await base44.asServiceRole.connectors.getConnection("notion");
 
-    // Temporary schema check
-    if (payload._check_schema) {
-      const dbRes = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}`, {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Notion-Version": "2022-06-28"
-        }
-      });
-      const dbData = await dbRes.json();
-      return Response.json({ properties: Object.keys(dbData.properties || {}), types: Object.fromEntries(Object.entries(dbData.properties || {}).map(([k,v]) => [k, v.type])) });
-    }
-
     const { rating, message, userName, userEmail } = payload;
 
     // Map rating to priority
