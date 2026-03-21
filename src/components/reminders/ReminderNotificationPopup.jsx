@@ -54,6 +54,7 @@ export default function ReminderNotificationPopup({ user }) {
   const [upcoming, setUpcoming] = useState([]);
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState([]);
+  const [nanaMessage, setNanaMessage] = useState("");
 
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
