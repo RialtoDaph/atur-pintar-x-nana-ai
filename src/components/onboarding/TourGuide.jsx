@@ -63,8 +63,7 @@ const TOUR_STEPS = [
   },
   {
     id: "tips-nav-link",
-    page: "Budget",
-    noNavigate: true,
+    page: "Menu",
     title: "Pusat Bantuan 💡",
     desc: "Ada fitur yang belum dipahami? Cari jawabannya di sini. Semua panduan tersedia lengkap!",
     placement: "bottom",
