@@ -372,13 +372,13 @@ export default function OnboardingQuestionnaire({ onClose }) {
                   </select>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm">Rp</span>
-                    <input type="number" className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                placeholder="Sisa utang" value={debtRemaining} onChange={(e) => setDebtRemaining(e.target.value)} />
+                    <input type="text" inputMode="numeric" className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                placeholder="Sisa utang" value={debtRemaining} onChange={(e) => setDebtRemaining(formatNumber(e.target.value))} />
                   </div>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm">Rp</span>
-                    <input type="number" className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                placeholder="Cicilan / bulan (opsional)" value={debtMonthly} onChange={(e) => setDebtMonthly(e.target.value)} />
+                    <input type="text" inputMode="numeric" className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                placeholder="Cicilan / bulan (opsional)" value={debtMonthly} onChange={(e) => setDebtMonthly(formatNumber(e.target.value))} />
                   </div>
                 </div>
             }
