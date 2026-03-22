@@ -52,7 +52,7 @@ export default function ContractPaymentsCard({ user }) {
       <div data-tour="contract-payments-card" className="bg-white rounded-2xl shadow-sm p-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h2 className="font-bold text-[#0A0A0A] text-sm">🏠 Gaji & Transaksi Berulang</h2>
+            <h2 className="font-bold text-[#0A0A0A] text-sm">🏠 Gaji & Transaksi Rutin</h2>
             {templates.length > 0 &&
             <p className="text-xs text-[#8FA4C8] mt-0.5">{formatCurrency(totalMonthly)}/bulan</p>
             }
