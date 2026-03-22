@@ -151,7 +151,7 @@ export default function TourGuide({ onComplete }) {
           setTimeout(() => {
             const r = measureElement(currentStep.id);
             setTargetRect(r);
-          }, 500);
+          }, 800);
         } else {
           setTargetRect(rect);
         }
