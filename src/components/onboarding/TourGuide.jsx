@@ -45,7 +45,7 @@ const TOUR_STEPS = [
     page: "Transactions",
     title: "Riwayat Transaksi 📋",
     desc: "Ketuk judul ini untuk buka riwayat lengkap semua transaksi.",
-    placement: "bottom",
+    placement: "top",
   },
   {
     id: "add-budget-btn",
@@ -72,7 +72,7 @@ const TOUR_STEPS = [
 ];
 
 const TOOLTIP_WIDTH = 280;
-const TOOLTIP_HEIGHT = 150;
+const TOOLTIP_HEIGHT = 160;
 
 function getTooltipStyle(rect, placement) {
   if (!rect) return {};
@@ -108,6 +108,8 @@ function measureElement(id) {
   const el = document.querySelector(`[data-tour="${id}"]`);
   if (!el) return null;
   const rect = el.getBoundingClientRect();
+  // Only return rect if element is actually visible in viewport
+  if (rect.width === 0 && rect.height === 0) return null;
   return { top: rect.top, left: rect.left, width: rect.width, height: rect.height, bottom: rect.bottom, right: rect.right };
 }
 
@@ -119,11 +121,12 @@ export default function TourGuide({ onComplete }) {
   const observerRef = useRef(null);
   const rafRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
+  const retryRef = useRef(null);
+  const retryCountRef = useRef(0);
 
   const currentStep = TOUR_STEPS[stepIndex];
   const isLast = stepIndex === TOUR_STEPS.length - 1;
 
-  // Measure using rAF for accuracy
   const measure = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
@@ -132,23 +135,37 @@ export default function TourGuide({ onComplete }) {
     });
   }, [currentStep.id]);
 
-  // Scroll to element, wait for scroll to finish, then measure
-  const scrollAndMeasure = useCallback(() => {
-    const el = document.querySelector(`[data-tour="${currentStep.id}"]`);
-    if (!el) {
-      setTargetRect(null);
-      return;
-    }
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  // Retry finding element until it appears in DOM (for lazy-loaded components)
+  const waitAndMeasure = useCallback(() => {
+    retryCountRef.current = 0;
+    if (retryRef.current) clearInterval(retryRef.current);
 
-    // Wait for smooth scroll to finish (~500ms), then measure
-    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    scrollTimeoutRef.current = setTimeout(measure, 500);
-  }, [currentStep.id, measure]);
+    retryRef.current = setInterval(() => {
+      retryCountRef.current++;
+      const rect = measureElement(currentStep.id);
+      if (rect) {
+        clearInterval(retryRef.current);
+        // Scroll element into view then measure
+        const el = document.querySelector(`[data-tour="${currentStep.id}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => {
+            const r = measureElement(currentStep.id);
+            setTargetRect(r);
+          }, 500);
+        } else {
+          setTargetRect(rect);
+        }
+      } else if (retryCountRef.current > 20) {
+        // Give up after ~2 seconds, show tooltip without highlight
+        clearInterval(retryRef.current);
+        setTargetRect(null);
+      }
+    }, 100);
+  }, [currentStep.id]);
 
-  // Attach ResizeObserver + scroll listener to keep tooltip in sync
+  // Attach ResizeObserver + scroll listener
   useEffect(() => {
-    // Disconnect previous observer
     if (observerRef.current) observerRef.current.disconnect();
 
     const el = document.querySelector(`[data-tour="${currentStep.id}"]`);
@@ -157,13 +174,12 @@ export default function TourGuide({ onComplete }) {
     observerRef.current = new ResizeObserver(measure);
     observerRef.current.observe(el);
 
-    // Also re-measure on any scroll in page
     window.addEventListener("scroll", measure, { passive: true });
     return () => {
       observerRef.current?.disconnect();
       window.removeEventListener("scroll", measure);
     };
-  }, [currentStep.id, measure]);
+  }, [currentStep.id, measure, targetRect]);
 
   // Navigate to correct page when step changes
   useEffect(() => {
@@ -174,10 +190,14 @@ export default function TourGuide({ onComplete }) {
     }
   }, [stepIndex]);
 
-  // Scroll & measure after navigation/render settles
+  // Wait for element after navigation/render
   useEffect(() => {
-    const timer = setTimeout(scrollAndMeasure, 300);
-    return () => clearTimeout(timer);
+    setTargetRect(null);
+    const timer = setTimeout(waitAndMeasure, 400);
+    return () => {
+      clearTimeout(timer);
+      if (retryRef.current) clearInterval(retryRef.current);
+    };
   }, [stepIndex, location.pathname]);
 
   // Cleanup on unmount
@@ -185,6 +205,7 @@ export default function TourGuide({ onComplete }) {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      if (retryRef.current) clearInterval(retryRef.current);
       observerRef.current?.disconnect();
     };
   }, []);
@@ -211,6 +232,14 @@ export default function TourGuide({ onComplete }) {
         height: targetRect.height + 12,
       }
     : null;
+
+  // Fallback position when element not found
+  const fallbackStyle = !targetRect ? {
+    bottom: 100,
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: TOOLTIP_WIDTH,
+  } : {};
 
   return createPortal(
     <div className="fixed inset-0 z-[9999]" style={{ pointerEvents: "none" }}>
@@ -258,7 +287,7 @@ export default function TourGuide({ onComplete }) {
       {/* Tooltip */}
       <div
         className="absolute bg-[#0A0A0A] border border-[#FF6A00]/40 rounded-2xl p-4 shadow-2xl"
-        style={{ ...tooltipStyle, pointerEvents: "all", zIndex: 10000 }}
+        style={{ ...(targetRect ? tooltipStyle : fallbackStyle), pointerEvents: "all", zIndex: 10000 }}
         onClick={e => e.stopPropagation()}
       >
         {/* Progress dots */}
