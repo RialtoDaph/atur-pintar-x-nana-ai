@@ -35,6 +35,14 @@ export default function OnboardingQuestionnaire({ onClose }) {
   const [monthlyIncome, setMonthlyIncome] = useState("");
   const [monthlyExpense, setMonthlyExpense] = useState("");
 
+  function formatNumber(val) {
+    const raw = val.replace(/\D/g, "");
+    return raw ? parseInt(raw, 10).toLocaleString("id-ID") : "";
+  }
+  function parseNumber(val) {
+    return val.replace(/\./g, "").replace(/,/g, "");
+  }
+
   const [hasGoal, setHasGoal] = useState(null);
   const [goalName, setGoalName] = useState("");
   const [goalTarget, setGoalTarget] = useState("");
