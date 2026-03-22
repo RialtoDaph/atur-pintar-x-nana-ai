@@ -451,8 +451,17 @@ export default function OnboardingQuestionnaire({ onClose }) {
                     <input type="text" inputMode="numeric" className="w-full border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
                 placeholder="Nominal (opsional)" value={reminderAmount} onChange={(e) => setReminderAmount(formatNumber(e.target.value))} />
                   </div>
-                  <input type="number" min="1" max="31" className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-              placeholder="Tanggal jatuh tempo (1-31)" value={reminderDay} onChange={(e) => setReminderDay(e.target.value)} />
+                  <div className="grid grid-cols-4 gap-2">
+                    {[1,5,10,15,20,25,28,31].map((d) => (
+                      <button key={d} type="button" onClick={() => setReminderDay(String(d))}
+                        className={`py-2 rounded-xl border text-sm font-semibold transition-all ${reminderDay === String(d) ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]" : "border-[#E2E8F0] text-[#4A5568] hover:border-[#CBD5E0]"}`}>
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                  <input type="number" min="1" max="31" inputMode="numeric"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                    placeholder="Atau ketik tanggal lain (1-31)" value={reminderDay} onChange={(e) => setReminderDay(e.target.value)} />
                 </div>
             }
               <NavButtons onPrev={prev} onNext={next} canNext={hasReminder === false || hasReminder && reminderTitle && reminderDay} />
