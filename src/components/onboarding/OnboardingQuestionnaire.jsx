@@ -102,7 +102,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
     if (hasGoal && goalName && goalTarget) {
       promises.push(base44.entities.SavingsGoal.create({
         name: goalName,
-        target_amount: parseFloat(goalTarget),
+        target_amount: parseFloat(parseNumber(goalTarget)),
         current_amount: 0,
         deadline: goalDeadline || undefined,
         icon: "🎯",
