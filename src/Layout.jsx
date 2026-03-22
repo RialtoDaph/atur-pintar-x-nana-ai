@@ -179,6 +179,7 @@ function LayoutInner({ children, currentPageName }) {
               <Link
                 key={item.page}
                 to={createPageUrl(item.page)}
+                data-tour={item.tourId || undefined}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                 active ?
                 "bg-[#FF6A00] text-white shadow-sm" :
