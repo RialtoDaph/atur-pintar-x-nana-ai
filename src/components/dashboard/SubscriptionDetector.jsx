@@ -54,7 +54,7 @@ export default function SubscriptionDetector({ user }) {
     return s + t.amount;
   }, 0);
 
-  if (loading) return <div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />;
+  if (loading) return <div data-tour="subscription-detector-card" className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />;
 
   return (
     <>
