@@ -6,18 +6,18 @@ import { createPageUrl } from "@/utils";
 
 const TOUR_STEPS = [
   {
-    id: "nana-chat",
-    page: "Dashboard",
-    title: "Tanya Nana AI 🤖",
-    desc: "Punya pertanyaan soal keuangan? Ketuk Nana kapan saja untuk dapat saran pintar.",
-    placement: "top-left",
-  },
-  {
     id: "balance-card",
     page: "Dashboard",
     title: "Ringkasan Keuangan 💰",
     desc: "Lihat saldo bersih, pemasukan, dan pengeluaran bulan ini dalam satu tampilan.",
     placement: "bottom",
+  },
+  {
+    id: "nana-chat",
+    page: "Dashboard",
+    title: "Tanya Nana AI 🤖",
+    desc: "Punya pertanyaan soal keuangan? Ketuk Nana kapan saja untuk dapat saran pintar.",
+    placement: "top-left",
   },
   {
     id: "add-transaction-btn",
