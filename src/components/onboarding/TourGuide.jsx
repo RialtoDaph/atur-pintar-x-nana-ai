@@ -128,6 +128,7 @@ export default function TourGuide({ onComplete }) {
 
   // Navigate to page if needed
   useEffect(() => {
+    if (currentStep.noNavigate) return;
     const targetPath = `/${currentStep.page}`;
     if (!location.pathname.startsWith(targetPath)) {
       navigate(createPageUrl(currentStep.page));
