@@ -138,7 +138,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
 
     // Save reminder AND create a recurring transaction for it
     if (hasReminder && reminderTitle && reminderDay) {
-      const reminderAmt = reminderAmount ? parseFloat(reminderAmount) : undefined;
+      const reminderAmt = reminderAmount ? parseFloat(parseNumber(reminderAmount)) : undefined;
       promises.push(base44.entities.Reminder.create({
         title: reminderTitle,
         type: "tagihan",
