@@ -68,9 +68,12 @@ export default function TransactionCategories({ tab, form, setForm, onShowSubCat
   };
 
   const defaultCats = DEFAULT_CATEGORIES[tab] || [];
+  const filteredGlobal = globalCats.filter(g => g.type === tab || g.type === "both");
   const filteredCustom = customCats.filter(c => c.type === tab || c.type === "both");
+  // Priority: DEFAULT < GlobalCategory < CustomCategory (custom always wins)
   const allCats = [
     ...defaultCats.map(c => ({ ...c, label: t(c.i18nKey) })),
+    ...filteredGlobal.map(g => ({ key: `global_${g.id}`, label: g.name, emoji: g.emoji, color: g.color || "#95A5A6" })),
     ...filteredCustom.map(c => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji, color: c.color || "#888", parent_category_key: c.parent_category_key })),
   ];
   
