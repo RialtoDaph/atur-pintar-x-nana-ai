@@ -49,6 +49,7 @@ export default function Menu() {
                 <Link
                   key={item.page}
                   to={createPageUrl(item.page)}
+                  data-tour={item.page === "Tips" ? "tips-nav-link" : undefined}
                   className={`flex items-center gap-4 px-5 py-4 hover:bg-[#F8FAFC] transition-colors ${
                     idx < group.items.length - 1 ? "border-b border-[#F2F4F7]" : ""
                   }`}
