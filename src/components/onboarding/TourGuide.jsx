@@ -6,6 +6,13 @@ import { createPageUrl } from "@/utils";
 
 const TOUR_STEPS = [
   {
+    id: "add-transaction-btn",
+    page: "Transactions",
+    title: "Tambah Transaksi ➕",
+    desc: "Ketuk tombol + untuk catat pemasukan atau pengeluaran baru.",
+    placement: "bottom-left",
+  },
+  {
     id: "balance-card",
     page: "Dashboard",
     title: "Ringkasan Keuangan 💰",
@@ -18,13 +25,6 @@ const TOUR_STEPS = [
     title: "Tanya Nana AI 🤖",
     desc: "Punya pertanyaan soal keuangan? Ketuk Nana kapan saja untuk dapat saran pintar.",
     placement: "top-left",
-  },
-  {
-    id: "add-transaction-btn",
-    page: "Transactions",
-    title: "Tambah Transaksi ➕",
-    desc: "Ketuk tombol + untuk catat pemasukan atau pengeluaran baru.",
-    placement: "bottom-left",
   },
   {
     id: "contract-payments-card",
