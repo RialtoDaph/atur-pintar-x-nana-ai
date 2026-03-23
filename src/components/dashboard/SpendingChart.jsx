@@ -73,7 +73,7 @@ export default function SpendingChart({ transactions, loading }) {
         </ResponsiveContainer>
       </div>
       <div className="mt-3 space-y-2">
-        {data.slice(0, 5).map((d) => (
+        {data.map((d) => (
           <div key={d.key} className="flex items-center gap-2 min-w-0">
             <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
             <span className="text-xs text-[#4A5568] flex-1 min-w-0 truncate">{d.emoji} {d.label}</span>
