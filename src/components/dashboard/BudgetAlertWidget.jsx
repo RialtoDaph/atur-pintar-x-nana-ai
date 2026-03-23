@@ -112,7 +112,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-                <span className="absolute inset-0 flex items-center justify-center text-base">
+                <span className={`absolute inset-0 flex items-center justify-center text-base font-bold ${isOver ? "text-[#FF6A00]" : ""}`}>
                   {isOver ? "!" : cat.emoji}
                 </span>
               </div>
