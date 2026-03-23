@@ -32,7 +32,10 @@ export default function SpendingChart({ transactions, loading }) {
 
   const categoryConfig = { ...DEFAULT_CONFIG };
   customCats.forEach(c => {
-    categoryConfig[`custom_${c.id}`] = { label: c.name, color: c.color || "#888", emoji: c.emoji };
+    const entry = { label: c.name, color: c.color || "#95A5A6", emoji: c.emoji || "📦" };
+    categoryConfig[`custom_${c.id}`] = entry;
+    // also map by plain id in case transactions stored it without prefix
+    categoryConfig[c.id] = entry;
   });
 
   const expenses = transactions.filter(t => t.type === "expense");
