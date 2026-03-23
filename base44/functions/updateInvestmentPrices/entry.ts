@@ -1,223 +1,90 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
-
-const FINNHUB_API_KEY = Deno.env.get("FINNHUB_API_KEY");
-
-// Fetch gold price in IDR
-async function fetchGoldPriceIDR(usdToIdr) {
-  try {
-    const res = await fetch(
-      `https://api.metals.live/v1/spot/gold`,
-      { signal: AbortSignal.timeout(5000) }
-    );
-    if (!res.ok) throw new Error('API error');
-    const data = await res.json();
-    // metals.live returns price per troy oz in USD
-    if (data?.price) {
-      const pricePerGramIDR = (data.price / 31.1035) * usdToIdr;
-      return { priceIDR: pricePerGramIDR, dailyChangePct: 0 };
-    }
-    return null;
-  } catch {
-    // Fallback: estimate based on historical rate (~650,000 IDR per gram)
-    return { priceIDR: 650000, dailyChangePct: 0 };
-  }
-}
-
-// Common crypto name → CoinGecko ID mapping
-const CRYPTO_COINGECKO_MAP = {
-  "bitcoin": "bitcoin", "btc": "bitcoin",
-  "ethereum": "ethereum", "eth": "ethereum",
-  "binance coin": "binancecoin", "bnb": "binancecoin",
-  "solana": "solana", "sol": "solana",
-  "ripple": "ripple", "xrp": "ripple",
-  "cardano": "cardano", "ada": "cardano",
-  "dogecoin": "dogecoin", "doge": "dogecoin",
-  "polygon": "matic-network", "matic": "matic-network",
-  "chainlink": "chainlink", "link": "chainlink",
-  "avalanche": "avalanche-2", "avax": "avalanche-2",
-  "litecoin": "litecoin", "ltc": "litecoin",
-  "polkadot": "polkadot", "dot": "polkadot",
-  "shiba inu": "shiba-inu", "shib": "shiba-inu",
-  "tron": "tron", "trx": "tron",
-  "tether": "tether", "usdt": "tether",
-  "usd coin": "usd-coin", "usdc": "usd-coin",
-};
-
-// Get current USD → IDR exchange rate
-async function getUsdToIdr() {
-  try {
-    const res = await fetch("https://api.frankfurter.app/latest?from=USD&to=IDR", { signal: AbortSignal.timeout(5000) });
-    const data = await res.json();
-    return data?.rates?.IDR || 16000; // fallback rate
-  } catch {
-    return 16000; // fallback
-  }
-}
-
-// Fetch crypto price in IDR via CoinGecko
-async function fetchCryptoPriceIDR(name) {
-  const lower = name.toLowerCase().trim();
-  const coinId = CRYPTO_COINGECKO_MAP[lower] || lower;
-  try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(coinId)}&vs_currencies=idr&include_24hr_change=true`,
-      { signal: AbortSignal.timeout(5000) }
-    );
-    const data = await res.json();
-    if (data[coinId]?.idr) {
-      return {
-        priceIDR: data[coinId].idr,
-        dailyChangePct: data[coinId].idr_24h_change || 0,
-      };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-// Use Finnhub symbol search to find ticker
-async function searchStockSymbol(name) {
-  try {
-    const res = await fetch(
-      `https://finnhub.io/api/v1/search?q=${encodeURIComponent(name)}&token=${FINNHUB_API_KEY}`,
-      { signal: AbortSignal.timeout(5000) }
-    );
-    const data = await res.json();
-    if (data.result && data.result.length > 0) {
-      const exact = data.result.find(r =>
-        r.symbol?.toUpperCase() === name.toUpperCase() ||
-        r.displaySymbol?.toUpperCase() === name.toUpperCase()
-      );
-      return (exact || data.result[0]).symbol;
-    }
-  } catch {
-    // ignore
-  }
-  return null;
-}
-
-async function fetchFinnhubQuote(symbol) {
-  try {
-    const res = await fetch(
-      `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${FINNHUB_API_KEY}`,
-      { signal: AbortSignal.timeout(5000) }
-    );
-    const data = await res.json();
-    if (data.c && data.c > 0) {
-      return { priceUSD: data.c, previousClose: data.pc || data.c };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-// Fetch stock price, return in IDR
-async function fetchStockPriceIDR(name, usdToIdr) {
-  const trimmed = name.trim();
-  const looksLikeTicker = trimmed.length <= 6 && trimmed === trimmed.toUpperCase();
-  let symbol = looksLikeTicker ? trimmed : await searchStockSymbol(trimmed);
-  if (!symbol) return null;
-
-  // Indonesian stock (.JK suffix) — price is already in IDR
-  const isIndonesian = symbol.endsWith(".JK") || symbol.endsWith(".JK");
-  const quote = await fetchFinnhubQuote(symbol);
-  if (!quote) return null;
-
-  const priceIDR = isIndonesian ? quote.priceUSD : quote.priceUSD * usdToIdr;
-  const dailyChangePct = quote.previousClose > 0
-    ? ((quote.priceUSD - quote.previousClose) / quote.previousClose) * 100
-    : 0;
-
-  return { priceIDR, dailyChangePct };
-}
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
 
-    let targetEmail = null;
-    try {
-      const user = await base44.auth.me();
-      if (user) targetEmail = user.email;
-    } catch {
-      // scheduled/service role call — process all users
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let investments;
-    if (targetEmail) {
-      investments = await base44.asServiceRole.entities.Investment.filter(
-        { created_by: targetEmail },
-        "-created_date",
-        200
-      );
-    } else {
-      investments = await base44.asServiceRole.entities.Investment.list("-created_date", 500);
-    }
+    // Fetch all investments for this user
+    const investments = await base44.entities.Investment.filter({ created_by: user.email });
 
-    // Only update types that have live market prices
-    const toUpdate = investments.filter(inv =>
-      ["saham", "crypto", "emas"].includes(inv.type) &&
-      inv.name &&
-      inv.quantity != null
-    );
+    for (const investment of investments) {
+      let newPrice = investment.price_per_unit;
+      let symbol = investment.name?.toLowerCase() || '';
 
-    // Fetch exchange rate once for all stocks
-    const usdToIdr = await getUsdToIdr();
-
-    const results = { updated: 0, failed: 0, skipped: 0, details: [] };
-
-    for (const inv of toUpdate) {
-      let result = null;
-
-      if (inv.type === "crypto") {
-        result = await fetchCryptoPriceIDR(inv.name);
-      } else if (inv.type === "saham") {
-        result = await fetchStockPriceIDR(inv.name, usdToIdr);
-      } else if (inv.type === "emas") {
-        result = await fetchGoldPriceIDR(usdToIdr);
-      }
-
-      if (result && result.priceIDR > 0) {
-        const qty = inv.quantity || 1;
-        const newCurrentValue = result.priceIDR * qty;
-
-        const updateData = {
-          current_value: Math.round(newCurrentValue),
-          price_per_unit: Math.round(result.priceIDR),
-          last_price_update: new Date().toISOString().split("T")[0],
-        };
-
-        // Only set daily_change_pct for crypto and saham (emas doesn't track daily change)
-        if (["crypto", "saham"].includes(inv.type)) {
-          updateData.daily_change_pct = Math.round(result.dailyChangePct * 100) / 100;
+      try {
+        if (investment.type === 'crypto') {
+          // Fetch from CoinGecko API
+          const cryptoMap = {
+            bitcoin: 'bitcoin',
+            ethereum: 'ethereum',
+            btc: 'bitcoin',
+            eth: 'ethereum'
+          };
+          const coinId = cryptoMap[symbol.split(' ')[0].toLowerCase()] || symbol.toLowerCase();
+          
+          const cryptoRes = await fetch(
+            `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=idr&include_24hr_change=true`
+          );
+          const cryptoData = await cryptoRes.json();
+          if (cryptoData[coinId]) {
+            newPrice = cryptoData[coinId].idr;
+          }
+        } else if (investment.type === 'saham') {
+          // Fetch from Finnhub API
+          const finnhubKey = Deno.env.get('FINNHUB_API_KEY');
+          if (!finnhubKey) throw new Error('Finnhub API key not configured');
+          
+          const stockRes = await fetch(
+            `https://finnhub.io/api/v1/quote?symbol=${symbol.toUpperCase()}&token=${finnhubKey}`
+          );
+          const stockData = await stockRes.json();
+          if (stockData.c) {
+            newPrice = stockData.c * 15000; // Convert USD to IDR (rough conversion)
+          }
+        } else if (investment.type === 'emas') {
+          // Fetch gold price (simplified - using a public gold API)
+          const goldRes = await fetch('https://api.metals.live/v1/spot/gold');
+          const goldData = await goldRes.json();
+          if (goldData.gold) {
+            newPrice = goldData.gold * 600000; // Convert oz to gram and to IDR (rough)
+          }
         }
 
-        await base44.asServiceRole.entities.Investment.update(inv.id, updateData);
-        results.updated++;
-        results.details.push({
-          name: inv.name,
-          priceIDR: Math.round(result.priceIDR),
-          change: result.dailyChangePct.toFixed(2),
+        // Calculate price change percentage
+        const oldPrice = investment.price_per_unit || newPrice;
+        const changePercent = Math.abs((newPrice - oldPrice) / oldPrice * 100);
+
+        // Update investment
+        const newValue = investment.quantity * newPrice;
+        await base44.entities.Investment.update(investment.id, {
+          price_per_unit: newPrice,
+          current_value: newValue,
+          last_price_update: new Date().toISOString().split('T')[0],
+          daily_change_pct: changePercent
         });
-      } else {
-        results.failed++;
-        results.details.push({ name: inv.name, error: "price not found" });
+
+        // Create alert if change > 5%
+        if (changePercent > 5) {
+          await base44.asServiceRole.entities.Alert.create({
+            type: 'unusual_pattern',
+            title: `${investment.name} Price Change`,
+            message: `${investment.name} harga berubah ${changePercent.toFixed(2)}%`,
+            severity: newPrice > oldPrice ? 'low' : 'medium',
+            status: 'unread',
+            created_by: user.email
+          });
+        }
+      } catch (error) {
+        console.error(`Error updating ${investment.name}:`, error.message);
       }
     }
 
-    results.skipped = investments.length - toUpdate.length;
-
-    return Response.json({
-      success: true,
-      total: investments.length,
-      updated: results.updated,
-      failed: results.failed,
-      skipped: results.skipped,
-      usdToIdr: Math.round(usdToIdr),
-      details: results.details,
-    });
+    return Response.json({ success: true, updated: investments.length });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
