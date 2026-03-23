@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from '@tanstack/react-query';
+import { useAppSettings } from "@/components/utils/useAppSettings";
 import PremiumGate from "@/components/subscription/PremiumGate";
 
 const DEFAULT_ANALYTICS_CARDS = [
