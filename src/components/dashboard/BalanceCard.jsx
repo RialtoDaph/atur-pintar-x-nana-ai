@@ -1,6 +1,19 @@
 import { TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
+const getBalanceFontSize = (value) => {
+  const str = String(value);
+  if (str.length > 15) return "text-xl";
+  if (str.length > 12) return "text-2xl";
+  return "text-3xl";
+};
+
+const getSmallFontSize = (value) => {
+  const str = String(value);
+  if (str.length > 12) return "text-xs";
+  return "text-sm";
+};
+
 export default function BalanceCard({ income, expense, savings, loading }) {
   const { formatCurrency, t } = useAppSettings();
   const balance = income - expense;
@@ -14,7 +27,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
   return (
     <div data-tour="balance-card" className="bg-[#161616] rounded-2xl p-4 border border-[#222]">
       <p className="text-[#8FA4C8] text-xs font-semibold uppercase tracking-widest mb-1">{t('balance_card_title')}</p>
-      <p className={`text-3xl font-bold mb-4 ${balance >= 0 ? "text-white" : "text-red-400"}`}>
+      <p className={`${getBalanceFontSize(formatCurrency(Math.abs(balance)))} font-bold mb-4 ${balance >= 0 ? "text-white" : "text-red-400"}`}>
         {balance >= 0 ? "" : "-"}{formatCurrency(Math.abs(balance))}
       </p>
 
@@ -27,7 +40,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">{t('income_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(income)}</p>
+            <p className={`text-white ${getSmallFontSize(formatCurrency(income))} font-semibold`}>{formatCurrency(income)}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -36,7 +49,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">{t('expense_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(expense)}</p>
+            <p className={`text-white ${getSmallFontSize(formatCurrency(expense))} font-semibold`}>{formatCurrency(expense)}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -45,7 +58,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">{t('savings_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(savings)}</p>
+            <p className={`text-white ${getSmallFontSize(formatCurrency(savings))} font-semibold`}>{formatCurrency(savings)}</p>
           </div>
         </div>
       </div>
