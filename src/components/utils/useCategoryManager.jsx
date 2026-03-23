@@ -192,6 +192,6 @@ export function useCategoryManager() {
     parseTransaction,
     createTransaction,
     formatCategory,
-    loadCustomCats,
+    loadCustomCats: loadAllCats,
   };
 }
