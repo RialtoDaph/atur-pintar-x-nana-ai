@@ -6,7 +6,10 @@ const ALL_CARDS = [
   { id: "daily_spending", label: "Pengeluaran Harian", emoji: "📊" },
   { id: "budget_chart", label: "Anggaran vs Pengeluaran", emoji: "💰" },
   { id: "goals_progress", label: "Progress Tujuan", emoji: "🎯" },
-  { id: "investments", label: "Investasi", emoji: "📦" },
+  { id: "investments", label: "Investasi", emoji: "📈" },
+  { id: "net_worth", label: "Kekayaan Bersih", emoji: "💎" },
+  { id: "anomaly_detector", label: "Deteksi Anomali", emoji: "⚠️" },
+  { id: "financial_calendar", label: "Kalender Keuangan", emoji: "📅" },
 ];
 
 export default function AnalyticsCardManager({ cards, onSave, onClose }) {
