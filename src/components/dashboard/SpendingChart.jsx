@@ -22,7 +22,12 @@ export default function SpendingChart({ transactions, loading }) {
   const [customCats, setCustomCats] = useState([]);
 
   useEffect(() => {
-    base44.entities.CustomCategory.list().then(setCustomCats);
+    Promise.all([
+      base44.entities.CustomCategory.list(),
+      base44.entities.GlobalCategory.list(),
+    ]).then(([custom, global]) => {
+      setCustomCats([...custom, ...global]);
+    });
   }, []);
 
   const categoryConfig = { ...DEFAULT_CONFIG };
