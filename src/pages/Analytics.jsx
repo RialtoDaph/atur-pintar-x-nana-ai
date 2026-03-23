@@ -205,6 +205,12 @@ export default function Analytics() {
 
 
 
+  const budgetData = budgets.map(b => {
+    const catConfig = allCategoriesConfig[b.category] || {};
+    const spent = thisMonthTx.filter(t => t.category === b.category).reduce((s, t) => s + t.amount, 0);
+    return { name: (catConfig.emoji || "") + " " + (catConfig.label || b.category), budget: b.amount, spent };
+  });
+
   const goalsData = goals.map(g => ({
     name: g.name,
     current: g.current_amount || 0,
