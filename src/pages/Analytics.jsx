@@ -8,7 +8,6 @@ import { LayoutList } from "lucide-react";
 import AnalyticsCardManager from "@/components/analytics/AnalyticsCardManager";
 import NetWorthCard from "@/components/analytics/NetWorthCard";
 import AIFinancialNarrative from "@/components/analytics/AIFinancialNarrative";
-import SmartBudgetSuggestion from "@/components/analytics/SmartBudgetSuggestion";
 import AnomalyDetector from "@/components/analytics/AnomalyDetector";
 import FinancialCalendar from "@/components/analytics/FinancialCalendar";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
@@ -300,15 +299,6 @@ export default function Analytics() {
         <AnomalyDetector
           transactions={transactions}
           allCategoriesConfig={allCategoriesConfig}
-        />
-
-        {/* Smart Budget Suggestion */}
-        <SmartBudgetSuggestion
-          transactions={transactions}
-          budgets={budgets}
-          allCategoriesConfig={allCategoriesConfig}
-          currentMonth={`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`}
-          user={user}
         />
 
         {/* Calendar Section */}
