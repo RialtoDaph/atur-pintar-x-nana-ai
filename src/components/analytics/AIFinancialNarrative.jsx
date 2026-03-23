@@ -8,12 +8,12 @@ import {
 } from "recharts";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
-export default function AIFinancialNarrative({ trendData, pieData, budgets, totalIncome, totalExpenses, savingsRate, periodLabel }) {
+export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel }) {
   const { formatCurrency, formatShortNumber } = useAppSettings();
   const [narrative, setNarrative] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(true);
-  const [activeChart, setActiveChart] = useState("line"); // "line" | "pie" | "budget"
+  const [activeChart, setActiveChart] = useState("line"); // "line" | "pie"
 
   async function generateNarrative() {
     setLoading(true);
@@ -102,16 +102,6 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
               >
                 🥧 Kategori
               </button>
-              {budgets && budgets.length > 0 && (
-                <button
-                  onClick={() => setActiveChart("budget")}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    activeChart === "budget" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
-                  }`}
-                >
-                  💰 Anggaran
-                </button>
-              )}
             </div>
           </div>
 
@@ -154,38 +144,6 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {activeChart === "budget" && budgets && budgets.length > 0 && (
-              <div className="space-y-2">
-                {budgets.slice(0, 6).map((b, i) => {
-                  const percentage = b.spent > 0 ? (b.spent / b.budget) * 100 : 0;
-                  const isExceeded = b.spent > b.budget;
-                  return (
-                    <div key={i} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-medium text-[#0A0A0A]">{b.name}</span>
-                        <span className={`font-semibold ${isExceeded ? "text-[#FF6B6B]" : "text-[#00C9A7]"}`}>
-                          {((percentage).toFixed(0))}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{
-                            width: `${Math.min(percentage, 100)}%`,
-                            backgroundColor: isExceeded ? "#FF6B6B" : "#4F7CFF"
-                          }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-[10px] text-[#8FA4C8]">
-                        <span>{formatCurrency(b.spent)}</span>
-                        <span>{formatCurrency(b.budget)}</span>
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
             )}
           </div>
