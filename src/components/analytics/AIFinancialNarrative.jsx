@@ -61,21 +61,21 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
   const netFlow = totalIncome - totalExpenses;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden border-2 border-[#FF6A00]/20">
-      {/* Header - Nana AI Style */}
-      <div className="flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-[#0A0A0A] to-[#1A1A1A]">
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 sm:p-5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#FF6A00] shadow-lg shadow-[#FF6A00]/30">
+          <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#FF6A00]">
             <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png" alt="Nana" className="w-full h-full object-contain" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white">Analisis AI Keuangan Bulanan</p>
-            <p className="text-xs text-[#FF6A00] font-medium">{periodLabel} · Nana AI</p>
+            <p className="text-sm font-bold text-[#1A1A1A]">Analisis AI Keuangan Bulanan</p>
+            <p className="text-xs text-[#8FA4C8]">{periodLabel} · Powered by Nana AI</p>
           </div>
         </div>
         <button
           onClick={() => setExpanded(e => !e)}
-          className="text-white hover:text-[#FF6A00] transition-colors tap-highlight-fix"
+          className="text-[#8FA4C8] hover:text-[#1A1A1A] transition-colors tap-highlight-fix"
         >
           {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </button>

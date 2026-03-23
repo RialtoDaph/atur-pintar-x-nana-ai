@@ -21,8 +21,6 @@ const DEFAULT_ANALYTICS_CARDS = [
   { id: "budget_chart", visible: true },
   { id: "goals_progress", visible: true },
   { id: "investments", visible: true },
-  { id: "anomaly_detector", visible: false },
-  { id: "financial_forecast", visible: false },
 ];
 
 const DEFAULT_CATEGORIES_FLAT = [
@@ -285,22 +283,18 @@ export default function Analytics() {
         />
 
         {/* Anomaly Detector */}
-        {isCardVisible("anomaly_detector") && (
-          <AnomalyDetector
-            transactions={transactions}
-            allCategoriesConfig={allCategoriesConfig}
-          />
-        )}
+        <AnomalyDetector
+          transactions={transactions}
+          allCategoriesConfig={allCategoriesConfig}
+        />
 
         {/* Financial Forecast */}
-        {isCardVisible("financial_forecast") && (
-          <FinancialForecast
-            trendData={trendData}
-            totalIncome={totalIncome}
-            totalExpenses={periodExpenses}
-            savingsRate={savingsRate}
-          />
-        )}
+        <FinancialForecast
+          trendData={trendData}
+          totalIncome={totalIncome}
+          totalExpenses={periodExpenses}
+          savingsRate={savingsRate}
+        />
 
         {/* Smart Budget Suggestion */}
         <SmartBudgetSuggestion
