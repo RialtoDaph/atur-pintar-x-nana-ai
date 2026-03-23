@@ -296,7 +296,6 @@ export default function Analytics() {
           totalExpenses={periodExpenses}
           savingsRate={savingsRate}
           periodLabel={formatPeriodLabel(filterPeriod)}
-          budgetData={budgetData}
         />
 
         {/* Net Worth Card */}
@@ -341,7 +340,22 @@ export default function Analytics() {
           );
         })()}
 
-
+        {/* Budget Section */}
+        {isCardVisible("budget_chart") && budgetData.length > 0 && (
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_budget_vs_spent')}</h2>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={budgetData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} />
+                <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} tickFormatter={formatYAxisTick} />
+                <Tooltip formatter={(value) => [formatCurrency(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }} />
+                <Bar dataKey="budget" fill="#4F7CFF" radius={[6, 6, 0, 0]} name={t('budget_total')} />
+                <Bar dataKey="spent" fill="#FF6B6B" radius={[6, 6, 0, 0]} name={t('budget_spent')} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {/* Goals Progress */}
         {isCardVisible("goals_progress") && goalsData.length > 0 && (

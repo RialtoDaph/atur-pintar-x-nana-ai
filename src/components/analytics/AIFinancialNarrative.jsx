@@ -102,17 +102,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
               >
                 🥧 Kategori
               </button>
-              {budgetData.length > 0 && (
-                <button
-                  onClick={() => setActiveChart("budget")}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    activeChart === "budget" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
-                  }`}
-                >
-                  💰 Anggaran
-                </button>
-              )}
-              </div>
+            </div>
           </div>
 
           {/* Charts */}
@@ -156,20 +146,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                 </div>
               </div>
             )}
-
-            {activeChart === "budget" && budgetData.length > 0 && (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={budgetData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} />
-                  <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} tickFormatter={v => formatShortNumber(v)} />
-                  <Tooltip formatter={(value) => [formatCurrency(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }} />
-                  <Bar dataKey="budget" fill="#4F7CFF" radius={[6, 6, 0, 0]} name="Anggaran" />
-                  <Bar dataKey="spent" fill="#FF6B6B" radius={[6, 6, 0, 0]} name="Pengeluaran" />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-            </div>
+          </div>
 
           {/* Metrics strip */}
           <div className="grid grid-cols-4 gap-1.5 px-4 sm:px-5 mt-3 mb-3">
