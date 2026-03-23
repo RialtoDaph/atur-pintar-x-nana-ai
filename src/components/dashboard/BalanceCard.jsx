@@ -5,15 +5,6 @@ export default function BalanceCard({ income, expense, savings, loading }) {
   const { formatCurrency, t } = useAppSettings();
   const balance = income - expense;
 
-  // Determine font size based on formatted string length
-  const getBalanceFontSize = () => {
-    const formatted = formatCurrency(Math.abs(balance));
-    const length = formatted.length;
-    if (length > 15) return 'text-lg';
-    if (length > 10) return 'text-xl';
-    return 'text-3xl';
-  };
-
   if (loading) {
     return (
       <div className="bg-[#0A0A0A] rounded-2xl p-5 animate-pulse h-36" />
@@ -23,7 +14,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
   return (
     <div data-tour="balance-card" className="bg-[#161616] rounded-2xl p-4 border border-[#222]">
       <p className="text-[#8FA4C8] text-xs font-semibold uppercase tracking-widest mb-1">{t('balance_card_title')}</p>
-      <p className={`${getBalanceFontSize()} font-bold mb-4 transition-all ${balance >= 0 ? "text-white" : "text-red-400"}`}>
+      <p className={`text-3xl font-bold mb-4 ${balance >= 0 ? "text-white" : "text-red-400"}`}>
         {balance >= 0 ? "" : "-"}{formatCurrency(Math.abs(balance))}
       </p>
 
