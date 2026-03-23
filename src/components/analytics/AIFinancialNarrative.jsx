@@ -195,7 +195,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                   <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest">Rangkuman Nana AI</p>
                   <button
                     onClick={generateNarrative}
-                    className="flex items-center gap-1 text-[10px] text-[#8FA4C8] hover:text-[#FF6A00] transition-colors tap-highlight-fix"
+                    className="flex items-center gap-1 text-[10px] text-[#8FA4C8] hover:text-[#7C3AED] transition-colors tap-highlight-fix"
                   >
                     <RefreshCw className="w-3 h-3" />
                     Perbarui
