@@ -14,6 +14,9 @@ import DateRangeFilter from "@/components/analytics/DateRangeFilter";
 import DailySpendingCard from "@/components/analytics/DailySpendingCard";
 
 const DEFAULT_ANALYTICS_CARDS = [
+  { id: "net_worth", visible: true },
+  { id: "anomaly_detector", visible: true },
+  { id: "financial_calendar", visible: true },
   { id: "daily_spending", visible: true },
   { id: "budget_chart", visible: true },
   { id: "goals_progress", visible: true },
