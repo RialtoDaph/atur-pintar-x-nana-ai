@@ -20,33 +20,27 @@ export default function BalanceCard({ income, expense, savings, loading }) {
 
       <div className="border-t border-[#2d2d2d] mb-3"></div>
 
-      <div className="grid grid-cols-3 gap-2">
-        <div className="flex items-center gap-2">
-          <div className="bg-green-500/40 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0">
+      <div className="grid grid-cols-3 gap-3">
+        <div className="flex flex-col items-center text-center">
+          <div className="bg-green-500/40 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mb-2">
             <TrendingUp className="w-4 h-4 text-[#99ff80]" />
           </div>
-          <div>
-            <p className="text-[#8FA4C8] text-[9px]">{t('income_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(income)}</p>
-          </div>
+          <p className="text-[#8FA4C8] text-[9px] mb-1">{t('income_label')}</p>
+          <p className="text-white text-xs font-semibold">{formatCurrency(income)}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="bg-red-500/40 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0">
+        <div className="flex flex-col items-center text-center">
+          <div className="bg-red-500/40 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mb-2">
             <TrendingDown className="w-4 h-4 text-[#ff6666]" />
           </div>
-          <div>
-            <p className="text-[#8FA4C8] text-[9px]">{t('expense_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(expense)}</p>
-          </div>
+          <p className="text-[#8FA4C8] text-[9px] mb-1">{t('expense_label')}</p>
+          <p className="text-white text-xs font-semibold">{formatCurrency(expense)}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="bg-blue-500/40 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0">
+        <div className="flex flex-col items-center text-center">
+          <div className="bg-blue-500/40 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mb-2">
             <PiggyBank className="w-4 h-4 text-[#80b3ff]" />
           </div>
-          <div>
-            <p className="text-[#8FA4C8] text-[9px]">{t('savings_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(savings)}</p>
-          </div>
+          <p className="text-[#8FA4C8] text-[9px] mb-1">{t('savings_label')}</p>
+          <p className="text-white text-xs font-semibold">{formatCurrency(savings)}</p>
         </div>
       </div>
     </div>
