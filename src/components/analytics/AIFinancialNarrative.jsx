@@ -65,7 +65,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
       {/* Header */}
       <div className="flex items-center justify-between p-4 sm:p-5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6A00] to-[#FF9A3C] flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div>
@@ -175,7 +175,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
             {!narrative && !loading && (
               <button
                 onClick={generateNarrative}
-                className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold text-[#7C3AED] hover:bg-[#7C3AED]/5 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold text-[#FF6A00] hover:bg-[#FF6A00]/5 transition-colors"
               >
                 <Sparkles className="w-4 h-4" />
                 Analisis dengan AI
@@ -184,7 +184,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
 
             {loading && (
               <div className="flex items-center justify-center gap-2 py-5 text-sm text-[#8FA4C8]">
-                <Loader2 className="w-4 h-4 animate-spin text-[#7C3AED]" />
+                <Loader2 className="w-4 h-4 animate-spin text-[#FF6A00]" />
                 Nana sedang menganalisis data kamu...
               </div>
             )}
@@ -195,7 +195,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                   <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest">Rangkuman Nana AI</p>
                   <button
                     onClick={generateNarrative}
-                    className="flex items-center gap-1 text-[10px] text-[#8FA4C8] hover:text-[#7C3AED] transition-colors tap-highlight-fix"
+                    className="flex items-center gap-1 text-[10px] text-[#8FA4C8] hover:text-[#FF6A00] transition-colors tap-highlight-fix"
                   >
                     <RefreshCw className="w-3 h-3" />
                     Perbarui
