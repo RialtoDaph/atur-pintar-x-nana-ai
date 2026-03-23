@@ -85,7 +85,12 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
           const isOver = b.percent > 100;
           const isNear = b.percent >= 80 && !isOver;
 
-          const riskColor = isOver ? "#FF6B6B" : b.percent >= 80 ? "#F5A623" : "#00C9A7";
+          let riskColor;
+          if (isOver) riskColor = "#FF6B6B";
+          else if (b.percent >= 90) riskColor = "#FF6B6B";
+          else if (b.percent >= 60) riskColor = "#F5A623";
+          else riskColor = "#00C9A7";
+
           const pieData = [
             { value: Math.min(b.spent, b.amount), color: riskColor },
             { value: Math.max(0, b.amount - b.spent), color: "#E8EEF7" }
@@ -108,7 +113,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
                   </PieChart>
                 </ResponsiveContainer>
                 <span className="absolute inset-0 flex items-center justify-center text-base">
-                  {cat.emoji}
+                  {isOver ? "!" : cat.emoji}
                 </span>
               </div>
               </Link>
