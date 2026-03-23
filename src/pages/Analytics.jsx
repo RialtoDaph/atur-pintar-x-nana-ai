@@ -6,10 +6,7 @@ import FinancialCalendar from "@/components/analytics/FinancialCalendar";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
 import DailySpendingCard from "@/components/analytics/DailySpendingCard";
 
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, Area, AreaChart, CartesianGrid
-} from "recharts";
+
 import { LayoutList } from "lucide-react";
 import AnalyticsCardManager from "@/components/analytics/AnalyticsCardManager";
 import NetWorthCard from "@/components/analytics/NetWorthCard";
@@ -17,9 +14,6 @@ import AIFinancialNarrative from "@/components/analytics/AIFinancialNarrative";
 
 const DEFAULT_ANALYTICS_CARDS = [
   { id: "daily_spending", visible: true },
-  { id: "income_expense_chart", visible: true },
-  { id: "spending_trend", visible: true },
-  { id: "category_breakdown", visible: true },
   { id: "budget_chart", visible: true },
   { id: "goals_progress", visible: true },
   { id: "investments", visible: true },
@@ -208,30 +202,7 @@ export default function Analytics() {
 
   const totalExpenses = filteredExpenses.reduce((s, t) => s + t.amount, 0);
 
-  const areaChartMonthRange = parseInt(filterPeriod) >= 12 || customDateRange ? monthDiff + 1 : 12;
-  const last12Months = Array.from({ length: Math.max(areaChartMonthRange, 12) }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - (Math.max(areaChartMonthRange, 12) - 1 - i), 1);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    const monthTx = transactions.filter(t => {
-      const td = new Date(t.date);
-      return td.getMonth() === month && td.getFullYear() === year;
-    });
-    return {
-      name: localizedMonths[month],
-      Expense: monthTx.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0),
-      Income: monthTx.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0),
-    };
-  });
 
-  const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const monthBudgets = budgets.filter(b => b.month === thisMonth);
-  const budgetData = monthBudgets.map(b => ({
-    name: allCategoriesConfig[b.category]?.label || b.category,
-    budget: b.amount,
-    spent: thisMonthTx.filter(t => t.category === b.category).reduce((s, t) => s + t.amount, 0),
-    color: allCategoriesConfig[b.category]?.color || "#8FA4C8"
-  }));
 
   const goalsData = goals.map(g => ({
     name: g.name,
@@ -376,79 +347,6 @@ export default function Analytics() {
               <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#FF6B6B]"/><span className="text-[#8FA4C8]">{t('analytics_expense_label')}</span></div>
             </div>
           </div>)}
-
-          {/* Spending Trend Area Chart */}
-          {isCardVisible("spending_trend") && (
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
-            <h2 className="font-bold text-[#0A0A0A] text-base mb-4">{t('analytics_spending_trend')}</h2>
-            <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={last12Months}>
-                <defs>
-                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} />
-                <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} tickFormatter={formatYAxisTick} />
-                <Tooltip formatter={(value) => [formatCurrency(value), undefined]} contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }} />
-                <Area type="monotone" dataKey="Expense" stroke="#FF6B6B" fill="url(#colorExpense)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>)}
-
-        </div>
-
-        {/* Category Breakdown */}
-        {isCardVisible("category_breakdown") && (
-        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
-          <h2 className="font-bold text-[#0A0A0A] text-base mb-1">{t('analytics_category_breakdown')}</h2>
-          <p className="text-xs text-[#8FA4C8] mb-4">{formatPeriodLabel(filterPeriod)}</p>
-
-          {pieData.length === 0 ? (
-            <p className="text-center text-[#8FA4C8] text-sm py-8">{t('analytics_no_expense_data')}</p>
-          ) : (
-            <>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={75}
-                    paddingAngle={2}
-                  >
-                    {pieData.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value) => [formatCurrency(value), undefined]}
-                    contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-
-              <div className="space-y-2 mt-4">
-                {pieData.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 min-w-0 text-xs sm:text-sm">
-                    <span className="text-base flex-shrink-0">{item.emoji}</span>
-                    <span className="font-medium text-[#0A0A0A] flex-1 truncate">{item.name}</span>
-                    <div className="w-12 h-1 bg-[#F2F4F7] rounded-full overflow-hidden flex-shrink-0 hidden sm:block">
-                      <div className="h-full rounded-full" style={{ width: `${(item.value / totalExpenses) * 100}%`, backgroundColor: item.color }} />
-                    </div>
-                    <span className="font-semibold text-[#0A0A0A] flex-shrink-0 whitespace-nowrap">{formatCurrency(item.value)}</span>
-                    <span className="text-[10px] text-[#8FA4C8] flex-shrink-0 w-6 text-right">{((item.value / totalExpenses) * 100).toFixed(0)}%</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>)}
 
         {/* Budget Section */}
         {isCardVisible("budget_chart") && budgetData.length > 0 && (
