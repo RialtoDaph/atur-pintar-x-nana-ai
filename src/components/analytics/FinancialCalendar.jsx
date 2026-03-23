@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { formatRupiah } from "@/components/utils/formatRupiah";
 
 export default function FinancialCalendar({ transactions, debts, goals }) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isOpen, setIsOpen] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -87,20 +87,30 @@ export default function FinancialCalendar({ transactions, debts, goals }) {
   const weekDays = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm">
-      {/* Header - Collapsible */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 hover:bg-[#F2F4F7] transition-colors rounded-2xl"
-      >
-        <h2 className="font-bold text-[#0A0A0A] text-base">Kalender Keuangan</h2>
-        <ChevronDown className={`w-5 h-5 text-[#8FA4C8] transition-transform ${isOpen ? "rotate-180" : ""}`} />
-      </button>
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 sm:p-5">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6A00] to-[#FF9A3C] flex items-center justify-center flex-shrink-0">
+            <span className="text-sm">📅</span>
+          </div>
+          <div>
+            <p className="text-sm font-bold text-[#1A1A1A]">Kalender Keuangan</p>
+            <p className="text-xs text-[#8FA4C8]">Visualisasi aktivitas bulanan</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="text-[#8FA4C8] hover:text-[#1A1A1A] transition-colors tap-highlight-fix"
+        >
+          {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        </button>
+      </div>
 
-      {/* Content - Expandable */}
-      {isOpen && (
-        <div className="px-4 pb-4 border-t border-[#E2E8F0]">
-          <div className="flex items-center justify-between mb-4 mt-4">
+      {expanded && (
+        <div className="px-4 sm:px-5 pb-5 border-t border-[#E2E8F0] pt-4 space-y-4">
+          {/* Month Navigation */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <button
                 onClick={prevMonth}
@@ -108,7 +118,7 @@ export default function FinancialCalendar({ transactions, debts, goals }) {
               >
                 <ChevronLeft className="w-4 h-4 text-[#8FA4C8]" />
               </button>
-              <span className="text-sm font-semibold text-[#0A0A0A] min-w-[100px] text-center">
+              <span className="text-sm font-semibold text-[#0A0A0A] min-w-[120px] text-center">
                 {monthName}
               </span>
               <button
@@ -121,18 +131,18 @@ export default function FinancialCalendar({ transactions, debts, goals }) {
           </div>
 
           {/* Legend */}
-          <div className="flex gap-2 flex-wrap mb-3 pb-3 border-b border-[#E2E8F0]">
-            <div className="flex items-center gap-1">
+          <div className="flex gap-3 flex-wrap text-xs pb-3 border-b border-[#E2E8F0]">
+            <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-[#00C9A7]" />
-              <span className="text-[9px] text-[#8FA4C8]">Income</span>
+              <span className="text-[#8FA4C8]">Income</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-[#FF6B6B]" />
-              <span className="text-[9px] text-[#8FA4C8]">Expense</span>
+              <span className="text-[#8FA4C8]">Expense</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-[#FF6A00]" />
-              <span className="text-[9px] text-[#8FA4C8]">Event</span>
+              <span className="text-[#8FA4C8]">Event</span>
             </div>
           </div>
 
@@ -141,10 +151,7 @@ export default function FinancialCalendar({ transactions, debts, goals }) {
             {/* Week day headers */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {weekDays.map((day) => (
-                <div
-                  key={day}
-                  className="text-center text-[9px] font-semibold text-[#8FA4C8] py-1"
-                >
+                <div key={day} className="text-center text-[9px] font-semibold text-[#8FA4C8] py-1">
                   {day}
                 </div>
               ))}
@@ -206,8 +213,8 @@ export default function FinancialCalendar({ transactions, debts, goals }) {
           </div>
 
           {/* Day details */}
-          <div className="mt-4 pt-3 border-t border-[#E2E8F0]">
-            <p className="text-[9px] text-[#8FA4C8] mb-2">Pilih tanggal untuk detail</p>
+          <div className="pt-3 border-t border-[#E2E8F0]">
+            <p className="text-[9px] text-[#8FA4C8] mb-2 font-medium">Pilih tanggal untuk detail</p>
             <DayDetailSelector dayData={dayData} monthYear={{ month, year }} />
           </div>
         </div>
@@ -225,7 +232,7 @@ function DayDetailSelector({ dayData, monthYear }) {
 
   if (!daysWithData.length) {
     return (
-      <p className="text-xs text-[#8FA4C8] text-center py-6">
+      <p className="text-xs text-[#8FA4C8] text-center py-4">
         Tidak ada transaksi atau event di bulan ini
       </p>
     );
@@ -237,12 +244,12 @@ function DayDetailSelector({ dayData, monthYear }) {
   return (
     <>
       {/* Day selector buttons */}
-      <div className="flex gap-1 flex-wrap mb-2">
+      <div className="flex gap-1 flex-wrap mb-3">
         {daysWithData.map((day) => (
           <button
             key={day}
             onClick={() => setSelectedDay(Number(day))}
-            className={`px-2 py-1 rounded text-[9px] font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-[9px] font-medium transition-colors tap-highlight-fix ${
               Number(day) === currentDay
                 ? "bg-[#FF6A00] text-white"
                 : "bg-[#F2F4F7] text-[#8FA4C8] hover:bg-[#E2E8F0]"
@@ -254,24 +261,24 @@ function DayDetailSelector({ dayData, monthYear }) {
       </div>
 
       {/* Day details */}
-      <div className="space-y-2">
+      <div className="space-y-1.5 text-xs">
         {data.income > 0 && (
           <div className="bg-[#00C9A7]/10 rounded p-2">
-            <p className="text-[9px] text-[#00C9A7] font-semibold mb-0.5">Pendapatan</p>
+            <p className="text-[9px] text-[#00C9A7] font-semibold">Pendapatan</p>
             <p className="text-xs font-bold text-[#00C9A7]">{formatRupiah(data.income)}</p>
           </div>
         )}
 
         {data.expense > 0 && (
           <div className="bg-[#FF6B6B]/10 rounded p-2">
-            <p className="text-[9px] text-[#FF6B6B] font-semibold mb-0.5">Pengeluaran</p>
+            <p className="text-[9px] text-[#FF6B6B] font-semibold">Pengeluaran</p>
             <p className="text-xs font-bold text-[#FF6B6B]">{formatRupiah(data.expense)}</p>
           </div>
         )}
 
         {data.events.map((event, i) => (
           <div key={i} className="bg-[#FF6A00]/10 rounded p-2">
-            <p className="text-[9px] text-[#FF6A00] font-semibold mb-0.5">
+            <p className="text-[9px] text-[#FF6A00] font-semibold">
               {event.icon} {event.title}
             </p>
             <p className="text-xs font-bold text-[#FF6A00]">{formatRupiah(event.amount)}</p>
