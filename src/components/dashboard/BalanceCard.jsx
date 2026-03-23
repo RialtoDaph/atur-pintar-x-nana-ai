@@ -1,6 +1,21 @@
 import { TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
+function formatShortNumber(num) {
+  if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + 'M';
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'jt';
+  if (num >= 1_000) return (num / 1_000).toFixed(1) + 'rb';
+  return num.toString();
+}
+
+function getBalanceCardFontSize(formattedValue) {
+  const length = formattedValue.length;
+  if (length > 16) return 'text-[8px]';
+  if (length > 12) return 'text-[9px]';
+  if (length > 10) return 'text-xs';
+  return 'text-xs';
+}
+
 export default function BalanceCard({ income, expense, savings, loading }) {
   const { formatCurrency, t } = useAppSettings();
   const balance = income - expense;
@@ -10,6 +25,18 @@ export default function BalanceCard({ income, expense, savings, loading }) {
       <div className="bg-[#0A0A0A] rounded-2xl p-5 animate-pulse h-36" />
     );
   }
+
+  const incomeFormatted = formatCurrency(income);
+  const expenseFormatted = formatCurrency(expense);
+  const savingsFormatted = formatCurrency(savings);
+
+  const incomeFontSize = getBalanceCardFontSize(incomeFormatted);
+  const expenseFontSize = getBalanceCardFontSize(expenseFormatted);
+  const savingsFontSize = getBalanceCardFontSize(savingsFormatted);
+
+  const incomeDisplay = incomeFormatted.length > 16 ? formatShortNumber(income) : incomeFormatted;
+  const expenseDisplay = expenseFormatted.length > 16 ? formatShortNumber(expense) : expenseFormatted;
+  const savingsDisplay = savingsFormatted.length > 16 ? formatShortNumber(savings) : savingsFormatted;
 
   return (
     <div data-tour="balance-card" className="bg-[#161616] rounded-2xl p-4 border border-[#222]">
@@ -27,7 +54,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">{t('income_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(income)}</p>
+            <p className={`text-white ${incomeFontSize} font-semibold`}>{incomeDisplay}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -36,7 +63,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">{t('expense_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(expense)}</p>
+            <p className={`text-white ${expenseFontSize} font-semibold`}>{expenseDisplay}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -45,7 +72,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
           </div>
           <div>
             <p className="text-[#8FA4C8] text-[9px]">{t('savings_label')}</p>
-            <p className="text-white text-xs font-semibold">{formatCurrency(savings)}</p>
+            <p className={`text-white ${savingsFontSize} font-semibold`}>{savingsDisplay}</p>
           </div>
         </div>
       </div>
