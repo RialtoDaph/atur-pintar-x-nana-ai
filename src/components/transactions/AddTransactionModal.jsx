@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { X, Settings2, Camera, Loader2, Scissors, Sparkles, Upload } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useCategoryManager } from "@/components/utils/useCategoryManager";
 import { parseRupiah } from "@/components/utils/parseRupiah";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import ManageCategoriesModal from "./ManageCategoriesModal";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
 
 export default function AddTransactionModal({ goals = [], onClose, onSave, initialValues = {} }) {
   const { t, formatCurrency, settings } = useAppSettings();
+  const { learnCategory } = useCategoryManager();
   const [tab, setTab] = useState("expense");
   const [form, setForm] = useState({
     amount: initialValues.amount || "",
@@ -132,6 +134,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
         amount,
         goal_id: form.goal_id || undefined,
       });
+      // Learn from user's category choice
+      if (form.note && form.category) {
+        learnCategory(form.note, form.category);
+      }
     } catch (error) {
       console.error("Save transaction failed:", error);
       throw error;
