@@ -5,12 +5,12 @@ import { base44 } from "@/api/base44Client";
  * Hook that builds a rich financial context snapshot for Nana AI.
  * This is appended to every message so Nana always has up-to-date data.
  */
-export function useFinancialContext() {
+export function useFinancialContext(enabled = true) {
   const [context, setContext] = useState(null);
 
   useEffect(() => {
-    buildContext();
-  }, []);
+    if (enabled) buildContext();
+  }, [enabled]);
 
   async function buildContext() {
     try {
