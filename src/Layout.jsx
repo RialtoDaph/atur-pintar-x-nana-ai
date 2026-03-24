@@ -160,7 +160,7 @@ function LayoutInner({ children, currentPageName }) {
       <div className="hidden sm:flex fixed left-0 top-0 h-full w-60 bg-[#0A0A0A] flex-col px-5 py-8 z-40">
         {/* Logo */}
         <div className="mb-8 px-2 flex items-center gap-2">
-          <img src={import.meta.env.VITE_LOGO_URL || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/54148c256_85F10F30-6B5D-4EA2-865F-C1C5AC4C4170.PNG"} alt="Logo" className="w-6 h-6" />
+          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-6 h-6" />
           <div>
             <p className="text-xl font-bold text-white tracking-tight">Atur Pintar</p>
             <p className="text-xs text-[#8FA4C8] mt-0.5">Financial Tracker</p>
@@ -245,7 +245,7 @@ function LayoutInner({ children, currentPageName }) {
             </button> :
 
           <div className="flex items-center gap-1">
-              <img src={import.meta.env.VITE_LOGO_URL || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/54148c256_85F10F30-6B5D-4EA2-865F-C1C5AC4C4170.PNG"} alt="Logo" className="w-8 h-8 flex-shrink-0" />
+              <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-8 h-8 flex-shrink-0" />
               <p className="text-white text-base font-bold tracking-tight">Atur Pintar</p>
             </div>
           }
