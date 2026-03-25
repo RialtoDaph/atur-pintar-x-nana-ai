@@ -11,7 +11,6 @@ import AIFinancialNarrative from "@/components/analytics/AIFinancialNarrative";
 import AnomalyDetector from "@/components/analytics/AnomalyDetector";
 import FinancialCalendar from "@/components/analytics/FinancialCalendar";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
-import AICardInsight from "@/components/analytics/AICardInsight";
 import DailySpendingCard from "@/components/analytics/DailySpendingCard";
 
 const DEFAULT_ANALYTICS_CARDS = [
@@ -355,7 +354,6 @@ export default function Analytics() {
                 <Bar dataKey="spent" fill="#FF6B6B" radius={[6, 6, 0, 0]} name={t('budget_spent')} />
               </BarChart>
             </ResponsiveContainer>
-            <AICardInsight type="budget" data={budgetData} formatCurrency={formatCurrency} />
           </div>
         )}
 
@@ -380,7 +378,6 @@ export default function Analytics() {
                 </div>
               ))}
             </div>
-            <AICardInsight type="goals" data={goalsData} formatCurrency={formatCurrency} />
           </div>
         )}
 
@@ -420,7 +417,6 @@ export default function Analytics() {
                 </div>
               ))}
             </div>
-            <AICardInsight type="investments" data={{ totalInvested, totalCurrentValue, investmentReturn, investments }} formatCurrency={formatCurrency} />
           </div>
         )}
 
