@@ -1,6 +1,7 @@
 import { createPageUrl } from "@/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, TrendingUp, Settings, Bell, Lightbulb, Search, Grid3x3, ArrowLeft } from "lucide-react";
+import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import NanaFloatingChat from "@/components/nana/NanaFloatingChat";
@@ -12,6 +13,7 @@ import TourGuide from "@/components/onboarding/TourGuide";
 function LayoutInner({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [showAlertsDrawer, setShowAlertsDrawer] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const { t } = useAppSettings();
   const location = useLocation();
@@ -251,6 +253,9 @@ function LayoutInner({ children, currentPageName }) {
           }
 
           <div className="flex items-center gap-2">
+            <button onClick={() => setShowAlertsDrawer(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
+              <Bell className="w-4 h-4" />
+            </button>
             <button onClick={() => setShowSearch(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
               <Search className="w-4 h-4" />
             </button>
@@ -309,6 +314,9 @@ function LayoutInner({ children, currentPageName }) {
       <ReminderNotificationPopup user={user} />
 
 
+
+      {/* Alerts Drawer */}
+      {showAlertsDrawer && <AlertsDrawer onClose={() => setShowAlertsDrawer(false)} user={user} />}
 
       {/* Global Search */}
       {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
