@@ -7,6 +7,7 @@ const ALL_CARDS = [
   { id: "anomaly_detector", label: "Deteksi Anomali", emoji: "⚠️" },
   { id: "financial_calendar", label: "Kalender Keuangan", emoji: "📅" },
   { id: "daily_spending", label: "Pengeluaran Harian", emoji: "📊" },
+  { id: "spending_chart", label: "Pengeluaran per Kategori", emoji: "🥧" },
   { id: "portfolio_summary", label: "Portofolio Investasi", emoji: "📈" },
   { id: "savings_goals", label: "Tujuan Tabungan", emoji: "🎯" },
 ];

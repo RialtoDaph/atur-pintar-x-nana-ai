@@ -15,7 +15,6 @@ import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 
 // Lazy load heavy components
-const SpendingChart = lazy(() => import("@/components/dashboard/SpendingChart"));
 const CashflowForecast = lazy(() => import("@/components/dashboard/CashflowForecast"));
 const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
 
@@ -172,12 +171,7 @@ export default function Dashboard() {
           </Suspense>
         )}
 
-        {/* Spending breakdown */}
-        {widgets.spendingChart && (
-          <Suspense fallback={<LazyFallback />}>
-            <SpendingChart transactions={thisMonthTx} loading={loading} />
-          </Suspense>
-        )}
+
 
         {/* Nana AI Chat */}
         <NanaDashboardChat />

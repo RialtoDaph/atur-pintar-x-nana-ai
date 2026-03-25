@@ -17,12 +17,14 @@ import AnomalyDetector from "@/components/analytics/AnomalyDetector";
 import FinancialCalendar from "@/components/analytics/FinancialCalendar";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
 import DailySpendingCard from "@/components/analytics/DailySpendingCard";
+import SpendingChart from "@/components/dashboard/SpendingChart";
 
 const DEFAULT_ANALYTICS_CARDS = [
   { id: "net_worth", visible: true },
   { id: "anomaly_detector", visible: true },
   { id: "financial_calendar", visible: true },
   { id: "daily_spending", visible: true },
+  { id: "spending_chart", visible: true },
   { id: "portfolio_summary", visible: true },
   { id: "savings_goals", visible: true },
 ];
@@ -340,6 +342,14 @@ export default function Analytics() {
           <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
             <PortfolioSummary user={user} />
           </Suspense>
+        )}
+
+        {/* Spending by Category */}
+        {isCardVisible("spending_chart") && (
+          <SpendingChart transactions={transactions.filter(t => {
+            const d = new Date(t.date);
+            return d >= monthRange.start && d <= monthRange.end;
+          })} loading={loading} />
         )}
 
         {/* Savings Goals */}
