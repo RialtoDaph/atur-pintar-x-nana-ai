@@ -4,16 +4,16 @@ import { Sparkles, Loader2, RefreshCw, ChevronDown, ChevronUp } from "lucide-rea
 import ReactMarkdown from "react-markdown";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
-  PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell, Legend, BarChart, Bar, LabelList
 } from "recharts";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
-export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel }) {
+export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel, goals = [] }) {
   const { formatCurrency, formatShortNumber } = useAppSettings();
   const [narrative, setNarrative] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(true);
-  const [activeChart, setActiveChart] = useState("line"); // "line" | "pie"
+  const [activeChart, setActiveChart] = useState("line"); // "line" | "pie" | "goals"
 
   async function generateNarrative() {
     setLoading(true);
@@ -102,6 +102,14 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
               >
                 🥧 Kategori
               </button>
+              <button
+                onClick={() => setActiveChart("goals")}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeChart === "goals" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
+                }`}
+              >
+                🎯 Goals
+              </button>
             </div>
           </div>
 
@@ -144,6 +152,46 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {activeChart === "goals" && (
+              <div>
+                {goals.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-40 text-[#8FA4C8] text-sm">
+                    <span className="text-3xl mb-2">🎯</span>
+                    <p>Belum ada savings goal yang dibuat.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 py-2">
+                    {goals.map((goal) => {
+                      const pct = Math.min(100, Math.round(((goal.current_amount || 0) / (goal.target_amount || 1)) * 100));
+                      return (
+                        <div key={goal.id} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-semibold text-[#1A1A1A] flex items-center gap-1">
+                              {goal.icon || "🎯"} {goal.name}
+                            </span>
+                            <span className="font-bold" style={{ color: pct >= 100 ? "#00C9A7" : "#FF6A00" }}>{pct}%</span>
+                          </div>
+                          <div className="w-full h-3 bg-[#F2F4F7] rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{
+                                width: `${pct}%`,
+                                background: pct >= 100 ? "#00C9A7" : `linear-gradient(90deg, #FF6A00, #FF9A3C)`
+                              }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-[#8FA4C8]">
+                            <span>{formatCurrency(goal.current_amount || 0)}</span>
+                            <span>{formatCurrency(goal.target_amount)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>

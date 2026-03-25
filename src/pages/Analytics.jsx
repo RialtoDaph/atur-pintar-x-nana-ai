@@ -300,6 +300,7 @@ export default function Analytics() {
           totalExpenses={periodExpenses}
           savingsRate={savingsRate}
           periodLabel={formatPeriodLabel(filterPeriod)}
+          goals={goals}
         />
 
         {/* Net Worth Card */}
