@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { AlertTriangle, ChevronDown, ChevronUp, TrendingUp } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronUp, TrendingUp, CheckCircle, HelpCircle } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
+import AnomalySecurityModal from "./AnomalySecurityModal";
 
 export default function AnomalyDetector({ transactions, allCategoriesConfig = {} }) {
   const { formatCurrency } = useAppSettings();
   const [anomalies, setAnomalies] = useState([]);
   const [expanded, setExpanded] = useState(false);
+  const [feedback, setFeedback] = useState({}); // { [category]: 'mine' | 'not_mine' }
+  const [securityModal, setSecurityModal] = useState(null); // anomaly object
 
   useEffect(() => {
     if (!transactions || transactions.length === 0) return;
@@ -105,42 +108,89 @@ export default function AnomalyDetector({ transactions, allCategoriesConfig = {}
 
       {expanded && (
         <div className="px-4 sm:px-5 pb-5 space-y-2.5">
-          {anomalies.map((item, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 bg-[#FFF5F0] border border-[#FF6A00]/20 rounded-xl">
-              <span className="text-2xl flex-shrink-0">{item.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-bold text-[#1A1A1A] truncate">{item.label}</p>
-                  <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                    <TrendingUp className="w-3 h-3 text-[#FF6A00]" />
-                    <span className="text-xs font-bold text-[#FF6A00]">
-                      {item.isNew ? "Baru!" : `+${item.pctIncrease}%`}
-                    </span>
+          {anomalies.map((item, i) => {
+            const fb = feedback[item.category];
+            return (
+              <div key={i} className={`flex flex-col gap-2.5 p-3 rounded-xl border ${
+                fb === 'not_mine' ? 'bg-red-50 border-red-200' :
+                fb === 'mine' ? 'bg-green-50 border-green-200' :
+                'bg-[#FFF5F0] border-[#FF6A00]/20'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl flex-shrink-0">{item.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-bold text-[#1A1A1A] truncate">{item.label}</p>
+                      <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                        <TrendingUp className="w-3 h-3 text-[#FF6A00]" />
+                        <span className="text-xs font-bold text-[#FF6A00]">
+                          {item.isNew ? "Baru!" : `+${item.pctIncrease}%`}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-[#8FA4C8]">
+                      <span>Bulan ini: <span className="font-semibold text-[#FF6B6B]">{formatCurrency(item.current)}</span></span>
+                      {!item.isNew && (
+                        <>
+                          <span>•</span>
+                          <span>Rata-rata: <span className="font-medium">{formatCurrency(item.average)}</span></span>
+                        </>
+                      )}
+                    </div>
+                    <div className="mt-2 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-[#FF6A00] transition-all"
+                        style={{ width: item.isNew ? "100%" : `${Math.min((item.current / (item.average * 2)) * 100, 100)}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-[#8FA4C8]">
-                  <span>Bulan ini: <span className="font-semibold text-[#FF6B6B]">{formatCurrency(item.current)}</span></span>
-                  {!item.isNew && (
-                    <>
-                      <span>•</span>
-                      <span>Rata-rata: <span className="font-medium">{formatCurrency(item.average)}</span></span>
-                    </>
-                  )}
-                </div>
-                {/* Progress bar */}
-                <div className="mt-2 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-[#FF6A00] transition-all"
-                    style={{ width: item.isNew ? "100%" : `${Math.min((item.current / (item.average * 2)) * 100, 100)}%` }}
-                  />
-                </div>
+
+                {/* Feedback buttons */}
+                {fb ? (
+                  <div className={`flex items-center gap-1.5 text-xs font-medium ${
+                    fb === 'mine' ? 'text-green-600' : 'text-red-500'
+                  }`}>
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    {fb === 'mine' ? 'Kamu mengonfirmasi ini transaksimu' : 'Ditandai mencurigakan — ikuti langkah keamanan'}
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setFeedback(prev => ({ ...prev, [item.category]: 'mine' }))}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-green-100 text-green-700 text-xs font-semibold hover:bg-green-200 transition-colors tap-highlight-fix"
+                    >
+                      <CheckCircle className="w-3 h-3" />
+                      Ini Transaksi Saya
+                    </button>
+                    <button
+                      onClick={() => setSecurityModal(item)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-red-100 text-red-600 text-xs font-semibold hover:bg-red-200 transition-colors tap-highlight-fix"
+                    >
+                      <HelpCircle className="w-3 h-3" />
+                      Bukan Transaksi Saya
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
           <p className="text-[10px] text-[#8FA4C8] text-center pt-1">
             Dibandingkan rata-rata 3 bulan terakhir
           </p>
         </div>
+      )}
+
+      {securityModal && (
+        <AnomalySecurityModal
+          anomaly={securityModal}
+          transactions={transactions}
+          onClose={() => setSecurityModal(null)}
+          onConfirm={() => {
+            setFeedback(prev => ({ ...prev, [securityModal.category]: 'not_mine' }));
+            setSecurityModal(null);
+          }}
+        />
       )}
     </div>
   );
