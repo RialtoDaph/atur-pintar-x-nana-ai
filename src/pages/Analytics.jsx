@@ -23,6 +23,8 @@ const DEFAULT_ANALYTICS_CARDS = [
   { id: "anomaly_detector", visible: true },
   { id: "financial_calendar", visible: true },
   { id: "daily_spending", visible: true },
+  { id: "portfolio_summary", visible: true },
+  { id: "savings_goals", visible: true },
 ];
 
 const DEFAULT_CATEGORIES_FLAT = [
@@ -324,31 +326,23 @@ export default function Analytics() {
         )}
 
         {/* Daily Spending Card */}
-        {(() => {
-          const orderedCards = analyticsCards.length > 0 ? analyticsCards : DEFAULT_ANALYTICS_CARDS;
-          const dailyVisible = orderedCards.find(c => c.id === "daily_spending")?.visible !== false;
-
-          if (!dailyVisible) return null;
-
-          return (
-            <div className="grid grid-cols-1 gap-5">
-              <DailySpendingCard
-                key="daily_spending"
-                transactions={transactions}
-                filterPeriod={filterPeriod}
-                customDateRange={customDateRange}
-              />
-            </div>
-          );
-        })()}
+        {isCardVisible("daily_spending") && (
+          <DailySpendingCard
+            transactions={transactions}
+            filterPeriod={filterPeriod}
+            customDateRange={customDateRange}
+          />
+        )}
 
         {/* Portfolio Summary */}
-        <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
-          <PortfolioSummary user={user} />
-        </Suspense>
+        {isCardVisible("portfolio_summary") && (
+          <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
+            <PortfolioSummary user={user} />
+          </Suspense>
+        )}
 
         {/* Savings Goals */}
-        <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
+        {isCardVisible("savings_goals") && (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 className="font-bold text-[#0A0A0A] text-sm">{t('savings_goals')}</h2>
@@ -356,9 +350,11 @@ export default function Analytics() {
                 {t('view_all')} <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
-            <GoalsMiniList goals={goals} loading={loading} />
+            <Suspense fallback={<div className="h-10 animate-pulse" />}>
+              <GoalsMiniList goals={goals} loading={loading} />
+            </Suspense>
           </div>
-        </Suspense>
+        )}
 
       </div>
 

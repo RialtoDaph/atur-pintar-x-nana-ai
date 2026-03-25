@@ -3,13 +3,12 @@ import { X, GripVertical, Eye, EyeOff } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const ALL_CARDS = [
-  { id: "daily_spending", label: "Pengeluaran Harian", emoji: "📊" },
-  { id: "budget_chart", label: "Anggaran vs Pengeluaran", emoji: "💰" },
-  { id: "goals_progress", label: "Progress Tujuan", emoji: "🎯" },
-  { id: "investments", label: "Investasi", emoji: "📈" },
   { id: "net_worth", label: "Kekayaan Bersih", emoji: "💎" },
   { id: "anomaly_detector", label: "Deteksi Anomali", emoji: "⚠️" },
   { id: "financial_calendar", label: "Kalender Keuangan", emoji: "📅" },
+  { id: "daily_spending", label: "Pengeluaran Harian", emoji: "📊" },
+  { id: "portfolio_summary", label: "Portofolio Investasi", emoji: "📈" },
+  { id: "savings_goals", label: "Tujuan Tabungan", emoji: "🎯" },
 ];
 
 export default function AnalyticsCardManager({ cards, onSave, onClose }) {
