@@ -112,7 +112,7 @@ export default function NanaDashboardChat() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 4px 24px rgba(255,106,0,0.18), 0 1px 4px rgba(255,106,0,0.08)' }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-[#E2E8F0]">
         <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-[#FF6A00]/50">
