@@ -95,27 +95,11 @@ export default function AnomalyDetector({ transactions, allCategoriesConfig }) {
           </div>
           <div>
             <p className="text-sm font-bold text-[#1A1A1A]">Deteksi Anomali Pengeluaran</p>
-            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-              {anomalies.slice(0, 3).map((item, i) => (
-                <span key={i} className="text-[10px] bg-[#FF6A00]/10 text-[#FF6A00] font-semibold px-1.5 py-0.5 rounded-full">
-                  {item.emoji} {item.isNew ? "Baru!" : `+${item.pctIncrease}%`}
-                </span>
-              ))}
-              {anomalies.length > 3 && (
-                <span className="text-[10px] text-[#8FA4C8]">+{anomalies.length - 3} lagi</span>
-              )}
-            </div>
+            <p className="text-xs text-[#8FA4C8]">{anomalies.length} kategori tidak biasa bulan ini</p>
           </div>
         </div>
-        <button
-          onClick={() => setExpanded(e => !e)}
-          className="text-xs font-semibold text-[#FF6A00] hover:text-[#e05a00] flex items-center gap-1 flex-shrink-0 tap-highlight-fix"
-        >
-          {expanded ? (
-            <><ChevronUp className="w-3.5 h-3.5" />Sembunyikan</>
-          ) : (
-            <><ChevronDown className="w-3.5 h-3.5" />Lihat Detail</>
-          )}
+        <button onClick={() => setExpanded(e => !e)} className="text-[#8FA4C8] hover:text-[#1A1A1A] transition-colors tap-highlight-fix">
+          {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </button>
       </div>
 
