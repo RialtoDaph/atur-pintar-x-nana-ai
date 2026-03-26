@@ -102,12 +102,18 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
               to={createPageUrl("Budget")}
               className="flex flex-col items-center flex-shrink-0 cursor-pointer group"
             >
-              <div
-                  className="relative w-10 h-10 mb-2 rounded-full flex items-center justify-center text-base"
-                  style={{ backgroundColor: riskColor + '22' }}
-                >
-                <span className={`text-base font-bold`} style={{ color: isOver ? '#FF6A00' : 'inherit' }}>
-                  {isOver ? '!' : cat.emoji}
+              <div className="relative w-10 h-10 mb-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={12} outerRadius={20} startAngle={90} endAngle={-270}>
+                      {pieData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <span className={`absolute inset-0 flex items-center justify-center text-base font-bold ${isOver ? "text-[#FF6A00]" : ""}`}>
+                  {isOver ? "!" : cat.emoji}
                 </span>
               </div>
               </Link>
