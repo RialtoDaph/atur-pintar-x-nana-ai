@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 export default function AddTransactionModal({ goals = [], onClose, onSave, initialValues = {} }) {
   const { t, formatCurrency, settings } = useAppSettings();
-  const { learnCategory } = useCategoryManager();
+  const { learnCategory, detectCategory, suggestFromHistory } = useCategoryManager();
   const [tab, setTab] = useState("expense");
   const [form, setForm] = useState({
     amount: initialValues.amount || "",
@@ -42,9 +42,20 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
   // Removed - now handled in TransactionCategories component
 
-  // AI category suggestion when user types a note
+  // Auto-suggest category: keyword → history → LLM (fallback)
   async function suggestCategory(noteValue) {
-    if (!noteValue || noteValue.length < 3) { setAiCatSuggestion(null); return; }
+    if (!noteValue || noteValue.length < 2) { setAiCatSuggestion(null); return; }
+
+    // 1. Keyword-based (instant, no API)
+    const fromKeyword = detectCategory(noteValue);
+    if (fromKeyword) { setAiCatSuggestion(fromKeyword); return; }
+
+    // 2. History-based (instant, localStorage)
+    const fromHistory = suggestFromHistory(noteValue);
+    if (fromHistory) { setAiCatSuggestion(fromHistory); return; }
+
+    // 3. LLM fallback (only if note is long enough)
+    if (noteValue.length < 4) return;
     setAiCatLoading(true);
     try {
       const res = await base44.integrations.Core.InvokeLLM({

@@ -160,6 +160,44 @@ export function useCategoryManager() {
   }, [detectCategory]);
 
   /**
+   * Learn from user's manual category selection (localStorage)
+   */
+  const learnCategory = useCallback((note, category) => {
+    if (!note || !category) return;
+    const key = "cat_history";
+    const existing = JSON.parse(localStorage.getItem(key) || "{}");
+    // Store last 5 words normalized as key
+    const normalized = note.toLowerCase().trim().split(/\s+/).slice(0, 5).join(" ");
+    existing[normalized] = category;
+    // Keep only last 200 entries
+    const entries = Object.entries(existing);
+    if (entries.length > 200) entries.splice(0, entries.length - 200);
+    localStorage.setItem(key, JSON.stringify(Object.fromEntries(entries)));
+  }, []);
+
+  /**
+   * Suggest category from history (localStorage) based on similar past notes
+   */
+  const suggestFromHistory = useCallback((note) => {
+    if (!note) return null;
+    const key = "cat_history";
+    const history = JSON.parse(localStorage.getItem(key) || "{}");
+    const noteLower = note.toLowerCase().trim();
+    // Exact prefix match first
+    for (const [pastNote, category] of Object.entries(history)) {
+      if (noteLower.startsWith(pastNote) || pastNote.startsWith(noteLower)) return category;
+    }
+    // Fuzzy: check if any word from note matches past note
+    const words = noteLower.split(/\s+/).filter(w => w.length > 2);
+    for (const word of words) {
+      for (const [pastNote, category] of Object.entries(history)) {
+        if (pastNote.includes(word)) return category;
+      }
+    }
+    return null;
+  }, []);
+
+  /**
    * Create transaction in database
    */
   const createTransaction = useCallback(async (txData) => {
@@ -197,6 +235,8 @@ export function useCategoryManager() {
     parseTransaction,
     createTransaction,
     formatCategory,
+    learnCategory,
+    suggestFromHistory,
     loadCustomCats: loadAllCats,
   };
 }
