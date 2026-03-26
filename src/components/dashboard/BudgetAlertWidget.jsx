@@ -93,7 +93,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
 
           const pieData = [
             { value: Math.min(b.spent, b.amount), color: riskColor },
-            { value: Math.max(0, b.amount - b.spent), color: "#E8EEF7" }
+            { value: Math.max(0, b.amount - b.spent), color: "transparent" }
           ];
 
           return (
@@ -105,7 +105,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
               <div className="relative w-10 h-10 mb-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={12} outerRadius={20} startAngle={90} endAngle={-270}>
+                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={12} outerRadius={20} startAngle={90} endAngle={-270} stroke="none">
                       {pieData.map((entry, i) => (
                         <Cell key={i} fill={entry.color} />
                       ))}
