@@ -31,7 +31,7 @@ export default function ProfileSettings() {
   }, []);
 
   async function handleLogout() {
-    base44.auth.logout();
+    base44.auth.logout('/');
   }
 
   async function handleDeleteAccount() {
