@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { CheckCircle, ChevronDown, X, TrendingUp, ArrowRight, Sparkles, Zap } from "lucide-react";
+import { CheckCircle, ChevronDown, X, TrendingUp, Sparkles, Users, ArrowRight, Play, Zap, BarChart2, MessageCircle, Shield } from "lucide-react";
 
 const SALARY_OPTIONS = [
   "< Rp 3.000.000",
@@ -14,50 +14,51 @@ const INTEREST_OPTIONS = ["Ya", "Mungkin", "Belum yakin"];
 
 const PROBLEMS = [
   { emoji: "💸", text: "Gaji masuk, tapi gak tau kemana hilangnya" },
-  { emoji: "🐷", text: "Udah coba nabung, tapi selalu kepake" },
+  { emoji: "😩", text: "Udah coba nabung, tapi selalu kepake juga" },
   { emoji: "😶‍🌫️", text: "Gak pernah tau kondisi keuangan sendiri" },
 ];
 
 const STEPS = [
-  { num: "01", label: "Tambah pengeluaran" },
-  { num: "02", label: "Semua langsung tercatat" },
-  { num: "03", label: "Lihat dashboard" },
-  { num: "04", label: "Nana AI kasih insight" },
-  { num: "05", label: "Analitik canggih — sekali lihat tau kemana uang pergi" },
+  { num: "01", title: "Tambah pengeluaran", desc: "Ketik atau pilih, selesai dalam 3 detik." },
+  { num: "02", title: "Semua langsung tercatat", desc: "Rapi, terorganisir, gak ada yang kelewat." },
+  { num: "03", title: "Lihat dashboard kamu", desc: "Kondisi keuangan seketika kelihatan jelas." },
+  { num: "04", title: "Nana AI kasih insight", desc: "Langsung tahu kamu boros di mana." },
+  { num: "05", title: "Analitik canggih", desc: "Sekali lihat, tau kemana uang pergi tiap bulan." },
 ];
 
 const FEATURES = [
-  { emoji: "⚡", title: "Pencatatan simpel", desc: "Gak ribet, 3 detik selesai" },
-  { emoji: "📊", title: "Dashboard jelas", desc: "Langsung ngerti kondisi keuangan" },
-  { emoji: "🔍", title: "Analitik", desc: "Tau kebiasaan kamu dari data nyata" },
-  { emoji: "🤖", title: "Nana AI", desc: "Kasih saran keuangan yang real" },
+  { icon: <Zap className="w-5 h-5" />, title: "Pencatatan simpel", desc: "Gak ribet. Tambah transaksi dalam hitungan detik." },
+  { icon: <BarChart2 className="w-5 h-5" />, title: "Dashboard jelas", desc: "Langsung ngerti kondisi keuangan tanpa pusing." },
+  { icon: <TrendingUp className="w-5 h-5" />, title: "Analitik lengkap", desc: "Tau pola kebiasaan kamu dan kapan kamu boros." },
+  { icon: <MessageCircle className="w-5 h-5" />, title: "Nana AI", desc: "Kasih saran real berdasarkan data keuangan kamu." },
 ];
 
-const PRICING = [
+const PLANS = [
   {
     name: "Gratis",
     price: "Rp 0",
     period: "30 hari pertama",
-    highlight: false,
+    features: ["Pencatatan transaksi", "Dashboard keuangan", "Laporan bulanan"],
     cta: "Mulai Gratis",
-    features: ["Semua fitur tersedia", "Nana AI aktif", "Tidak perlu kartu kredit"],
+    highlight: false,
   },
   {
     name: "Premium",
     price: "Rp 39.000",
     period: "per bulan",
+    features: ["Semua fitur gratis", "Nana AI tanpa batas", "Analitik canggih", "Budget & Goals tracker", "Export laporan"],
+    cta: "Coba Sekarang",
     highlight: true,
-    cta: "Coba Gratis 30 Hari",
-    features: ["Semua fitur termasuk Nana AI", "Analitik canggih", "Dashboard real-time", "Support prioritas"],
+    badge: "Paling populer",
   },
   {
     name: "Tahunan",
     price: "Rp 299.000",
     period: "per tahun",
+    features: ["Semua fitur Premium", "Hemat 36% vs bulanan", "Prioritas support"],
+    cta: "Hemat Lebih Banyak",
     highlight: false,
     badge: "Hemat 36%",
-    cta: "Pilih Tahunan",
-    features: ["Semua fitur Premium", "Hemat Rp 169.000/tahun", "Nana AI unlimited"],
   },
 ];
 
@@ -66,6 +67,8 @@ export default function LandingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [count, setCount] = useState(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const howRef = useRef(null);
   const [form, setForm] = useState({
     name: "", email: "", whatsapp: "", job: "",
     salary_estimate: "", city: "", biggest_money_problem: "",
@@ -106,33 +109,40 @@ export default function LandingPage() {
 
   const slotsLeft = count !== null ? Math.max(0, 500 - count) : null;
 
+  const scrollToHow = () => {
+    howRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { font-family: 'Inter', sans-serif; }
-        .gt { background: linear-gradient(135deg, #FF6A00 0%, #FFB347 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .glow { box-shadow: 0 0 40px rgba(255,106,0,0.3); }
-        .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
-        .idk { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: white; }
-        .idk:focus { outline: none; border-color: #FF6A00; box-shadow: 0 0 0 3px rgba(255,106,0,0.15); }
-        .idk::placeholder { color: rgba(255,255,255,0.3); }
-        .ierr { border-color: #EF4444 !important; }
-        html { scroll-behavior: smooth; }
+        .g-text { background: linear-gradient(135deg, #FF6A00 0%, #FFB347 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .glow { box-shadow: 0 0 40px rgba(255,106,0,0.25); }
+        .card-d { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+        .inp { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: white; }
+        .inp:focus { outline: none; border-color: #FF6A00; box-shadow: 0 0 0 3px rgba(255,106,0,0.15); }
+        .inp::placeholder { color: rgba(255,255,255,0.3); }
+        .inp-err { border-color: #EF4444 !important; }
+        .step-line::after { content: ''; position: absolute; left: 19px; top: 40px; bottom: -16px; width: 1px; background: rgba(255,106,0,0.2); }
       `}</style>
 
       {/* ── NAV ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 sm:px-8 py-4 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center gap-2">
-          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-8 h-8" />
-          <span className="font-bold text-white text-sm">Atur Pintar</span>
+          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-7 h-7" />
+          <span className="font-black text-white text-sm tracking-tight">Atur Pintar</span>
         </div>
-        {slotsLeft !== null && slotsLeft > 0 && (
-          <div className="hidden sm:flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-3 py-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] animate-pulse" />
-            <span className="text-xs text-[#FF6A00] font-semibold">{slotsLeft} slot tersisa</span>
-          </div>
-        )}
+        <div className="hidden sm:flex items-center gap-4">
+          {slotsLeft !== null && slotsLeft > 0 && (
+            <div className="flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-3 py-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] animate-pulse" />
+              <span className="text-[11px] text-[#FF6A00] font-semibold">{slotsLeft} slot tersisa</span>
+            </div>
+          )}
+          <button onClick={scrollToHow} className="text-xs text-white/50 hover:text-white transition-colors">Cara Kerja</button>
+        </div>
         <button
           onClick={() => setShowForm(true)}
           className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors"
@@ -142,201 +152,210 @@ export default function LandingPage() {
       </nav>
 
       {/* ── 1. HERO ── */}
-      <section className="pt-32 pb-20 px-5 text-center relative">
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[#FF6A00]/10 blur-[120px] pointer-events-none" />
+      <section className="pt-28 pb-20 px-5 sm:px-8 text-center relative">
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-[#FF6A00]/6 blur-[140px] pointer-events-none" />
 
-        {/* Urgency badge */}
-        <div className="inline-flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/25 rounded-full px-4 py-1.5 mb-7">
-          <Sparkles className="w-3.5 h-3.5 text-[#FF6A00]" />
-          <span className="text-xs text-[#FF6A00] font-bold">Gratis untuk 500 user pertama</span>
+        <div className="inline-flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-4 py-1.5 mb-6">
+          <Sparkles className="w-3 h-3 text-[#FF6A00]" />
+          <span className="text-[11px] text-[#FF6A00] font-bold uppercase tracking-wide">Gratis untuk 500 user pertama</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl font-black leading-tight mb-5 max-w-2xl mx-auto">
-          Uang kamu hilang{" "}
-          <span className="gt">tanpa sadar?</span>
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.1] mb-5 max-w-3xl mx-auto">
+          Uang kamu hilang<br />
+          <span className="g-text">tanpa sadar?</span>
         </h1>
 
-        <p className="text-base sm:text-lg text-white/55 max-w-md mx-auto mb-10 leading-relaxed">
+        <p className="text-base sm:text-lg text-white/50 max-w-lg mx-auto mb-10 leading-relaxed">
           Atur Pintar bantu kamu catat pengeluaran dan kasih insight dari AI biar kamu <span className="text-white font-semibold">gak boros lagi.</span>
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={() => setShowForm(true)}
-            className="group flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center"
+            className="group flex items-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
+            <Users className="w-4 h-4" />
             Coba Gratis Sekarang
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
-          <a
-            href="#cara-kerja"
-            className="flex items-center gap-2 text-white/60 hover:text-white text-sm font-medium transition-colors"
+          <button
+            onClick={scrollToHow}
+            className="flex items-center gap-2 text-white/60 hover:text-white border border-white/10 hover:border-white/20 font-semibold text-sm px-6 py-4 rounded-2xl transition-all w-full sm:w-auto"
           >
-            Lihat Cara Kerja ↓
-          </a>
+            <Play className="w-3.5 h-3.5" />
+            Lihat Cara Kerja
+          </button>
         </div>
 
         {count !== null && (
-          <div className="flex items-center justify-center gap-2">
+          <div className="mt-8 flex items-center justify-center gap-3">
             <div className="flex -space-x-2">
-              {["🧑‍💼","👩‍💻","🧑‍🎓","👩‍💼","🧑‍🍳"].map((e, i) => (
+              {["🧑‍💼", "👩‍💻", "🧑‍🎓", "👩‍💼", "🧑‍🍳"].map((e, i) => (
                 <div key={i} className="w-8 h-8 rounded-full bg-[#1A1A1A] border-2 border-[#0A0A0A] flex items-center justify-center text-sm">{e}</div>
               ))}
             </div>
             <p className="text-sm text-white/50">
               <span className="text-white font-bold">{count}</span> orang sudah bergabung
-              {slotsLeft > 0 && <span className="text-[#FF6A00]"> · {slotsLeft} slot tersisa</span>}
+              {slotsLeft > 0 && <span className="text-[#FF6A00] font-semibold"> · {slotsLeft} slot tersisa</span>}
             </p>
           </div>
         )}
       </section>
 
       {/* ── 2. PROBLEM ── */}
-      <section className="px-5 pb-20 max-w-xl mx-auto">
-        <p className="text-center text-white/30 text-xs font-bold uppercase tracking-widest mb-4">Kamu pernah ngerasain ini?</p>
-        <h2 className="text-center text-2xl sm:text-3xl font-black text-white mb-8">Jujur deh... 👇</h2>
+      <section className="px-5 sm:px-8 pb-20 max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Familiar gak?</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-white">Masalah yang kamu rasain juga</h2>
+        </div>
         <div className="space-y-3">
           {PROBLEMS.map((p, i) => (
-            <div key={i} className="card rounded-2xl px-5 py-4 flex items-center gap-4">
-              <span className="text-2xl">{p.emoji}</span>
-              <p className="text-white/80 font-medium text-sm leading-relaxed">{p.text}</p>
+            <div key={i} className="card-d rounded-2xl px-5 py-4 flex items-center gap-4">
+              <span className="text-2xl flex-shrink-0">{p.emoji}</span>
+              <p className="text-white/80 text-sm sm:text-base font-medium leading-snug">{p.text}</p>
             </div>
           ))}
         </div>
         <div className="mt-6 bg-[#FF6A00]/8 border border-[#FF6A00]/20 rounded-2xl px-5 py-4 text-center">
-          <p className="text-white/70 text-sm">Kalau iya, kamu <span className="text-white font-bold">gak sendirian.</span> Dan ini bukan soal gaji — ini soal <span className="text-[#FF6A00] font-bold">kebiasaan.</span></p>
-        </div>
-      </section>
-
-      {/* ── 3. SOLUTION ── */}
-      <section className="px-5 pb-20 max-w-xl mx-auto text-center">
-        <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-4">Solusinya</p>
-        <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">Dengan Atur Pintar:</h2>
-        <p className="text-white/50 text-sm mb-8">Simple. Cepat. Pintar.</p>
-        <div className="space-y-3 text-left mb-8">
-          {[
-            { emoji: "⚡", text: "Catat transaksi dalam 3 detik" },
-            { emoji: "📱", text: "Lihat kondisi keuangan langsung" },
-            { emoji: "🤖", text: "Dapat insight dari Nana AI" },
-          ].map((s, i) => (
-            <div key={i} className="flex items-center gap-4 card rounded-2xl px-5 py-4">
-              <span className="text-xl">{s.emoji}</span>
-              <p className="text-white font-semibold text-sm">{s.text}</p>
-              <CheckCircle className="w-4 h-4 text-[#FF6A00] ml-auto flex-shrink-0" />
-            </div>
-          ))}
-        </div>
-        <div className="bg-gradient-to-r from-[#FF6A00]/15 to-[#FFB347]/10 border border-[#FF6A00]/25 rounded-2xl px-6 py-5">
-          <p className="text-white font-bold text-base leading-relaxed">
-            "Bukan cuma catat.<br />Tapi <span className="gt">ngerti uang kamu.</span>"
+          <p className="text-white/70 text-sm leading-relaxed">
+            Kamu gak sendirian. Dan ini bukan masalah kemauan — <span className="text-white font-semibold">ini masalah tools yang belum tepat.</span>
           </p>
         </div>
       </section>
 
-      {/* ── 4. DEMO FLOW ── */}
-      <section id="cara-kerja" className="px-5 pb-20 max-w-2xl mx-auto">
-        <p className="text-center text-white/30 text-xs font-bold uppercase tracking-widest mb-4">Cara Kerja</p>
-        <h2 className="text-center text-2xl sm:text-3xl font-black text-white mb-10">Semudah 5 langkah 👆</h2>
-        <div className="relative">
-          {/* vertical line */}
-          <div className="absolute left-6 top-6 bottom-6 w-px bg-white/8" />
-          <div className="space-y-4">
-            {STEPS.map((s, i) => (
-              <div key={i} className="flex items-center gap-5 relative">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-black text-sm z-10 ${i === 3 ? "bg-[#FF6A00] text-white" : "bg-[#1A1A1A] border border-white/10 text-white/50"}`}>
-                  {s.num}
-                </div>
-                <div className="card rounded-2xl px-5 py-3.5 flex-1">
-                  <p className="text-white text-sm font-semibold">{s.label}</p>
-                </div>
+      {/* ── 3. SOLUTION ── */}
+      <section className="px-5 sm:px-8 pb-20 max-w-2xl mx-auto text-center">
+        <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Solusinya simpel</p>
+        <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Dengan Atur Pintar:</h2>
+        <p className="text-[#FF6A00] font-bold text-sm mb-8">Bukan cuma catat. Tapi ngerti uang kamu.</p>
+        <div className="space-y-3 text-left">
+          {[
+            { icon: "⚡", text: "Catat transaksi dalam 3 detik" },
+            { icon: "📊", text: "Lihat kondisi keuangan langsung" },
+            { icon: "🤖", text: "Dapat insight personal dari Nana AI" },
+          ].map((item, i) => (
+            <div key={i} className="card-d rounded-2xl px-5 py-4 flex items-center gap-4">
+              <span className="text-2xl">{item.icon}</span>
+              <p className="text-white font-semibold text-sm sm:text-base">{item.text}</p>
+              <CheckCircle className="w-4 h-4 text-[#FF6A00] ml-auto flex-shrink-0" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 4. HOW IT WORKS ── */}
+      <section ref={howRef} className="px-5 sm:px-8 pb-20 max-w-2xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Cara kerja</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-white">Semudah ini, serius.</h2>
+        </div>
+        <div className="space-y-0">
+          {STEPS.map((step, i) => (
+            <div key={i} className={`relative flex gap-5 ${i < STEPS.length - 1 ? "pb-8 step-line" : ""}`}>
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#FF6A00]/15 border border-[#FF6A00]/30 flex items-center justify-center">
+                <span className="text-[#FF6A00] text-xs font-black">{step.num}</span>
               </div>
-            ))}
-          </div>
+              <div className="pt-1.5">
+                <p className="text-white font-bold text-sm sm:text-base">{step.title}</p>
+                <p className="text-white/40 text-xs mt-0.5">{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all hover:scale-105"
+          >
+            Coba Sekarang <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </section>
 
       {/* ── 5. FEATURES ── */}
-      <section className="px-5 pb-20 max-w-2xl mx-auto">
-        <p className="text-center text-white/30 text-xs font-bold uppercase tracking-widest mb-4">Fitur</p>
-        <h2 className="text-center text-2xl sm:text-3xl font-black text-white mb-10">Yang kamu butuhkan, <span className="gt">ada semua.</span></h2>
+      <section className="px-5 sm:px-8 pb-20 max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Fitur utama</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-white">Yang kamu dapetin</h2>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {FEATURES.map((f, i) => (
-            <div key={i} className="card rounded-2xl p-6 hover:border-[#FF6A00]/30 transition-all hover:bg-white/[0.06]">
-              <div className="text-3xl mb-3">{f.emoji}</div>
-              <h3 className="font-bold text-white mb-1">{f.title}</h3>
-              <p className="text-sm text-white/45 leading-relaxed">{f.desc}</p>
+            <div key={i} className="card-d rounded-2xl p-5 hover:border-[#FF6A00]/25 transition-colors group">
+              <div className="w-9 h-9 rounded-xl bg-[#FF6A00]/10 flex items-center justify-center text-[#FF6A00] mb-3 group-hover:bg-[#FF6A00]/20 transition-colors">
+                {f.icon}
+              </div>
+              <p className="text-white font-bold text-sm mb-1">{f.title}</p>
+              <p className="text-white/45 text-xs leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── 6. SOCIAL PROOF ── */}
-      <section className="px-5 pb-20 max-w-xl mx-auto text-center">
-        <div className="card rounded-3xl p-8">
-          <div className="text-4xl mb-4">💬</div>
-          <p className="text-white font-bold text-lg leading-relaxed mb-3">
+      <section className="px-5 sm:px-8 pb-20 max-w-2xl mx-auto">
+        <div className="card-d rounded-3xl p-8 glow text-center">
+          <div className="w-14 h-14 rounded-full bg-[#FF6A00]/10 flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-7 h-7 text-[#FF6A00]" />
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-white mb-2">
+            {count !== null ? count : "—"}
+          </p>
+          <p className="text-white/40 text-sm mb-5">early users sudah bergabung</p>
+          <div className="w-full bg-white/8 rounded-full h-2 mb-5">
+            <div
+              className="bg-gradient-to-r from-[#FF6A00] to-[#FFB347] h-2 rounded-full transition-all"
+              style={{ width: `${count !== null ? Math.min((count / 500) * 100, 100) : 0}%` }}
+            />
+          </div>
+          <p className="text-white/60 text-sm leading-relaxed italic">
             "Dirancang untuk membantu kamu yang sering bingung kemana uang pergi."
           </p>
-          <p className="text-white/40 text-sm">Sudah digunakan oleh early users</p>
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <div className="flex -space-x-2">
-              {["😊","🙌","💪","🧠","✨"].map((e, i) => (
-                <div key={i} className="w-8 h-8 rounded-full bg-[#1A1A1A] border-2 border-[#0A0A0A] flex items-center justify-center text-sm">{e}</div>
-              ))}
-            </div>
-            {count !== null && (
-              <p className="text-sm text-white/50"><span className="text-white font-bold">{count}</span> orang bergabung</p>
-            )}
-          </div>
-          {/* Slot progress */}
-          {count !== null && (
-            <div className="mt-5">
-              <div className="flex justify-between text-xs text-white/30 mb-2">
-                <span>{count} dari 500 slot terisi</span>
-                <span className="text-[#FF6A00]">{slotsLeft} tersisa</span>
-              </div>
-              <div className="w-full bg-white/8 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-[#FF6A00] to-[#FFB347] h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min((count / 500) * 100, 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
+          <p className="text-white/25 text-xs mt-3">— Tim Atur Pintar</p>
         </div>
       </section>
 
       {/* ── 7. PRICING ── */}
-      <section className="px-5 pb-20 max-w-3xl mx-auto">
-        <p className="text-center text-white/30 text-xs font-bold uppercase tracking-widest mb-4">Harga</p>
-        <h2 className="text-center text-2xl sm:text-3xl font-black text-white mb-2">Harga sederhana</h2>
-        <p className="text-center text-white/40 text-sm mb-10">Akses semua fitur termasuk Nana AI</p>
+      <section className="px-5 sm:px-8 pb-20 max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Harga</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-white">Harga sederhana, gak ribet</h2>
+          <p className="text-white/40 text-sm mt-2">Akses semua fitur termasuk Nana AI</p>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {PRICING.map((plan, i) => (
+          {PLANS.map((plan, i) => (
             <div
               key={i}
-              className={`rounded-2xl p-6 relative ${plan.highlight ? "bg-[#FF6A00] glow" : "card"}`}
+              className={`relative rounded-2xl p-6 flex flex-col ${
+                plan.highlight
+                  ? "bg-[#FF6A00] border border-[#FF6A00]"
+                  : "card-d"
+              }`}
             >
               {plan.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-full">{plan.badge}</span>
+                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${
+                  plan.highlight ? "bg-white text-[#FF6A00]" : "bg-[#FF6A00] text-white"
+                }`}>
+                  {plan.badge}
+                </div>
               )}
-              {plan.highlight && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-[#FF6A00] text-[10px] font-bold px-3 py-1 rounded-full">PALING POPULER</span>
-              )}
-              <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${plan.highlight ? "text-white/70" : "text-white/40"}`}>{plan.name}</p>
-              <p className={`text-2xl font-black mb-0.5 ${plan.highlight ? "text-white" : "text-white"}`}>{plan.price}</p>
-              <p className={`text-xs mb-5 ${plan.highlight ? "text-white/70" : "text-white/40"}`}>{plan.period}</p>
-              <ul className="space-y-2 mb-6">
-                {plan.features.map((f, j) => (
-                  <li key={j} className={`flex items-center gap-2 text-xs ${plan.highlight ? "text-white/90" : "text-white/60"}`}>
+              <p className={`font-black text-base mb-1 ${plan.highlight ? "text-white" : "text-white"}`}>{plan.name}</p>
+              <p className={`text-3xl font-black mb-0.5 ${plan.highlight ? "text-white" : "g-text"}`}>{plan.price}</p>
+              <p className={`text-xs mb-5 ${plan.highlight ? "text-white/70" : "text-white/35"}`}>{plan.period}</p>
+              <div className="space-y-2.5 flex-1 mb-6">
+                {plan.features.map((feat, j) => (
+                  <div key={j} className="flex items-center gap-2">
                     <CheckCircle className={`w-3.5 h-3.5 flex-shrink-0 ${plan.highlight ? "text-white" : "text-[#FF6A00]"}`} />
-                    {f}
-                  </li>
+                    <p className={`text-xs ${plan.highlight ? "text-white/90" : "text-white/60"}`}>{feat}</p>
+                  </div>
                 ))}
-              </ul>
+              </div>
               <button
                 onClick={() => setShowForm(true)}
-                className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.highlight ? "bg-white text-[#FF6A00] hover:bg-white/90" : "bg-[#FF6A00]/10 border border-[#FF6A00]/30 text-[#FF6A00] hover:bg-[#FF6A00]/20"}`}
+                className={`w-full font-bold text-sm py-3 rounded-xl transition-all ${
+                  plan.highlight
+                    ? "bg-white text-[#FF6A00] hover:bg-white/90"
+                    : "border border-white/15 text-white hover:border-[#FF6A00]/50 hover:text-[#FF6A00]"
+                }`}
               >
                 {plan.cta}
               </button>
@@ -346,28 +365,36 @@ export default function LandingPage() {
       </section>
 
       {/* ── 8. FINAL CTA ── */}
-      <section className="px-5 pb-28 max-w-2xl mx-auto text-center">
-        <div className="card rounded-3xl p-10 glow relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#FF6A00]/10 to-transparent pointer-events-none" />
-          <div className="relative">
-            <Zap className="w-10 h-10 text-[#FF6A00] mx-auto mb-5" />
-            <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight mb-6">
-              "Kalau kamu gak kontrol uangmu,{" "}
-              <span className="gt">uangmu yang kontrol kamu.</span>"
-            </h2>
-            <button
-              onClick={() => setShowForm(true)}
-              className="group inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-10 py-4 rounded-2xl transition-all hover:scale-105 active:scale-95"
-            >
-              Coba Gratis Sekarang
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            {slotsLeft !== null && slotsLeft > 0 && (
-              <p className="mt-3 text-xs text-white/30">⚡ Hanya tersisa <span className="text-[#FF6A00] font-bold">{slotsLeft}</span> slot gratis</p>
-            )}
-          </div>
+      <section className="px-5 sm:px-8 pb-24 max-w-2xl mx-auto text-center">
+        <div className="card-d rounded-3xl p-10 sm:p-14">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-[#FF6A00]/6 blur-[80px] pointer-events-none" />
+          <h2 className="text-2xl sm:text-4xl font-black text-white mb-3 leading-tight relative">
+            Kalau kamu gak kontrol uangmu,<br />
+            <span className="g-text">uangmu yang kontrol kamu.</span>
+          </h2>
+          <p className="text-white/40 text-sm mb-8 relative">Mulai sekarang. Gratis 30 hari. Gak perlu kartu kredit.</p>
+          <button
+            onClick={() => setShowForm(true)}
+            className="relative group inline-flex items-center gap-3 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-black text-base px-10 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95"
+          >
+            <Users className="w-5 h-5" />
+            Coba Gratis Sekarang
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+          {slotsLeft !== null && slotsLeft > 0 && (
+            <p className="text-[#FF6A00] text-xs font-semibold mt-4">⚡ {slotsLeft} slot gratis tersisa</p>
+          )}
         </div>
       </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="border-t border-white/5 py-8 text-center px-5">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-5 h-5" />
+          <span className="text-sm font-black text-white">Atur Pintar</span>
+        </div>
+        <p className="text-white/20 text-xs">© 2025 Atur Pintar. Segera hadir untuk semua.</p>
+      </footer>
 
       {/* ── FORM MODAL ── */}
       {showForm && !submitted && (
@@ -381,38 +408,37 @@ export default function LandingPage() {
             </button>
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 rounded-lg bg-[#FF6A00] flex items-center justify-center">
-                  <TrendingUp className="w-3.5 h-3.5 text-white" />
-                </div>
-                <span className="text-xs font-semibold text-[#FF6A00]">Atur Pintar — Daftar Gratis</span>
+                <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-5 h-5" />
+                <span className="text-xs font-bold text-[#FF6A00]">Atur Pintar — Waiting List</span>
               </div>
-              <h2 className="text-xl font-black text-white">Coba Gratis Sekarang</h2>
+              <h2 className="text-xl font-black text-white">Daftar Akses Awal</h2>
               <p className="text-sm text-white/40 mt-1">Isi form ini untuk mendapatkan akses pertama, gratis.</p>
             </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-white/60 mb-1.5 block">Nama Lengkap *</label>
-                <input className={`idk w-full rounded-xl px-4 py-3 text-sm ${errors.name ? "ierr" : ""}`} placeholder="John Doe" value={form.name} onChange={(e) => handleChange("name", e.target.value)} />
+                <input className={`inp w-full rounded-xl px-4 py-3 text-sm ${errors.name ? "inp-err" : ""}`} placeholder="Nama kamu" value={form.name} onChange={(e) => handleChange("name", e.target.value)} />
                 {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
               </div>
               <div>
                 <label className="text-xs font-semibold text-white/60 mb-1.5 block">Email *</label>
-                <input type="email" className={`idk w-full rounded-xl px-4 py-3 text-sm ${errors.email ? "ierr" : ""}`} placeholder="nama@email.com" value={form.email} onChange={(e) => handleChange("email", e.target.value)} />
+                <input type="email" className={`inp w-full rounded-xl px-4 py-3 text-sm ${errors.email ? "inp-err" : ""}`} placeholder="nama@email.com" value={form.email} onChange={(e) => handleChange("email", e.target.value)} />
                 {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
               </div>
               <div>
                 <label className="text-xs font-semibold text-white/60 mb-1.5 block">WhatsApp <span className="text-white/30">(opsional)</span></label>
-                <input className="idk w-full rounded-xl px-4 py-3 text-sm" placeholder="08xx-xxxx-xxxx" value={form.whatsapp} onChange={(e) => handleChange("whatsapp", e.target.value)} />
+                <input className="inp w-full rounded-xl px-4 py-3 text-sm" placeholder="08xx-xxxx-xxxx" value={form.whatsapp} onChange={(e) => handleChange("whatsapp", e.target.value)} />
               </div>
               <div>
                 <label className="text-xs font-semibold text-white/60 mb-1.5 block">Pekerjaan *</label>
-                <input className={`idk w-full rounded-xl px-4 py-3 text-sm ${errors.job ? "ierr" : ""}`} placeholder="Karyawan, Freelancer, Mahasiswa..." value={form.job} onChange={(e) => handleChange("job", e.target.value)} />
+                <input className={`inp w-full rounded-xl px-4 py-3 text-sm ${errors.job ? "inp-err" : ""}`} placeholder="Karyawan, Freelancer, Mahasiswa..." value={form.job} onChange={(e) => handleChange("job", e.target.value)} />
                 {errors.job && <p className="text-xs text-red-400 mt-1">{errors.job}</p>}
               </div>
               <div>
-                <label className="text-xs font-semibold text-white/60 mb-1.5 block">Perkiraan Gaji / Bulan *</label>
+                <label className="text-xs font-semibold text-white/60 mb-1.5 block">Perkiraan Pendapatan per Bulan *</label>
                 <div className="relative">
-                  <select className={`idk w-full rounded-xl px-4 py-3 text-sm appearance-none ${errors.salary_estimate ? "ierr" : ""} ${!form.salary_estimate ? "text-white/30" : "text-white"}`} value={form.salary_estimate} onChange={(e) => handleChange("salary_estimate", e.target.value)}>
+                  <select className={`inp w-full rounded-xl px-4 py-3 text-sm appearance-none ${errors.salary_estimate ? "inp-err" : ""} ${!form.salary_estimate ? "text-white/30" : "text-white"}`} value={form.salary_estimate} onChange={(e) => handleChange("salary_estimate", e.target.value)}>
                     <option value="" disabled>Pilih rentang gaji</option>
                     {SALARY_OPTIONS.map((s) => <option key={s} value={s} className="bg-[#111] text-white">{s}</option>)}
                   </select>
@@ -422,11 +448,15 @@ export default function LandingPage() {
               </div>
               <div>
                 <label className="text-xs font-semibold text-white/60 mb-1.5 block">Asal Kota *</label>
-                <input className={`idk w-full rounded-xl px-4 py-3 text-sm ${errors.city ? "ierr" : ""}`} placeholder="Jakarta, Bandung, Surabaya..." value={form.city} onChange={(e) => handleChange("city", e.target.value)} />
+                <input className={`inp w-full rounded-xl px-4 py-3 text-sm ${errors.city ? "inp-err" : ""}`} placeholder="Jakarta, Bandung, Surabaya..." value={form.city} onChange={(e) => handleChange("city", e.target.value)} />
                 {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city}</p>}
               </div>
               <div>
-                <label className="text-xs font-semibold text-white/60 mb-2 block">Kamu saat ini mencatat keuangan pakai apa?</label>
+                <label className="text-xs font-semibold text-white/60 mb-1.5 block">Tantangan terbesar soal uang? <span className="text-white/30">(opsional)</span></label>
+                <textarea className="inp w-full rounded-xl px-4 py-3 text-sm resize-none" rows={3} placeholder="Cerita dong..." value={form.biggest_money_problem} onChange={(e) => handleChange("biggest_money_problem", e.target.value)} />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-white/60 mb-2 block">Kamu biasanya catat keuangan pakai apa?</label>
                 <div className="grid grid-cols-2 gap-2">
                   {TRACKING_OPTIONS.map((opt) => (
                     <button type="button" key={opt} onClick={() => handleChange("current_finance_tracking_method", opt)}
@@ -437,7 +467,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-white/60 mb-2 block">Bersedia coba versi awal?</label>
+                <label className="text-xs font-semibold text-white/60 mb-2 block">Mau coba versi awalnya?</label>
                 <div className="flex gap-2">
                   {INTEREST_OPTIONS.map((opt) => (
                     <button type="button" key={opt} onClick={() => handleChange("early_access_interest", opt)}
@@ -447,15 +477,16 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
-              <button type="submit" disabled={loading} className="w-full bg-[#FF6A00] hover:bg-[#e05e00] disabled:opacity-60 text-white font-bold py-4 rounded-xl transition-all mt-2 text-sm">
+              <button type="submit" disabled={loading}
+                className="w-full bg-[#FF6A00] hover:bg-[#e05e00] disabled:opacity-60 text-white font-black py-4 rounded-xl transition-all mt-2 text-sm">
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Mendaftarkan...
                   </span>
-                ) : "🚀 Coba Gratis Sekarang"}
+                ) : "🚀 Daftar Waiting List Sekarang"}
               </button>
-              <p className="text-center text-white/25 text-[10px]">Tidak perlu kartu kredit. Gratis 30 hari.</p>
+              <p className="text-center text-white/25 text-[10px] leading-relaxed">Pengguna waiting list mendapat akses lebih awal, gratis.</p>
             </form>
           </div>
         </div>
@@ -468,31 +499,23 @@ export default function LandingPage() {
             <div className="w-16 h-16 rounded-full bg-green-500/15 flex items-center justify-center mx-auto mb-5">
               <CheckCircle className="w-9 h-9 text-green-400" />
             </div>
-            <h2 className="text-xl font-black text-white mb-3">Kamu sudah masuk! 🎉</h2>
-            <p className="text-white/50 text-sm leading-relaxed mb-6">
-              Terima kasih! Kamu sudah masuk waiting list Atur Pintar.<br />
-              Kami akan hubungi kamu saat akses awal dibuka.
+            <h2 className="text-xl font-black text-white mb-2">Kamu sudah masuk! 🎉</h2>
+            <p className="text-white/50 text-sm leading-relaxed mb-5">
+              Terima kasih! Kamu udah masuk waiting list Atur Pintar.<br />
+              Kami bakal hubungi kamu saat akses pertama dibuka.
             </p>
-            <div className="card rounded-2xl p-4 mb-5">
+            <div className="card-d rounded-2xl p-4 mb-5">
               <p className="text-xs text-white/40 mb-1">Total yang sudah bergabung</p>
-              <p className="text-3xl font-black gt">{count}</p>
+              <p className="text-3xl font-black g-text">{count}</p>
               <p className="text-xs text-white/40 mt-1">dari 500 slot</p>
             </div>
-            <button onClick={() => { setShowForm(false); setSubmitted(false); }} className="w-full bg-white/8 hover:bg-white/12 border border-white/10 text-white/60 text-sm font-medium py-3 rounded-xl transition-colors">
+            <button onClick={() => { setShowForm(false); setSubmitted(false); }}
+              className="w-full bg-white/8 hover:bg-white/12 border border-white/10 text-white/60 text-sm font-semibold py-3 rounded-xl transition-colors">
               Tutup
             </button>
           </div>
         </div>
       )}
-
-      {/* ── FOOTER ── */}
-      <footer className="border-t border-white/5 py-8 text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-6 h-6" />
-          <span className="text-sm font-bold text-white">Atur Pintar</span>
-        </div>
-        <p className="text-white/25 text-xs">© 2025 Atur Pintar. AI Financial Tracker untuk generasi muda.</p>
-      </footer>
     </div>
   );
 }
