@@ -52,7 +52,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<Navigate to="/Dashboard" replace />} />
       <Route path="/Dashboard" element={
         <LayoutWrapper currentPageName="Dashboard">
           <Dashboard />
