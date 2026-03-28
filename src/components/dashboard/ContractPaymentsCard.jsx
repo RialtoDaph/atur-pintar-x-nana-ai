@@ -264,10 +264,9 @@ function ItemSection({ label, emoji, items, isIncome, onEdit, onDelete, onMarkDo
                 </button>
                 <button
                   onClick={() => onDelete(tx.id)}
-                  className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] active:bg-[#FEE2E2] transition-colors tap-highlight-fix text-[10px] font-semibold"
+                  className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] active:bg-[#FEE2E2] transition-colors tap-highlight-fix"
                 >
                   <Trash2 className="w-3 h-3" />
-                  <span>Catat &amp; Hapus</span>
                 </button>
               </div>
             </div>

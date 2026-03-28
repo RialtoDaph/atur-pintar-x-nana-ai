@@ -288,10 +288,10 @@ export default function SubscriptionCard({ user }) {
                             </button>
                             <button
                               onClick={() => handleCancel(sub.id)}
-                              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] active:bg-[#FEE2E2] transition-colors tap-highlight-fix text-[10px] font-semibold"
+                              className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] active:bg-[#FEE2E2] transition-colors tap-highlight-fix"
+                              title="Batalkan"
                             >
                               <XCircle className="w-3.5 h-3.5" />
-                              <span>Batalkan</span>
                             </button>
                           </>
                         )}
