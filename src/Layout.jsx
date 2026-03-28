@@ -214,8 +214,8 @@ function LayoutInner({ children, currentPageName }) {
             to={createPageUrl("ProfileSettings")}
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#888] hover:text-white hover:bg-white/10 transition-colors">
 
-            <div className="w-5 h-5 rounded-full bg-[#FF6A00] flex items-center justify-center text-white text-[9px] font-bold">
-              {initials}
+            <div className="w-5 h-5 rounded-full bg-[#FF6A00] flex items-center justify-center text-white text-[9px] font-bold overflow-hidden">
+              {user?.profile_picture ? <img src={user.profile_picture} alt="avatar" className="w-full h-full object-cover" /> : initials}
             </div>
             <span className="truncate">{user?.full_name || t('profile')}</span>
           </Link>
@@ -252,8 +252,8 @@ function LayoutInner({ children, currentPageName }) {
             <button onClick={() => setShowSearch(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
               <Search className="w-4 h-4" />
             </button>
-            <Link to={createPageUrl("ProfileSettings")} className="w-8 h-8 rounded-full bg-[#FF6A00] flex items-center justify-center text-white text-xs font-bold tap-highlight-fix">
-              {initials}
+            <Link to={createPageUrl("ProfileSettings")} className="w-8 h-8 rounded-full bg-[#FF6A00] flex items-center justify-center text-white text-xs font-bold tap-highlight-fix overflow-hidden">
+              {user?.profile_picture ? <img src={user.profile_picture} alt="avatar" className="w-full h-full object-cover" /> : initials}
             </Link>
           </div>
         </div>
