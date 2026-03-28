@@ -1,16 +1,11 @@
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, ChevronDown, RefreshCw, CheckCircle2 } from "lucide-react";
-import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
+import { toast } from "sonner";
 import EditContractModal from "./EditContractModal";
 
-const INTERVAL_LABEL = {
-  daily: "harian",
-  weekly: "mingguan",
-  monthly: "bulanan",
-  yearly: "tahunan",
-};
+const INTERVAL_LABEL = { daily: "harian", weekly: "mingguan", monthly: "bulanan", yearly: "tahunan" };
 
 function calcMonthly(tx) {
   if (tx.recurring_interval === "yearly") return tx.amount / 12;
@@ -39,21 +34,22 @@ export default function ContractPaymentsCard({ user }) {
     setLoading(false);
   }
 
+  async function handleMarkDone(tx) {
+    await base44.entities.Transaction.create({
+      amount: tx.amount,
+      type: tx.type,
+      category: tx.category,
+      note: (tx.note || "Transaksi rutin") + " (selesai)",
+      date: new Date().toISOString().split("T")[0],
+      is_recurring: false,
+      is_recurring_child: true,
+      recurring_parent_id: tx.id,
+    });
+    toast.success(`✅ "${tx.note || "Transaksi rutin"}" dicatat!`);
+  }
+
   async function handleDelete(id) {
-    const tx = templates.find((t) => t.id === id);
-    if (!confirm(`Catat pembayaran "${tx?.note || 'transaksi rutin'}" ke riwayat dan hapus dari daftar rutin?`)) return;
-    // Create a one-time transaction record in history
-    if (tx) {
-      await base44.entities.Transaction.create({
-        amount: tx.amount,
-        type: tx.type,
-        category: tx.category,
-        note: (tx.note || 'Transaksi rutin') + ' (dicatat manual)',
-        date: new Date().toISOString().split('T')[0],
-        is_recurring_child: false,
-        is_recurring: false,
-      });
-    }
+    if (!confirm("Hapus transaksi rutin ini?")) return;
     await base44.entities.Transaction.delete(id);
     setTemplates((prev) => prev.filter((t) => t.id !== id));
   }
@@ -70,20 +66,6 @@ export default function ContractPaymentsCard({ user }) {
     loadTemplates();
   }
 
-  async function handleMarkDone(tx) {
-    await base44.entities.Transaction.create({
-      amount: tx.amount,
-      type: tx.type,
-      category: tx.category,
-      note: (tx.note || 'Transaksi rutin') + ' (selesai)',
-      date: new Date().toISOString().split('T')[0],
-      is_recurring: false,
-      is_recurring_child: true,
-      recurring_parent_id: tx.id,
-    });
-    toast.success(`✅ "${tx.note || 'Transaksi rutin'}" berhasil dicatat ke riwayat!`);
-  }
-
   const incomes = templates.filter((t) => t.type === "income");
   const expenses = templates.filter((t) => t.type === "expense");
   const totalIncome = incomes.reduce((s, t) => s + calcMonthly(t), 0);
@@ -93,88 +75,50 @@ export default function ContractPaymentsCard({ user }) {
 
   return (
     <>
-      <div data-tour="contract-payments-card" className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         {/* Header */}
-        <button
-          onClick={() => setOpen((o) => !o)}
-          className="w-full flex items-center gap-3 px-4 py-3.5 tap-highlight-fix"
-        >
-          <div className="w-9 h-9 rounded-xl bg-[#4F7CFF]/10 flex items-center justify-center flex-shrink-0">
-            <RefreshCw className="w-4 h-4 text-[#4F7CFF]" />
+        <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center gap-3 px-4 py-3 tap-highlight-fix">
+          <div className="w-8 h-8 rounded-lg bg-[#4F7CFF]/10 flex items-center justify-center flex-shrink-0">
+            <RefreshCw className="w-3.5 h-3.5 text-[#4F7CFF]" />
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-sm font-bold text-[#1A1A1A]">Gaji & Transaksi Rutin</p>
-            <p className="text-[11px] text-[#8FA4C8] truncate">
-              {loading
-                ? "Memuat..."
-                : templates.length === 0
-                ? "Belum ada transaksi rutin"
-                : `${incomes.length} pemasukan · ${expenses.length} pengeluaran`}
+            <p className="text-xs font-bold text-[#1A1A1A]">Transaksi Rutin</p>
+            <p className="text-[10px] text-[#8FA4C8]">
+              {loading ? "Memuat..." : templates.length === 0 ? "Belum ada" : `${incomes.length} masuk · ${expenses.length} keluar`}
             </p>
           </div>
           {!loading && templates.length > 0 && (
-            <div className="text-right flex-shrink-0 mr-1">
-              <p className={`text-xs font-bold ${net >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                {net >= 0 ? "+" : ""}{formatCurrency(net)}
-              </p>
-              <p className="text-[10px] text-[#8FA4C8]">/ bulan</p>
-            </div>
+            <span className={`text-xs font-bold flex-shrink-0 mr-1 ${net >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+              {net >= 0 ? "+" : ""}{formatCurrency(net)}<span className="text-[9px] font-normal text-[#8FA4C8]">/bln</span>
+            </span>
           )}
-          <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform flex-shrink-0 ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`w-3.5 h-3.5 text-[#8FA4C8] transition-transform flex-shrink-0 ${open ? "rotate-180" : ""}`} />
         </button>
 
         {open && (
           <div className="border-t border-[#F2F4F7]">
-            {/* Net summary */}
+            {/* Summary strip */}
             {templates.length > 0 && (
               <div className="grid grid-cols-3 divide-x divide-[#F2F4F7] bg-[#F8FAFC]">
-                <div className="px-3 py-2.5 text-center">
-                  <p className="text-[10px] text-[#8FA4C8] mb-0.5">Masuk / bln</p>
-                  <p className="text-xs font-bold text-[#00C9A7]">+{formatCurrency(totalIncome)}</p>
-                </div>
-                <div className="px-3 py-2.5 text-center">
-                  <p className="text-[10px] text-[#8FA4C8] mb-0.5">Keluar / bln</p>
-                  <p className="text-xs font-bold text-[#FF6B6B]">−{formatCurrency(totalExpense)}</p>
-                </div>
-                <div className="px-3 py-2.5 text-center">
-                  <p className="text-[10px] text-[#8FA4C8] mb-0.5">Net / bln</p>
-                  <p className={`text-xs font-bold ${net >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                    {net >= 0 ? "+" : ""}{formatCurrency(net)}
-                  </p>
-                </div>
+                {[
+                  { label: "Masuk/bln", val: `+${formatCurrency(totalIncome)}`, color: "text-[#00C9A7]" },
+                  { label: "Keluar/bln", val: `−${formatCurrency(totalExpense)}`, color: "text-[#FF6B6B]" },
+                  { label: "Net/bln", val: `${net >= 0 ? "+" : ""}${formatCurrency(net)}`, color: net >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]" },
+                ].map(({ label, val, color }) => (
+                  <div key={label} className="py-2 text-center">
+                    <p className="text-[9px] text-[#8FA4C8]">{label}</p>
+                    <p className={`text-[11px] font-bold ${color}`}>{val}</p>
+                  </div>
+                ))}
               </div>
             )}
 
             {loading ? (
-              <div className="p-4 space-y-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-11 bg-[#F2F4F7] rounded-xl animate-pulse" />
-                ))}
-              </div>
+              <div className="p-3 space-y-2">{[1,2,3].map(i => <div key={i} className="h-9 bg-[#F2F4F7] rounded-lg animate-pulse" />)}</div>
             ) : (
               <>
-                <ItemSection
-                  label="Pemasukan Rutin"
-                  emoji="💰"
-                  items={incomes}
-                  isIncome
-                  onEdit={setEditingId}
-                  onDelete={handleDelete}
-                  onMarkDone={handleMarkDone}
-                  formatCurrency={formatCurrency}
-                  onAdd={() => setShowAdd("income")}
-                />
-                <ItemSection
-                  label="Pengeluaran Rutin"
-                  emoji="📤"
-                  items={expenses}
-                  isIncome={false}
-                  onEdit={setEditingId}
-                  onDelete={handleDelete}
-                  onMarkDone={handleMarkDone}
-                  formatCurrency={formatCurrency}
-                  onAdd={() => setShowAdd("expense")}
-                />
+                <Section label="💰 Pemasukan" items={incomes} isIncome onMarkDone={handleMarkDone} onEdit={setEditingId} onDelete={handleDelete} formatCurrency={formatCurrency} onAdd={() => setShowAdd("income")} />
+                <Section label="📤 Pengeluaran" items={expenses} isIncome={false} onMarkDone={handleMarkDone} onEdit={setEditingId} onDelete={handleDelete} formatCurrency={formatCurrency} onAdd={() => setShowAdd("expense")} />
               </>
             )}
           </div>
@@ -183,90 +127,54 @@ export default function ContractPaymentsCard({ user }) {
 
       {showAdd && (
         <EditContractModal
-          contract={{
-            type: showAdd,
-            recurring_interval: "monthly",
-            date: new Date().toISOString().split("T")[0],
-          }}
+          contract={{ type: showAdd, recurring_interval: "monthly", date: new Date().toISOString().split("T")[0] }}
           onClose={() => setShowAdd(null)}
           onSave={handleAdd}
         />
       )}
-
       {editingContract && (
-        <EditContractModal
-          contract={editingContract}
-          onClose={() => setEditingId(null)}
-          onSave={handleUpdate}
-        />
+        <EditContractModal contract={editingContract} onClose={() => setEditingId(null)} onSave={handleUpdate} />
       )}
     </>
   );
 }
 
-function ItemSection({ label, emoji, items, isIncome, onEdit, onDelete, onMarkDone, formatCurrency, onAdd }) {
+function Section({ label, items, isIncome, onMarkDone, onEdit, onDelete, formatCurrency, onAdd }) {
   return (
     <div className="border-t border-[#F2F4F7]">
-      {/* Section header */}
-      <div className="flex items-center justify-between px-4 py-2.5">
-        <p className="text-xs font-bold text-[#4A5568]">{emoji} {label}</p>
-        <button
-          onClick={onAdd}
-          className="flex items-center gap-1 text-[11px] font-semibold text-[#FF6A00] hover:opacity-75 tap-highlight-fix"
-        >
+      <div className="flex items-center justify-between px-4 py-2">
+        <p className="text-[10px] font-bold text-[#8FA4C8] uppercase tracking-wide">{label}</p>
+        <button onClick={onAdd} className="flex items-center gap-0.5 text-[10px] font-semibold text-[#FF6A00] tap-highlight-fix">
           <Plus className="w-3 h-3" /> Tambah
         </button>
       </div>
 
       {items.length === 0 ? (
-        <button
-          onClick={onAdd}
-          className="mx-4 mb-3 w-[calc(100%-2rem)] flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-[#E2E8F0] text-[11px] font-medium text-[#8FA4C8] hover:border-[#FF6A00] hover:text-[#FF6A00] transition-colors tap-highlight-fix"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          {isIncome ? "Tambah gaji / pendapatan rutin" : "Tambah tagihan / cicilan rutin"}
+        <button onClick={onAdd} className="mx-3 mb-2.5 w-[calc(100%-1.5rem)] flex items-center justify-center gap-1 py-2 rounded-xl border-2 border-dashed border-[#E2E8F0] text-[10px] text-[#8FA4C8] hover:border-[#FF6A00] hover:text-[#FF6A00] transition-colors tap-highlight-fix">
+          <Plus className="w-3 h-3" />
+          {isIncome ? "Tambah gaji/pendapatan rutin" : "Tambah tagihan/cicilan rutin"}
         </button>
       ) : (
-        <div className="divide-y divide-[#F2F4F7] mb-1">
+        <div className="pb-1">
           {items.map((tx) => (
-            <div key={tx.id} className="flex items-center gap-3 px-4 py-2.5">
-              <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-sm flex-shrink-0"
-                style={{ background: isIncome ? "#00C9A715" : "#FF6B6B15" }}
-              >
-                {isIncome ? "💰" : "📤"}
-              </div>
+            <div key={tx.id} className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#F8FAFC] transition-colors">
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-[#1A1A1A] truncate">
-                  {tx.note || (isIncome ? "Pendapatan" : "Tagihan")}
-                </p>
-                <p className="text-[10px] text-[#8FA4C8] capitalize">
-                  {INTERVAL_LABEL[tx.recurring_interval] || tx.recurring_interval}
-                </p>
+                <p className="text-xs font-medium text-[#1A1A1A] truncate">{tx.note || (isIncome ? "Pendapatan" : "Tagihan")}</p>
+                <p className="text-[9px] text-[#8FA4C8] capitalize">{INTERVAL_LABEL[tx.recurring_interval] || tx.recurring_interval}</p>
               </div>
               <span className={`text-xs font-bold flex-shrink-0 ${isIncome ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
                 {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
               </span>
+              {/* Actions */}
               <div className="flex items-center gap-0.5 flex-shrink-0">
-                <button
-                  onClick={() => onMarkDone(tx)}
-                  title="Tandai Selesai"
-                  className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20 transition-colors tap-highlight-fix text-[10px] font-semibold"
-                >
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>Selesai</span>
+                <button onClick={() => onMarkDone(tx)} title="Tandai Selesai" className="p-1.5 rounded-lg bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20 transition-colors tap-highlight-fix">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                 </button>
-                <button
-                  onClick={() => onEdit(tx.id)}
-                  className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#4F7CFF] hover:bg-[#F2F4F7] active:bg-[#E8EDFF] transition-colors tap-highlight-fix"
-                >
-                  <Pencil className="w-3 h-3" />
+                <button onClick={() => onEdit(tx.id)} title="Edit" className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#4F7CFF] hover:bg-[#F2F4F7] transition-colors tap-highlight-fix">
+                  <Pencil className="w-3.5 h-3.5" />
                 </button>
-                <button
-                  onClick={() => onDelete(tx.id)}
-                  className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] active:bg-[#FEE2E2] transition-colors tap-highlight-fix"
-                >
-                  <Trash2 className="w-3 h-3" />
+                <button onClick={() => onDelete(tx.id)} title="Hapus" className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] transition-colors tap-highlight-fix">
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
