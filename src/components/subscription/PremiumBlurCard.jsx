@@ -27,22 +27,4 @@ export default function PremiumBlurCard({ children, title }) {
       </div>
     </div>
   );
-}}>
-        {children}
-      </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 rounded-2xl gap-2">
-        <div className="w-10 h-10 rounded-full bg-[#FF6A00]/10 flex items-center justify-center">
-          <Crown className="w-5 h-5 text-[#FF6A00]" />
-        </div>
-        <p className="text-sm font-bold text-[#1A1A1A]">Fitur Premium</p>
-        <p className="text-xs text-[#8FA4C8] text-center px-6">Upgrade untuk akses penuh ke fitur ini</p>
-        <Link
-          to="/Subscription"
-          className="mt-1 px-4 py-2 bg-[#FF6A00] text-white rounded-xl text-xs font-bold hover:bg-[#e05e00] transition-colors shadow-sm"
-        >
-          Upgrade Sekarang
-        </Link>
-      </div>
-    </div>
-  );
 }
