@@ -1,4 +1,46 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+
+function MatrixBackground() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+    const cols = Math.floor(w / 18);
+    const drops = Array(cols).fill(1);
+    const chars = '01アイウエオカキクケコABCDEF∑∆∫πΩ';
+    let raf;
+    const draw = () => {
+      ctx.fillStyle = 'rgba(10,10,10,0.06)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.font = '13px monospace';
+      drops.forEach((y, i) => {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const progress = y / (h / 13);
+        if (progress < 0.3) {
+          ctx.fillStyle = `rgba(255,106,0,${0.6 + Math.random() * 0.4})`;
+        } else if (progress < 0.6) {
+          ctx.fillStyle = `rgba(255,179,71,${0.3 + Math.random() * 0.3})`;
+        } else {
+          ctx.fillStyle = `rgba(255,106,0,${0.05 + Math.random() * 0.15})`;
+        }
+        ctx.fillText(char, i * 18, y * 13);
+        if (y * 13 > h && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      });
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    const onResize = () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', onResize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', onResize); };
+  }, []);
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, opacity: 0.45 }} />;
+}
 import { base44 } from "@/api/base44Client";
 import { CheckCircle, TrendingUp, Sparkles, Users, ArrowRight, Play, Zap, BarChart2, MessageCircle, Shield } from "lucide-react";
 
@@ -88,7 +130,8 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden page-bg">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden">
+      <MatrixBackground />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { font-family: 'Inter', sans-serif; }
@@ -102,7 +145,7 @@ export default function LandingPage() {
       `}</style>
 
       {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center px-5 sm:px-12 lg:px-20 py-3 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5 dot-pattern">
+      <nav className="relative z-50 fixed top-0 left-0 right-0 flex items-center px-5 sm:px-12 lg:px-20 py-3 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center gap-2">
           <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-7 h-7" />
           <span className="font-black text-white text-sm tracking-tight">Atur Pintar</span>
@@ -121,11 +164,11 @@ export default function LandingPage() {
       </nav>
 
       {/* 1. HERO */}
-      <section className="pt-28 pb-20 px-5 sm:px-12 lg:px-20 relative">
+      <section className="pt-28 pb-20 px-5 sm:px-12 lg:px-20 relative z-10">
         <div className="absolute top-10 left-0 w-[600px] h-[500px] rounded-full bg-[#FF6A00]/6 blur-[140px] pointer-events-none" />
 
-        <div className="max-w-5xl">
-          <div className="inline-flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-4 py-1.5 mb-6">
+        <div className="max-w-5xl text-center sm:text-left">
+          <div className="inline-flex items-center justify-center sm:justify-start gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-4 py-1.5 mb-6">
             <Sparkles className="w-3 h-3 text-[#FF6A00]" />
             <span className="text-[11px] text-[#FF6A00] font-bold uppercase tracking-wide">AI-powered personal finance</span>
           </div>
@@ -140,7 +183,7 @@ export default function LandingPage() {
             <span className="text-white font-semibold">gak boros lagi.</span>
           </p>
 
-          <div className="flex flex-col sm:flex-row items-start gap-3">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3">
             <button
               onClick={handleCTA}
               className="group flex items-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto"
@@ -158,7 +201,7 @@ export default function LandingPage() {
             </button>
           </div>
 
-          <div className="mt-8 flex items-center gap-3">
+          <div className="mt-8 flex items-center justify-center sm:justify-start gap-3">
             <div className="flex -space-x-2">
               {["🧑‍💼", "👩‍💻", "🧑‍🎓", "👩‍💼", "🧑‍🍳"].map((e, i) => (
                 <div key={i} className="w-8 h-8 rounded-full bg-[#1A1A1A] border-2 border-[#0A0A0A] flex items-center justify-center text-sm">{e}</div>
@@ -170,9 +213,9 @@ export default function LandingPage() {
       </section>
 
       {/* 2. PROBLEM */}
-      <section className="px-5 sm:px-12 lg:px-20 pb-20">
-        <div className="max-w-2xl">
-          <div className="mb-8">
+      <section className="px-5 sm:px-12 lg:px-20 pb-20 relative z-10">
+        <div className="max-w-2xl mx-auto sm:mx-0">
+          <div className="mb-8 text-center sm:text-left">
             <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Familiar gak?</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Masalah yang kamu rasain juga</h2>
           </div>
@@ -194,8 +237,8 @@ export default function LandingPage() {
       </section>
 
       {/* 3. SOLUTION */}
-      <section className="px-5 sm:px-12 lg:px-20 pb-20">
-        <div className="max-w-2xl">
+      <section className="px-5 sm:px-12 lg:px-20 pb-20 relative z-10">
+        <div className="max-w-2xl mx-auto sm:mx-0 text-center sm:text-left">
           <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Solusinya simpel</p>
           <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Dengan Atur Pintar:</h2>
           <p className="text-[#FF6A00] font-bold text-sm mb-8">Bukan cuma catat. Tapi ngerti uang kamu.</p>
@@ -216,9 +259,9 @@ export default function LandingPage() {
       </section>
 
       {/* 4. HOW IT WORKS */}
-      <section ref={howRef} className="px-5 sm:px-12 lg:px-20 pb-20">
-        <div className="max-w-2xl">
-          <div className="mb-10">
+      <section ref={howRef} className="px-5 sm:px-12 lg:px-20 pb-20 relative z-10">
+        <div className="max-w-2xl mx-auto sm:mx-0">
+          <div className="mb-10 text-center sm:text-left">
             <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Cara kerja</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Semudah ini, serius.</h2>
           </div>
@@ -235,7 +278,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <div className="mt-8">
+          <div className="mt-8 flex justify-center sm:justify-start">
             <button
               onClick={handleCTA}
               className="inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all hover:scale-105"
@@ -247,9 +290,9 @@ export default function LandingPage() {
       </section>
 
       {/* 5. FEATURES */}
-      <section ref={featuresRef} className="px-5 sm:px-12 lg:px-20 pb-20">
-        <div className="max-w-3xl">
-          <div className="mb-10">
+      <section ref={featuresRef} className="px-5 sm:px-12 lg:px-20 pb-20 relative z-10">
+        <div className="max-w-3xl mx-auto sm:mx-0">
+          <div className="mb-10 text-center sm:text-left">
             <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Fitur utama</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Yang kamu dapetin</h2>
           </div>
@@ -268,9 +311,9 @@ export default function LandingPage() {
       </section>
 
       {/* 6. SOCIAL PROOF */}
-      <section className="px-5 sm:px-12 lg:px-20 pb-20">
-        <div className="max-w-2xl">
-          <div className="card-d rounded-3xl p-8 glow">
+      <section className="px-5 sm:px-12 lg:px-20 pb-20 relative z-10">
+        <div className="max-w-2xl mx-auto sm:mx-0">
+          <div className="card-d rounded-3xl p-8 glow text-center sm:text-left">
             <div className="w-14 h-14 rounded-full bg-[#FF6A00]/10 flex items-center justify-center mb-4">
               <Shield className="w-7 h-7 text-[#FF6A00]" />
             </div>
@@ -283,9 +326,9 @@ export default function LandingPage() {
       </section>
 
       {/* 7. PRICING */}
-      <section ref={pricingRef} className="px-5 sm:px-12 lg:px-20 pb-20">
-        <div className="max-w-4xl">
-          <div className="mb-10">
+      <section ref={pricingRef} className="px-5 sm:px-12 lg:px-20 pb-20 relative z-10">
+        <div className="max-w-4xl mx-auto sm:mx-0">
+          <div className="mb-10 text-center sm:text-left">
             <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Harga</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Harga sederhana, gak ribet</h2>
             <p className="text-white/40 text-sm mt-2">Akses semua fitur termasuk Nana AI</p>
@@ -333,14 +376,15 @@ export default function LandingPage() {
       </section>
 
       {/* 8. FINAL CTA */}
-      <section className="px-5 sm:px-12 lg:px-20 pb-24">
-        <div className="max-w-2xl card-d rounded-3xl p-10 sm:p-14 relative overflow-hidden">
+      <section className="px-5 sm:px-12 lg:px-20 pb-24 relative z-10">
+        <div className="max-w-2xl mx-auto sm:mx-0 card-d rounded-3xl p-10 sm:p-14 relative overflow-hidden text-center sm:text-left">
           <div className="absolute top-0 left-0 w-80 h-80 rounded-full bg-[#FF6A00]/6 blur-[80px] pointer-events-none" />
           <h2 className="text-2xl sm:text-4xl font-black text-white mb-3 leading-tight relative">
             Kalau kamu gak kontrol uangmu,<br />
             <span className="g-text">uangmu yang kontrol kamu.</span>
           </h2>
           <p className="text-white/40 text-sm mb-8 relative">Mulai sekarang. Gratis 30 hari. Gak perlu kartu kredit.</p>
+          <div className="flex justify-center sm:justify-start">
           <button
             onClick={handleCTA}
             className="relative group inline-flex items-center gap-3 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-black text-base px-10 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95"
@@ -349,12 +393,13 @@ export default function LandingPage() {
             Mulai Gratis Sekarang
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
+          </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/5 py-8 px-5 sm:px-12 lg:px-20">
-        <div className="flex items-center gap-2 mb-2">
+      <footer className="border-t border-white/5 py-8 px-5 sm:px-12 lg:px-20 relative z-10 text-center sm:text-left">
+        <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
           <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-5 h-5" />
           <span className="text-sm font-black text-white">Atur Pintar</span>
         </div>
