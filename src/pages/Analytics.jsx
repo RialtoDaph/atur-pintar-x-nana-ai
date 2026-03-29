@@ -302,7 +302,7 @@ export default function Analytics() {
               transactions={transactions}
             />
           ) : (
-            <PremiumBlurCard>
+            <PremiumBlurCard title="📊 Kekayaan Bersih (Net Worth)">
               <NetWorthCard goals={goals} investments={investments} debts={debts} transactions={transactions} />
             </PremiumBlurCard>
           )
@@ -315,7 +315,7 @@ export default function Analytics() {
           isPremium ? (
             <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
           ) : (
-            <PremiumBlurCard>
+            <PremiumBlurCard title="📅 Kalender Keuangan">
               <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
             </PremiumBlurCard>
           )
@@ -326,7 +326,7 @@ export default function Analytics() {
           isPremium ? (
             <DailySpendingCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
           ) : (
-            <PremiumBlurCard>
+            <PremiumBlurCard title="📈 Pengeluaran Harian">
               <DailySpendingCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
             </PremiumBlurCard>
           )
@@ -339,7 +339,7 @@ export default function Analytics() {
               <PortfolioSummary user={user} />
             </Suspense>
           ) : (
-            <PremiumBlurCard>
+            <PremiumBlurCard title="💼 Ringkasan Portofolio Investasi">
               <div className="bg-white rounded-2xl h-32 shadow-sm" />
             </PremiumBlurCard>
           )
@@ -353,7 +353,7 @@ export default function Analytics() {
               return d >= monthRange.start && d <= monthRange.end;
             })} loading={loading} />
           ) : (
-            <PremiumBlurCard>
+            <PremiumBlurCard title="🛍️ Pengeluaran per Kategori">
               <SpendingChart transactions={transactions.filter(t => {
                 const d = new Date(t.date);
                 return d >= monthRange.start && d <= monthRange.end;
