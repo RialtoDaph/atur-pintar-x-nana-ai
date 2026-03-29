@@ -58,6 +58,8 @@ export default function OnboardingQuestionnaire({ onClose }) {
   const [riskTolerance, setRiskTolerance] = useState("");
   const [financialGoal, setFinancialGoal] = useState("");
 
+  const [salaryDay, setSalaryDay] = useState("");
+
   const [hasReminder, setHasReminder] = useState(null);
   const [reminderTitle, setReminderTitle] = useState("");
   const [reminderAmount, setReminderAmount] = useState("");
@@ -85,12 +87,19 @@ export default function OnboardingQuestionnaire({ onClose }) {
 
     // Save monthly income as a RECURRING transaction template
     if (monthlyIncome) {
+      // Build date with the correct salary day in current month
+      let salaryDate = TODAY;
+      if (salaryDay) {
+        const d = new Date(TODAY);
+        d.setDate(parseInt(salaryDay));
+        salaryDate = d.toISOString().split("T")[0];
+      }
       promises.push(base44.entities.Transaction.create({
         amount: parseFloat(parseNumber(monthlyIncome)),
         type: "income",
         category: "salary",
         note: "Pendapatan bulanan",
-        date: TODAY,
+        date: salaryDate,
         is_recurring: true,
         recurring_interval: "monthly"
       }));
@@ -304,7 +313,21 @@ Atur Pintar x Nana Ai</h2>
                   </div>
                 </div>
               </div>
-              <NavButtons onPrev={prev} onNext={next} canNext={!!monthlyIncome && !!monthlyExpense} />
+                <div>
+                  <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Tanggal Gajian Tiap Bulan</label>
+                  <div className="grid grid-cols-4 gap-2 mb-2">
+                    {[1, 5, 10, 15, 20, 25, 28, 31].map((d) =>
+                      <button key={d} type="button" onClick={() => setSalaryDay(String(d))}
+                        className={`py-2 rounded-xl border text-sm font-semibold transition-all ${salaryDay === String(d) ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]" : "border-[#E2E8F0] text-[#4A5568] hover:border-[#CBD5E0]"}`}>
+                        {d}
+                      </button>
+                    )}
+                  </div>
+                  <input type="number" min="1" max="31" inputMode="numeric"
+                    className="w-full border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+                    placeholder="Atau ketik tanggal lain (1-31)" value={salaryDay} onChange={(e) => setSalaryDay(e.target.value)} />
+                </div>
+              <NavButtons onPrev={prev} onNext={next} canNext={!!monthlyIncome && !!monthlyExpense && !!salaryDay} />
             </div>
           }
 
