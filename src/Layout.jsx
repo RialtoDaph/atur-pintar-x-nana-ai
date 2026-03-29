@@ -275,7 +275,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Mobile bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-50 border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-40 border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {mobileMainNav.map((item) => {
           const active = currentPageName === item.page;
           return (

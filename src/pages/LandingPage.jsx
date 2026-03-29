@@ -27,44 +27,25 @@ const PLANS = [
   {
     name: "Gratis",
     price: "Rp 0",
-    period: "Gratis selamanya",
-    features: [
-      "Pencatatan transaksi (maks 30/bln)",
-      "Dashboard keuangan dasar",
-      "Laporan bulanan",
-      "3 Goals tabungan",
-      "5 pesan Nana AI/bln",
-    ],
+    period: "Gratis selamanya(terbatas)",
+    features: ["Pencatatan transaksi", "Dashboard keuangan", "Laporan bulanan"],
     cta: "Mulai Gratis",
     highlight: false,
   },
   {
-    name: "Premium Bulanan",
+    name: "Premium",
     price: "Rp 39.000",
     period: "per bulan",
-    features: [
-      "Transaksi tak terbatas",
-      "Nana AI tanpa batas",
-      "Analitik canggih & kalender",
-      "Budget & Goals tracker",
-      "Manajemen investasi",
-      "Export laporan (PDF & Excel)",
-      "Deteksi anomali & alert pintar",
-    ],
+    features: ["Semua fitur gratis", "Nana AI tanpa batas", "Analitik canggih", "Budget & Goals tracker", "Export laporan"],
     cta: "Coba Sekarang",
     highlight: true,
     badge: "Paling populer",
   },
   {
-    name: "Premium Tahunan",
+    name: "Tahunan",
     price: "Rp 299.000",
-    period: "per tahun · hemat Rp 169.000",
-    features: [
-      "Semua fitur Premium Bulanan",
-      "Hemat 36% vs bulanan",
-      "Prioritas support",
-      "Akses fitur baru lebih awal",
-    ],
+    period: "per tahun",
+    features: ["Semua fitur Premium", "Hemat 36% vs bulanan", "Prioritas support"],
     cta: "Coba Sekarang",
     highlight: false,
     badge: "Hemat 36%",
@@ -269,33 +250,31 @@ export default function LandingPage() {
         <div className="text-center mb-10">
           <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Harga</p>
           <h2 className="text-2xl sm:text-3xl font-black text-white">Harga sederhana, gak ribet</h2>
-          <p className="text-white/40 text-sm mt-2">Semua akses termasuk Nana AI — mulai gratis</p>
+          <p className="text-white/40 text-sm mt-2">Akses semua fitur termasuk Nana AI</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {PLANS.map((plan, i) => (
             <div
               key={i}
               className={`relative rounded-2xl p-6 flex flex-col ${
-                plan.highlight
-                  ? "bg-gradient-to-b from-[#FF6A00] to-[#e05e00] border-2 border-[#FF6A00] shadow-[0_0_40px_rgba(255,106,0,0.35)]"
-                  : "card-d"
+                plan.highlight ? "bg-[#FF6A00] border border-[#FF6A00]" : "card-d"
               }`}
             >
               {plan.badge && (
-                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide whitespace-nowrap ${
+                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${
                   plan.highlight ? "bg-white text-[#FF6A00]" : "bg-[#FF6A00] text-white"
                 }`}>
                   {plan.badge}
                 </div>
               )}
-              <p className="font-black text-xs uppercase tracking-widest mb-1 text-white/50">{plan.name}</p>
+              <p className="font-black text-base mb-1 text-white">{plan.name}</p>
               <p className={`text-3xl font-black mb-0.5 ${plan.highlight ? "text-white" : "g-text"}`}>{plan.price}</p>
               <p className={`text-xs mb-5 ${plan.highlight ? "text-white/70" : "text-white/35"}`}>{plan.period}</p>
               <div className="space-y-2.5 flex-1 mb-6">
                 {plan.features.map((feat, j) => (
-                  <div key={j} className="flex items-start gap-2">
-                    <CheckCircle className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${plan.highlight ? "text-white" : "text-[#FF6A00]"}`} />
-                    <p className={`text-xs leading-relaxed ${plan.highlight ? "text-white/90" : "text-white/60"}`}>{feat}</p>
+                  <div key={j} className="flex items-center gap-2">
+                    <CheckCircle className={`w-3.5 h-3.5 flex-shrink-0 ${plan.highlight ? "text-white" : "text-[#FF6A00]"}`} />
+                    <p className={`text-xs ${plan.highlight ? "text-white/90" : "text-white/60"}`}>{feat}</p>
                   </div>
                 ))}
               </div>
