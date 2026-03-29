@@ -236,33 +236,7 @@ export default function Transactions() {
         </div>
 
         <div className="max-w-2xl mx-auto px-5 mt-4 space-y-4">
-          {/* Select mode action bar */}
-          {selectMode && (
-            <div className="bg-white rounded-xl shadow-sm px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button onClick={selectAll} className="text-xs font-semibold text-[#FF6A00]">{t('tx_select_all')}</button>
-                {selectedIds.size > 0 && <span className="text-xs text-[#8FA4C8]">({selectedIds.size} {t('tx_selected')})</span>}
-              </div>
-              <div className="flex items-center gap-2">
-                {selectedIds.size > 0 && (
-                  <button
-                    onClick={handleDeleteSelected}
-                    disabled={deleting}
-                    className="px-3 py-1.5 rounded-lg bg-[#FF6B6B] text-white text-xs font-bold disabled:opacity-50"
-                  >
-                    {deleting ? t('tx_deleting') : `${t('tx_delete_selected')} (${selectedIds.size})`}
-                  </button>
-                )}
-                <button
-                  onClick={handleDeleteAll}
-                  disabled={deleting || filtered.length === 0}
-                  className="px-3 py-1.5 rounded-lg bg-[#0A0A0A] text-white text-xs font-bold disabled:opacity-50"
-                >
-                  {t('tx_delete_all')}
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Select mode action bar - moved inside history card header */}
 
           {/* AI Insights */}
           {!loading && transactions.length > 0 && (
@@ -288,6 +262,23 @@ export default function Transactions() {
                 <p className="text-sm font-bold text-[#1A1A1A]">{t('tx_history')} {t('tx_title')}</p>
                 <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${historyOpen ? "rotate-180" : ""}`} />
               </button>
+              {selectMode && selectedIds.size > 0 && (
+                <button
+                  onClick={handleDeleteSelected}
+                  disabled={deleting}
+                  className="px-3 py-1.5 rounded-lg bg-[#FF6B6B] text-white text-xs font-bold disabled:opacity-50 tap-highlight-fix"
+                >
+                  {deleting ? t('tx_deleting') : `Hapus (${selectedIds.size})`}
+                </button>
+              )}
+              {selectMode && (
+                <button
+                  onClick={selectAll}
+                  className="px-3 py-1.5 rounded-lg bg-[#F2F4F7] text-[#4A5568] text-xs font-semibold tap-highlight-fix"
+                >
+                  Pilih Semua
+                </button>
+              )}
               <button
                 onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-[#0A0A0A] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}
