@@ -88,7 +88,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden page-bg">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { font-family: 'Inter', sans-serif; }
@@ -97,6 +97,8 @@ export default function LandingPage() {
         .card-d { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
         .step-line::after { content: ''; position: absolute; left: 19px; top: 40px; bottom: -16px; width: 1px; background: rgba(255,106,0,0.2); }
         .dot-pattern { background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 22px 22px; }
+        .page-bg { background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 28px 28px; }
+        .page-bg::before { content: ''; position: fixed; inset: 0; background: linear-gradient(to bottom right, rgba(255,106,0,0.03) 0%, transparent 50%, rgba(255,106,0,0.02) 100%); pointer-events: none; z-index: 0; }
       `}</style>
 
       {/* NAV */}
