@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
 Deno.serve(async (req) => {
   try {
@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
     const expectedSignature = await sha512(`${order_id}${status_code}${gross_amount}${serverKey}`);
 
     if (signature_key !== expectedSignature) {
-      console.error("Invalid signature");
+      console.error("Invalid signature for order:", order_id);
       return Response.json({ error: 'Invalid signature' }, { status: 403 });
     }
 
@@ -22,10 +22,17 @@ Deno.serve(async (req) => {
     });
 
     if (payments.length === 0) {
+      console.error("Order not found:", order_id);
       return Response.json({ message: 'Order not found' }, { status: 404 });
     }
 
     const payment = payments[0];
+
+    // Idempotency: jika sudah approved, jangan proses ulang
+    if (payment.status === 'approved') {
+      return Response.json({ message: 'Already processed' });
+    }
+
     let newStatus = payment.status;
 
     if (transaction_status === 'capture' || transaction_status === 'settlement') {

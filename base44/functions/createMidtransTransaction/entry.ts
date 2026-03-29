@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
 Deno.serve(async (req) => {
   try {
@@ -13,6 +13,25 @@ Deno.serve(async (req) => {
 
     if (!plan || !['premium_monthly', 'premium_yearly'].includes(plan)) {
       return Response.json({ error: 'Invalid plan' }, { status: 400 });
+    }
+
+    // Cek apakah sudah ada pending payment yang belum selesai
+    const existingPending = await base44.asServiceRole.entities.SubscriptionPayment.filter({
+      user_email: user.email,
+      status: 'pending',
+    });
+
+    // Kalau ada pending dengan snap token yang masih valid, return token lama
+    if (existingPending.length > 0 && existingPending[0].midtrans_snap_token) {
+      const existing = existingPending[0];
+      // Cek apakah order sudah lebih dari 24 jam (token Midtrans expired)
+      const createdAt = new Date(existing.created_date).getTime();
+      const ageHours = (Date.now() - createdAt) / (1000 * 60 * 60);
+      if (ageHours < 24) {
+        return Response.json({ token: existing.midtrans_snap_token, order_id: existing.midtrans_order_id });
+      }
+      // Token expired, batalkan yang lama
+      await base44.asServiceRole.entities.SubscriptionPayment.update(existing.id, { status: 'expired' });
     }
 
     const amount = plan === 'premium_monthly' ? 39000 : 299000;
@@ -55,8 +74,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Failed to get Snap token', detail: snapData }, { status: 500 });
     }
 
-    // Simpan record pembayaran
-    await base44.entities.SubscriptionPayment.create({
+    // Simpan record pembayaran baru
+    await base44.asServiceRole.entities.SubscriptionPayment.create({
       user_email: user.email,
       user_name: user.full_name,
       plan: plan,
