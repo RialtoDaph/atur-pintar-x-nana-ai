@@ -172,7 +172,7 @@ export default function TourGuide({ onComplete }) {
         } else {
           setTargetRect(rect);
         }
-      } else if (retryCountRef.current > 20) {
+      } else if (retryCountRef.current > 40) {
         // Give up after ~2 seconds, show tooltip without highlight
         clearInterval(retryRef.current);
         setTargetRect(null);
@@ -209,11 +209,7 @@ export default function TourGuide({ onComplete }) {
   // Wait for element after navigation/render
   useEffect(() => {
     setTargetRect(null);
-    const timer = setTimeout(waitAndMeasure, 400);
-    return () => {
-      clearTimeout(timer);
-      if (retryRef.current) clearInterval(retryRef.current);
-    };
+    const timer = setTimeout(waitAndMeasure, 700);
   }, [stepIndex, location.pathname]);
 
   // Cleanup on unmount
