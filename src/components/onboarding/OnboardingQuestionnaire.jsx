@@ -195,7 +195,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
     await Promise.all(promises);
 
     // Seed sample data so charts & analytics are visible immediately
-    await seedSampleData();
+    // await seedSampleData(); // DISABLED
 
     setSaving(false);
     onClose();
