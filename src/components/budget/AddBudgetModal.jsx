@@ -4,15 +4,15 @@ import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const DEFAULT_CATEGORIES = [
-  { key: "housing",       label_id: "Rumah/Sewa",         label_en: "Housing/Rent",    emoji: "🏠", color: "#4F7CFF" },
-  { key: "food",          label_id: "Makanan & Minuman",   label_en: "Food & Drinks",   emoji: "🍔", color: "#00C9A7" },
-  { key: "transport",     label_id: "Transportasi",        label_en: "Transport",       emoji: "🚗", color: "#F5A623" },
-  { key: "health",        label_id: "Kesehatan",           label_en: "Health",          emoji: "❤️", color: "#FF6B6B" },
-  { key: "entertainment", label_id: "Hiburan",             label_en: "Entertainment",   emoji: "🎬", color: "#9B59B6" },
-  { key: "shopping",      label_id: "Belanja",             label_en: "Shopping",        emoji: "🛍️", color: "#E91E8C" },
-  { key: "subscriptions", label_id: "Langganan",           label_en: "Subscriptions",   emoji: "📱", color: "#1ABC9C" },
-  { key: "other",         label_id: "Lainnya",             label_en: "Other",           emoji: "📦", color: "#95A5A6" },
-];
+{ key: "housing", label_id: "Rumah/Sewa", label_en: "Housing/Rent", emoji: "🏠", color: "#4F7CFF" },
+{ key: "food", label_id: "Makanan & Minuman", label_en: "Food & Drinks", emoji: "🍔", color: "#00C9A7" },
+{ key: "transport", label_id: "Transportasi", label_en: "Transport", emoji: "🚗", color: "#F5A623" },
+{ key: "health", label_id: "Kesehatan", label_en: "Health", emoji: "❤️", color: "#FF6B6B" },
+{ key: "entertainment", label_id: "Hiburan", label_en: "Entertainment", emoji: "🎬", color: "#9B59B6" },
+{ key: "shopping", label_id: "Belanja", label_en: "Shopping", emoji: "🛍️", color: "#E91E8C" },
+{ key: "subscriptions", label_id: "Langganan", label_en: "Subscriptions", emoji: "📱", color: "#1ABC9C" },
+{ key: "other", label_id: "Lainnya", label_en: "Other", emoji: "📦", color: "#95A5A6" }];
+
 
 export default function AddBudgetModal({ onClose, onSave, existingCategories, editBudget }) {
   const { t, settings, formatCurrency } = useAppSettings();
@@ -29,23 +29,23 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
 
   // Merge default + custom
   const allCategories = [
-    ...DEFAULT_CATEGORIES.map(c => ({
-      key: c.key,
-      label: lang === "id" ? c.label_id : c.label_en,
-      emoji: c.emoji,
-      color: c.color,
-    })),
-    ...customCategories.map(c => ({
-      key: `custom_${c.id}`,
-      label: c.name,
-      emoji: c.emoji,
-      color: c.color || "#95A5A6",
-    })),
-  ];
+  ...DEFAULT_CATEGORIES.map((c) => ({
+    key: c.key,
+    label: lang === "id" ? c.label_id : c.label_en,
+    emoji: c.emoji,
+    color: c.color
+  })),
+  ...customCategories.map((c) => ({
+    key: `custom_${c.id}`,
+    label: c.name,
+    emoji: c.emoji,
+    color: c.color || "#95A5A6"
+  }))];
+
 
   // Filter out already-budgeted categories (except the one being edited)
   const available = allCategories.filter(
-    c => !existingCategories.includes(c.key) || c.key === editBudget?.category
+    (c) => !existingCategories.includes(c.key) || c.key === editBudget?.category
   );
 
   const isEditing = !!editBudget;
@@ -63,13 +63,13 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
     setRawAmount(raw);
   }
 
-  const displayAmount = rawAmount
-    ? Number(rawAmount).toLocaleString("id-ID")
-    : "";
+  const displayAmount = rawAmount ?
+  Number(rawAmount).toLocaleString("id-ID") :
+  "";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6">
+      <div className="bg-white my-20 p-6 rounded-3xl w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-[#1A1A1A]">
             {isEditing ? t("budget_edit_title") : t("budget_add_title")}
@@ -84,26 +84,26 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
           <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">
             {t("category")}
           </label>
-          {available.length === 0 ? (
-            <p className="text-sm text-[#8FA4C8] text-center py-4">{t("budget_all_set")}</p>
-          ) : (
-            <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto">
-              {available.map(c => (
-                <button
-                  key={c.key}
-                  onClick={() => setCategory(c.key)}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
-                    category === c.key
-                      ? "border-[#FF6A00] bg-[#FF6A00]/10"
-                      : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"
-                  }`}
-                >
+          {available.length === 0 ?
+          <p className="text-sm text-[#8FA4C8] text-center py-4">{t("budget_all_set")}</p> :
+
+          <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto">
+              {available.map((c) =>
+            <button
+              key={c.key}
+              onClick={() => setCategory(c.key)}
+              className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
+              category === c.key ?
+              "border-[#FF6A00] bg-[#FF6A00]/10" :
+              "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"}`
+              }>
+              
                   <span className="text-xl">{c.emoji}</span>
                   <span className="text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
                 </button>
-              ))}
+            )}
             </div>
-          )}
+          }
         </div>
 
         {/* Amount input */}
@@ -119,19 +119,19 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
               className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3.5 text-xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
               placeholder="0"
               value={displayAmount}
-              onChange={handleAmountChange}
-            />
+              onChange={handleAmountChange} />
+            
           </div>
         </div>
 
         <button
           onClick={handleSave}
           disabled={saving || !category || !rawAmount}
-          className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] disabled:opacity-40 hover:bg-[#e05e00] transition-colors"
-        >
+          className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] disabled:opacity-40 hover:bg-[#e05e00] transition-colors">
+          
           {saving ? t("saving") : isEditing ? t("budget_save_edit") : t("budget_save_new")}
         </button>
       </div>
-    </div>
-  );
+    </div>);
+
 }
