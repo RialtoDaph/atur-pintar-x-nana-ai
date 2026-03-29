@@ -7,6 +7,7 @@ import InteractivePrompt from "./InteractivePrompt";
 
 export default function NanaFloatingChat() {
   const [open, setOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeConv, setActiveConv] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -16,6 +17,17 @@ export default function NanaFloatingChat() {
   const [unreadCount, setUnreadCount] = useState(0);
   const bottomRef = useRef(null);
   const { context, formatContextForMessage } = useFinancialContext(open);
+
+  // Detect open modals/dialogs and hide Nana
+  useEffect(() => {
+    const checkModals = () => {
+      const hasModal = document.querySelectorAll('[role="dialog"][data-state="open"], .fixed.inset-0:not([data-nana])').length > 0;
+      setIsModalOpen(hasModal);
+    };
+    const observer = new MutationObserver(checkModals);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-state", "class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -119,6 +131,8 @@ export default function NanaFloatingChat() {
     .filter((m) => m.role === "user" || m.role === "assistant")
     .map((m) => m.role === "user" ? { ...m, content: m.content?.replace(/\n\n---\n\[FINANCIAL_CONTEXT[\s\S]*?\[\/FINANCIAL_CONTEXT\]\n---/g, "").trim() } : m);
 
+  if (isModalOpen) return null;
+
   return (
     <>
       <style>{`
@@ -134,9 +148,9 @@ export default function NanaFloatingChat() {
       `}</style>
       {/* Floating button */}
       {!open &&
-      <div data-tour="nana-chat" className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 cursor-pointer" onClick={openChat}>
-        <div className="relative flex items-center gap-2 bg-[#0A0A0A] border border-[#FF6A00] rounded-2xl px-3 py-2 shadow-lg hover:bg-[#1A1A1A] transition-all active:scale-95 nana-float">
-          <div className="w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 border border-[#FF6A00]/40">
+      <div data-nana="true" data-tour="nana-chat" className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 cursor-pointer" onClick={openChat}>
+        <div className="relative flex items-center gap-1.5 sm:gap-2 bg-[#0A0A0A] border border-[#FF6A00] rounded-2xl px-2 py-1.5 sm:px-3 sm:py-2 shadow-lg hover:bg-[#1A1A1A] transition-all active:scale-95 nana-float">
+          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl overflow-hidden flex-shrink-0 border border-[#FF6A00]/40">
             <img
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png"
               alt="Nana AI"
@@ -144,12 +158,12 @@ export default function NanaFloatingChat() {
             />
           </div>
           <div>
-            <p className="text-white text-xs font-bold leading-tight">Nana AI</p>
-            <p className="text-[#8FA4C8] text-[10px] leading-tight">Chat sekarang ✨</p>
+            <p className="text-white text-[11px] sm:text-xs font-bold leading-tight">Nana AI</p>
+            <p className="text-[#8FA4C8] text-[9px] sm:text-[10px] leading-tight">Chat sekarang ✨</p>
           </div>
           {unreadCount > 0 && (
-            <div className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-[#FF6A00] rounded-full flex items-center justify-center px-1 border-2 border-[#0A0A0A]">
-              <span className="text-white text-[9px] font-bold leading-none">{unreadCount > 9 ? "9+" : unreadCount}</span>
+            <div className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] bg-[#FF6A00] rounded-full flex items-center justify-center px-1 border-2 border-[#0A0A0A]">
+              <span className="text-white text-[8px] sm:text-[9px] font-bold leading-none">{unreadCount > 9 ? "9+" : unreadCount}</span>
             </div>
           )}
         </div>
@@ -158,9 +172,8 @@ export default function NanaFloatingChat() {
 
       {/* Chat panel */}
       {open &&
-      <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[380px] max-w-[420px] rounded-2xl shadow-2xl flex flex-col bg-[#1A1A1A] border border-[#2D2D2D] overflow-hidden"
-      style={{ height: "520px", boxShadow: "0 8px 40px rgba(0,0,0,0.3)" }}>
-          
+      <div data-nana="true" className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[380px] max-w-[420px] rounded-2xl shadow-2xl flex flex-col bg-[#1A1A1A] border border-[#2D2D2D] overflow-hidden h-[360px] sm:h-[520px]"
+      style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.3)" }}>
           {/* Header */}
           <div className="bg-[#0F1114] px-4 py-3 flex items-center gap-3 flex-shrink-0 border-b border-[#2D2D2D]">
             <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
