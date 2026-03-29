@@ -224,8 +224,8 @@ export default function OnboardingQuestionnaire({ onClose }) {
           {currentStep.id === "welcome" &&
           <div className="text-center">
               <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/ba12d8d2f_3.png" alt="Atur Pintar" className="w-20 h-20 mx-auto mb-4 object-contain" />
-              <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Selamat Datang di 
-Atur Pintar x Nana Ai</h2>
+              <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Selamat Datang di Atur Pintar 
+            </h2>
               <p className="text-sm text-[#4A5568] leading-relaxed mb-6">Jawab beberapa pertanyaan singkat agar kami bisa menyiapkan dasbor sesuai kondisi keuanganmu.
 
             </p>
