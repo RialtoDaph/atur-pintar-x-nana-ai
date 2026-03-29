@@ -49,6 +49,12 @@ export default function Transactions() {
 
   useEffect(() => { if (user) loadData(); }, [user]);
 
+  useEffect(() => {
+    const handler = () => { if (user) loadData(); };
+    window.addEventListener("refresh-dashboard", handler);
+    return () => window.removeEventListener("refresh-dashboard", handler);
+  }, [user]);
+
   async function loadData() {
     setLoading(true);
     try {
