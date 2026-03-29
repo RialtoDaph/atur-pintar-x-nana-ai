@@ -11,12 +11,18 @@ const PLANS = [
     color: "border-[#E2E8F0]",
     badge: null,
     features: [
-      "Catat transaksi",
-      "Nana AI chat (basic)",
+      "Catat transaksi (unlimited)",
       "Dashboard keuangan",
-      "Analitik dasar",
-      "AI insight sederhana",
-      "Goals & Budget basic",
+      "Chat Nana AI (30x/bulan)",
+      "Anggaran maks. 2 kategori",
+      "Goals maks. 2 tujuan",
+      "Utang maks. 2 aktif",
+      "Analisis AI (3 bulan terakhir)",
+    ],
+    limits: [
+      "❌ Fitur Investasi",
+      "❌ Analitik lanjutan (blur)",
+      "❌ Nana AI > 30 chat/bln",
     ],
   },
   {
@@ -28,16 +34,17 @@ const PLANS = [
     badge: "Populer",
     features: [
       "Semua fitur Free",
-      "AI financial coach penuh",
+      "Anggaran & Goals unlimited",
+      "Utang unlimited",
+      "Nana AI chat unlimited",
+      "Fitur Investasi penuh",
+      "Analitik lanjutan (semua kartu)",
       "AI insight lebih dalam",
       "Prediksi cashflow otomatis",
-      "Analitik lanjutan",
-      "Financial health score",
-      "Laporan keuangan bulanan",
-      "Unlimited AI chat",
       "Export PDF & Google Sheets",
       "Custom kategori & widget",
     ],
+    limits: [],
   },
   {
     key: "premium_yearly",
@@ -51,6 +58,7 @@ const PLANS = [
       "Harga lebih hemat",
       "Priority support",
     ],
+    limits: [],
   },
 ];
 
@@ -183,6 +191,11 @@ export default function Subscription() {
                     {plan.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs text-[#1A1A1A]">
                         <Check className="w-3.5 h-3.5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
+                        {f}
+                      </li>
+                    ))}
+                    {plan.limits?.map((f, i) => (
+                      <li key={`limit-${i}`} className="flex items-start gap-2 text-xs text-[#8FA4C8]">
                         {f}
                       </li>
                     ))}

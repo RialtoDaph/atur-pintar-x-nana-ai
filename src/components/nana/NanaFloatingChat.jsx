@@ -14,6 +14,8 @@ export default function NanaFloatingChat() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(false);
   const [preferences, setPreferences] = useState(null);
+  const [user, setUser] = useState(null);
+  const [chatCount, setChatCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const bottomRef = useRef(null);
   const { context, formatContextForMessage } = useFinancialContext(open);
@@ -31,9 +33,14 @@ export default function NanaFloatingChat() {
 
   useEffect(() => {
     let isMounted = true;
-    base44.auth.me().then((user) => {
+    base44.auth.me().then((u) => {
       if (!isMounted) return;
-      base44.entities.NanaPreferences.filter({ created_by: user.email }).then((prefs) => {
+      setUser(u);
+      // Count monthly Nana messages
+      const monthKey = new Date().toISOString().slice(0, 7);
+      const stored = JSON.parse(localStorage.getItem(`nana_count_${u.id}_${monthKey}`) || '0');
+      setChatCount(parseInt(stored) || 0);
+      base44.entities.NanaPreferences.filter({ created_by: u.email }).then((prefs) => {
         if (isMounted && prefs?.length > 0) setPreferences(prefs[0]);
       }).catch(() => {});
     }).catch(() => {});
@@ -96,8 +103,13 @@ export default function NanaFloatingChat() {
     await base44.agents.addMessage(conv, { role: "user", content: displayText + contextBlock });
   }
 
+  const FREE_NANA_LIMIT = 30;
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  const nanaLimitReached = !isPremium && chatCount >= FREE_NANA_LIMIT;
+
   async function sendMessage() {
     if (!input.trim() || sending) return;
+    if (nanaLimitReached) return;
     let conv = activeConv;
     if (!conv) {
       conv = await base44.agents.createConversation({
@@ -112,10 +124,16 @@ export default function NanaFloatingChat() {
     setSending(true);
     const text = input;
     setInput("");
-    // Append the full financial context to every message so Nana always has fresh data
     const contextBlock = formatContextForMessage(context);
     const messageContent = text + contextBlock;
     await base44.agents.addMessage(conv, { role: "user", content: messageContent });
+    // Track count
+    if (!isPremium) {
+      const monthKey = new Date().toISOString().slice(0, 7);
+      const newCount = chatCount + 1;
+      setChatCount(newCount);
+      if (user) localStorage.setItem(`nana_count_${user.id}_${monthKey}`, JSON.stringify(newCount));
+    }
     setSending(false);
   }
 
@@ -306,17 +324,20 @@ export default function NanaFloatingChat() {
           {/* Input */}
           <div className="px-3 py-2.5 bg-[#0F1114] border-t border-[#2D2D2D] flex-shrink-0">
             <div className="flex gap-2 bg-[#2D2D2D] rounded-xl border border-[#3D3D3D] px-3 py-1.5">
-              <textarea
-              className="flex-1 text-xs text-white resize-none outline-none bg-transparent placeholder:text-[#8FA4C8] max-h-16"
-              rows={1}
-              placeholder="Tanya atau catat transaksi..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKey} />
-
+              {nanaLimitReached ? (
+                <p className="flex-1 text-xs text-[#8FA4C8] py-1">Batas 30 chat/bulan. <a href="/Subscription" className="text-[#FF6A00] underline">Upgrade</a></p>
+              ) : (
+                <textarea
+                className="flex-1 text-xs text-white resize-none outline-none bg-transparent placeholder:text-[#8FA4C8] max-h-16"
+                rows={1}
+                placeholder="Tanya atau catat transaksi..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKey} />
+              )}
               <button
               onClick={sendMessage}
-              disabled={!input.trim() || sending}
+              disabled={!input.trim() || sending || nanaLimitReached}
               className="w-7 h-7 rounded-full bg-[#FF6A00] flex items-center justify-center flex-shrink-0 disabled:opacity-40 hover:bg-[#e05e00] transition-colors self-end">
 
                 <Send className="w-3 h-3 text-white" />

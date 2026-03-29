@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import PremiumGate from "@/components/subscription/PremiumGate";
+import PremiumBlurCard from "@/components/subscription/PremiumBlurCard";
 import { Plus, Trash2, TrendingUp, RefreshCw, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -101,7 +102,34 @@ export default function InvestmentsPage() {
   const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
 
   if (!loading && !isPremium) {
-    return <PremiumGate feature="Manajemen Investasi" />;
+    return (
+      <div className="min-h-screen bg-[#F2F4F7] pb-8">
+        <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+          <div className="max-w-2xl mx-auto">
+            <p className="text-[#8FA4C8] text-sm font-medium">Portofolio</p>
+            <h1 className="text-white text-2xl font-bold mt-0.5">Investasi</h1>
+          </div>
+        </div>
+        <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
+          <PremiumBlurCard>
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <p className="font-bold text-[#1A1A1A] mb-2">Portofolio Investasi</p>
+              <div className="space-y-3">
+                {["Reksa Dana - Pertumbuhan", "Saham BBCA", "Emas Digital"].map((n, i) => (
+                  <div key={i} className="flex items-center justify-between border-b border-[#F2F4F7] pb-2">
+                    <span className="text-sm text-[#1A1A1A]">{n}</span>
+                    <span className="text-sm font-bold text-[#00C9A7]">+{(i+1)*3}.{i+1}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PremiumBlurCard>
+          <PremiumBlurCard>
+            <div className="bg-white rounded-2xl p-6 shadow-sm h-40" />
+          </PremiumBlurCard>
+        </div>
+      </div>
+    );
   }
 
   const totalInvested = investments.reduce((s, i) => s + i.initial_amount, 0);

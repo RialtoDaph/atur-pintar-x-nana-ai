@@ -11,6 +11,7 @@ import { Suspense, lazy } from "react";
 const PortfolioSummary = lazy(() => import("@/components/dashboard/PortfolioSummary"));
 const GoalsMiniList = lazy(() => import("@/components/dashboard/GoalsMiniList"));
 import AnalyticsCardManager from "@/components/analytics/AnalyticsCardManager";
+import PremiumBlurCard from "@/components/subscription/PremiumBlurCard";
 import NetWorthCard from "@/components/analytics/NetWorthCard";
 import AIFinancialNarrative from "@/components/analytics/AIFinancialNarrative";
 
@@ -248,18 +249,6 @@ export default function Analytics() {
 
   const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F2F4F7] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[#00C9A7] border-t-transparent animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isPremium) {
-    return <PremiumGate feature="Analitik lanjutan" />;
-  }
-
   const totalIncome = trendData.reduce((sum, month) => sum + month.Income, 0);
   const periodExpenses = trendData.reduce((sum, month) => sum + month.Expenses, 0);
   const netCashflow = totalIncome - periodExpenses;
@@ -292,56 +281,85 @@ export default function Analytics() {
           <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
         </div>
 
-        {/* AI Financial Narrative */}
+        {/* AI Financial Narrative — visible to all, but free users only see 3 months */}
         <AIFinancialNarrative
           trendData={trendData}
           pieData={pieData}
           totalIncome={totalIncome}
           totalExpenses={periodExpenses}
           savingsRate={savingsRate}
-          periodLabel={formatPeriodLabel(filterPeriod)}
+          periodLabel={formatPeriodLabel(isPremium ? filterPeriod : "3")}
           goals={goals}
         />
 
         {/* Net Worth Card */}
         {isCardVisible("net_worth") && (
-          <NetWorthCard
-            goals={goals}
-            investments={investments}
-            debts={debts}
-            transactions={transactions}
-          />
+          isPremium ? (
+            <NetWorthCard
+              goals={goals}
+              investments={investments}
+              debts={debts}
+              transactions={transactions}
+            />
+          ) : (
+            <PremiumBlurCard>
+              <NetWorthCard goals={goals} investments={investments} debts={debts} transactions={transactions} />
+            </PremiumBlurCard>
+          )
         )}
 
 
 
         {/* Calendar Section */}
         {isCardVisible("financial_calendar") && (
-          <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
+          isPremium ? (
+            <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
+          ) : (
+            <PremiumBlurCard>
+              <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
+            </PremiumBlurCard>
+          )
         )}
 
         {/* Daily Spending Card */}
         {isCardVisible("daily_spending") && (
-          <DailySpendingCard
-            transactions={transactions}
-            filterPeriod={filterPeriod}
-            customDateRange={customDateRange}
-          />
+          isPremium ? (
+            <DailySpendingCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
+          ) : (
+            <PremiumBlurCard>
+              <DailySpendingCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
+            </PremiumBlurCard>
+          )
         )}
 
         {/* Portfolio Summary */}
         {isCardVisible("portfolio_summary") && (
-          <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
-            <PortfolioSummary user={user} />
-          </Suspense>
+          isPremium ? (
+            <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
+              <PortfolioSummary user={user} />
+            </Suspense>
+          ) : (
+            <PremiumBlurCard>
+              <div className="bg-white rounded-2xl h-32 shadow-sm" />
+            </PremiumBlurCard>
+          )
         )}
 
         {/* Spending by Category */}
         {isCardVisible("spending_chart") && (
-          <SpendingChart transactions={transactions.filter(t => {
-            const d = new Date(t.date);
-            return d >= monthRange.start && d <= monthRange.end;
-          })} loading={loading} />
+          isPremium ? (
+            <SpendingChart transactions={transactions.filter(t => {
+              const d = new Date(t.date);
+              return d >= monthRange.start && d <= monthRange.end;
+            })} loading={loading} />
+          ) : (
+            <PremiumBlurCard>
+              <SpendingChart transactions={transactions.filter(t => {
+                const d = new Date(t.date);
+                return d >= monthRange.start && d <= monthRange.end;
+              })} loading={loading} />
+            </PremiumBlurCard>
+          )
         )}
 
 
