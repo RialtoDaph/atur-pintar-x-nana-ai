@@ -79,7 +79,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
         category: "opening_balance",
         note: "Saldo Awal",
         date: TODAY,
-        is_recurring: false,
+        is_recurring: false
       }));
     }
 
@@ -92,7 +92,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
         note: "Pendapatan bulanan",
         date: TODAY,
         is_recurring: true,
-        recurring_interval: "monthly",
+        recurring_interval: "monthly"
       }));
     }
 
@@ -158,7 +158,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
           note: reminderTitle,
           date: dueDateStr,
           is_recurring: true,
-          recurring_interval: "monthly",
+          recurring_interval: "monthly"
         }));
       }
     }
@@ -215,7 +215,8 @@ export default function OnboardingQuestionnaire({ onClose }) {
           {currentStep.id === "welcome" &&
           <div className="text-center">
               <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/ba12d8d2f_3.png" alt="Atur Pintar" className="w-20 h-20 mx-auto mb-4 object-contain" />
-              <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Selamat Datang di Atur Pintar</h2>
+              <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Selamat Datang di 
+Atur Pintar x Nana Ai</h2>
               <p className="text-sm text-[#4A5568] leading-relaxed mb-6">Jawab beberapa pertanyaan singkat agar kami bisa menyiapkan dasbor sesuai kondisi keuanganmu.
 
             </p>
@@ -225,8 +226,7 @@ export default function OnboardingQuestionnaire({ onClose }) {
                   Mulai <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
-            </div>
-          }
+            </div>}
 
           {/* STEP: Locale */}
           {currentStep.id === "locale" &&
@@ -450,16 +450,16 @@ export default function OnboardingQuestionnaire({ onClose }) {
                 placeholder="Nominal (opsional)" value={reminderAmount} onChange={(e) => setReminderAmount(formatNumber(e.target.value))} />
                   </div>
                   <div className="grid grid-cols-4 gap-2">
-                    {[1,5,10,15,20,25,28,31].map((d) => (
-                      <button key={d} type="button" onClick={() => setReminderDay(String(d))}
-                        className={`py-2 rounded-xl border text-sm font-semibold transition-all ${reminderDay === String(d) ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]" : "border-[#E2E8F0] text-[#4A5568] hover:border-[#CBD5E0]"}`}>
+                    {[1, 5, 10, 15, 20, 25, 28, 31].map((d) =>
+                <button key={d} type="button" onClick={() => setReminderDay(String(d))}
+                className={`py-2 rounded-xl border text-sm font-semibold transition-all ${reminderDay === String(d) ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]" : "border-[#E2E8F0] text-[#4A5568] hover:border-[#CBD5E0]"}`}>
                         {d}
                       </button>
-                    ))}
+                )}
                   </div>
                   <input type="number" min="1" max="31" inputMode="numeric"
-                    className="w-full border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
-                    placeholder="Atau ketik tanggal lain (1-31)" value={reminderDay} onChange={(e) => setReminderDay(e.target.value)} />
+              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+              placeholder="Atau ketik tanggal lain (1-31)" value={reminderDay} onChange={(e) => setReminderDay(e.target.value)} />
                 </div>
             }
               <NavButtons onPrev={prev} onNext={next} canNext={hasReminder === false || hasReminder && reminderTitle && reminderDay} />
@@ -498,14 +498,14 @@ function NavButtons({ onPrev, onNext, canNext = true, showSkip = false, onSkip }
         <ArrowLeft className="w-4 h-4" />
       </button>
       {showSkip &&
-        <button onClick={onSkip} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-[#4A5568] text-xs font-semibold hover:bg-[#F8FAFC] transition-colors">
+      <button onClick={onSkip} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-[#4A5568] text-xs font-semibold hover:bg-[#F8FAFC] transition-colors">
           Lewati
         </button>
       }
       <button onClick={onNext} disabled={!canNext}
-        className="flex-1 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-bold hover:bg-[#e05e00] transition-colors disabled:opacity-40 flex items-center justify-center gap-1">
+      className="flex-1 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-bold hover:bg-[#e05e00] transition-colors disabled:opacity-40 flex items-center justify-center gap-1">
         Lanjut <ArrowRight className="w-4 h-4" />
       </button>
-    </div>
-  );
+    </div>);
+
 }
