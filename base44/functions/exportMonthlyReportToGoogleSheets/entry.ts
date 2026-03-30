@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
 Deno.serve(async (req) => {
   try {
@@ -9,68 +9,57 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get current month's transactions
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    const transactions = await base44.entities.Transaction.filter(
-      { created_by: user.email },
-      '-date'
-    );
+    const [allTransactions, customCategories, goals] = await Promise.all([
+      base44.entities.Transaction.filter({ created_by: user.email }, '-date'),
+      base44.entities.CustomCategory.filter({ created_by: user.email }),
+      base44.entities.SavingsGoal.filter({ created_by: user.email })
+    ]);
 
-    const monthlyTransactions = transactions.filter(t => t.date >= monthStart && t.date <= monthEnd);
-    const customCategories = await base44.entities.CustomCategory.filter({ created_by: user.email });
-    const goals = await base44.entities.SavingsGoal.filter({ created_by: user.email });
+    const transactions = allTransactions.filter(t => t.date >= monthStart && t.date <= monthEnd);
 
-    // Default categories
     const defaultCategories = {
+      housing: { label: 'Rumah', emoji: '🏠' },
       food: { label: 'Makanan', emoji: '🍔' },
       transport: { label: 'Transportasi', emoji: '🚗' },
-      utilities: { label: 'Listrik/Air', emoji: '💡' },
+      health: { label: 'Kesehatan', emoji: '❤️' },
       entertainment: { label: 'Hiburan', emoji: '🎬' },
       shopping: { label: 'Belanja', emoji: '🛍️' },
-      health: { label: 'Kesehatan', emoji: '⚕️' },
-      education: { label: 'Pendidikan', emoji: '📚' },
-      salary: { label: 'Gaji', emoji: '💰' },
+      subscriptions: { label: 'Langganan', emoji: '📱' },
+      salary: { label: 'Gaji', emoji: '💼' },
       freelance: { label: 'Freelance', emoji: '💻' },
-      investment: { label: 'Investasi', emoji: '📈' },
-      other: { label: 'Lainnya', emoji: '📌' }
+      savings: { label: 'Tabungan', emoji: '🐷' },
+      other: { label: 'Lainnya', emoji: '📦' }
     };
 
-    // Calculate summaries
-    const income = monthlyTransactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + t.amount, 0);
+    function getCategoryLabel(key) {
+      if (!key) return 'Lainnya';
+      if (defaultCategories[key]) return `${defaultCategories[key].emoji} ${defaultCategories[key].label}`;
+      const custom = customCategories.find(c => `custom_${c.id}` === key || c.id === key);
+      if (custom) return `${custom.emoji} ${custom.name}`;
+      return key;
+    }
 
-    const expenses = monthlyTransactions
-      .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0);
+    const income = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+    const expenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+    const savings = transactions.filter(t => t.type === 'savings').reduce((s, t) => s + t.amount, 0);
 
-    const savings = monthlyTransactions
-      .filter(t => t.type === 'savings')
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    // Group expenses by category
     const expensesByCategory = {};
-    monthlyTransactions
-      .filter(t => t.type === 'expense')
-      .forEach(t => {
-        const catKey = t.category || 'other';
-        if (!expensesByCategory[catKey]) {
-          expensesByCategory[catKey] = 0;
-        }
-        expensesByCategory[catKey] += t.amount;
-      });
+    transactions.filter(t => t.type === 'expense').forEach(t => {
+      const key = t.category || 'other';
+      expensesByCategory[key] = (expensesByCategory[key] || 0) + t.amount;
+    });
 
-    // Create sheet title
     const monthName = now.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-    const sheetTitle = `Laporan ${monthName}`;
 
-    // Prepare data for Google Sheets
+    // Build rows
     const values = [
-      ['LAPORAN KEUANGAN BULANAN'],
+      ['LAPORAN KEUANGAN BULANAN - ATUR PINTAR'],
       [`Bulan: ${monthName}`],
+      ['Dibuat:', new Date().toLocaleString('id-ID')],
       [''],
       ['RINGKASAN'],
       ['Pemasukan', income],
@@ -78,91 +67,52 @@ Deno.serve(async (req) => {
       ['Tabungan', savings],
       ['Saldo Bersih', income - expenses],
       [''],
-      ['PENGELUARAN BERDASARKAN KATEGORI'],
-      ['Kategori', 'Jumlah']
+      ['PENGELUARAN PER KATEGORI'],
+      ['Kategori', 'Jumlah (Rp)'],
+      ...Object.entries(expensesByCategory).map(([k, v]) => [getCategoryLabel(k), v]),
+      [''],
+      ['SEMUA TRANSAKSI BULAN INI'],
+      ['Tanggal', 'Jenis', 'Kategori', 'Nominal (Rp)', 'Catatan'],
+      ...transactions.map(t => [t.date, t.type, getCategoryLabel(t.category), t.amount, t.note || '']),
+      [''],
+      ['TUJUAN TABUNGAN'],
+      ['Nama', 'Target (Rp)', 'Terkumpul (Rp)', 'Progress (%)', 'Status'],
+      ...goals.map(g => [g.name, g.target_amount, g.current_amount || 0, (((g.current_amount || 0) / g.target_amount) * 100).toFixed(1), g.status])
     ];
 
-    // Add category breakdown
-    Object.entries(expensesByCategory).forEach(([catKey, amount]) => {
-      let label = catKey;
-      if (defaultCategories[catKey]) {
-        label = `${defaultCategories[catKey].emoji} ${defaultCategories[catKey].label}`;
-      } else {
-        const custom = customCategories.find(c => c.id === catKey);
-        if (custom) {
-          label = `${custom.emoji} ${custom.name}`;
-        }
-      }
-      values.push([label, amount]);
-    });
-
-    // Get Google Sheets connector
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('googlesheets');
 
-    // Create new spreadsheet
-    const createResponse = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+    // Create spreadsheet
+    const createRes = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        properties: {
-          title: sheetTitle,
-          locale: 'id_ID'
-        }
-      })
+      headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ properties: { title: `Laporan ${monthName} - Atur Pintar` } })
     });
 
-    const spreadsheet = await createResponse.json();
-    const spreadsheetId = spreadsheet.spreadsheetId;
-    const sheetId = spreadsheet.sheets[0].properties.sheetId;
+    const spreadsheet = await createRes.json();
+    if (!spreadsheet.spreadsheetId) {
+      return Response.json({ error: 'Gagal membuat spreadsheet: ' + JSON.stringify(spreadsheet) }, { status: 500 });
+    }
 
-    // Update sheet with data
+    const spreadsheetId = spreadsheet.spreadsheetId;
+
+    // Write data
     await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/'Sheet1'!A1?valueInputOption=RAW`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1?valueInputOption=RAW`,
       {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ values })
       }
     );
-
-    // Format header row
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        requests: [
-          {
-            repeatCell: {
-              range: { sheetId, startRowIndex: 0, endRowIndex: 1 },
-              cell: {
-                userEnteredFormat: {
-                  textFormat: { bold: true, fontSize: 14 },
-                  backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
-                  textFormat: { bold: true, foregroundColor: { red: 1, green: 1, blue: 1 } }
-                }
-              },
-              fields: 'userEnteredFormat'
-            }
-          }
-        ]
-      })
-    });
 
     return Response.json({
       success: true,
       spreadsheetId,
       spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${spreadsheetId}`,
-      message: `Laporan ${monthName} berhasil dibuat di Google Sheets`
+      message: `Laporan ${monthName} berhasil dibuat`
     });
+
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
