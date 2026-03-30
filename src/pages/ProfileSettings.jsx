@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { LogOut, Trash2, Crown, ChevronDown, Pencil, Moon, Sun } from "lucide-react";
+import { LogOut, Trash2, Crown, ChevronDown, Pencil } from "lucide-react";
 import EditProfileForm from "@/components/profile/EditProfileForm";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAppSettings } from "@/components/utils/useAppSettings";
@@ -16,15 +16,6 @@ export default function ProfileSettings() {
   const [deleting, setDeleting] = useState(false);
   const [expandedDropdown, setExpandedDropdown] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
-
-  function toggleDarkMode() {
-    const next = !darkMode;
-    setDarkMode(next);
-    localStorage.setItem("darkMode", String(next));
-    if (next) document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
-  }
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -117,23 +108,6 @@ export default function ProfileSettings() {
               </Link>
             </div>
           )}
-        </div>
-
-        {/* Dark Mode Toggle */}
-        <div className="bg-white dark:bg-[#1A1E25] rounded-2xl shadow-sm overflow-hidden">
-          <button
-            onClick={toggleDarkMode}
-            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] dark:hover:bg-white/5 transition-colors">
-            {darkMode ? <Moon className="w-5 h-5 text-[#FF6A00]" /> : <Sun className="w-5 h-5 text-[#FF6A00]" />}
-            <div className="text-left flex-1">
-              <p className="font-medium text-[#1A1A1A] dark:text-white text-sm">Mode Gelap</p>
-              <p className="text-xs text-[#8FA4C8]">{darkMode ? "Aktif — tampilan gelap" : "Nonaktif — tampilan terang"}</p>
-            </div>
-            {/* Toggle pill */}
-            <div className={`w-11 h-6 rounded-full transition-colors flex-shrink-0 flex items-center px-0.5 ${darkMode ? 'bg-[#FF6A00]' : 'bg-[#D1D5DB]'}`}>
-              <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${darkMode ? 'translate-x-5' : 'translate-x-0'}`} />
-            </div>
-          </button>
         </div>
 
         {/* Nana AI Preferences Dropdown */}

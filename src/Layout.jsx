@@ -98,8 +98,8 @@ function LayoutInner({ children, currentPageName }) {
 
   // Update tab history when navigating to a main page
   useEffect(() => {
-    const mobileMainNav = ["Dashboard", "Transactions", "Analytics", "Investments"];
-    const mobileMorePages = ["Goals", "Budget", "Debts", "Reminders", "Alerts", "Tips", "Settings", "Menu"];
+    const mobileMainNav = ["Dashboard", "Transactions", "Analytics", "Budget"];
+    const mobileMorePages = ["Goals", "Debts", "Reminders", "Alerts", "Tips", "Settings", "Menu", "Investments"];
 
     if (mobileMainNav.includes(currentPageName)) {
       tabHistory.current[currentPageName] = currentPageName;

@@ -116,7 +116,7 @@ export default function EditContractModal({ contract, onClose, onSave }) {
             />
           </div>
 
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-4 sticky bottom-0 bg-white pb-2">
             <button
               onClick={onClose}
               className="flex-1 px-4 py-2 rounded-lg bg-[#F2F4F7] text-[#1A1A1A] font-semibold text-sm hover:bg-[#E2E8F0] transition-colors">

@@ -28,8 +28,8 @@ function AddSubscriptionModal({ onClose, onSave }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4 pb-4 sm:pb-0" onClick={onClose}>
-      <div className="bg-white my-20 p-4 rounded-2xl w-full max-w-sm space-y-3 shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4 pb-6 sm:pb-0" onClick={onClose}>
+      <div className="bg-white p-4 rounded-2xl w-full max-w-sm space-y-3 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-sm font-bold text-[#1A1A1A]">Tambah Langganan</h2>
         <form onSubmit={handleSubmit} className="space-y-2.5">
           <div className="flex gap-2">

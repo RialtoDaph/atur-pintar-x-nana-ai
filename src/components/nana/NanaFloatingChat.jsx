@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Send, Plus, X, AlertTriangle, TrendingDown, Target } from "lucide-react";
+import { Send, Plus, X, AlertTriangle, TrendingDown, Target, History, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useFinancialContext } from "./useFinancialContext";
 import InteractivePrompt from "./InteractivePrompt";
@@ -17,6 +17,8 @@ export default function NanaFloatingChat() {
   const [user, setUser] = useState(null);
   const [chatCount, setChatCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showHistory, setShowHistory] = useState(false);
+  const [conversations, setConversations] = useState([]);
   const bottomRef = useRef(null);
   const { context, formatContextForMessage } = useFinancialContext(open);
 
@@ -66,18 +68,33 @@ export default function NanaFloatingChat() {
     return unsub;
   }, [activeConv?.id, open]);
 
+  async function loadConversations() {
+    const convs = await base44.agents.listConversations({ agent_name: "nana" });
+    setConversations(convs || []);
+    return convs || [];
+  }
+
   async function openChat() {
     setOpen(true);
     setUnreadCount(0);
     localStorage.setItem("nana_last_seen", Date.now().toString());
     if (activeConv) return;
     setLoading(true);
-    const convs = await base44.agents.listConversations({ agent_name: "nana" });
-    if (convs && convs.length > 0) {
+    const convs = await loadConversations();
+    if (convs.length > 0) {
       const conv = await base44.agents.getConversation(convs[0].id);
       setActiveConv(conv);
       setMessages(conv.messages || []);
     }
+    setLoading(false);
+  }
+
+  async function selectConversation(convId) {
+    setLoading(true);
+    setShowHistory(false);
+    const conv = await base44.agents.getConversation(convId);
+    setActiveConv(conv);
+    setMessages(conv.messages || []);
     setLoading(false);
   }
 
@@ -201,6 +218,9 @@ export default function NanaFloatingChat() {
               <p className="text-white font-bold text-sm">Nana</p>
               <p className="text-[#8FA4C8] text-[10px]">Asisten Keuangan Pribadi</p>
             </div>
+            <button onClick={async () => { await loadConversations(); setShowHistory(h => !h); }} className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" title="Riwayat percakapan">
+              <History className="w-3.5 h-3.5 text-white" />
+            </button>
             <button onClick={newConversation} className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" title="Obrolan baru">
               <Plus className="w-3.5 h-3.5 text-white" />
             </button>
@@ -208,6 +228,36 @@ export default function NanaFloatingChat() {
               <X className="w-3.5 h-3.5 text-white" />
             </button>
           </div>
+
+          {/* History Panel */}
+          {showHistory && (
+            <div className="absolute inset-0 top-[52px] z-10 bg-[#0F1114] overflow-y-auto">
+              <div className="px-3 py-3">
+                <p className="text-[10px] text-[#8FA4C8] font-semibold uppercase tracking-widest mb-2">Riwayat Percakapan</p>
+                {conversations.length === 0 ? (
+                  <p className="text-xs text-[#8FA4C8] text-center py-8">Belum ada percakapan</p>
+                ) : (
+                  <div className="space-y-1">
+                    {conversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => selectConversation(conv.id)}
+                        className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 transition-colors ${
+                          activeConv?.id === conv.id ? 'bg-[#FF6A00]/20 border border-[#FF6A00]/30' : 'bg-[#2D2D2D] hover:bg-[#3D3D3D]'
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <p className="text-xs text-white font-medium truncate">{conv.metadata?.name || 'Obrolan'}</p>
+                          <p className="text-[10px] text-[#8FA4C8]">{new Date(conv.created_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                        </div>
+                        <ChevronRight className="w-3.5 h-3.5 text-[#8FA4C8] flex-shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 bg-[#1A1A1A] scrollbar-thin scrollbar-thumb-[#2D2D2D] scrollbar-track-transparent">
