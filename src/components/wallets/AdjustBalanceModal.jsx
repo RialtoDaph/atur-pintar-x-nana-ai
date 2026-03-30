@@ -7,12 +7,13 @@ export default function AdjustBalanceModal({ wallet, onClose, onSaved }) {
   const { formatCurrency } = useAppSettings();
   const [mode, setMode] = useState("set"); // set | add | subtract
   const [amount, setAmount] = useState("");
+  const [amountDisplay, setAmountDisplay] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const val = parseFloat(amount) || 0;
+    const val = parseFloat(amount.replace(/\./g, "")) || 0;
     let newBalance = wallet.balance;
     if (mode === "set") newBalance = val;
     else if (mode === "add") newBalance = wallet.balance + val;
@@ -57,14 +58,22 @@ export default function AdjustBalanceModal({ wallet, onClose, onSaved }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="number"
-            required
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Masukkan nominal"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#FF6A00]"
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">Rp</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              required
+              value={amountDisplay}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^0-9]/g, "");
+                setAmountDisplay(raw ? Number(raw).toLocaleString("id-ID") : "");
+                setAmount(raw);
+              }}
+              placeholder="0"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#FF6A00]"
+            />
+          </div>
           <button
             type="submit"
             disabled={loading}

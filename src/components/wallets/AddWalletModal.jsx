@@ -13,6 +13,15 @@ const WALLET_TYPES = [
 const ICONS = ["🏦", "💳", "📱", "💵", "💰", "🏧", "💼", "🪙", "🤑", "💸"];
 const COLORS = ["#FF6A00", "#3B82F6", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444", "#06B6D4", "#84CC16"];
 
+function formatRupiah(val) {
+  if (!val && val !== 0) return "";
+  return Number(val).toLocaleString("id-ID");
+}
+
+function parseRupiah(str) {
+  return parseFloat(str.replace(/\./g, "").replace(/,/g, ".")) || 0;
+}
+
 export default function AddWalletModal({ onClose, onSaved, wallet }) {
   const { formatCurrency } = useAppSettings();
   const isEdit = !!wallet;
@@ -24,6 +33,7 @@ export default function AddWalletModal({ onClose, onSaved, wallet }) {
     color: wallet?.color || "#FF6A00",
     description: wallet?.description || "",
   });
+  const [balanceDisplay, setBalanceDisplay] = useState(wallet?.balance ? formatRupiah(wallet.balance) : "");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -41,7 +51,7 @@ export default function AddWalletModal({ onClose, onSaved, wallet }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl" style={{ maxHeight: "100dvh", overflowY: "auto" }}>
+      <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl" style={{ maxHeight: "90dvh", overflowY: "auto" }}>
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h2 className="text-lg font-bold text-[#1A1A1A]">{isEdit ? "Edit Dompet" : "Tambah Dompet"}</h2>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
@@ -49,23 +59,35 @@ export default function AddWalletModal({ onClose, onSaved, wallet }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {/* Icon & Color */}
-          <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Ikon</label>
-            <div className="flex flex-wrap gap-2">
-              {ICONS.map((ic) => (
-                <button
-                  key={ic}
-                  type="button"
-                  onClick={() => setForm({ ...form, icon: ic })}
-                  className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center border-2 transition-all ${
-                    form.icon === ic ? "border-[#FF6A00] bg-orange-50" : "border-gray-100 bg-gray-50"
-                  }`}
-                >
-                  {ic}
-                </button>
-              ))}
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
+          {/* Icon & Color row */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Ikon</label>
+              <div className="flex flex-wrap gap-1.5">
+                {ICONS.map((ic) => (
+                  <button
+                    key={ic}
+                    type="button"
+                    onClick={() => setForm({ ...form, icon: ic })}
+                    className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border-2 transition-all ${
+                      form.icon === ic ? "border-[#FF6A00] bg-orange-50" : "border-gray-100 bg-gray-50"
+                    }`}
+                  >
+                    {ic}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Warna</label>
+              <div className="flex flex-col gap-1.5">
+                {COLORS.slice(0,4).map((c) => (
+                  <button key={c} type="button" onClick={() => setForm({ ...form, color: c })}
+                    className={`w-7 h-7 rounded-full border-2 transition-all ${form.color === c ? "border-gray-800 scale-110" : "border-transparent"}`}
+                    style={{ backgroundColor: c }} />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -103,29 +125,21 @@ export default function AddWalletModal({ onClose, onSaved, wallet }) {
 
           {/* Balance */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Saldo</label>
-            <input
-              type="number"
-              value={form.balance}
-              onChange={(e) => setForm({ ...form, balance: parseFloat(e.target.value) || 0 })}
-              placeholder="0"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#FF6A00]"
-            />
-          </div>
-
-          {/* Color */}
-          <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Warna</label>
-            <div className="flex gap-2 flex-wrap">
-              {COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setForm({ ...form, color: c })}
-                  className={`w-8 h-8 rounded-full border-2 transition-all ${form.color === c ? "border-gray-800 scale-110" : "border-transparent"}`}
-                  style={{ backgroundColor: c }}
-                />
-              ))}
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Saldo (Rp)</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">Rp</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={balanceDisplay}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, "");
+                  setBalanceDisplay(raw ? Number(raw).toLocaleString("id-ID") : "");
+                  setForm({ ...form, balance: parseFloat(raw) || 0 });
+                }}
+                placeholder="0"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#FF6A00]"
+              />
             </div>
           </div>
 
