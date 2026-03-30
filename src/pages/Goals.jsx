@@ -73,17 +73,19 @@ export default function Goals() {
     // deposit → "savings" (outflow from wallet, counted in balance)
     // withdrawal → "income" (money returns to wallet, increases balance)
     const txType = type === "deposit" ? "savings" : "income";
+    const numAmount = Number(amount);
+    if (!numAmount || numAmount <= 0) return;
     const tx = {
       goal_id: goalId,
-      amount,
+      amount: numAmount,
       type: txType,
       note,
       date: new Date().toISOString().split("T")[0],
     };
     const newAmount =
       type === "deposit"
-        ? (goal.current_amount || 0) + amount
-        : Math.max((goal.current_amount || 0) - amount, 0);
+        ? (goal.current_amount || 0) + numAmount
+        : Math.max((goal.current_amount || 0) - numAmount, 0);
 
     const previousGoals = goals;
     const optimisticTx = { ...tx, id: `temp_${Date.now()}`, created_date: new Date().toISOString() };
