@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
 import { base44 } from "@/api/base44Client";
@@ -14,8 +14,8 @@ import BalanceCard from "@/components/dashboard/BalanceCard";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 
-// Lazy load heavy components
-const CashflowForecast = lazy(() => import("@/components/dashboard/CashflowForecast"));
+import CashflowForecast from "@/components/dashboard/CashflowForecast";
+
 const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
 
 const BudgetAlertWidget = lazy(() => import("@/components/dashboard/BudgetAlertWidget"));
