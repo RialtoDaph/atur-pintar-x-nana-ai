@@ -48,26 +48,23 @@ export default function Wallets() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F4F7] pb-8">
-      {/* Header dark */}
-      <div className="bg-[#0A0A0A] px-5 pt-6 pb-14">
-        <div className="max-w-xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-[#F2F4F7] p-4 sm:p-6">
+      <div className="max-w-xl mx-auto space-y-5">
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div>
-            <p className="text-[#8FA4C8] text-xs font-medium">Keuangan</p>
-            <h1 className="text-white text-xl font-bold mt-0.5">Dompet Saya</h1>
+            <h1 className="text-xl font-black text-[#1A1A1A]">Dompet Saya</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Kelola semua akun keuanganmu</p>
           </div>
           <button
             onClick={() => setShowAdd(true)}
-            className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg tap-highlight-fix"
+            className="flex items-center gap-2 bg-[#FF6A00] text-white text-sm font-bold px-4 py-2.5 rounded-xl"
           >
-            <Plus className="w-5 h-5 text-white" />
+            <Plus className="w-4 h-4" />
+            Tambah
           </button>
         </div>
-      </div>
-
-      <div className="max-w-xl mx-auto px-4 -mt-6 space-y-4">
-
-
 
         {/* Total card */}
         <div className="rounded-2xl p-5 text-white" style={{ background: "linear-gradient(135deg, #FF6A00, #FF9A3C)" }}>

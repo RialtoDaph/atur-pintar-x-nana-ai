@@ -7,14 +7,12 @@ export default function AdjustBalanceModal({ wallet, onClose, onSaved }) {
   const { formatCurrency } = useAppSettings();
   const [mode, setMode] = useState("set"); // set | add | subtract
   const [amount, setAmount] = useState("");
-
-  const parseAmount = () => parseFloat(String(amount).replace(/[^0-9.]/g, "")) || 0;
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const val = parseAmount();
+    const val = parseFloat(amount) || 0;
     let newBalance = wallet.balance;
     if (mode === "set") newBalance = val;
     else if (mode === "add") newBalance = wallet.balance + val;
@@ -60,8 +58,7 @@ export default function AdjustBalanceModal({ wallet, onClose, onSaved }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="text"
-            inputMode="decimal"
+            type="number"
             required
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
