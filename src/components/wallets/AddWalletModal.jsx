@@ -3,6 +3,10 @@ import { X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/AppSettingsContext";
 
+function parseNumber(str) {
+  return parseFloat(String(str).replace(/[^0-9.]/g, "")) || 0;
+}
+
 const WALLET_TYPES = [
   { value: "bank", label: "Bank", emoji: "🏦" },
   { value: "e_wallet", label: "E-Wallet", emoji: "📱" },
@@ -16,6 +20,7 @@ const COLORS = ["#FF6A00", "#3B82F6", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"
 export default function AddWalletModal({ onClose, onSaved, wallet }) {
   const { formatCurrency } = useAppSettings();
   const isEdit = !!wallet;
+  const [balanceStr, setBalanceStr] = useState(wallet?.balance != null ? String(wallet.balance) : "");
   const [form, setForm] = useState({
     name: wallet?.name || "",
     type: wallet?.type || "bank",
@@ -29,10 +34,11 @@ export default function AddWalletModal({ onClose, onSaved, wallet }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const finalForm = { ...form, balance: parseNumber(balanceStr) };
     if (isEdit) {
-      await base44.entities.Wallet.update(wallet.id, form);
+      await base44.entities.Wallet.update(wallet.id, finalForm);
     } else {
-      await base44.entities.Wallet.create({ ...form, is_active: true });
+      await base44.entities.Wallet.create({ ...finalForm, is_active: true });
     }
     setLoading(false);
     onSaved();
@@ -105,9 +111,10 @@ export default function AddWalletModal({ onClose, onSaved, wallet }) {
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Saldo</label>
             <input
-              type="number"
-              value={form.balance}
-              onChange={(e) => setForm({ ...form, balance: parseFloat(e.target.value) || 0 })}
+              type="text"
+              inputMode="decimal"
+              value={balanceStr}
+              onChange={(e) => setBalanceStr(e.target.value)}
               placeholder="0"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#FF6A00]"
             />
