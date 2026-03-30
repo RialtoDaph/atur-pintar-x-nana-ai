@@ -11,7 +11,6 @@ import LandingPage from '@/pages/LandingPage';
 import AdminSubscriptions from '@/pages/AdminSubscriptions';
 import Dashboard from '@/pages/Dashboard';
 import ProfileSettings from '@/pages/ProfileSettings';
-import Wallets from '@/pages/Wallets';
 
 const { Pages, Layout } = pagesConfig;
 
@@ -74,7 +73,6 @@ const AuthenticatedApp = () => {
       <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
       <Route path="/AdminSubscriptions" element={<LayoutWrapper currentPageName="AdminSubscriptions"><AdminSubscriptions /></LayoutWrapper>} />
       <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
-      <Route path="/Wallets" element={<LayoutWrapper currentPageName="Wallets"><Wallets /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

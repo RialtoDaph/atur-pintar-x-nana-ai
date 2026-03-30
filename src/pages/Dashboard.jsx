@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from "react";
+import { useState, useEffect, Suspense } from "react";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
 import { base44 } from "@/api/base44Client";
@@ -15,8 +15,10 @@ import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
-import DashboardInsights from "@/components/dashboard/DashboardInsights";
-import BudgetAlertWidget from "@/components/dashboard/BudgetAlertWidget";
+
+const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
+
+const BudgetAlertWidget = lazy(() => import("@/components/dashboard/BudgetAlertWidget"));
 
 const LazyFallback = () => (
   <div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />

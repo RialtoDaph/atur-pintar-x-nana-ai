@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import { Target, CreditCard, TrendingUp, Lightbulb, ChevronRight, Bell, Settings, User, Wallet } from "lucide-react";
+import { Target, CreditCard, TrendingUp, Lightbulb, ChevronRight, Bell, Settings, User } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function Menu() {
@@ -9,7 +9,6 @@ export default function Menu() {
     {
       title: t('menu_finance'),
       items: [
-        { label: "Dompet Saya", desc: "Kelola saldo semua akun keuanganmu", icon: Wallet, emoji: "👛", page: "Wallets", color: "#FF6A00" },
         { label: t('nav_goals'), desc: "Pantau dan capai target keuanganmu", icon: Target, emoji: "🎯", page: "Goals", color: "#FF6A00" },
         { label: t('nav_debts'), desc: "Lacak cicilan dan sisa hutang", icon: CreditCard, emoji: "💳", page: "Debts", color: "#FF6B6B" },
         { label: t('nav_investments'), desc: "Monitor portofolio investasimu", icon: TrendingUp, emoji: "📈", page: "Investments", color: "#4F7CFF" },
