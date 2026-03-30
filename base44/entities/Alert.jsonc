@@ -1,0 +1,68 @@
+{
+  "name": "Alert",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "spending_spike",
+        "bill_upcoming",
+        "goal_near",
+        "savings_opportunity",
+        "unusual_pattern",
+        "budget_exceeded"
+      ],
+      "description": "Type of alert"
+    },
+    "title": {
+      "type": "string",
+      "description": "Alert title"
+    },
+    "message": {
+      "type": "string",
+      "description": "Alert message"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium",
+      "description": "Alert severity level"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "unread",
+        "read",
+        "dismissed"
+      ],
+      "default": "unread",
+      "description": "Alert status"
+    },
+    "category": {
+      "type": "string",
+      "description": "Related category or goal ID"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional data (spending amount, goal progress, etc.)"
+    },
+    "email_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether email notification was sent"
+    },
+    "action_url": {
+      "type": "string",
+      "description": "URL to take action on alert"
+    }
+  },
+  "required": [
+    "type",
+    "title",
+    "message"
+  ]
+}

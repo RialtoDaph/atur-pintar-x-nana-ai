@@ -1,0 +1,58 @@
+{
+  "name": "SplitIOU",
+  "type": "object",
+  "properties": {
+    "store_name": {
+      "type": "string",
+      "description": "Nama toko dari split bill"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal split bill"
+    },
+    "debtor_name": {
+      "type": "string",
+      "description": "Nama orang yang berhutang"
+    },
+    "debtor_email": {
+      "type": "string",
+      "description": "Email orang yang berhutang (jika tersedia)"
+    },
+    "creditor_name": {
+      "type": "string",
+      "description": "Nama orang yang memberikan pinjaman (biasanya Saya)"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Jumlah yang harus dibayar"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "unpaid",
+        "paid"
+      ],
+      "default": "unpaid",
+      "description": "Status pembayaran"
+    },
+    "receipt_image_url": {
+      "type": "string",
+      "description": "URL foto struk asli"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Catatan tambahan"
+    }
+  },
+  "required": [
+    "debtor_name",
+    "amount",
+    "date"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

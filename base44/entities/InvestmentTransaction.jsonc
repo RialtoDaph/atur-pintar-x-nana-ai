@@ -1,0 +1,51 @@
+{
+  "name": "InvestmentTransaction",
+  "type": "object",
+  "properties": {
+    "investment_id": {
+      "type": "string",
+      "description": "ID dari investasi terkait"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "buy",
+        "sell",
+        "dividend",
+        "adjustment"
+      ],
+      "description": "Jenis transaksi"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Jumlah unit/lembar yang ditransaksikan"
+    },
+    "price_per_unit": {
+      "type": "number",
+      "description": "Harga per unit pada waktu transaksi"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Total nilai transaksi"
+    },
+    "transaction_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal transaksi"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Catatan transaksi"
+    }
+  },
+  "required": [
+    "investment_id",
+    "type",
+    "transaction_date"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

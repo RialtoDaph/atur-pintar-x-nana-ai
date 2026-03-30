@@ -1,0 +1,28 @@
+{
+  "name": "CategoryLearning",
+  "type": "object",
+  "properties": {
+    "note_fragment": {
+      "type": "string",
+      "description": "Cleaned lowercase note fragment from the transaction"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category key the user assigned to this note"
+    },
+    "count": {
+      "type": "number",
+      "default": 1,
+      "description": "How many times this mapping has been confirmed"
+    }
+  },
+  "required": [
+    "note_fragment",
+    "category"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

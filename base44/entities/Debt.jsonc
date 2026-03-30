@@ -1,0 +1,65 @@
+{
+  "name": "Debt",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the debt (e.g. KPR, Kartu Kredit BCA)"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Original/total debt amount"
+    },
+    "remaining_amount": {
+      "type": "number",
+      "description": "Remaining balance to pay"
+    },
+    "interest_rate": {
+      "type": "number",
+      "description": "Annual interest rate (%)"
+    },
+    "monthly_payment": {
+      "type": "number",
+      "description": "Monthly payment amount"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Next payment due date"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "kpr",
+        "kendaraan",
+        "kartu_kredit",
+        "pinjaman_pribadi",
+        "lainnya"
+      ],
+      "default": "lainnya",
+      "description": "Type of debt"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paid"
+      ],
+      "default": "active"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji icon"
+    }
+  },
+  "required": [
+    "name",
+    "total_amount",
+    "remaining_amount"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

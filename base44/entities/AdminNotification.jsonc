@@ -1,0 +1,43 @@
+{
+  "name": "AdminNotification",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Notification title"
+    },
+    "message": {
+      "type": "string",
+      "description": "Notification body"
+    },
+    "target_type": {
+      "type": "string",
+      "enum": [
+        "all",
+        "specific"
+      ],
+      "default": "all",
+      "description": "Target audience"
+    },
+    "target_email": {
+      "type": "string",
+      "description": "Target user email if specific"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "read_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "List of emails that have read this notification"
+    }
+  },
+  "required": [
+    "title",
+    "message"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "name": "Investment",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the investment"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "saham",
+        "reksa_dana",
+        "crypto",
+        "deposito",
+        "obligasi",
+        "emas",
+        "lainnya"
+      ],
+      "default": "reksa_dana",
+      "description": "Type of investment"
+    },
+    "initial_amount": {
+      "type": "number",
+      "description": "Initial investment amount"
+    },
+    "current_value": {
+      "type": "number",
+      "description": "Current market value"
+    },
+    "purchase_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of purchase"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Number of units/shares"
+    },
+    "price_per_unit": {
+      "type": "number",
+      "description": "Current price per unit"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji icon"
+    },
+    "last_price_update": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when price was last auto-updated"
+    },
+    "daily_change_pct": {
+      "type": "number",
+      "description": "Daily price change percentage from previous close"
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "initial_amount",
+    "current_value"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

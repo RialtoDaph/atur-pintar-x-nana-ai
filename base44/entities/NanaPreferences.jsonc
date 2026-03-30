@@ -1,0 +1,51 @@
+{
+  "name": "NanaPreferences",
+  "type": "object",
+  "properties": {
+    "tone": {
+      "type": "string",
+      "enum": [
+        "formal",
+        "santai"
+      ],
+      "default": "santai",
+      "description": "Tone komunikasi Nana AI"
+    },
+    "preferred_advice_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "budgeting",
+          "savings",
+          "investments",
+          "debt_management",
+          "spending_analysis",
+          "goals"
+        ]
+      },
+      "default": [
+        "budgeting",
+        "savings",
+        "spending_analysis"
+      ],
+      "description": "Jenis saran keuangan yang diprioritaskan"
+    },
+    "frequency_preference": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "default": "weekly",
+      "description": "Frekuensi saran yang diinginkan"
+    }
+  },
+  "required": [],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "name": "AppSettings",
+  "type": "object",
+  "properties": {
+    "language": {
+      "type": "string",
+      "enum": [
+        "id",
+        "en",
+        "de"
+      ],
+      "default": "id",
+      "description": "Bahasa preferensi"
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "IDR",
+        "USD",
+        "EUR"
+      ],
+      "default": "IDR",
+      "description": "Mata uang preferensi"
+    },
+    "currency_symbol": {
+      "type": "string",
+      "default": "Rp",
+      "description": "Simbol mata uang"
+    },
+    "decimal_separator": {
+      "type": "string",
+      "enum": [
+        ",",
+        "."
+      ],
+      "default": ",",
+      "description": "Pemisah desimal"
+    },
+    "thousand_separator": {
+      "type": "string",
+      "enum": [
+        ",",
+        "."
+      ],
+      "default": ".",
+      "description": "Pemisah ribuan"
+    },
+    "date_format": {
+      "type": "string",
+      "enum": [
+        "DD/MM/YYYY",
+        "MM/DD/YYYY",
+        "YYYY-MM-DD"
+      ],
+      "default": "DD/MM/YYYY",
+      "description": "Format tanggal"
+    },
+    "category_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Urutan kategori"
+    },
+    "analytics_cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "visible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "default": [],
+      "description": "Urutan dan visibilitas kartu analitik"
+    },
+    "settings_unlocked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Apakah admin telah membuka kunci pengaturan bahasa & mata uang"
+    }
+  },
+  "required": [],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

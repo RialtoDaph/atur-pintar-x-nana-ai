@@ -1,0 +1,54 @@
+{
+  "name": "SavingsGoal",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the savings goal"
+    },
+    "target_amount": {
+      "type": "number",
+      "description": "Target amount to save"
+    },
+    "current_amount": {
+      "type": "number",
+      "description": "Current amount saved",
+      "default": 0
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji icon for the goal"
+    },
+    "color": {
+      "type": "string",
+      "description": "Color theme for the goal"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Target deadline for the goal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "paused"
+      ],
+      "default": "active"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description"
+    }
+  },
+  "required": [
+    "name",
+    "target_amount"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

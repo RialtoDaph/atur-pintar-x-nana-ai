@@ -1,0 +1,56 @@
+{
+  "name": "InvestmentTaxLog",
+  "type": "object",
+  "properties": {
+    "investment_id": {
+      "type": "string",
+      "description": "ID dari investasi"
+    },
+    "tax_type": {
+      "type": "string",
+      "enum": [
+        "capital_gain",
+        "dividend",
+        "interest"
+      ],
+      "description": "Jenis pajak"
+    },
+    "gross_amount": {
+      "type": "number",
+      "description": "Jumlah sebelum pajak"
+    },
+    "tax_rate": {
+      "type": "number",
+      "description": "Persentase pajak"
+    },
+    "tax_amount": {
+      "type": "number",
+      "description": "Jumlah pajak yang dipotong"
+    },
+    "net_amount": {
+      "type": "number",
+      "description": "Jumlah setelah pajak"
+    },
+    "transaction_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal transaksi pajak"
+    },
+    "year": {
+      "type": "number",
+      "description": "Tahun pajak"
+    }
+  },
+  "required": [
+    "investment_id",
+    "tax_type",
+    "tax_amount",
+    "transaction_date",
+    "year"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

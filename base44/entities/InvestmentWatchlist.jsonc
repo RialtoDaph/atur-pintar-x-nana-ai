@@ -1,0 +1,48 @@
+{
+  "name": "InvestmentWatchlist",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nama aset yang dipantau"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "saham",
+        "reksa_dana",
+        "crypto",
+        "deposito",
+        "obligasi",
+        "emas",
+        "lainnya"
+      ],
+      "description": "Jenis aset"
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Simbol ticker atau identifier"
+    },
+    "target_price": {
+      "type": "number",
+      "description": "Harga target untuk notifikasi"
+    },
+    "current_price": {
+      "type": "number",
+      "description": "Harga terkini"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Catatan tentang aset"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

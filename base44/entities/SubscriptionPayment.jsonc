@@ -1,0 +1,62 @@
+{
+  "name": "SubscriptionPayment",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email pengguna yang melakukan pembayaran"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Nama pengguna"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "premium_monthly",
+        "premium_yearly"
+      ],
+      "description": "Paket yang dibeli"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Nominal pembayaran"
+    },
+    "payment_proof_url": {
+      "type": "string",
+      "description": "URL bukti transfer (manual)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Status verifikasi pembayaran"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Catatan admin"
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal disetujui"
+    },
+    "midtrans_order_id": {
+      "type": "string",
+      "description": "Order ID Midtrans"
+    },
+    "midtrans_snap_token": {
+      "type": "string",
+      "description": "Snap Token dari Midtrans"
+    }
+  },
+  "required": [
+    "user_email",
+    "plan",
+    "amount"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Budget",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "description": "Category key this budget applies to"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monthly budget limit"
+    },
+    "month": {
+      "type": "string",
+      "description": "Month in YYYY-MM format"
+    },
+    "color": {
+      "type": "string",
+      "description": "Color for the budget card"
+    }
+  },
+  "required": [
+    "category",
+    "amount",
+    "month"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

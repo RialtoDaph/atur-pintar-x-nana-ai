@@ -1,0 +1,56 @@
+{
+  "name": "SystemLog",
+  "type": "object",
+  "properties": {
+    "log_type": {
+      "type": "string",
+      "enum": [
+        "login",
+        "activity",
+        "error"
+      ],
+      "description": "Type of log entry"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of user"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID of user"
+    },
+    "action": {
+      "type": "string",
+      "description": "Action performed"
+    },
+    "entity_type": {
+      "type": "string",
+      "description": "Entity type involved"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "Entity ID involved"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "IP address"
+    },
+    "details": {
+      "type": "string",
+      "description": "Additional details or error message"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "error"
+      ],
+      "default": "info"
+    }
+  },
+  "required": [
+    "log_type",
+    "action"
+  ]
+}

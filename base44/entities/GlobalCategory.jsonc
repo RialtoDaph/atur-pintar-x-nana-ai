@@ -1,0 +1,40 @@
+{
+  "name": "GlobalCategory",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Category name"
+    },
+    "emoji": {
+      "type": "string",
+      "description": "Emoji icon"
+    },
+    "color": {
+      "type": "string",
+      "description": "Hex color"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "expense",
+        "income",
+        "both"
+      ],
+      "default": "expense"
+    },
+    "is_default": {
+      "type": "boolean",
+      "default": true,
+      "description": "Admin-created default category"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "emoji"
+  ]
+}

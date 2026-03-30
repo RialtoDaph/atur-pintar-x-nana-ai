@@ -1,0 +1,78 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "goal_id": {
+      "type": "string",
+      "description": "ID of the savings goal (if linked)"
+    },
+    "debt_id": {
+      "type": "string",
+      "description": "ID of the debt (if this transaction is a debt payment)"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Amount of the transaction"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "income",
+        "expense",
+        "savings"
+      ],
+      "default": "expense"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category key (default or custom_<id>)"
+    },
+    "note": {
+      "type": "string",
+      "description": "Description or merchant name"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this is a recurring transaction"
+    },
+    "recurring_interval": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "weekly",
+        "monthly",
+        "yearly"
+      ],
+      "description": "How often the transaction recurs"
+    },
+    "recurring_last_generated": {
+      "type": "string",
+      "format": "date",
+      "description": "Last date a recurring entry was auto-generated from this template"
+    },
+    "is_recurring_child": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this was auto-generated from a recurring template"
+    },
+    "recurring_parent_id": {
+      "type": "string",
+      "description": "ID of the parent recurring transaction"
+    }
+  },
+  "required": [
+    "amount",
+    "type",
+    "date"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

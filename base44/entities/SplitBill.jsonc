@@ -1,0 +1,86 @@
+{
+  "name": "SplitBill",
+  "type": "object",
+  "properties": {
+    "store_name": {
+      "type": "string",
+      "description": "Nama toko tempat pembelian"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal transaksi"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Total tagihan"
+    },
+    "tax_amount": {
+      "type": "number",
+      "description": "Total pajak",
+      "default": 0
+    },
+    "receipt_image_url": {
+      "type": "string",
+      "description": "URL gambar struk"
+    },
+    "items": {
+      "type": "array",
+      "description": "Daftar item pada struk",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "allocated_to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "participants": {
+      "type": "array",
+      "description": "Nama peserta split bill",
+      "items": {
+        "type": "string"
+      }
+    },
+    "split_mode": {
+      "type": "string",
+      "enum": [
+        "equal",
+        "itemized"
+      ],
+      "default": "equal",
+      "description": "Mode pembagian: rata atau per item"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "completed"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "store_name",
+    "date",
+    "total_amount"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

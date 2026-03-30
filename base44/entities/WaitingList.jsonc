@@ -1,0 +1,61 @@
+{
+  "name": "WaitingList",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nama lengkap"
+    },
+    "email": {
+      "type": "string",
+      "description": "Alamat email"
+    },
+    "whatsapp": {
+      "type": "string",
+      "description": "Nomor WhatsApp (opsional)"
+    },
+    "job": {
+      "type": "string",
+      "description": "Pekerjaan"
+    },
+    "salary_estimate": {
+      "type": "string",
+      "description": "Perkiraan gaji per bulan"
+    },
+    "city": {
+      "type": "string",
+      "description": "Asal kota"
+    },
+    "biggest_money_problem": {
+      "type": "string",
+      "description": "Tantangan terbesar dalam mengatur uang"
+    },
+    "current_finance_tracking_method": {
+      "type": "string",
+      "enum": [
+        "Tidak mencatat",
+        "Notes di HP",
+        "Excel / Spreadsheet",
+        "Aplikasi lain"
+      ],
+      "description": "Cara mencatat keuangan saat ini"
+    },
+    "early_access_interest": {
+      "type": "string",
+      "enum": [
+        "Ya",
+        "Mungkin",
+        "Belum yakin"
+      ],
+      "description": "Kesediaan mencoba versi awal"
+    }
+  },
+  "required": [
+    "name",
+    "email",
+    "job",
+    "city",
+    "current_finance_tracking_method",
+    "early_access_interest"
+  ]
+}

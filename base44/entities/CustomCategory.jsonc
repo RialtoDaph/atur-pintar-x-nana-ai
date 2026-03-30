@@ -1,0 +1,36 @@
+{
+  "name": "CustomCategory",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Category name"
+    },
+    "emoji": {
+      "type": "string",
+      "description": "Emoji icon"
+    },
+    "color": {
+      "type": "string",
+      "description": "Hex color"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "expense",
+        "income",
+        "both"
+      ],
+      "default": "expense",
+      "description": "Applicable transaction type"
+    },
+    "parent_category_key": {
+      "type": "string",
+      "description": "Parent category key (default or custom_<id>)"
+    }
+  },
+  "required": [
+    "name",
+    "emoji"
+  ]
+}
