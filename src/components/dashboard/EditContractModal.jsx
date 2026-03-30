@@ -36,7 +36,7 @@ export default function EditContractModal({ contract, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:w-96 max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white my-10 px-1 rounded-t-2xl sm:rounded-2xl w-full sm:w-96 max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="sticky top-0 bg-white border-b border-[#F2F4F7] px-5 py-4 flex items-center justify-between rounded-t-2xl">
           <h2 className="font-bold text-[#1A1A1A]">Edit Kontrak</h2>
           <button onClick={onClose} className="p-1 hover:bg-[#F2F4F7] rounded-lg transition-colors">
@@ -87,8 +87,8 @@ export default function EditContractModal({ contract, onClose, onSave }) {
                 value={formatAmount(data.amount)}
                 onChange={handleAmountChange}
                 className="bg-white text-black pl-9 pr-3 py-2 text-sm rounded-lg w-full border border-[#E2E8F0] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
-                placeholder="0"
-              />
+                placeholder="0" />
+              
             </div>
           </div>
 
@@ -112,8 +112,8 @@ export default function EditContractModal({ contract, onClose, onSave }) {
             <DateInput
               value={data.date || new Date().toISOString().split("T")[0]}
               onChange={(date) => setData({ ...data, date })}
-              label=""
-            />
+              label="" />
+            
           </div>
 
           <div className="flex gap-2 pt-4 sticky bottom-0 bg-white pb-2">
