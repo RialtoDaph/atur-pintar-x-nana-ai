@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
 import { base44 } from "@/api/base44Client";
