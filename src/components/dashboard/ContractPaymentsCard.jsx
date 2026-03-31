@@ -60,7 +60,7 @@ export default function ContractPaymentsCard({ user }) {
       recurring_parent_id: tx.id,
     });
     // Update recurring_last_generated agar RecurringManager tidak generate duplikat
-    await base44.entities.Transaction.update(tx.id, { recurring_last_generated: today });
+    try { await base44.entities.Transaction.update(tx.id, { recurring_last_generated: today }); } catch (_) {}
     window.dispatchEvent(new Event("refresh-dashboard"));
   }
 
