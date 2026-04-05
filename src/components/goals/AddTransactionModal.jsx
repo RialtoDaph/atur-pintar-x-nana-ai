@@ -33,8 +33,8 @@ export default function AddTransactionModal({ type, onClose, onSave, maxWithdraw
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-      <div className="bg-white my-20 p-6 rounded-3xl w-full max-w-sm shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-sm shadow-2xl p-6" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-[#1A1A1A]">
             {isDeposit ? "Tambah Dana" : "Tarik Dana"}

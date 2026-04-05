@@ -13,16 +13,20 @@ const COLORS = [
 { name: "teal", hex: "#1ABC9C" }];
 
 
+function numToDisplay(val) {
+  if (!val && val !== 0) return "";
+  return String(Math.round(Number(val))).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 export default function AddGoalModal({ onClose, onSave, goal = null }) {
   const { t, settings } = useAppSettings();
-  const [form, setForm] = useState(goal || {
-    name: "",
-    target_amount: "",
-    current_amount: "",
-    icon: "💰",
-    color: "blue",
-    deadline: "",
-    description: ""
+  const [form, setForm] = useState(() => {
+    if (!goal) return { name: "", target_amount: "", current_amount: "", icon: "💰", color: "blue", deadline: "", description: "" };
+    return {
+      ...goal,
+      target_amount: numToDisplay(goal.target_amount),
+      current_amount: numToDisplay(goal.current_amount),
+    };
   });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
@@ -164,7 +168,7 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="goal-target" className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">
-                {t('target_amount')} <span className="text-red-400" aria-hidden="true">*</span>
+                Target Jumlah <span className="text-red-400" aria-hidden="true">*</span>
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm" aria-hidden="true">{settings.currency_symbol}</span>
@@ -189,7 +193,7 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
               }
             </div>
             <div>
-              <label htmlFor="goal-current" className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('already_saved')}</label>
+              <label htmlFor="goal-current" className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">Sudah Ditabung</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm" aria-hidden="true">{settings.currency_symbol}</span>
                 <input
@@ -205,7 +209,7 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
             </div>
           </div>
           <div>
-            <label htmlFor="goal-deadline" className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('deadline_optional')}</label>
+            <label htmlFor="goal-deadline" className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">Deadline (opsional)</label>
             <input
               id="goal-deadline"
               type="date"
@@ -215,7 +219,7 @@ export default function AddGoalModal({ onClose, onSave, goal = null }) {
             
           </div>
           <div>
-            <label htmlFor="goal-desc" className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">{t('description_optional')}</label>
+            <label htmlFor="goal-desc" className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1 block">Deskripsi (opsional)</label>
             <textarea
               id="goal-desc"
               rows={2}

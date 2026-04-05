@@ -7,6 +7,7 @@ import { createPageUrl } from "@/utils";
 import AddTransactionModal from "@/components/goals/AddTransactionModal";
 import AddGoalModal from "@/components/goals/AddGoalModal";
 import GoalCard from "@/components/goals/GoalCard";
+import GoalsNanaPanel from "@/components/goals/GoalsNanaPanel";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
 const FREE_GOALS_LIMIT = 2;
@@ -348,6 +349,8 @@ export default function Goals() {
     </div>
 
     <div className="max-w-2xl mx-auto px-5 -mt-10 space-y-3">
+      <GoalsNanaPanel goals={goals} />
+
       {goalsLimitReached && (
         <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 border border-[#FF6A00]/20">
           <Crown className="w-5 h-5 text-[#FF6A00] flex-shrink-0" />

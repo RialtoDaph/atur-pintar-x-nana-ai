@@ -14,6 +14,7 @@ function LayoutInner({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const [showAlertsDrawer, setShowAlertsDrawer] = useState(false);
+  const [anyModalOpen, setAnyModalOpen] = useState(false);
   const [unreadAlertCount, setUnreadAlertCount] = useState(0);
   const [showTour, setShowTour] = useState(false);
   const { t } = useAppSettings();
@@ -80,6 +81,17 @@ function LayoutInner({ children, currentPageName }) {
   const mobileMorePages = ["Goals", "Debts", "Reminders", "Alerts", "Tips", "Settings", "Menu"];
 
   const initials = user?.full_name ? user.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "U";
+
+  // Detect open modals → hide mobile nav + Nana
+  useEffect(() => {
+    const checkModals = () => {
+      const hasModal = document.querySelectorAll('[role="dialog"][data-state="open"], .fixed.inset-0:not([data-nana]):not([data-tour-overlay])').length > 0;
+      setAnyModalOpen(hasModal);
+    };
+    const observer = new MutationObserver(checkModals);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-state", "class"] });
+    return () => observer.disconnect();
+  }, []);
 
   // Detect if we're on a nested page (detail view)
   const mainPages = ["Dashboard", "Transactions", "Goals", "Budget", "Debts", "Investments", "Analytics", "Tips", "Reminders", "Alerts", "Settings", "Menu"];
@@ -274,8 +286,8 @@ function LayoutInner({ children, currentPageName }) {
         </AnimatePresence>
       </div>
 
-      {/* Mobile bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      {/* Mobile bottom nav — hidden when any modal is open */}
+      {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {mobileMainNav.map((item) => {
           const active = currentPageName === item.page;
           return (
@@ -301,7 +313,7 @@ function LayoutInner({ children, currentPageName }) {
           <Grid3x3 className="w-5 h-5" />
           {t('nav_more')}
         </button>
-      </div>
+      </div>}
 
       {/* Nana Floating Chat */}
       <NanaFloatingChat />

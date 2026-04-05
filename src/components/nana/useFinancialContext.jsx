@@ -40,9 +40,9 @@ export function useFinancialContext(enabled = true) {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       });
 
-      // This month transactions
-      const thisTx = transactions.filter((t) => t.date?.startsWith(thisMonth));
-      const lastTx = transactions.filter((t) => t.date?.startsWith(lastMonth));
+      // This month transactions — exclude recurring templates (is_recurring=true & not child)
+      const thisTx = transactions.filter((t) => t.date?.startsWith(thisMonth) && !(t.is_recurring === true && !t.is_recurring_child));
+      const lastTx = transactions.filter((t) => t.date?.startsWith(lastMonth) && !(t.is_recurring === true && !t.is_recurring_child));
 
       const thisIncome = thisTx.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
       const thisExpense = thisTx.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);

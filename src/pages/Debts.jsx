@@ -6,6 +6,7 @@ import AddDebtModal from "@/components/debts/AddDebtModal.jsx";
 import PayDebtModal from "@/components/debts/PayDebtModal";
 import IOUSection from "@/components/splitbill/IOUSection";
 import { useAppSettings } from "@/components/utils/useAppSettings";
+import DebtNanaPanel from "@/components/debts/DebtNanaPanel";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 import { toast } from "sonner";
 
@@ -152,6 +153,7 @@ export default function DebtsPage() {
           </div>
         )}
         <IOUSection />
+        <DebtNanaPanel debts={debts} />
         {loading ? (
           [...Array(2)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" />)
         ) : activeDebts.length === 0 ? (

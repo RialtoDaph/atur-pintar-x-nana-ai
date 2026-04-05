@@ -72,20 +72,22 @@ export default function BudgetNanaPanel({ budgets, spendingByCategory, goals }) 
       ? `\nTarget tabungan yang belum tercapai: ${fmt(totalSavingsTarget)}`
       : "";
 
-    const prompt = `Kamu adalah Nana AI, asisten keuangan personal yang ramah dan praktis.
+    const prompt = `Kamu adalah Nana AI, asisten keuangan personal.
 
-Situasi keuangan pengguna bulan ini:
+PENTING: Berikan HANYA saran tentang anggaran dan pengeluaran di bawah ini. Jangan bahas investasi, utang, atau topik lain.
+
+Situasi anggaran pengguna bulan ini:
 ${exceededText ? `\n🔴 ANGGARAN TERLAMPAUI:\n${exceededText}` : ""}
 ${criticalText ? `\n🟠 MENDEKATI BATAS (85-100%):\n${criticalText}` : ""}
 ${nearText ? `\n🟡 PERLU PERHATIAN (70-85%):\n${nearText}` : ""}
 ${goalsText}
 
-Berikan saran penyesuaian gaya hidup yang SPESIFIK, PRAKTIS, dan EMPATIK untuk membantu pengguna:
-1. Menghemat di kategori yang terlampaui/mendekati batas
-2. Mencapai target tabungan mereka
-3. Tips kebiasaan sehari-hari yang bisa langsung diterapkan
+Berikan saran KHUSUS ANGGARAN yang spesifik dan praktis:
+1. Cara menghemat di kategori yang terlampaui/mendekati batas
+2. Tips kebiasaan sehari-hari untuk kontrol pengeluaran
+3. Realokasi anggaran yang disarankan jika perlu
 
-Format: gunakan emoji, singkat tapi berdampak. Maksimal 180 kata. Bahasa Indonesia yang santai.`;
+Format: emoji, singkat, berdampak. Maksimal 150 kata. Bahasa Indonesia santai.`;
 
     try {
       const res = await base44.integrations.Core.InvokeLLM({ prompt });

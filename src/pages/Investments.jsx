@@ -13,6 +13,7 @@ import EducationResources from "@/components/investments/EducationResources";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { INVESTMENT_TYPES_MAP } from "@/components/investments/investmentConstants";
 import { Pencil } from "lucide-react";
+import InvestmentNanaPanel from "@/components/investments/InvestmentNanaPanel";
 
 export default function InvestmentsPage() {
   const { formatCurrency, t, settings } = useAppSettings();
@@ -285,6 +286,8 @@ export default function InvestmentsPage() {
             )}
           </div>
         )}
+
+        <InvestmentNanaPanel investments={investments} />
 
         <RiskProfileRecommendation investments={investments} />
 

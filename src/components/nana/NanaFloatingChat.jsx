@@ -8,6 +8,7 @@ import InteractivePrompt from "./InteractivePrompt";
 export default function NanaFloatingChat() {
   const [open, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [responseStyle, setResponseStyle] = useState("ringkas"); // 'ringkas' | 'detail'
   const [activeConv, setActiveConv] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -142,7 +143,8 @@ export default function NanaFloatingChat() {
     const text = input;
     setInput("");
     const contextBlock = formatContextForMessage(context);
-    const messageContent = text + contextBlock;
+    const styleInstruction = responseStyle === "ringkas" ? "\n[MODE JAWABAN: SANGAT RINGKAS, maksimal 80 kata, poin singkat saja]" : "\n[MODE JAWABAN: DETAIL, penjelasan lengkap dengan contoh konkret]";
+    const messageContent = text + styleInstruction + contextBlock;
     await base44.agents.addMessage(conv, { role: "user", content: messageContent });
     // Track count
     if (!isPremium) {
@@ -216,7 +218,14 @@ export default function NanaFloatingChat() {
             </div>
             <div className="flex-1">
               <p className="text-white font-bold text-sm">Nana</p>
-              <p className="text-[#8FA4C8] text-[10px]">Asisten Keuangan Pribadi</p>
+              <div className="flex gap-1 mt-0.5 bg-black/20 rounded-md p-0.5">
+                {["ringkas", "detail"].map(s => (
+                  <button key={s} onClick={() => setResponseStyle(s)}
+                    className={`text-[9px] px-1.5 py-0.5 rounded font-medium capitalize transition-colors ${responseStyle === s ? "bg-[#FF6A00] text-white" : "text-[#8FA4C8] hover:text-white"}`}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
             <button onClick={async () => { await loadConversations(); setShowHistory(h => !h); }} className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" title="Riwayat percakapan">
               <History className="w-3.5 h-3.5 text-white" />
@@ -338,7 +347,7 @@ export default function NanaFloatingChat() {
                   }
                   return (
                     <>
-                      <ReactMarkdown className="prose prose-xs max-w-none text-white [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:my-2 [&>ol]:my-2 [&>li]:mb-1 [&>strong]:font-semibold [&>code]:bg-black/30 [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>pre]:bg-black/50 [&>pre]:p-2 [&>pre]:rounded [&>pre]:text-[10px] [&>pre]:overflow-x-auto [&>h3]:font-semibold [&>h3]:mt-2 [&>h3]:mb-1">
+                      <ReactMarkdown className="prose prose-sm max-w-none text-white [&>p]:text-sm [&>p]:mb-2 [&>p:last-child]:mb-0 [&>p]:leading-relaxed [&>ul]:my-2 [&>ul]:pl-4 [&>ol]:my-2 [&>ol]:pl-4 [&>li]:mb-1.5 [&>li]:text-sm [&>strong]:font-bold [&>strong]:text-white [&>h1]:text-base [&>h1]:font-bold [&>h1]:mt-3 [&>h1]:mb-1 [&>h2]:text-sm [&>h2]:font-bold [&>h2]:mt-2 [&>h2]:mb-0.5 [&>h3]:text-sm [&>h3]:font-semibold [&>h3]:mt-1.5 [&>h3]:mb-0.5 [&>code]:bg-black/30 [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-xs [&>pre]:bg-black/50 [&>pre]:p-2 [&>pre]:rounded [&>pre]:text-xs [&>pre]:overflow-x-auto">
                         {displayContent}
                       </ReactMarkdown>
                       {interactivePrompt && (

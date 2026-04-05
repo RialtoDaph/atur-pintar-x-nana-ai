@@ -4,6 +4,23 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import DateInput from "@/components/utils/DateInput";
 import { parseRupiah } from "@/components/utils/parseRupiah";
 
+const EXPENSE_CATS = [
+  { key: "housing", emoji: "🏠", label: "Rumah" },
+  { key: "food", emoji: "🍔", label: "Makan" },
+  { key: "transport", emoji: "🚗", label: "Transport" },
+  { key: "health", emoji: "❤️", label: "Kesehatan" },
+  { key: "entertainment", emoji: "🎬", label: "Hiburan" },
+  { key: "shopping", emoji: "🛍️", label: "Belanja" },
+  { key: "subscriptions", emoji: "📱", label: "Langganan" },
+  { key: "other", emoji: "📦", label: "Lainnya" },
+];
+const INCOME_CATS = [
+  { key: "salary", emoji: "💼", label: "Gaji" },
+  { key: "freelance", emoji: "💻", label: "Freelance" },
+  { key: "other", emoji: "📦", label: "Lainnya" },
+];
+const ICONS = ["📱","🏠","🚗","🍔","💳","⚡","🎬","🛍️","💼","💻","❤️","📦","🎵","✈️","🐾"];
+
 const INTERVALS = ["daily", "weekly", "monthly", "yearly"];
 
 export default function EditContractModal({ contract, onClose, onSave }) {
@@ -89,6 +106,40 @@ export default function EditContractModal({ contract, onClose, onSave }) {
                 className="bg-white text-black pl-9 pr-3 py-2 text-sm rounded-lg w-full border border-[#E2E8F0] focus:outline-none focus:ring-1 focus:ring-[#FF6A00]"
                 placeholder="0" />
               
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Kategori</label>
+            <div className="flex flex-wrap gap-1.5">
+              {(data.type === "income" ? INCOME_CATS : EXPENSE_CATS).map(cat => (
+                <button
+                  key={cat.key}
+                  onClick={() => setData({ ...data, category: cat.key })}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                    data.category === cat.key ? "bg-[#FF6A00] text-white border-[#FF6A00]" : "bg-[#F2F4F7] text-[#1A1A1A] border-transparent hover:bg-[#E2E8F0]"
+                  }`}
+                >
+                  {cat.emoji} {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#1A1A1A] mb-2">Ikon</label>
+            <div className="flex flex-wrap gap-1.5">
+              {ICONS.map(icon => (
+                <button
+                  key={icon}
+                  onClick={() => setData({ ...data, icon })}
+                  className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all ${
+                    data.icon === icon ? "bg-[#FF6A00] scale-110" : "bg-[#F2F4F7] hover:bg-[#E2E8F0]"
+                  }`}
+                >
+                  {icon}
+                </button>
+              ))}
             </div>
           </div>
 
