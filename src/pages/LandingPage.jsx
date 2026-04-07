@@ -284,7 +284,7 @@ export default function LandingPage() {
               onClick={handleCTA}
               className="inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all hover:scale-105">
               
-              Coba Sekarang <ArrowRight className="w-4 h-4" />
+              Lihat Demo <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
