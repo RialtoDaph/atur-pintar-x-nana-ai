@@ -179,9 +179,9 @@ export default function LandingPage() {
             <span className="g-text">tanpa sadar?</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-white/50 max-w-lg mb-10 leading-relaxed">
-            Atur Pintar bantu kamu catat pengeluaran dan kasih insight dari AI biar kamu{" "}
-            <span className="text-white font-semibold">gak boros lagi.</span>
+          <p className="text-base sm:text-lg text-white/50 max-w-lg mb-10 leading-relaxed">Atur Pintar tahu kemana uang kamu pergi — dan kasih tahu kamu cara berhentiin itu. Dalam 3 detik.
+
+
           </p>
 
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3">
