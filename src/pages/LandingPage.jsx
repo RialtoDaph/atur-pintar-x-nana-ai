@@ -246,8 +246,8 @@ export default function LandingPage() {
           <div className="space-y-3">
             {[
             { icon: "⚡", text: "Catat transaksi dalam 3 detik" },
-            { icon: "📊", text: "Dashboard realtime, tau kondisi keuangan kamu kapanpun" },
-            { icon: "🤖", text: "Nana AI, asisten keuangan kamu — kasih saran personal tiap minggu" }].
+            { icon: "📊", text: "Lihat kondisi keuangan langsung" },
+            { icon: "🤖", text: "Dapat insight personal dari Nana AI" }].
             map((item, i) =>
             <div key={i} className="card-d rounded-2xl px-5 py-4 flex items-center gap-4">
                 <span className="text-2xl">{item.icon}</span>
@@ -284,7 +284,7 @@ export default function LandingPage() {
               onClick={handleCTA}
               className="inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all hover:scale-105">
               
-              Lihat Demo <ArrowRight className="w-4 h-4" />
+              Coba Sekarang <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -318,8 +318,8 @@ export default function LandingPage() {
             <div className="w-14 h-14 rounded-full bg-[#FF6A00]/10 flex items-center justify-center mb-4">
               <Shield className="w-7 h-7 text-[#FF6A00]" />
             </div>
-            <p className="text-white/60 text-sm leading-relaxed italic">
-              "Dirancang untuk membantu kamu yang sering bingung kemana uang pergi."
+            <p className="text-white/60 text-sm leading-relaxed italic">"Dirancang deng
+
             </p>
             <p className="text-white/25 text-xs mt-3">— Tim Atur Pintar</p>
           </div>
