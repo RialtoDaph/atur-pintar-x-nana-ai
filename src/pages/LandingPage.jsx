@@ -46,9 +46,9 @@ import { base44 } from "@/api/base44Client";
 import { CheckCircle, TrendingUp, Sparkles, Users, ArrowRight, Play, Zap, BarChart2, MessageCircle, Shield } from "lucide-react";
 
 const PROBLEMS = [
-{ emoji: "💸", text: "Gaji masuk, tapi gak tau kemana hilangnya" },
-{ emoji: "😩", text: "Udah coba nabung, tapi selalu kepake juga" },
-{ emoji: "😶‍🌫️", text: "Gak pernah tau kondisi keuangan sendiri" }];
+{ emoji: "💸", text: "Gaji masuk pagi, sore udah gak kerasa ada" },
+{ emoji: "😩", text: "Nabung tapi selalu kepake pas butuh-butuhnya" },
+{ emoji: "😶‍🌫️", text: "khir bulan cuma bisa nunggu gajian lagi" }];
 
 
 const STEPS = [
@@ -241,8 +241,8 @@ export default function LandingPage() {
       <section className="px-5 sm:px-12 lg:px-20 pb-20 relative z-10">
         <div className="max-w-2xl mx-auto sm:mx-0 text-center sm:text-left">
           <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Solusinya simpel</p>
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Dengan Atur Pintar:</h2>
-          <p className="text-[#FF6A00] font-bold text-sm mb-8">Bukan cuma catat. Tapi ngerti uang kamu.</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Kendalikan uangmu. Mulai hari ini.</h2>
+          <p className="text-[#FF6A00] font-bold text-sm mb-8">Bukan cuma catat. Tapi beneran ngerti dan berubah.</p>
           <div className="space-y-3">
             {[
             { icon: "⚡", text: "Catat transaksi dalam 3 detik" },
