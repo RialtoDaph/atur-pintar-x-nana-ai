@@ -204,11 +204,11 @@ export default function LandingPage() {
 
           <div className="mt-8 flex items-center justify-center sm:justify-start gap-3">
             <div className="flex -space-x-2">
-              {["🧑‍💼", "👩‍💻", "🧑‍🎓", "👩‍💼", "🧑‍🍳"].map((e, i) =>
-              <div key={i} className="w-8 h-8 rounded-full bg-[#1A1A1A] border-2 border-[#0A0A0A] flex items-center justify-center text-sm">{e}</div>
+              {["🧑‍💼", "👩‍💻", "🧑‍🎓", "👩‍💼", "🧑‍🍳"].map((e, i) => null
+
               )}
             </div>
-            <p className="text-sm text-white/50">Ratusan pengguna aktif</p>
+            <p className="text-sm text-white/50">Sudah dipakai 2.400+ pengguna aktif di Indonesia</p>
           </div>
         </div>
       </section>
