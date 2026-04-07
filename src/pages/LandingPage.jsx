@@ -318,7 +318,7 @@ export default function LandingPage() {
             <div className="w-14 h-14 rounded-full bg-[#FF6A00]/10 flex items-center justify-center mb-4">
               <Shield className="w-7 h-7 text-[#FF6A00]" />
             </div>
-            <p className="text-white/60 text-sm leading-relaxed italic">"Dirancang dengan mengutamakan privacy d
+            <p className="text-white/60 text-sm leading-relaxed italic">"Dirancang dengan mengutamakan privacy dan keamanan pengguna"
 
             </p>
             <p className="text-white/25 text-xs mt-3">— Tim Atur Pintar</p>
