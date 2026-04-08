@@ -215,6 +215,33 @@ export default function Settings() {
           </div>
         )}
 
+        {/* Legal */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Legal</p>
+          </div>
+          <Link
+            to="/PrivacyPolicy"
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+          >
+            <ShieldCheck className="w-5 h-5 text-[#FF6A00]" />
+            <div className="text-left">
+              <p className="font-medium text-[#1A1A1A] text-sm">Kebijakan Privasi</p>
+              <p className="text-xs text-[#8FA4C8]">Pelajari bagaimana kami melindungi data kamu</p>
+            </div>
+          </Link>
+          <Link
+            to="/TermsOfService"
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+          >
+            <ShieldCheck className="w-5 h-5 text-[#8FA4C8]" />
+            <div className="text-left">
+              <p className="font-medium text-[#1A1A1A] text-sm">Syarat & Ketentuan</p>
+              <p className="text-xs text-[#8FA4C8]">Ketentuan penggunaan layanan Atur Pintar</p>
+            </div>
+          </Link>
+        </div>
+
         <p className="text-center text-xs text-[#8FA4C8] pb-4">{t('settings_version')}</p>
       </div>
 

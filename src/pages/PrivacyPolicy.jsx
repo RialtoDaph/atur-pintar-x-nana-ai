@@ -12,9 +12,9 @@ export default function PrivacyPolicy() {
           <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-6 h-6" />
           <span className="font-black text-white text-sm">Atur Pintar</span>
         </div>
-        <Link to="/LandingPage" className="ml-auto flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors">
+        <button onClick={() => window.history.length > 1 ? window.history.back() : null} className="ml-auto flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" /> Kembali
-        </Link>
+        </button>
       </nav>
 
       <div className="max-w-2xl mx-auto px-5 pt-24 pb-20">
