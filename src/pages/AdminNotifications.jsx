@@ -12,6 +12,8 @@ export default function AdminNotifications() {
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ title: "", message: "", target_type: "all", target_email: "" });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [inactiveUsers, setInactiveUsers] = useState([]);
+  const [showReengagement, setShowReengagement] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -23,37 +25,77 @@ export default function AdminNotifications() {
 
   async function loadData() {
     setLoading(true);
-    const [notifRes, usersRes] = await Promise.all([
-      base44.entities.AdminNotification.list("-created_date", 100),
-      base44.functions.invoke("adminGetUsers", {}),
-    ]);
-    setNotifications(notifRes);
-    setAllUsers(usersRes.data?.users || []);
+    try {
+      const [notifRes, usersRes, transRes] = await Promise.all([
+        base44.entities.AdminNotification.list("-created_date", 100),
+        base44.functions.invoke("adminGetUsers", {}),
+        base44.entities.Transaction.list()
+      ]);
+      setNotifications(notifRes);
+      const users = usersRes.data?.users || [];
+      setAllUsers(users);
+      
+      // Calculate inactive users (no transactions in 14 days)
+      const fourteenDaysAgo = new Date();
+      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      const userLastActivity = {};
+      transRes.forEach(t => {
+        if (!userLastActivity[t.created_by] || new Date(t.created_date) > new Date(userLastActivity[t.created_by])) {
+          userLastActivity[t.created_by] = t.created_date;
+        }
+      });
+      
+      const inactive = users.filter(u => {
+        const lastDate = userLastActivity[u.email] ? new Date(userLastActivity[u.email]) : new Date(u.created_date);
+        return new Date() - lastDate > 14 * 24 * 60 * 60 * 1000;
+      }).map(u => ({
+        ...u,
+        daysSinceActivity: Math.floor((new Date() - new Date(userLastActivity[u.email] || u.created_date)) / (1000 * 60 * 60 * 24))
+      }));
+      setInactiveUsers(inactive);
+    } catch (e) {
+      console.error(e);
+    }
     setLoading(false);
   }
 
-  async function sendToInactiveUsers() {
-    if (!window.confirm("Send notification to all users inactive >14 days?")) return;
-    setSending(true);
+  const sendToInactiveUser = async (userEmail, userName, daysSince) => {
     try {
-      const allUsers = await base44.entities.User.list();
-      const fourteenDaysAgo = new Date();
-      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
-      const inactive = allUsers.filter(u => new Date(u.updated_date || u.created_date) < fourteenDaysAgo);
-      for (const u of inactive) {
-        await base44.entities.AdminNotification.create({
-          title: "We miss you!",
-          message: "Haven't seen you in a while. Come back to Atur Pintar to manage your finances.",
-          target_type: "specific",
-          target_email: u.email,
-          is_read: false,
-          read_by: []
-        });
-      }
-      await loadData();
-    } catch (e) {}
+      await base44.entities.AdminNotification.create({
+        title: "📱 Halo " + userName + "!",
+        message: `Sudah ${daysSince} hari kamu tidak mencatat keuangan. Yuk balik lagi, Nana kangen nih! 😊`,
+        target_type: "specific",
+        target_email: userEmail,
+        is_read: false,
+        read_by: []
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const sendToAllInactive = async () => {
+    if (!window.confirm(`Send reminder to ${inactiveUsers.length} inactive users?`)) return;
+    setSending(true);
+    for (const u of inactiveUsers) {
+      await sendToInactiveUser(u.email, u.full_name || u.email, u.daysSinceActivity);
+    }
     setSending(false);
-  }
+    await loadData();
+  };
+
+  const applyTemplate = (template) => {
+    const templates = {
+      approved: { title: "✅ Pembayaran Premium Diterima", message: "Terima kasih atas pembayaran Anda. Akun Anda sudah diupgrade ke premium! Nikmati fitur-fitur eksklusif." },
+      welcome: { title: "🎉 Selamat di Premium!", message: "Selamat datang di Atur Pintar Premium! Akses unlimited analitik, laporan, dan fitur canggih lainnya." },
+      renewal: { title: "⏰ Perpanjangan Berakhir Segera", message: "Langganan premium Anda akan berakhir dalam 3 hari. Perpanjang sekarang untuk akses tanpa gangguan!" },
+      reengagement: { title: "📱 Kami Rindu Kamu!", message: "Sudah lama tidak ada berita dari Anda. Yuk kembali mencatat keuangan dan raih target Anda!" },
+      maintenance: { title: "🔧 Pemeliharaan Sistem", message: "Atur Pintar akan melakukan pemeliharaan sistem. Kami akan offline selama beberapa jam. Terima kasih atas kesabaran Anda." }
+    };
+    if (templates[template]) {
+      setForm({ ...form, ...templates[template] });
+    }
+  };
 
   async function handleSend() {
     if (!form.title.trim() || !form.message.trim()) return;
@@ -106,9 +148,9 @@ export default function AdminNotifications() {
                 <Plus className="w-4 h-4" />
                 Kirim Notifikasi
               </button>
-              <button onClick={sendToInactiveUsers} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 shadow-sm">
+              <button onClick={() => setShowReengagement(!showReengagement)} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 shadow-sm">
                 <Send className="w-4 h-4" />
-                Inactive Users
+                Re-engagement ({inactiveUsers.length})
               </button>
             </div>
           </div>
@@ -127,6 +169,52 @@ export default function AdminNotifications() {
           <div className="bg-white rounded-2xl p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-1"><User className="w-4 h-4 text-purple-500" /><p className="text-xs text-[#8FA4C8]">Targeted</p></div>
             <p className="text-2xl font-bold text-purple-600">{notifications.filter(n => n.target_type === "specific").length}</p>
+          </div>
+        </div>
+
+        {/* Re-engagement Section */}
+        {showReengagement && (
+          <div className="mb-8 bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0]">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-[#1A1A1A]">Re-engagement ({inactiveUsers.length} users)</h2>
+              <button onClick={() => setShowReengagement(false)} className="text-sm text-[#8FA4C8] hover:text-[#1A1A1A]">×</button>
+            </div>
+            {inactiveUsers.length === 0 ? (
+              <p className="text-sm text-[#8FA4C8]">Semua user aktif! Tidak ada yang perlu di-reengage.</p>
+            ) : (
+              <>
+                <div className="space-y-2 mb-4 max-h-[300px] overflow-y-auto">
+                  {inactiveUsers.map(u => (
+                    <div key={u.id} className="flex items-center justify-between p-3 bg-[#F8FAFC] rounded-lg">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-[#1A1A1A]">{u.full_name || u.email}</p>
+                        <p className="text-xs text-[#8FA4C8]">{u.email} • {u.daysSinceActivity} days inactive</p>
+                      </div>
+                      <button onClick={() => sendToInactiveUser(u.email, u.full_name || u.email, u.daysSinceActivity)}
+                        className="px-3 py-1 bg-[#FF6A00] text-white text-xs font-bold rounded hover:bg-[#E55A00]">Send</button>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={sendToAllInactive} disabled={sending}
+                  className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-60">
+                  {sending ? "Sending..." : "Send to All Inactive"}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Notification Templates */}
+        <div className="mb-6 bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0]">
+          <p className="text-sm font-semibold text-[#1A1A1A] mb-3">Templates</p>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {['approved', 'welcome', 'renewal', 'reengagement', 'maintenance'].map(t => (
+              <button key={t}
+                onClick={() => applyTemplate(t)}
+                className="px-3 py-2 text-xs font-medium text-[#FF6A00] border border-[#FF6A00] rounded-lg hover:bg-[#FF6A00]/5">
+                {t === 'approved' ? '✅ Approved' : t === 'welcome' ? '🎉 Welcome' : t === 'renewal' ? '⏰ Renewal' : t === 'reengagement' ? '📱 Reeng' : '🔧 Maintenance'}
+              </button>
+            ))}
           </div>
         </div>
 

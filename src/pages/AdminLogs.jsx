@@ -24,6 +24,7 @@ export default function AdminLogs() {
   const [filterSeverity, setFilterSeverity] = useState("all");
   const [page, setPage] = useState(1);
   const PER_PAGE = 30;
+  const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -36,12 +37,29 @@ export default function AdminLogs() {
   async function loadLogs(type = "all") {
     setLoading(true);
     try {
-      const allLogs = await base44.entities.SystemLog.list("-created_date", 50);
+      const allLogs = await base44.entities.SystemLog.list("-created_date", 100);
       setLogs(allLogs);
     } catch (e) {
       setLogs([]);
     }
     setLoading(false);
+  }
+
+  async function clearOldLogs() {
+    if (!window.confirm("Clear all logs older than 30 days? This cannot be undone.")) return;
+    setClearing(true);
+    try {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const oldLogs = logs.filter(l => new Date(l.created_date) < thirtyDaysAgo);
+      for (const log of oldLogs) {
+        await base44.entities.SystemLog.delete(log.id);
+      }
+      await loadLogs();
+    } catch (e) {
+      console.error(e);
+    }
+    setClearing(false);
   }
 
   const filtered = logs.filter(l => {
@@ -82,10 +100,15 @@ export default function AdminLogs() {
             <h1 className="text-2xl font-bold text-[#1A1A1A]">System Logs</h1>
             <p className="text-sm text-[#8FA4C8] mt-1">Login logs, activity logs, dan error logs</p>
           </div>
-          <button onClick={() => loadLogs(filterType)} className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E2E8F0] rounded-xl text-sm font-medium hover:bg-[#F8FAFC] shadow-sm">
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
+          <div className="flex gap-2">
+            <button onClick={clearOldLogs} disabled={clearing} className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 disabled:opacity-60 shadow-sm">
+              🗑️ Clear Old
+            </button>
+            <button onClick={() => loadLogs(filterType)} className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E2E8F0] rounded-xl text-sm font-medium hover:bg-[#F8FAFC] shadow-sm">
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Stats */}

@@ -12,6 +12,7 @@ export default function AdminUsers() {
   const [filter, setFilter] = useState("all");
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [showStats, setShowStats] = useState(true);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -131,6 +132,35 @@ export default function AdminUsers() {
   const threeDaysAgo = new Date();
   threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
   const overduePending = pendingPayments.filter(p => new Date(p.created_date) < threeDaysAgo);
+  
+  // Stats
+  const totalUsers = users.length;
+  const premiumUsers = users.filter(u => u.subscription_plan && u.subscription_plan !== "free" && u.subscription_status === "active").length;
+  const freeUsers = totalUsers - premiumUsers;
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+  const inactiveUsers = users.filter(u => new Date(u.updated_date || u.created_date) < fourteenDaysAgo).length;
+
+  // CSV Export
+  const exportCSV = () => {
+    const headers = ["Name", "Email", "Plan", "Status", "Joined", "Last Active"];
+    const rows = users.map(u => [
+      u.full_name || "—",
+      u.email,
+      u.subscription_plan || "free",
+      u.subscription_status || "—",
+      new Date(u.created_date).toLocaleDateString("id-ID"),
+      new Date(u.updated_date || u.created_date).toLocaleDateString("id-ID")
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `users_export_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   if (loading) return (
     <AdminLayout currentPage="AdminUsers">
@@ -150,6 +180,32 @@ export default function AdminUsers() {
     <AdminLayout currentPage="AdminUsers">
       <div className="p-4 sm:p-8">
         <AdminPageHeader title="User Management" subtitle="Manage users & approve payments" />
+        
+        {/* Quick Stats */}
+        {showStats && (
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+              <p className="text-xs text-[#8FA4C8] font-medium">Total</p>
+              <p className="text-2xl font-bold text-[#1A1A1A]">{totalUsers}</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+              <p className="text-xs text-[#8FA4C8] font-medium">Premium</p>
+              <p className="text-2xl font-bold text-[#FF6A00]">{premiumUsers}</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+              <p className="text-xs text-[#8FA4C8] font-medium">Free</p>
+              <p className="text-2xl font-bold text-gray-600">{freeUsers}</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+              <p className="text-xs text-[#8FA4C8] font-medium">Pending</p>
+              <p className="text-2xl font-bold text-yellow-600">{pendingPayments.length}</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+              <p className="text-xs text-[#8FA4C8] font-medium">Inactive</p>
+              <p className="text-2xl font-bold text-red-600">{inactiveUsers}</p>
+            </div>
+          </div>
+        )}
 
         {successMsg && (
           <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-start gap-2">
@@ -230,9 +286,14 @@ export default function AdminUsers() {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-[#1A1A1A]">Users ({filteredUsers.length})</h2>
-            <button onClick={loadData} className="p-2 hover:bg-[#F8FAFC] rounded-lg transition-colors">
-              <RefreshCw className="w-4 h-4 text-[#FF6A00]" />
-            </button>
+            <div className="flex gap-2">
+              <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                📥 Export CSV
+              </button>
+              <button onClick={loadData} className="p-2 hover:bg-[#F8FAFC] rounded-lg transition-colors">
+                <RefreshCw className="w-4 h-4 text-[#FF6A00]" />
+              </button>
+            </div>
           </div>
 
           {/* Filter */}

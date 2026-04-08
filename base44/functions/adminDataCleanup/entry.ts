@@ -10,6 +10,12 @@ Deno.serve(async (req) => {
     }
 
     const cleanupEmails = ['larasadelia586@gmail.com', 'imeldaiis61@gmail.com'];
+    const allEntityNames = [
+      'Transaction', 'SavingsGoal', 'Debt', 'Account', 'Budget', 'Reminder',
+      'GamificationProfile', 'NanaPreferences', 'UserRiskProfile', 'Investment',
+      'InvestmentTransaction', 'InvestmentWatchlist', 'InvestmentTaxLog', 'Subscription', 'Alert',
+      'SplitBill', 'SplitIOU', 'CategoryLearning', 'SharedWallet'
+    ];
     const duplicateAccountIds = [
       '69d6ab5e92af1ffb43dc4917', '69d6ab5e92af1ffb43dc4918', '69d6ab5e92af1ffb43dc4919',
       '69d6aa3cc8f31cc09e13834f', '69d6aa3cc8f31cc09e138350', '69d6aa3cc8f31cc09e138351',
@@ -46,15 +52,9 @@ Deno.serve(async (req) => {
     ];
 
     // Delete entities by created_by
-    const entities = [
-      'Transaction', 'SavingsGoal', 'Debt', 'Account', 'Budget', 'Reminder',
-      'GamificationProfile', 'NanaPreferences', 'UserRiskProfile', 'Investment',
-      'InvestmentTransaction', 'InvestmentWatchlist', 'Subscription', 'Alert',
-      'SplitBill', 'SplitIOU'
-    ];
 
     let deletedCount = 0;
-    for (const entityName of entities) {
+    for (const entityName of allEntityNames) {
       try {
         const query = { '$or': [{ created_by: cleanupEmails[0] }, { created_by: cleanupEmails[1] }] };
         // Note: SDK may not support bulk delete with OR - try individually
@@ -78,8 +78,8 @@ Deno.serve(async (req) => {
     for (const id of idDeletions) {
       try {
         // Try deleting from each entity
-        const allEntities = ['Account', 'Budget', 'SavingsGoal', 'Reminder', 'Investment', 'Subscription', 'GamificationProfile', 'Alert', 'SubscriptionPayment'];
-        for (const entityName of allEntities) {
+        const searchEntities = [...allEntityNames, 'SubscriptionPayment'];
+        for (const entityName of searchEntities) {
           try {
             await base44.asServiceRole.entities[entityName].delete(id);
             deletedCount++;

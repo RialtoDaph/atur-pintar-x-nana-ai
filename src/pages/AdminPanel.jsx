@@ -36,9 +36,9 @@ export default function AdminPanel() {
       <button
         onClick={runDataCleanup}
         disabled={cleaning}
-        className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:opacity-60"
+        className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:opacity-60 text-lg"
       >
-        {cleaning ? "Running Cleanup..." : "Run Data Cleanup"}
+        {cleaning ? "Jalankan Cleanup..." : "🧹 Bersihkan Data Sample"}
       </button>
     </div>
   );

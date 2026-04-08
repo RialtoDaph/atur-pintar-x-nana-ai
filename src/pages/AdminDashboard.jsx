@@ -25,16 +25,16 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       // Fetch all data in parallel
-      const [allUsers, allSubs, allTransactions, pendingPayments] = await Promise.all([
+      const [allUsers, allTransactions, pendingPayments, approvedPayments] = await Promise.all([
         base44.entities.User.list(),
-        base44.entities.Subscription.list(),
         base44.entities.Transaction.list(),
-        base44.entities.SubscriptionPayment.filter({ status: "pending" })
+        base44.entities.SubscriptionPayment.filter({ status: "pending" }),
+        base44.entities.SubscriptionPayment.filter({ status: "approved" })
       ]);
 
       // Calculate metrics
       const totalUsers = allUsers.length;
-      const premiumUsers = allUsers.filter(u => u.subscription_plan && u.subscription_plan !== "free").length;
+      const premiumUsers = allUsers.filter(u => u.subscription_plan && u.subscription_plan !== "free" && u.subscription_status === "active").length;
       const thisMonth = new Date().toISOString().slice(0, 7);
       const newUsersThisMonth = allUsers.filter(u => u.created_date?.startsWith(thisMonth)).length;
       
@@ -44,8 +44,7 @@ export default function AdminDashboard() {
       const oldPendingCount = pendingPayments.filter(p => new Date(p.created_date) < threeDaysAgo).length;
 
       // Monthly revenue (approved payments this month)
-      const approvedThisMonth = await base44.entities.SubscriptionPayment.filter({ status: "approved" });
-      const monthlyRevenue = approvedThisMonth
+      const monthlyRevenue = approvedPayments
         .filter(p => p.created_date?.startsWith(thisMonth))
         .reduce((sum, p) => sum + (p.amount || 0), 0);
 
@@ -75,13 +74,25 @@ export default function AdminDashboard() {
         });
       }
 
+      // MRR calculation
+      const mrrMonthly = allUsers.filter(u => u.subscription_plan === "premium_monthly" && u.subscription_status === "active").length * 49000;
+      const mrrYearly = allUsers.filter(u => u.subscription_plan === "premium_yearly" && u.subscription_status === "active").length * (490000 / 12);
+      const totalMRR = mrrMonthly + mrrYearly;
+      
+      // Churn (expired subscriptions this month)
+      const expiredUsers = allUsers.filter(u => u.subscription_status === "expired" && u.updated_date?.startsWith(thisMonth)).length;
+
       setStats({
         totalUsers,
         premiumUsers,
+        freeUsers: totalUsers - premiumUsers,
         newUsersThisMonth,
         pendingPaymentCount: pendingPayments.length,
         oldPendingCount,
         monthlyRevenue: Math.round(monthlyRevenue),
+        totalMRR: Math.round(totalMRR),
+        conversionRate: totalUsers > 0 ? Math.round((premiumUsers / totalUsers) * 100) : 0,
+        churnCount: expiredUsers,
         activeUsers,
         onboardingRate,
         completedOnboarding
@@ -144,6 +155,20 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* MRR & Revenue Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+            <p className="text-xs text-[#8FA4C8] font-medium mb-2">MRR (Monthly Recurring Revenue)</p>
+            <p className="text-3xl font-bold text-[#FF6A00]">Rp {fmt(stats?.totalMRR)}</p>
+            <p className="text-xs text-[#8FA4C8] mt-2">From {premiumUsers} premium users</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+            <p className="text-xs text-[#8FA4C8] font-medium mb-2">Premium Conversion</p>
+            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.conversionRate}%</p>
+            <p className="text-xs text-[#8FA4C8] mt-2">{stats?.premiumUsers}/{stats?.totalUsers} users</p>
+          </div>
+        </div>
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
