@@ -1,0 +1,51 @@
+{
+  "name": "Account",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nama rekening (e.g., Rekening BCA, Dompet Cash, OVO)"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "bank",
+        "cash",
+        "ewallet",
+        "other"
+      ],
+      "default": "bank"
+    },
+    "balance": {
+      "type": "number",
+      "default": 0,
+      "description": "Saldo rekening"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji icon"
+    },
+    "color": {
+      "type": "string",
+      "description": "Warna kartu"
+    },
+    "is_default": {
+      "type": "boolean",
+      "default": false,
+      "description": "Rekening utama"
+    },
+    "institution": {
+      "type": "string",
+      "description": "Nama bank/institusi"
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

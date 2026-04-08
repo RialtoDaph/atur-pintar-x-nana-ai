@@ -13,6 +13,9 @@ import Dashboard from '@/pages/Dashboard';
 import ProfileSettings from '@/pages/ProfileSettings';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
+import Notifications from '@/pages/Notifications';
+import Accounts from '@/pages/Accounts';
+import SharedFinance from '@/pages/SharedFinance';
 
 const { Pages, Layout } = pagesConfig;
 
@@ -63,7 +66,7 @@ const AuthenticatedApp = () => {
           <Dashboard />
         </LayoutWrapper>
       } />
-      {Object.entries(Pages).filter(([path]) => path !== 'Dashboard' && path !== 'LandingPage' && path !== 'Subscription' && path !== 'AdminSubscriptions' && path !== 'ProfileSettings').map(([path, Page]) => (
+      {Object.entries(Pages).filter(([path]) => path !== 'Dashboard' && path !== 'LandingPage' && path !== 'Subscription' && path !== 'AdminSubscriptions' && path !== 'ProfileSettings' && path !== 'Investments' && path !== 'Reminders' && path !== 'Alerts' && path !== 'Notifications' && path !== 'Accounts' && path !== 'SharedFinance').map(([path, Page]) => (
         <Route
           key={path}
           path={`/${path}`}
@@ -78,6 +81,9 @@ const AuthenticatedApp = () => {
       <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
       <Route path="/AdminSubscriptions" element={<LayoutWrapper currentPageName="AdminSubscriptions"><AdminSubscriptions /></LayoutWrapper>} />
       <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
+      <Route path="/Notifications" element={<LayoutWrapper currentPageName="Notifications"><Notifications /></LayoutWrapper>} />
+      <Route path="/Accounts" element={<LayoutWrapper currentPageName="Accounts"><Accounts /></LayoutWrapper>} />
+      <Route path="/SharedFinance" element={<LayoutWrapper currentPageName="SharedFinance"><SharedFinance /></LayoutWrapper>} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
       <Route path="*" element={<PageNotFound />} />

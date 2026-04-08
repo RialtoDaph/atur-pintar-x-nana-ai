@@ -13,6 +13,7 @@ import BalanceCard from "@/components/dashboard/BalanceCard";
 
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
+import StreakWidget from "@/components/dashboard/StreakWidget";
 
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
 
@@ -169,6 +170,9 @@ export default function Dashboard() {
             loadData();
           }} />
         )}
+
+        {/* Streak Widget */}
+        {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} />}
 
         {/* Reminder Widget */}
         <ReminderWidget user={user} />

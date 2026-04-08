@@ -2,6 +2,10 @@
   "name": "Transaction",
   "type": "object",
   "properties": {
+    "account_id": {
+      "type": "string",
+      "description": "ID rekening terkait"
+    },
     "goal_id": {
       "type": "string",
       "description": "ID of the savings goal (if linked)"
@@ -37,8 +41,7 @@
     },
     "is_recurring": {
       "type": "boolean",
-      "default": false,
-      "description": "Whether this is a recurring transaction"
+      "default": false
     },
     "recurring_interval": {
       "type": "string",
@@ -47,22 +50,18 @@
         "weekly",
         "monthly",
         "yearly"
-      ],
-      "description": "How often the transaction recurs"
+      ]
     },
     "recurring_last_generated": {
       "type": "string",
-      "format": "date",
-      "description": "Last date a recurring entry was auto-generated from this template"
+      "format": "date"
     },
     "is_recurring_child": {
       "type": "boolean",
-      "default": false,
-      "description": "True if this was auto-generated from a recurring template"
+      "default": false
     },
     "recurring_parent_id": {
-      "type": "string",
-      "description": "ID of the parent recurring transaction"
+      "type": "string"
     }
   },
   "required": [

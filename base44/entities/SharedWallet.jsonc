@@ -1,0 +1,45 @@
+{
+  "name": "SharedWallet",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nama dompet bersama"
+    },
+    "description": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string",
+      "description": "Email pembuat"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Daftar email anggota (termasuk owner)"
+    },
+    "pending_invites": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Daftar email yang diundang"
+    },
+    "icon": {
+      "type": "string",
+      "default": "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67"
+    },
+    "invite_code": {
+      "type": "string",
+      "description": "Kode unik untuk bergabung"
+    }
+  },
+  "required": [
+    "name",
+    "owner_email"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "name": "GamificationProfile",
+  "type": "object",
+  "properties": {
+    "daily_streak": {
+      "type": "integer",
+      "default": 0,
+      "description": "Streak harian"
+    },
+    "longest_streak": {
+      "type": "integer",
+      "default": 0,
+      "description": "Streak terpanjang"
+    },
+    "last_activity_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal aktivitas terakhir"
+    },
+    "total_points": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total XP poin"
+    },
+    "level": {
+      "type": "integer",
+      "default": 1,
+      "description": "Level pengguna"
+    },
+    "achievements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Daftar achievement yang diraih"
+    }
+  },
+  "required": [],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, TrendingUp, Settings, Bell, Lightbulb, Search, Grid3x3, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, Settings, Bell, Lightbulb, Search, Grid3x3, ArrowLeft, Wallet, Users } from "lucide-react";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
@@ -59,14 +59,14 @@ function LayoutInner({ children, currentPageName }) {
   { name: "Goals", label: t('nav_goals'), icon: Target, page: "Goals" },
   { name: "Budget", label: t('nav_budget'), icon: PiggyBank, page: "Budget" },
   { name: "Debts", label: t('nav_debts'), icon: CreditCard, page: "Debts" },
-  { name: "Investments", label: t('nav_investments'), icon: TrendingUp, page: "Investments" },
+  { name: "Accounts", label: "Rekening", icon: Wallet, page: "Accounts" },
+  { name: "SharedFinance", label: "Keuangan Bersama", icon: Users, page: "SharedFinance" },
   { name: "Analytics", label: t('nav_analytics'), icon: BarChart2, page: "Analytics" },
   { name: "Tips", label: t('nav_tips'), icon: Lightbulb, page: "Tips", tourId: "tips-nav-link" }];
 
 
   const navSettingsItems = [
-  { name: "Reminders", label: t('nav_reminders'), icon: Bell, page: "Reminders" },
-  { name: "Alerts", label: t('nav_alerts'), icon: Bell, page: "Alerts" },
+  { name: "Notifications", label: "Notifikasi", icon: Bell, page: "Notifications" },
   { name: "Settings", label: t('nav_settings'), icon: Settings, page: "Settings" }];
 
 
@@ -78,7 +78,7 @@ function LayoutInner({ children, currentPageName }) {
   { name: "Budget", label: t('nav_budget'), icon: PiggyBank, page: "Budget" }];
 
 
-  const mobileMorePages = ["Goals", "Debts", "Reminders", "Alerts", "Tips", "Settings", "Menu"];
+  const mobileMorePages = ["Goals", "Debts", "Notifications", "Accounts", "SharedFinance", "Tips", "Settings", "Menu"];
 
   const initials = user?.full_name ? user.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "U";
 
