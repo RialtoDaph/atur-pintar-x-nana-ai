@@ -120,15 +120,14 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
     setProfile(updated);
   }
 
-  if (loading || !profile) return null;
-
-  const currentLevel = LEVELS.find(l => l.level === (profile.level || 1)) || LEVELS[0];
-  const nextLevel = LEVELS.find(l => l.level === (profile.level || 1) + 1);
-  const progressToNext = nextLevel && profile.total_points >= currentLevel.min
-    ? Math.min(100, ((profile.total_points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100)
+  const safeProfile = profile || { daily_streak: 0, longest_streak: 0, total_points: 0, level: 1, last_activity_date: null };
+  const currentLevel = LEVELS.find(l => l.level === (safeProfile.level || 1)) || LEVELS[0];
+  const nextLevel = LEVELS.find(l => l.level === (safeProfile.level || 1) + 1);
+  const progressToNext = nextLevel && safeProfile.total_points >= currentLevel.min
+    ? Math.min(100, ((safeProfile.total_points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100)
     : 0;
 
-  const isActiveToday = profile.last_activity_date === format(new Date(), "yyyy-MM-dd");
+  const isActiveToday = safeProfile.last_activity_date === format(new Date(), "yyyy-MM-dd");
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-[#F2F4F7] overflow-hidden">
@@ -150,7 +149,7 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
           className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${isActiveToday ? "bg-[#FF6A00]/10" : "bg-[#F2F4F7]"}`}
         >
           <Flame className={`w-4 h-4 ${isActiveToday ? "text-[#FF6A00]" : "text-[#8FA4C8]"}`} />
-          <p className={`text-xs font-black leading-none mt-0.5 ${isActiveToday ? "text-[#FF6A00]" : "text-[#8FA4C8]"}`}>{profile.daily_streak}</p>
+          <p className={`text-xs font-black leading-none mt-0.5 ${isActiveToday ? "text-[#FF6A00]" : "text-[#8FA4C8]"}`}>{safeProfile.daily_streak}</p>
         </motion.div>
 
         <div className="flex-1 min-w-0">
@@ -162,7 +161,7 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
               <div className="flex-1 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
                 <div className="h-full rounded-full" style={{ width: `${progressToNext}%`, backgroundColor: currentLevel.color }} />
               </div>
-              <span className="text-[10px] text-[#8FA4C8] whitespace-nowrap">{profile.total_points} XP</span>
+              <span className="text-[10px] text-[#8FA4C8] whitespace-nowrap">{safeProfile.total_points} XP</span>
             </div>
           )}
         </div>
@@ -176,15 +175,15 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
       {expanded && (
         <div className="border-t border-[#F2F4F7] px-4 py-3 grid grid-cols-3 gap-3">
           <div className="text-center">
-            <p className="text-2xl font-black text-[#FF6A00]">{profile.daily_streak}</p>
+            <p className="text-2xl font-black text-[#FF6A00]">{safeProfile.daily_streak}</p>
             <p className="text-[10px] text-[#8FA4C8] font-medium">Streak Kini</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-black text-[#1A1A1A]">{profile.longest_streak || 0}</p>
+            <p className="text-2xl font-black text-[#1A1A1A]">{safeProfile.longest_streak || 0}</p>
             <p className="text-[10px] text-[#8FA4C8] font-medium">Terpanjang</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-black" style={{ color: currentLevel.color }}>{profile.total_points}</p>
+            <p className="text-2xl font-black" style={{ color: currentLevel.color }}>{safeProfile.total_points}</p>
             <p className="text-[10px] text-[#8FA4C8] font-medium">Total XP</p>
           </div>
           <div className="col-span-3">
