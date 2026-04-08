@@ -11,9 +11,11 @@ Deno.serve(async (req) => {
     sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
     const sevenDaysStr = sevenDaysFromNow.toISOString().split('T')[0];
 
-    // Get all premium users
+    // Get all premium users (exclude admins)
     const allUsers = await base44.asServiceRole.entities.User.list();
-    const premiumUsers = allUsers.filter(u => u.subscription_plan && u.subscription_plan !== 'free' && u.subscription_end_date);
+    const premiumUsers = allUsers.filter(u => 
+      u.subscription_plan && u.subscription_plan !== 'free' && u.subscription_end_date && u.role !== 'admin'
+    );
 
     let expired = 0, expiring3d = 0, expiring7d = 0;
 

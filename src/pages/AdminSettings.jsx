@@ -13,6 +13,7 @@ export default function AdminSettings() {
   const [showAddAdmin, setShowAddAdmin] = useState(false);
   const [newAdminEmail, setNewAdminEmail] = useState("");
 
+  const [appConfig, setAppConfig] = useState(null);
   const [settings, setSettings] = useState({
     app_name: "Atur Pintar",
     maintenance_mode: false,
@@ -40,12 +41,32 @@ export default function AdminSettings() {
   async function loadData() {
     setLoading(true);
     try {
-      const [waitRes, adminRes] = await Promise.all([
+      const [waitRes, adminRes, configRes] = await Promise.all([
         base44.entities.WaitingList.list("-created_date", 100),
-        base44.entities.User.filter({ role: "admin" })
+        base44.entities.User.filter({ role: "admin" }),
+        base44.asServiceRole.entities.AppConfig.list()
       ]);
       setWaitingList(waitRes);
       setAdmins(adminRes);
+      
+      if (configRes && configRes.length) {
+        const config = configRes[0];
+        setAppConfig(config);
+        setSettings({
+          app_name: config.app_name || "Atur Pintar",
+          maintenance_mode: config.maintenance_mode || false,
+          premium_monthly_price: config.premium_price_monthly || 49000,
+          premium_yearly_price: config.premium_price_yearly || 490000,
+          features: {
+            split_bill: config.feature_split_bill !== false,
+            shared_wallet: config.feature_shared_wallet !== false,
+            investments: config.feature_investment !== false,
+            nana_ai: config.feature_nana_ai !== false,
+            gamification: config.feature_gamification !== false,
+            waiting_list_form: config.feature_waiting_list !== false
+          }
+        });
+      }
     } catch (e) {
       console.error(e);
     }
@@ -55,12 +76,33 @@ export default function AdminSettings() {
   async function handleSaveSettings() {
     setSaving(true);
     try {
+      if (appConfig) {
+        await base44.asServiceRole.entities.AppConfig.update(appConfig.id, {
+          app_name: settings.app_name,
+          maintenance_mode: settings.maintenance_mode,
+          premium_price_monthly: settings.premium_monthly_price,
+          premium_price_yearly: settings.premium_yearly_price,
+          feature_split_bill: settings.features.split_bill,
+          feature_shared_wallet: settings.features.shared_wallet,
+          feature_investment: settings.features.investments,
+          feature_nana_ai: settings.features.nana_ai,
+          feature_gamification: settings.features.gamification,
+          feature_waiting_list: settings.features.waiting_list_form
+        });
+      }
+      
+      const changes = [];
+      if (settings.maintenance_mode) changes.push('maintenance_mode');
+      if (settings.features.split_bill === false) changes.push('-split_bill');
+      if (settings.features.investments === false) changes.push('-investments');
+      if (settings.features.nana_ai === false) changes.push('-nana_ai');
+      
       await base44.entities.SystemLog.create({
         log_type: "activity",
         user_email: user?.email,
         action: "settings_updated",
         severity: "info",
-        details: `Updated app settings`
+        details: `Updated AppConfig: ${changes.length ? changes.join(', ') : 'all features enabled'}`
       });
       setSuccessMsg("✓ Pengaturan tersimpan");
       setTimeout(() => setSuccessMsg(""), 3000);
