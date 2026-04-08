@@ -91,53 +91,30 @@ export default function StreakWidget({ user, transactionCount }) {
   const isActiveToday = profile.last_activity_date === format(new Date(), "yyyy-MM-dd");
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 border border-[#F2F4F7]">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Daily Streak</p>
-        <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: currentLevel.color + "20", color: currentLevel.color }}>
-          Lv.{currentLevel.level} {currentLevel.name}
-        </span>
+    <div className="bg-white rounded-2xl shadow-sm px-4 py-3 border border-[#F2F4F7] flex items-center gap-3">
+      {/* Flame + streak */}
+      <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${isActiveToday ? "bg-[#FF6A00]/10" : "bg-[#F2F4F7]"}`}>
+        <Flame className={`w-4 h-4 ${isActiveToday ? "text-[#FF6A00]" : "text-[#8FA4C8]"}`} />
+        <p className={`text-xs font-black leading-none mt-0.5 ${isActiveToday ? "text-[#FF6A00]" : "text-[#8FA4C8]"}`}>{profile.daily_streak}</p>
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Streak */}
-        <div className={`flex flex-col items-center justify-center w-16 h-16 rounded-2xl ${isActiveToday ? "bg-[#FF6A00]/10" : "bg-[#F2F4F7]"}`}>
-          <Flame className={`w-6 h-6 ${isActiveToday ? "text-[#FF6A00]" : "text-[#8FA4C8]"}`} />
-          <p className={`text-xl font-black ${isActiveToday ? "text-[#FF6A00]" : "text-[#8FA4C8]"}`}>{profile.daily_streak}</p>
-        </div>
-
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-sm font-bold text-[#1A1A1A]">
-              {profile.daily_streak === 0 ? "Mulai streak hari ini!" :
-               !isActiveToday ? "Catat transaksi untuk lanjutkan streak!" :
-               `${profile.daily_streak} hari berturut-turut 🔥`}
-            </p>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-[#1A1A1A] leading-tight">
+          {!isActiveToday ? "Catat transaksi hari ini!" : `${profile.daily_streak} hari berturut-turut 🔥`}
+        </p>
+        {nextLevel && (
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex-1 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
+              <div className="h-full rounded-full" style={{ width: `${progressToNext}%`, backgroundColor: currentLevel.color }} />
+            </div>
+            <span className="text-[10px] text-[#8FA4C8] whitespace-nowrap">{profile.total_points} XP</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs font-bold text-[#1A1A1A]">{profile.total_points} XP</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Trophy className="w-3.5 h-3.5 text-purple-400" />
-              <span className="text-xs text-[#8FA4C8]">Terpanjang: {profile.longest_streak} hr</span>
-            </div>
-          </div>
-          {/* XP Progress bar */}
-          {nextLevel && (
-            <div className="mt-2">
-              <div className="h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${progressToNext}%`, backgroundColor: currentLevel.color }}
-                />
-              </div>
-              <p className="text-[10px] text-[#8FA4C8] mt-0.5">{profile.total_points}/{nextLevel.min} XP → Lv.{nextLevel.level} {nextLevel.name}</p>
-            </div>
-          )}
-        </div>
+        )}
       </div>
+
+      <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: currentLevel.color + "20", color: currentLevel.color }}>
+        Lv.{currentLevel.level}
+      </span>
     </div>
   );
 }

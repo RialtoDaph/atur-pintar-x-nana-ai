@@ -21,8 +21,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
     category: initialValues.category || "",
     note: initialValues.note || "",
     date: new Date().toISOString().split("T")[0],
-    goal_id: ""
+    goal_id: "",
+    account_id: ""
   });
+  const [accounts, setAccounts] = useState([]);
   const [saving, setSaving] = useState(false);
   const [aiCatSuggestion, setAiCatSuggestion] = useState(null);
   const [aiCatLoading, setAiCatLoading] = useState(false);
@@ -39,6 +41,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const [showGoalSelect, setShowGoalSelect] = useState(false);
   const fileRef = useRef(null);
   const cameraRef = useRef(null);
+
+  useEffect(() => {
+    base44.entities.Account.list().then(list => setAccounts(list || [])).catch(() => {});
+  }, []);
 
   // Removed - now handled in TransactionCategories component
 
@@ -310,6 +316,39 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
             setForm={setForm}
             onShowSubCatPopup={setSubCatPopup} />
           
+
+          {/* Account Selector */}
+          {accounts.length > 0 && (
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-[#8FA4C8] mb-2">Rekening / Dompet</p>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                <button
+                  onClick={() => setForm(f => ({ ...f, account_id: "" }))}
+                  className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                    form.account_id === ""
+                      ? "bg-[#1A1A1A] text-white border-[#1A1A1A]"
+                      : "bg-[#F2F4F7] text-[#4A5568] border-transparent"
+                  }`}
+                >
+                  Semua
+                </button>
+                {accounts.map(acc => (
+                  <button
+                    key={acc.id}
+                    onClick={() => setForm(f => ({ ...f, account_id: acc.id }))}
+                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                      form.account_id === acc.id
+                        ? "bg-[#FF6A00] text-white border-[#FF6A00]"
+                        : "bg-[#F2F4F7] text-[#4A5568] border-transparent"
+                    }`}
+                  >
+                    <span>{acc.icon || "💳"}</span>
+                    {acc.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <TransactionFormInputs
             form={form}

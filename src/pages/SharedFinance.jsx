@@ -91,11 +91,14 @@ export default function SharedFinance() {
   const [joining, setJoining] = useState(false);
 
   useEffect(() => {
-    base44.auth.me().then(u => {
+    base44.auth.me().then(async u => {
       setUser(u);
-      return base44.entities.SharedWallet.filter({ owner_email: u.email });
-    }).then(list => {
-      setWallets(list);
+      // Load all wallets: owned + member of
+      const all = await base44.entities.SharedWallet.list();
+      const mine = all.filter(w =>
+        (w.members || []).includes(u.email) || w.owner_email === u.email
+      );
+      setWallets(mine);
     }).finally(() => setLoading(false));
   }, []);
 
