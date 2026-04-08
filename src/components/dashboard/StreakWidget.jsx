@@ -34,7 +34,20 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
   async function fetchProfile() {
     try {
       const existing = await base44.entities.GamificationProfile.filter({ created_by: user.email });
-      if (existing.length > 0) setProfile(existing[0]);
+      if (existing.length > 0) {
+        // Delete old/stale profiles - keep only fresh ones
+        for (const p of existing) {
+          // If profile has inconsistent data (points but no streak, etc), delete it
+          if (p.total_points > 0 || (p.longest_streak > 0 && p.daily_streak === 0)) {
+            try {
+              await base44.entities.GamificationProfile.delete(p.id);
+            } catch (e) {}
+          }
+        }
+        // Re-fetch after cleanup
+        const cleaned = await base44.entities.GamificationProfile.filter({ created_by: user.email });
+        if (cleaned.length > 0) setProfile(cleaned[0]);
+      }
     } catch (e) {}
     setLoading(false);
   }
