@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Trash2, RefreshCw, AlertCircle } from "lucide-react";
 
-export default function AdminStreakManager() {
+export default function AdminStreakManager({ onActionComplete }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -57,7 +57,8 @@ export default function AdminStreakManager() {
 
       setSuccessMsg(`Streak reset untuk ${email}`);
       setTimeout(() => setSuccessMsg(""), 3000);
-      loadUsers();
+      await loadUsers();
+      onActionComplete?.();
     } catch (error) {
       setErrorMsg("Error reset streak: " + error.message);
     }
@@ -80,7 +81,8 @@ export default function AdminStreakManager() {
       const res = await base44.functions.invoke('adminManageStreaks', { action: 'resetAll' });
       setSuccessMsg(res.data.message);
       setTimeout(() => setSuccessMsg(""), 3000);
-      loadUsers();
+      await loadUsers();
+      onActionComplete?.();
     } catch (error) {
       setErrorMsg("Error reset all: " + error.message);
     }
@@ -96,7 +98,8 @@ export default function AdminStreakManager() {
       const res = await base44.functions.invoke('adminManageStreaks', { action: 'deleteDuplicates', email });
       setSuccessMsg(res.data.message);
       setTimeout(() => setSuccessMsg(""), 3000);
-      loadUsers();
+      await loadUsers();
+      onActionComplete?.();
     } catch (error) {
       setErrorMsg("Error hapus duplikat: " + error.message);
     }

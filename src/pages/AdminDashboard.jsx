@@ -93,7 +93,7 @@ export default function AdminDashboard() {
 
         {/* Streak Manager */}
         <div className="mt-6">
-          <AdminStreakManager />
+          <AdminStreakManager onActionComplete={loadStats} />
         </div>
 
         {/* Charts */}
