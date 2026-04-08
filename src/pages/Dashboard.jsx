@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [showNanaIntro, setShowNanaIntro] = useState(false);
   const [user, setUser] = useState(null);
   const [showSampleBanner, setShowSampleBanner] = useState(hasSampleData);
+  const [lastTxAddedAt, setLastTxAddedAt] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -185,7 +186,7 @@ export default function Dashboard() {
         )}
 
         {/* Streak Widget */}
-        {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} />}
+        {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} lastTxAddedAt={lastTxAddedAt} />}
 
         {/* Reminder Widget */}
         <ReminderWidget user={user} />
@@ -219,6 +220,7 @@ export default function Dashboard() {
             const tx = await base44.entities.Transaction.create(data);
             if (data.account_id) await syncAccountBalance(data.account_id, data.amount, data.type, 1);
             setShowAddTransaction(false);
+            setLastTxAddedAt(Date.now());
             loadData();
           }}
         />

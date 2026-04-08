@@ -12,7 +12,7 @@ const LEVELS = [
   { level: 5, name: "Master", min: 1500, max: 9999, color: "#FF6A00" },
 ];
 
-export default function StreakWidget({ user, transactionCount }) {
+export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
@@ -22,7 +22,7 @@ export default function StreakWidget({ user, transactionCount }) {
   useEffect(() => {
     if (!user) return;
     loadAndUpdateStreak();
-  }, [user, transactionCount]);
+  }, [user, lastTxAddedAt]);
 
   async function loadAndUpdateStreak() {
     const today = format(new Date(), "yyyy-MM-dd");
