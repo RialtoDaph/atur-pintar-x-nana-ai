@@ -16,7 +16,6 @@ import { syncAccountBalance } from "@/components/utils/accountSync";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import StreakWidget from "@/components/dashboard/StreakWidget";
-import MonthOverMonthComparison from "@/components/dashboard/MonthOverMonthComparison";
 import SharedWalletCard from "@/components/dashboard/SharedWalletCard";
 
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
@@ -190,12 +189,6 @@ export default function Dashboard() {
         {/* Streak Widget - Now prominent */}
         {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} lastTxAddedAt={lastTxAddedAt} />}
 
-        {/* Shared Wallet Entry Point */}
-        {user?.onboarding_completed && <SharedWalletCard />}
-
-        {/* Month over Month Comparison */}
-        {user?.onboarding_completed && !loading && <MonthOverMonthComparison transactions={transactions} />}
-
         {/* Reminder Widget */}
         <ReminderWidget user={user} />
 
@@ -204,17 +197,11 @@ export default function Dashboard() {
           <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
         </Suspense>
 
-
-
-        {/* Cashflow Forecast */}
-        {widgets.cashflowForecast && (
-          <Suspense fallback={<LazyFallback />}>
-            <CashflowForecast transactions={transactions} loading={loading} user={user} />
-          </Suspense>
-        )}
-
-        {/* Accounts Widget — bottom */}
+        {/* Accounts Widget */}
         {user?.onboarding_completed && <AccountsWidget user={user} />}
+
+        {/* Shared Wallet Card - Bottom */}
+        {user?.onboarding_completed && <SharedWalletCard />}
 
         <div className="h-2" />
 

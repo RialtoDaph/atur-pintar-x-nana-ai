@@ -1,22 +1,20 @@
 import { Link } from "react-router-dom";
-import { Users, ArrowRight } from "lucide-react";
+import { Users } from "lucide-react";
 import { createPageUrl } from "@/utils";
 
 export default function SharedWalletCard() {
   return (
     <Link
       to={createPageUrl("SharedFinance")}
-      className="block bg-gradient-to-br from-[#FF6A00]/90 to-[#e05e00] rounded-2xl p-5 shadow-md hover:shadow-lg transition-all"
+      className="block bg-white rounded-xl p-4 border border-[#E2E8F0] hover:shadow-sm transition-all"
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="w-5 h-5 text-white" />
-            <p className="text-white font-bold text-sm">Dompet Bersama</p>
-          </div>
-          <p className="text-white/80 text-xs">Kelola keuangan bersama keluarga atau teman</p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[#FF6A00]/10 flex items-center justify-center">
+          <Users className="w-5 h-5 text-[#FF6A00]" />
         </div>
-        <ArrowRight className="w-4 h-4 text-white flex-shrink-0" />
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-[#0A0A0A]">Dompet Bersama</p>
+        </div>
       </div>
     </Link>
   );
