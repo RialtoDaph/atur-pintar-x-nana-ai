@@ -183,10 +183,9 @@ function Section({ label, items, isIncome, onMarkDone, onEdit, onDelete, formatC
           {items.map((tx) => (
             <div key={tx.id}>
               <div
-                className={`flex items-center gap-2.5 px-4 py-2.5 cursor-pointer transition-colors tap-highlight-fix ${tappedId === tx.id ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
-                onClick={() => setTappedId(tappedId === tx.id ? null : tx.id)}
+                className={`flex items-center gap-2.5 px-4 py-2.5 transition-colors ${tappedId === tx.id ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
               >
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0" onClick={() => setTappedId(tappedId === tx.id ? null : tx.id)}>
                   <p className="text-xs font-medium text-[#1A1A1A] truncate">{tx.note || (isIncome ? "Pendapatan" : "Tagihan")}</p>
                   <p className="text-[9px] text-[#8FA4C8] capitalize">
                     {INTERVAL_LABEL[tx.recurring_interval] || tx.recurring_interval}
@@ -195,32 +194,31 @@ function Section({ label, items, isIncome, onMarkDone, onEdit, onDelete, formatC
                       : ''}
                   </p>
                 </div>
-                <span className={`text-xs font-bold flex-shrink-0 ${isIncome ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+                <span className={`text-xs font-bold flex-shrink-0 ${isIncome ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`} onClick={() => setTappedId(tappedId === tx.id ? null : tx.id)}>
                   {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
                 </span>
-                <ChevronDown className={`w-3 h-3 text-[#8FA4C8] flex-shrink-0 transition-transform ${tappedId === tx.id ? "rotate-180" : ""}`} />
+                <button
+                  onClick={() => onMarkDone(tx)}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex-shrink-0 transition-colors tap-highlight-fix ${
+                    isIncome
+                      ? "bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20"
+                      : "bg-[#FF6B6B]/10 text-[#FF6B6B] hover:bg-[#FF6B6B]/20"
+                  }`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  {isIncome ? "Terima" : "Bayar"}
+                </button>
               </div>
               {tappedId === tx.id && (
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-[#F8FAFC] border-t border-[#F2F4F7]">
+                <div className="flex items-center gap-2 px-4 py-2 bg-[#F8FAFC] border-t border-[#F2F4F7]">
                   <button
-                    onClick={(e) => { e.stopPropagation(); onMarkDone(tx); setTappedId(null); }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-colors tap-highlight-fix ${
-                      isIncome
-                        ? "bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20"
-                        : "bg-[#FF6B6B]/10 text-[#FF6B6B] hover:bg-[#FF6B6B]/20"
-                    }`}
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    {isIncome ? "Terima" : "Bayar"}
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onEdit(tx.id); setTappedId(null); }}
+                    onClick={() => { onEdit(tx.id); setTappedId(null); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4F7CFF]/10 text-[#4F7CFF] text-[10px] font-bold hover:bg-[#4F7CFF]/20 transition-colors tap-highlight-fix"
                   >
                     <Pencil className="w-3.5 h-3.5" /> Edit
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); onDelete(tx.id); setTappedId(null); }}
+                    onClick={() => { onDelete(tx.id); setTappedId(null); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FF6B6B]/10 text-[#FF6B6B] text-[10px] font-bold hover:bg-[#FF6B6B]/20 transition-colors tap-highlight-fix ml-auto"
                   >
                     <Trash2 className="w-3.5 h-3.5" /> Hapus
