@@ -3,7 +3,7 @@ import { createPageUrl } from "@/utils";
 import { useState } from "react";
 import {
   LayoutDashboard, Users, ArrowLeftRight, Tag, Sparkles,
-  CreditCard, Bell, ScrollText, AlertTriangle, ChevronRight, Shield, Menu, X
+  CreditCard, Bell, ScrollText, AlertTriangle, ChevronRight, Shield, Menu, X, Settings
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: "Categories", icon: Tag, page: "AdminCategories" },
   { label: "Subscriptions", icon: CreditCard, page: "AdminSubscriptions" },
   { label: "Notifications", icon: Bell, page: "AdminNotifications" },
+  { label: "Settings", icon: Settings, page: "AdminSettings" },
   { label: "System Logs", icon: ScrollText, page: "AdminLogs" },
 ];
 

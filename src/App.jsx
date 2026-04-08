@@ -21,6 +21,7 @@ import AdminUsers from '@/pages/AdminUsers';
 import AdminLogs from '@/pages/AdminLogs';
 import AdminNotifications from '@/pages/AdminNotifications';
 import AdminCategories from '@/pages/AdminCategories';
+import AdminSettings from '@/pages/AdminSettings';
 
 const { Pages, Layout } = pagesConfig;
 
@@ -94,6 +95,7 @@ const AuthenticatedApp = () => {
       <Route path="/AdminLogs" element={<LayoutWrapper currentPageName="AdminLogs"><AdminLogs /></LayoutWrapper>} />
       <Route path="/AdminNotifications" element={<LayoutWrapper currentPageName="AdminNotifications"><AdminNotifications /></LayoutWrapper>} />
       <Route path="/AdminCategories" element={<LayoutWrapper currentPageName="AdminCategories"><AdminCategories /></LayoutWrapper>} />
+      <Route path="/AdminSettings" element={<LayoutWrapper currentPageName="AdminSettings"><AdminSettings /></LayoutWrapper>} />
       <Route path="/AdminAIInsights" element={<Navigate to="/AdminDashboard" replace />} />
       <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />
       <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />
