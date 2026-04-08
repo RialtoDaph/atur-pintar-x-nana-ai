@@ -16,7 +16,8 @@ export default function AdminStreakManager() {
   async function loadUsers() {
     setLoading(true);
     try {
-      const gamificationProfiles = await base44.asServiceRole.entities.GamificationProfile.list();
+      const res = await base44.functions.invoke('adminGetGamificationProfiles', {});
+      const gamificationProfiles = res.data.users.flatMap(u => u.profiles);
       const userMap = {};
       
       gamificationProfiles.forEach(profile => {
@@ -52,7 +53,8 @@ export default function AdminStreakManager() {
     if (!window.confirm(`Reset streak untuk ${email}?`)) return;
 
     try {
-      const profiles = await base44.asServiceRole.entities.GamificationProfile.filter({ created_by: email });
+      const res = await base44.functions.invoke('adminGetGamificationProfiles', {});
+      const profiles = res.data.users.find(u => u.email === email)?.profiles || [];
       await Promise.all(
         profiles.map(p =>
           base44.asServiceRole.entities.GamificationProfile.update(p.id, {
@@ -84,7 +86,8 @@ export default function AdminStreakManager() {
     if (!window.confirm("Reset SEMUA streak user? Tindakan ini tidak bisa dibatalkan!")) return;
 
     try {
-      const allProfiles = await base44.asServiceRole.entities.GamificationProfile.list();
+      const res = await base44.functions.invoke('adminGetGamificationProfiles', {});
+      const allProfiles = res.data.users.flatMap(u => u.profiles);
       await Promise.all(
         allProfiles.map(p =>
           base44.asServiceRole.entities.GamificationProfile.update(p.id, {
