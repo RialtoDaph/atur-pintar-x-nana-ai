@@ -14,7 +14,7 @@ const DEFAULT_CATEGORIES = [
 { key: "other", label_id: "Lainnya", label_en: "Other", emoji: "📦", color: "#95A5A6" }];
 
 
-export default function AddBudgetModal({ onClose, onSave, existingCategories, editBudget }) {
+export default function AddBudgetModal({ onClose, onSave, existingCategories, editBudget, existingBudgets = [], month }) {
   const { t, settings, formatCurrency } = useAppSettings();
   const lang = settings.language || "id";
 
@@ -22,10 +22,7 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
   const [rawAmount, setRawAmount] = useState(editBudget?.amount ? String(editBudget.amount) : "");
   const [saving, setSaving] = useState(false);
   const [customCategories, setCustomCategories] = useState([]);
-
-  useEffect(() => {
-    base44.entities.CustomCategory.filter({ type: "expense" }, "-created_date").then(setCustomCategories).catch(() => {});
-  }, []);
+  const [error, setError] = useState(null);
 
   // Merge default + custom
   const allCategories = [
@@ -52,9 +49,27 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
 
   async function handleSave() {
     if (!category || !rawAmount) return;
+    setError(null);
+
+    // Check for duplicate budget (same category + month, excluding current edit)
+    if (month) {
+      const isDuplicate = existingBudgets.some(
+        (b) => b.category === category && b.month === month && b.id !== editBudget?.id
+      );
+      if (isDuplicate) {
+        setError(`Budget untuk kategori ini di bulan ${month} sudah ada.`);
+        return;
+      }
+    }
+
     setSaving(true);
-    await onSave({ category, amount: parseFloat(rawAmount.replace(/\./g, "").replace(",", ".")) });
-    setSaving(false);
+    try {
+      await onSave({ category, amount: parseFloat(rawAmount.replace(/\./g, "").replace(",", ".")) });
+    } catch (err) {
+      setError(err.message || "Gagal menyimpan budget.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   // Format rupiah on-the-fly while typing (integer only)
@@ -78,6 +93,12 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 mb-4">
+            <p className="text-xs font-semibold text-red-600">{error}</p>
+          </div>
+        )}
 
         {/* Category picker */}
         <div className="mb-5">
@@ -124,13 +145,7 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
           </div>
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={saving || !category || !rawAmount}
-          className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] disabled:opacity-40 hover:bg-[#e05e00] transition-colors">
-          
-          {saving ? t("saving") : isEditing ? t("budget_save_edit") : t("budget_save_new")}
-        </button>
+
       </div>
     </div>);
 

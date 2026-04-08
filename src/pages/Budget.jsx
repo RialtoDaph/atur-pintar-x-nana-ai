@@ -287,15 +287,16 @@ export default function BudgetPage() {
       </div>
 
       {/* Modal */}
-      {showAdd && (
-        <AddBudgetModal
-          existingCategories={budgets.map(b => b.category)}
-          currentMonth={currentMonth}
-          editBudget={editingBudget}
-          onClose={closeModal}
-          onSave={handleSave}
-        />
-      )}
-    </div>
-  );
-}
+       {showAdd && (
+         <AddBudgetModal
+           existingCategories={budgets.map(b => b.category)}
+           existingBudgets={budgets}
+           month={currentMonth}
+           editBudget={editingBudget}
+           onClose={closeModal}
+           onSave={handleSave}
+         />
+       )}
+      </div>
+      );
+      }

@@ -91,7 +91,8 @@ export default function Transactions() {
     setTransactions(prev => prev.filter(t => t.id !== id));
     try {
       await base44.entities.Transaction.delete(id);
-      if (tx?.account_id) await syncAccountBalance(tx.account_id, tx.amount, tx.type, -1);
+      // Call sync function for account balance + savings goal
+      await base44.functions.invoke("syncTransactionChanges", { action: "delete", oldTransaction: tx });
       toast.success(t('tx_delete_success'));
     } catch (error) {
       console.error("Delete failed:", error);
@@ -107,9 +108,8 @@ export default function Transactions() {
     setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...data } : t));
     try {
       await base44.entities.Transaction.update(id, data);
-      // Reverse old balance effect, apply new
-      if (oldTx?.account_id) await syncAccountBalance(oldTx.account_id, oldTx.amount, oldTx.type, -1);
-      if (data.account_id) await syncAccountBalance(data.account_id, data.amount, data.type, 1);
+      // Call sync function for account balance + savings goal
+      await base44.functions.invoke("syncTransactionChanges", { action: "update", transaction: data, oldTransaction: oldTx });
       toast.success(t('tx_update_success'));
       setEditingTx(null);
     } catch (error) {
@@ -516,7 +516,8 @@ export default function Transactions() {
                   throw new Error("Invalid transaction data");
                 }
                 await base44.entities.Transaction.create(data);
-                if (data.account_id) await syncAccountBalance(data.account_id, data.amount, data.type, 1);
+                // Call sync function for account balance + savings goal
+                await base44.functions.invoke("syncTransactionChanges", { action: "create", transaction: data });
                 toast.success(t('tx_create_success'));
                 setTransactions(prev => prev.filter(t => t.id !== tempId));
                 loadData();
@@ -526,8 +527,8 @@ export default function Transactions() {
                 setTransactions(prev => prev.filter(t => t.id !== tempId));
               }
             }}
-          />
-        )}
+            />
+            )}
 
         {editingTx && (
           <EditTransactionModal
