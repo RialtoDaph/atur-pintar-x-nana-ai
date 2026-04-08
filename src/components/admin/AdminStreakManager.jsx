@@ -53,16 +53,7 @@ export default function AdminStreakManager() {
     if (!window.confirm(`Reset streak untuk ${email}?`)) return;
 
     try {
-      const res = await base44.functions.invoke('adminGetGamificationProfiles', {});
-      const profiles = res.data.users.find(u => u.email === email)?.profiles || [];
-      await Promise.all(
-        profiles.map(p =>
-          base44.asServiceRole.entities.GamificationProfile.update(p.id, {
-            daily_streak: 0,
-            last_activity_date: null
-          })
-        )
-      );
+      const res = await base44.functions.invoke('adminManageStreaks', { action: 'resetUser', email });
 
       setSuccessMsg(`Streak reset untuk ${email}`);
       setTimeout(() => setSuccessMsg(""), 3000);
@@ -86,18 +77,8 @@ export default function AdminStreakManager() {
     if (!window.confirm("Reset SEMUA streak user? Tindakan ini tidak bisa dibatalkan!")) return;
 
     try {
-      const res = await base44.functions.invoke('adminGetGamificationProfiles', {});
-      const allProfiles = res.data.users.flatMap(u => u.profiles);
-      await Promise.all(
-        allProfiles.map(p =>
-          base44.asServiceRole.entities.GamificationProfile.update(p.id, {
-            daily_streak: 0,
-            last_activity_date: null
-          })
-        )
-      );
-
-      setSuccessMsg(`Reset semua ${allProfiles.length} streak`);
+      const res = await base44.functions.invoke('adminManageStreaks', { action: 'resetAll' });
+      setSuccessMsg(res.data.message);
       setTimeout(() => setSuccessMsg(""), 3000);
       loadUsers();
     } catch (error) {
@@ -112,13 +93,8 @@ export default function AdminStreakManager() {
     if (!window.confirm(`Hapus ${userProfiles.length - 1} duplikat untuk ${email}?`)) return;
 
     try {
-      // Sort by created_date, keep yang paling lama
-      const sorted = [...userProfiles].sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
-      const toDelete = sorted.slice(1);
-
-      await Promise.all(toDelete.map(p => base44.asServiceRole.entities.GamificationProfile.delete(p.id)));
-
-      setSuccessMsg(`Hapus ${toDelete.length} duplikat untuk ${email}`);
+      const res = await base44.functions.invoke('adminManageStreaks', { action: 'deleteDuplicates', email });
+      setSuccessMsg(res.data.message);
       setTimeout(() => setSuccessMsg(""), 3000);
       loadUsers();
     } catch (error) {
