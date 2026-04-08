@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Users, Plus, Copy, UserPlus, Crown, X, Check, Loader2, Link, Mail } from "lucide-react";
 import { toast } from "sonner";
+import PremiumGate from "@/components/subscription/PremiumGate";
 
 function generateCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -158,6 +159,23 @@ export default function SharedFinance() {
   }
 
   const ICONS = ["👨‍👩‍👧", "💑", "👫", "🏠", "💍", "👨‍👩‍👧‍👦", "🤝", "❤️"];
+  const isPremium = user?.subscription_plan && ["premium_monthly", "premium_yearly"].includes(user.subscription_plan) && user?.subscription_status === "active";
+
+  if (!loading && !isPremium) {
+    return (
+      <div className="min-h-screen bg-[#F2F4F7] pb-10">
+        <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+          <div className="max-w-2xl mx-auto">
+            <p className="text-[#8FA4C8] text-sm font-medium">Keuangan Bersama</p>
+            <h1 className="text-white text-2xl font-bold mt-0.5">Shared Finance</h1>
+          </div>
+        </div>
+        <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
+          <PremiumGate user={user} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-10">
@@ -292,7 +310,7 @@ export default function SharedFinance() {
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+        )}
+        </div>
+        );
+        }

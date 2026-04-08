@@ -57,7 +57,14 @@ export default function NanaPreferencesSettings() {
       if (preferences.id) {
         await base44.entities.NanaPreferences.update(preferences.id, preferences);
       } else {
-        await base44.entities.NanaPreferences.create(preferences);
+        // Check if a record already exists for this user
+        const existing = await base44.entities.NanaPreferences.filter({ created_by: user.email });
+        if (existing && existing.length > 0) {
+          // Update the existing record instead of creating a new one
+          await base44.entities.NanaPreferences.update(existing[0].id, preferences);
+        } else {
+          await base44.entities.NanaPreferences.create(preferences);
+        }
       }
       await loadPreferences();
     } catch (error) {
