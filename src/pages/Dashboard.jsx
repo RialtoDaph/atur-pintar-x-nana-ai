@@ -98,8 +98,17 @@ export default function Dashboard() {
     queryKey: ["budgets", user?.email],
     queryFn: () => base44.entities.Budget.filter({ created_by: user.email }),
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 menit cache
+    staleTime: 5 * 60 * 1000,
   });
+
+  const { data: accounts = [] } = useQuery({
+    queryKey: ["accounts_dashboard", user?.email],
+    queryFn: () => base44.entities.Account.filter({ created_by: user.email }),
+    enabled,
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const accountsTotal = accounts.reduce((s, a) => s + (a.balance || 0), 0);
 
   const loading = goalsLoading || txLoading || budgetsLoading;
 
@@ -156,6 +165,7 @@ export default function Dashboard() {
             income={monthIncome}
             expense={monthExpense}
             savings={totalSaved}
+            totalBalance={accounts.length > 0 ? accountsTotal : null}
             loading={loading}
           />
         </div>
@@ -172,9 +182,6 @@ export default function Dashboard() {
             loadData();
           }} />
         )}
-
-        {/* Accounts Widget */}
-        {user?.onboarding_completed && <AccountsWidget user={user} />}
 
         {/* Streak Widget */}
         {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} />}
@@ -196,7 +203,8 @@ export default function Dashboard() {
           </Suspense>
         )}
 
-
+        {/* Accounts Widget — bottom */}
+        {user?.onboarding_completed && <AccountsWidget user={user} />}
 
         <div className="h-2" />
 

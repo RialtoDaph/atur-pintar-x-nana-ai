@@ -10,9 +10,9 @@ function compactRupiah(value) {
   return `${sign}Rp ${abs.toLocaleString('id-ID')}`;
 }
 
-export default function BalanceCard({ income, expense, savings, loading }) {
+export default function BalanceCard({ income, expense, savings, totalBalance, loading }) {
   const { formatCurrency, t } = useAppSettings();
-  const balance = income - expense;
+  const balance = totalBalance !== null && totalBalance !== undefined ? totalBalance : income - expense;
 
   if (loading) {
     return (
@@ -22,7 +22,7 @@ export default function BalanceCard({ income, expense, savings, loading }) {
 
   return (
     <div data-tour="balance-card" className="bg-gradient-to-br from-[#1a1a1a] via-[#161616] to-[#111] rounded-2xl p-5 border border-[#2a2a2a] shadow-2xl" style={{boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,106,0,0.08)'}}>
-      <p className="text-[#8FA4C8] text-[10px] font-bold uppercase tracking-[0.15em] mb-1 text-center">Saldo Bulan Ini</p>
+      <p className="text-[#8FA4C8] text-[10px] font-bold uppercase tracking-[0.15em] mb-1 text-center">{totalBalance !== null && totalBalance !== undefined ? "Total Saldo Rekening" : "Saldo Bulan Ini"}</p>
       <p className={`font-black mb-5 text-center tracking-tight ${balance >= 0 ? "text-white" : "text-red-400"} ${Math.abs(balance) >= 1_000_000_000 ? "text-2xl" : Math.abs(balance) >= 100_000_000 ? "text-3xl" : "text-4xl"}`}>
         {compactRupiah(balance)}
       </p>

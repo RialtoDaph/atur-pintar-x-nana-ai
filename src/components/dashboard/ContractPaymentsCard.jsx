@@ -19,7 +19,7 @@ export default function ContractPaymentsCard({ user }) {
   const { formatCurrency } = useAppSettings();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [showAdd, setShowAdd] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [confirmTx, setConfirmTx] = useState(null);

@@ -64,7 +64,7 @@ export default function SubscriptionCard({ user }) {
   const { formatCurrency } = useAppSettings();
   const [subs, setSubs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [confirmSub, setConfirmSub] = useState(null);
 
