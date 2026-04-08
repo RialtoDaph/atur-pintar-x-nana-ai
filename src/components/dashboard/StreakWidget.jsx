@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Flame, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import StreakCelebrationPopup from "./StreakCelebrationPopup";
 
 const LEVELS = [
   { level: 1, name: "Pemula", min: 0, max: 100, color: "#8FA4C8" },
@@ -16,8 +17,9 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
-  const [justUpdated, setJustUpdated] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [streakMessage, setStreakMessage] = useState("");
+  const [popupStreak, setPopupStreak] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -29,8 +31,6 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
     const existing = await base44.entities.GamificationProfile.filter({ created_by: user.email });
 
     if (existing.length === 0) {
-      // First time - only create if there's actual transactions
-      if (transactionCount === 0) { setLoading(false); return; }
       const p = await base44.entities.GamificationProfile.create({
         daily_streak: 1,
         longest_streak: 1,
@@ -40,9 +40,9 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
         achievements: ["first_transaction"],
       });
       setProfile(p);
-      setJustUpdated(true);
-      setStreakMessage("🎉 Transaksi pertama tercatat!");
-      setTimeout(() => setJustUpdated(false), 3000);
+      setPopupStreak(1);
+      setStreakMessage("Transaksi pertama tercatat! Streak kamu dimulai!");
+      setShowPopup(true);
       setLoading(false);
       return;
     }
@@ -53,37 +53,31 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
 
     let updates = {};
 
-    // Only update streak/activity date if user has actual transactions today
-    if (transactionCount > 0) {
-      if (last === today) {
-        // Already active today
-        if (!p.achievements?.includes("first_transaction")) {
-          updates.achievements = [...(p.achievements || []), "first_transaction"];
-          updates.total_points = (p.total_points || 0) + 50;
-        }
-        // Always show animation when a new transaction is added
-        setJustUpdated(true);
-        setStreakMessage(`✅ Transaksi dicatat! Streak ${p.daily_streak} hari 🔥`);
-        setTimeout(() => setJustUpdated(false), 3000);
-      } else if (last === yesterday) {
-        // Continued streak!
-        const newStreak = (p.daily_streak || 0) + 1;
-        updates.daily_streak = newStreak;
-        updates.longest_streak = Math.max(p.longest_streak || 0, newStreak);
-        updates.last_activity_date = today;
-        updates.total_points = (p.total_points || 0) + 10 + (newStreak % 7 === 0 ? 50 : 0);
-        setJustUpdated(true);
-        setStreakMessage(newStreak % 7 === 0 ? `🏆 ${newStreak} hari! Bonus +50 XP!` : `🔥 Streak ${newStreak} hari! +10 XP`);
-        setTimeout(() => setJustUpdated(false), 3500);
-      } else {
-        // Streak broken or first tx today
-        updates.daily_streak = 1;
-        updates.last_activity_date = today;
-        updates.total_points = (p.total_points || 0) + 5;
-        setJustUpdated(true);
-        setStreakMessage("✅ Streak dimulai hari ini! +5 XP");
-        setTimeout(() => setJustUpdated(false), 3000);
+    // Always update streak when this is triggered by a new transaction (lastTxAddedAt)
+    if (last === today) {
+      if (!p.achievements?.includes("first_transaction")) {
+        updates.achievements = [...(p.achievements || []), "first_transaction"];
+        updates.total_points = (p.total_points || 0) + 50;
       }
+      setPopupStreak(p.daily_streak);
+      setStreakMessage(`Catatan tersimpan! Terus pertahankan streakmu ya!`);
+      setShowPopup(true);
+    } else if (last === yesterday) {
+      const newStreak = (p.daily_streak || 0) + 1;
+      updates.daily_streak = newStreak;
+      updates.longest_streak = Math.max(p.longest_streak || 0, newStreak);
+      updates.last_activity_date = today;
+      updates.total_points = (p.total_points || 0) + 10 + (newStreak % 7 === 0 ? 50 : 0);
+      setPopupStreak(newStreak);
+      setStreakMessage(newStreak % 7 === 0 ? `Luar biasa! ${newStreak} hari! Kamu dapat bonus +50 XP!` : `Streak berlanjut! +10 XP untukmu!`);
+      setShowPopup(true);
+    } else {
+      updates.daily_streak = 1;
+      updates.last_activity_date = today;
+      updates.total_points = (p.total_points || 0) + 5;
+      setPopupStreak(1);
+      setStreakMessage("Streak baru dimulai hari ini! +5 XP");
+      setShowPopup(true);
     }
 
     // Update level
@@ -112,27 +106,12 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-[#F2F4F7] overflow-hidden">
-      {/* Celebration banner */}
-      <AnimatePresence>
-        {justUpdated && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            className="overflow-hidden"
-          >
-            <div className="bg-[#FF6A00]/10 border-b border-[#FF6A00]/20 px-4 py-2 flex items-center gap-2">
-              <motion.span
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ repeat: 2, duration: 0.4 }}
-                className="text-lg"
-              >🔥</motion.span>
-              <p className="text-xs font-bold text-[#FF6A00]">{streakMessage}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <StreakCelebrationPopup
+        show={showPopup}
+        message={streakMessage}
+        streak={popupStreak}
+        onClose={() => setShowPopup(false)}
+      />
 
       <button
         onClick={() => setExpanded(v => !v)}
@@ -140,7 +119,7 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
       >
         {/* Flame + streak */}
         <motion.div
-          animate={justUpdated ? { scale: [1, 1.25, 1] } : {}}
+          animate={showPopup ? { scale: [1, 1.25, 1] } : {}}
           transition={{ duration: 0.5 }}
           className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${isActiveToday ? "bg-[#FF6A00]/10" : "bg-[#F2F4F7]"}`}
         >
