@@ -49,7 +49,7 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
     // Create profile if doesn't exist
     if (existing.length === 0) {
       const created = await base44.entities.GamificationProfile.create({
-        daily_streak: 1,
+        daily_streak: 0,
         longest_streak: 0,
         last_activity_date: today,
         total_points: 0,
@@ -111,9 +111,9 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
 
   const currentLevel = LEVELS.find(l => l.level === (profile.level || 1)) || LEVELS[0];
   const nextLevel = LEVELS.find(l => l.level === (profile.level || 1) + 1);
-  const progressToNext = nextLevel
+  const progressToNext = nextLevel && profile.total_points >= currentLevel.min
     ? Math.min(100, ((profile.total_points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100)
-    : 100;
+    : 0;
 
   const isActiveToday = profile.last_activity_date === format(new Date(), "yyyy-MM-dd");
 
