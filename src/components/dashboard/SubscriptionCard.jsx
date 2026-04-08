@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, ChevronDown, Bell, CreditCard, CheckCircle2 } from "lucide-react";
+import { Plus, ChevronDown, Bell, CreditCard, CheckCircle2 } from "lucide-react";
+import EditSubscriptionModal from "./EditSubscriptionModal";
 import ConfirmMarkDoneModal from "./ConfirmMarkDoneModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { syncAccountBalance } from "@/components/utils/accountSync";
@@ -67,6 +68,7 @@ export default function SubscriptionCard({ user }) {
   const [open, setOpen] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [confirmSub, setConfirmSub] = useState(null);
+  const [editingSub, setEditingSub] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -100,9 +102,15 @@ export default function SubscriptionCard({ user }) {
   }
 
   async function handleDelete(id) {
-    if (!confirm("Hapus langganan ini?")) return;
     await base44.entities.Subscription.delete(id);
     setSubs((prev) => prev.filter((s) => s.id !== id));
+    setEditingSub(null);
+  }
+
+  async function handleEdit(id, data) {
+    await base44.entities.Subscription.update(id, data);
+    setSubs((prev) => prev.map((s) => s.id === id ? { ...s, ...data } : s).sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date)));
+    setEditingSub(null);
   }
 
   const active = subs.filter((s) => s.status === "active");
@@ -150,7 +158,7 @@ export default function SubscriptionCard({ user }) {
                     const isSoon = days >= 0 && days <= 3;
                     const isOverdue = days < 0;
                     return (
-                      <div key={sub.id} className="flex items-center gap-3 px-4 py-3">
+                      <div key={sub.id} className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-colors tap-highlight-fix" onClick={() => setEditingSub(sub)}>
                         <div className="w-9 h-9 rounded-xl bg-[#F8FAFC] border border-[#F0F2F5] flex items-center justify-center text-base flex-shrink-0">
                           {sub.icon || "📦"}
                         </div>
@@ -166,16 +174,13 @@ export default function SubscriptionCard({ user }) {
                               isSoon ? "bg-[#FF6A00]/10 text-[#FF6A00]" :
                               "bg-[#F2F4F7] text-[#8FA4C8]"
                             }`}>
-                              {isOverdue ? `${Math.abs(days)}h lalu` : days === 0 ? "Hari ini!" : `${days}h lagi`}
+                              {isOverdue ? `${Math.abs(days)} hari lalu` : days === 0 ? "Hari ini!" : `${days} hari lagi`}
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                           <button onClick={() => setConfirmSub(sub)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20 transition-colors tap-highlight-fix text-[10px] font-bold">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Bayar
-                          </button>
-                          <button onClick={() => handleDelete(sub.id)} className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] transition-colors tap-highlight-fix">
-                            <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
@@ -187,15 +192,12 @@ export default function SubscriptionCard({ user }) {
                     </div>
                   )}
                   {subs.filter(s => s.status === "cancelled").map((sub) => (
-                    <div key={sub.id} className="flex items-center gap-3 px-4 py-2.5 opacity-40">
+                    <div key={sub.id} className="flex items-center gap-3 px-4 py-2.5 opacity-40 cursor-pointer hover:bg-[#F8FAFC] tap-highlight-fix" onClick={() => setEditingSub(sub)}>
                       <div className="w-8 h-8 rounded-xl bg-[#F2F4F7] flex items-center justify-center text-sm flex-shrink-0">{sub.icon || "📦"}</div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-[#1A1A1A] truncate">{sub.name}</p>
                         <p className="text-[10px] text-[#8FA4C8]">{formatCurrency(sub.amount)}{CYCLE_LABEL[sub.billing_cycle]}</p>
                       </div>
-                      <button onClick={() => handleDelete(sub.id)} className="p-1.5 text-[#CBD5E0] hover:text-[#FF6B6B] tap-highlight-fix">
-                        <Trash2 className="w-3 h-3" />
-                      </button>
                     </div>
                   ))}
                 </div>
@@ -211,6 +213,14 @@ export default function SubscriptionCard({ user }) {
       </div>
 
       {showAdd && <AddSubscriptionModal onClose={() => setShowAdd(false)} onSave={handleAdd} />}
+      {editingSub && (
+        <EditSubscriptionModal
+          sub={editingSub}
+          onClose={() => setEditingSub(null)}
+          onSave={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
       {confirmSub && (
         <ConfirmMarkDoneModal
           title={confirmSub.name}

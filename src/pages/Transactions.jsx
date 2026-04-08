@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Pencil, CheckSquare, Square, Repeat2, Target, Search, Upload, ChevronDown } from "lucide-react";
+import { Plus, CheckSquare, Square, Repeat2, Target, Search, Upload, ChevronDown, CheckCircle2 } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
@@ -82,6 +82,24 @@ export default function Transactions() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleProcessRecurring(tx) {
+    const today = new Date().toISOString().split("T")[0];
+    const child = {
+      amount: tx.amount, type: tx.type, category: tx.category,
+      note: tx.note, date: today,
+      is_recurring: false, is_recurring_child: true,
+      recurring_parent_id: tx.id,
+      ...(tx.account_id ? { account_id: tx.account_id } : {}),
+      ...(tx.goal_id ? { goal_id: tx.goal_id } : {}),
+    };
+    await base44.entities.Transaction.create(child);
+    await base44.entities.Transaction.update(tx.id, { recurring_last_generated: today });
+    if (tx.account_id) await syncAccountBalance(tx.account_id, tx.amount, tx.type, 1);
+    toast.success(tx.type === "income" ? "Pemasukan diterima!" : "Pembayaran dicatat!");
+    loadData();
+    window.dispatchEvent(new Event("refresh-dashboard"));
   }
 
   async function handleDelete(id) {
@@ -220,6 +238,16 @@ export default function Transactions() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginatedFiltered = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
   const hasMore = filtered.length > page * PAGE_SIZE;
+
+  const recurringParentIdsWithChildThisMonth = useMemo(() => {
+    const now = new Date();
+    return new Set(
+      transactions
+        .filter(tx => tx.is_recurring_child && (() => { const d = new Date(tx.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); })())
+        .map(tx => tx.recurring_parent_id)
+        .filter(Boolean)
+    );
+  }, [transactions]);
 
   const { grouped, sortedGroups } = useMemo(() => {
     const g = {};
@@ -414,8 +442,8 @@ export default function Transactions() {
                             return (
                               <div
                                 key={tx.id}
-                                className={`flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-all duration-150 group border-b border-[#F2F4F7] last:border-b-0 ${selectMode ? "cursor-pointer" : ""} ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
-                                onClick={selectMode ? () => toggleSelect(tx.id) : undefined}
+                                className={`flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-all duration-150 group border-b border-[#F2F4F7] last:border-b-0 cursor-pointer ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
+                                onClick={selectMode ? () => toggleSelect(tx.id) : () => setEditingTx(tx)}
                               >
                                 {selectMode && (
                                   <div className="flex-shrink-0">
@@ -442,20 +470,23 @@ export default function Transactions() {
                                     {new Date(tx.date).toLocaleDateString(locale, { month: "short", day: "numeric" })} · {cat.label}
                                   </p>
                                 </div>
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                  {!selectMode && tx.is_recurring && !tx.is_recurring_child && !recurringParentIdsWithChildThisMonth.has(tx.id) && (
+                                    <button
+                                      onClick={() => handleProcessRecurring(tx)}
+                                      className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold transition-colors tap-highlight-fix ${
+                                        tx.type === "income"
+                                          ? "bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20"
+                                          : "bg-[#FF6B6B]/10 text-[#FF6B6B] hover:bg-[#FF6B6B]/20"
+                                      }`}
+                                    >
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      {tx.type === "income" ? "Terima" : "Bayar"}
+                                    </button>
+                                  )}
                                   <span className="text-xs font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
                                     {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
                                   </span>
-                                  {!selectMode && (
-                                    <>
-                                      <button onClick={() => setEditingTx(tx)} className="text-[#CBD5E0] hover:text-[#4F7CFF] active:text-[#4F7CFF] p-1 tap-highlight-fix">
-                                        <Pencil className="w-3.5 h-3.5" />
-                                      </button>
-                                      <button onClick={() => handleDelete(tx.id)} disabled={deleting} className="text-[#CBD5E0] hover:text-[#FF6B6B] active:text-[#FF6B6B] p-1 disabled:opacity-50 tap-highlight-fix">
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
-                                    </>
-                                  )}
                                 </div>
                               </div>
                             );
