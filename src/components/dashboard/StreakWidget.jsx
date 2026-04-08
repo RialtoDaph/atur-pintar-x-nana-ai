@@ -21,17 +21,29 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
   const [streakMessage, setStreakMessage] = useState("");
   const [popupStreak, setPopupStreak] = useState(0);
 
+  // Initial load: just fetch & display profile, no popup
   useEffect(() => {
     if (!user) return;
-    loadAndUpdateStreak(!!lastTxAddedAt);
-  }, [user, lastTxAddedAt]);
+    loadProfile();
+  }, [user]);
 
-  async function loadAndUpdateStreak(fromNewTx = false) {
+  // Triggered only when a new transaction is added
+  useEffect(() => {
+    if (!user || !lastTxAddedAt) return;
+    updateStreak();
+  }, [lastTxAddedAt]);
+
+  async function loadProfile() {
+    const existing = await base44.entities.GamificationProfile.filter({ created_by: user.email });
+    if (existing.length > 0) setProfile(existing[0]);
+    setLoading(false);
+  }
+
+  async function updateStreak() {
     const today = format(new Date(), "yyyy-MM-dd");
     const existing = await base44.entities.GamificationProfile.filter({ created_by: user.email });
 
     if (existing.length === 0) {
-      if (!fromNewTx) { setLoading(false); return; }
       const p = await base44.entities.GamificationProfile.create({
         daily_streak: 1,
         longest_streak: 1,
@@ -44,7 +56,6 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
       setPopupStreak(1);
       setStreakMessage("Transaksi pertama tercatat! Streak kamu dimulai!");
       setShowPopup(true);
-      setLoading(false);
       return;
     }
 
@@ -53,9 +64,6 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
     const yesterday = format(new Date(Date.now() - 86400000), "yyyy-MM-dd");
 
     let updates = {};
-
-    // Only update streak when triggered by a new transaction
-    if (!fromNewTx) { setProfile(p); setLoading(false); return; }
 
     if (last === today) {
       if (!p.achievements?.includes("first_transaction")) {
@@ -83,7 +91,6 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
       setShowPopup(true);
     }
 
-    // Update level
     const newPoints = updates.total_points || p.total_points || 0;
     const lvl = LEVELS.find(l => newPoints >= l.min && newPoints < l.max) || LEVELS[LEVELS.length - 1];
     updates.level = lvl.level;
@@ -94,7 +101,6 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
     } else {
       setProfile(p);
     }
-    setLoading(false);
   }
 
   if (loading || !profile) return null;

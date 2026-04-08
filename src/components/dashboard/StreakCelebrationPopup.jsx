@@ -37,7 +37,7 @@ export default function StreakCelebrationPopup({ show, message, streak, onClose 
               className="w-24 h-24 rounded-full overflow-hidden border-4 border-[#FF6A00] shadow-lg"
             >
               <img
-                src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png"
                 alt="Nana"
                 className="w-full h-full object-cover"
               />
