@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { CheckCircle, Trash2, HandCoins, MessageCircle } from "lucide-react";
+import { CheckCircle, Trash2, HandCoins } from "lucide-react";
 import { formatRupiah } from "@/components/utils/formatRupiah";
 
 export default function IOUSection() {
@@ -29,13 +29,6 @@ export default function IOUSection() {
   async function deleteIOU(id) {
     await base44.entities.SplitIOU.delete(id);
     loadIOUs();
-  }
-
-  function sendWhatsAppReminder(iou) {
-    const message = `Hei ${iou.debtor_name}, jangan lupa ya hutang kamu di ${iou.store_name} tanggal ${iou.date} sebesar Rp ${(iou.amount).toLocaleString('id-ID')} belum lunas 😊`;
-    const encodedMsg = encodeURIComponent(message);
-    const waLink = `https://wa.me/?text=${encodedMsg}`;
-    window.open(waLink, '_blank');
   }
 
   const unpaid = ious.filter((i) => i.status === "unpaid");
@@ -88,9 +81,6 @@ export default function IOUSection() {
                 <p className="text-[#FF6A00] font-bold text-sm">{formatRupiah(iou.amount)}</p>
               </div>
               <div className="flex gap-1 flex-shrink-0">
-                <button onClick={() => sendWhatsAppReminder(iou)} className="w-8 h-8 rounded-full bg-[#25D366]/10 flex items-center justify-center text-[#25D366] hover:bg-[#25D366]/20 transition-colors" title="Remind via WhatsApp">
-                  <MessageCircle className="w-4 h-4" />
-                </button>
                 <button onClick={() => markPaid(iou.id)} className="w-8 h-8 rounded-full bg-[#00C9A7]/10 flex items-center justify-center text-[#00C9A7] hover:bg-[#00C9A7]/20 transition-colors" title="Tandai sudah dibayar">
                   <CheckCircle className="w-4 h-4" />
                 </button>

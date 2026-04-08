@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
@@ -16,7 +16,6 @@ import { syncAccountBalance } from "@/components/utils/accountSync";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import StreakWidget from "@/components/dashboard/StreakWidget";
-import SharedWalletCard from "@/components/dashboard/SharedWalletCard";
 
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
 
@@ -186,7 +185,7 @@ export default function Dashboard() {
           }} />
         )}
 
-        {/* Streak Widget - Now prominent */}
+        {/* Streak Widget */}
         {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} lastTxAddedAt={lastTxAddedAt} />}
 
         {/* Reminder Widget */}
@@ -197,11 +196,17 @@ export default function Dashboard() {
           <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
         </Suspense>
 
-        {/* Accounts Widget */}
-        {user?.onboarding_completed && <AccountsWidget user={user} />}
 
-        {/* Shared Wallet Card - Bottom */}
-        {user?.onboarding_completed && <SharedWalletCard />}
+
+        {/* Cashflow Forecast */}
+        {widgets.cashflowForecast && (
+          <Suspense fallback={<LazyFallback />}>
+            <CashflowForecast transactions={transactions} loading={loading} user={user} />
+          </Suspense>
+        )}
+
+        {/* Accounts Widget — bottom */}
+        {user?.onboarding_completed && <AccountsWidget user={user} />}
 
         <div className="h-2" />
 
