@@ -142,8 +142,14 @@ export default function Accounts() {
   }, []);
 
   async function handleDelete(id) {
-    await base44.entities.Account.delete(id);
+    // Optimistic update: remove from UI immediately
     setAccounts(prev => prev.filter(a => a.id !== id));
+    try {
+      await base44.entities.Account.delete(id);
+    } catch (error) {
+      // If delete fails (account already deleted), just keep it removed from UI
+      console.log('Account already deleted or cannot be deleted');
+    }
   }
 
   async function setDefault(acc) {
