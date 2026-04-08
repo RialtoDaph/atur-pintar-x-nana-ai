@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, ChevronDown, Bell, CreditCard, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, Pencil, ChevronDown, Bell, CreditCard, CheckCircle2 } from "lucide-react";
 import ConfirmMarkDoneModal from "./ConfirmMarkDoneModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { syncAccountBalance } from "@/components/utils/accountSync";
@@ -60,6 +60,79 @@ function AddSubscriptionModal({ onClose, onSave }) {
   );
 }
 
+const SUBSCRIPTION_ICONS = ["📦", "🎵", "🎬", "📺", "🎮", "📰", "☁️", "🛒", "💪", "🍕", "🎓", "💼", "📱", "🔐", "🌐", "🎨", "🏃", "🎯", "🔔", "🎁"];
+
+function EditSubscriptionModal({ sub, onClose, onSave, onDelete }) {
+  const [form, setForm] = useState({
+    name: sub.name || "",
+    icon: sub.icon || "📦",
+    amount: String(sub.amount || ""),
+    billing_cycle: sub.billing_cycle || "monthly",
+    next_due_date: sub.next_due_date || "",
+    status: sub.status || "active"
+  });
+  const [saving, setSaving] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name || !form.amount || !form.next_due_date) return;
+    setSaving(true);
+    await onSave(sub.id, { ...form, amount: parseFloat(form.amount) });
+    setSaving(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4 pb-6 sm:pb-0" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl overflow-visible" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+          <h2 className="text-sm font-bold text-[#1A1A1A]">Edit Langganan</h2>
+          <button onClick={() => onDelete(sub.id)} className="text-[10px] font-bold text-[#FF6B6B] px-2.5 py-1 rounded-lg bg-[#FF6B6B]/10 tap-highlight-fix">Hapus</button>
+        </div>
+        <form onSubmit={handleSubmit} className="px-4 pb-4 space-y-2.5">
+          <div className="flex gap-2">
+            <div className="relative">
+              <button type="button" onClick={() => setShowIconPicker(p => !p)}
+                className="w-12 h-[38px] border border-[#E2E8F0] rounded-xl text-base flex items-center justify-center hover:border-[#FF6A00] transition-colors tap-highlight-fix">
+                {form.icon}
+              </button>
+              {showIconPicker && (
+                <div className="absolute top-full left-0 mt-1 bg-white border border-[#E2E8F0] rounded-xl shadow-lg p-2 grid grid-cols-5 gap-1 z-20 w-44">
+                  {SUBSCRIPTION_ICONS.map(emoji => (
+                    <button key={emoji} type="button" onClick={() => { set("icon", emoji); setShowIconPicker(false); }}
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center text-base hover:bg-[#F2F4F7] tap-highlight-fix ${form.icon === emoji ? "bg-[#FF6A00]/10" : ""}`}>
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <input type="text" placeholder="Nama layanan" value={form.name} onChange={(e) => set("name", e.target.value)} required
+              className="flex-1 border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6A00]/30 focus:border-[#FF6A00]" />
+          </div>
+          <input type="number" placeholder="Jumlah tagihan" value={form.amount} onChange={(e) => set("amount", e.target.value)} required
+            className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6A00]/30 focus:border-[#FF6A00]" />
+          <select value={form.billing_cycle} onChange={(e) => set("billing_cycle", e.target.value)}
+            className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6A00]/30 focus:border-[#FF6A00]">
+            <option value="monthly">Bulanan</option>
+            <option value="quarterly">Triwulanan</option>
+            <option value="yearly">Tahunan</option>
+          </select>
+          <input type="date" value={form.next_due_date} onChange={(e) => set("next_due_date", e.target.value)} required
+            className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6A00]/30 focus:border-[#FF6A00]" />
+          <div className="flex gap-2 pt-1">
+            <button type="button" onClick={onClose} className="flex-1 py-2 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#8FA4C8]">Batal</button>
+            <button type="submit" disabled={saving} className="flex-1 py-2 rounded-xl bg-[#FF6A00] text-white text-sm font-bold disabled:opacity-60">
+              {saving ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function SubscriptionCard({ user }) {
   const { formatCurrency } = useAppSettings();
   const [subs, setSubs] = useState([]);
@@ -67,6 +140,8 @@ export default function SubscriptionCard({ user }) {
   const [open, setOpen] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [confirmSub, setConfirmSub] = useState(null);
+  const [tappedSubId, setTappedSubId] = useState(null);
+  const [editingSub, setEditingSub] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -103,6 +178,14 @@ export default function SubscriptionCard({ user }) {
     if (!confirm("Hapus langganan ini?")) return;
     await base44.entities.Subscription.delete(id);
     setSubs((prev) => prev.filter((s) => s.id !== id));
+    setEditingSub(null);
+    setTappedSubId(null);
+  }
+
+  async function handleUpdate(id, data) {
+    await base44.entities.Subscription.update(id, data);
+    setSubs((prev) => prev.map((s) => s.id === id ? { ...s, ...data } : s).sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date)));
+    setEditingSub(null);
   }
 
   const active = subs.filter((s) => s.status === "active");
@@ -149,35 +232,56 @@ export default function SubscriptionCard({ user }) {
                     const days = getDaysUntil(sub.next_due_date);
                     const isSoon = days >= 0 && days <= 3;
                     const isOverdue = days < 0;
+                    const isTapped = tappedSubId === sub.id;
                     return (
-                      <div key={sub.id} className="flex items-center gap-3 px-4 py-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#F8FAFC] border border-[#F0F2F5] flex items-center justify-center text-base flex-shrink-0">
-                          {sub.icon || "📦"}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-[#1A1A1A] truncate">{sub.name}</p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] font-bold text-[#FF6A00]">
-                              {formatCurrency(sub.amount)}
-                              <span className="font-normal text-[#8FA4C8]">{CYCLE_LABEL[sub.billing_cycle]}</span>
-                            </span>
-                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                              isOverdue ? "bg-[#FF6B6B]/10 text-[#FF6B6B]" :
-                              isSoon ? "bg-[#FF6A00]/10 text-[#FF6A00]" :
-                              "bg-[#F2F4F7] text-[#8FA4C8]"
-                            }`}>
-                              {isOverdue ? `${Math.abs(days)}h lalu` : days === 0 ? "Hari ini!" : `${days}h lagi`}
-                            </span>
+                      <div key={sub.id}>
+                        <div
+                          className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors tap-highlight-fix ${isTapped ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
+                          onClick={() => setTappedSubId(isTapped ? null : sub.id)}
+                        >
+                          <div className="w-9 h-9 rounded-xl bg-[#F8FAFC] border border-[#F0F2F5] flex items-center justify-center text-base flex-shrink-0">
+                            {sub.icon || "📦"}
                           </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-[#1A1A1A] truncate">{sub.name}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[11px] font-bold text-[#FF6A00]">
+                                {formatCurrency(sub.amount)}
+                                <span className="font-normal text-[#8FA4C8]">{CYCLE_LABEL[sub.billing_cycle]}</span>
+                              </span>
+                              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                                isOverdue ? "bg-[#FF6B6B]/10 text-[#FF6B6B]" :
+                                isSoon ? "bg-[#FF6A00]/10 text-[#FF6A00]" :
+                                "bg-[#F2F4F7] text-[#8FA4C8]"
+                              }`}>
+                                {isOverdue ? `${Math.abs(days)} hari lalu` : days === 0 ? "Hari ini!" : `${days} hari lagi`}
+                              </span>
+                            </div>
+                          </div>
+                          <ChevronDown className={`w-3.5 h-3.5 text-[#8FA4C8] flex-shrink-0 transition-transform ${isTapped ? "rotate-180" : ""}`} />
                         </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <button onClick={() => setConfirmSub(sub)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20 transition-colors tap-highlight-fix text-[10px] font-bold">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Bayar
-                          </button>
-                          <button onClick={() => handleDelete(sub.id)} className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] transition-colors tap-highlight-fix">
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
+                        {isTapped && (
+                          <div className="flex items-center gap-2 px-4 py-2.5 bg-[#F8FAFC] border-t border-[#F2F4F7]">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setConfirmSub(sub); setTappedSubId(null); }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00C9A7]/10 text-[#00C9A7] text-[10px] font-bold hover:bg-[#00C9A7]/20 transition-colors tap-highlight-fix"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Bayar
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setEditingSub(sub); setTappedSubId(null); }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4F7CFF]/10 text-[#4F7CFF] text-[10px] font-bold hover:bg-[#4F7CFF]/20 transition-colors tap-highlight-fix"
+                            >
+                              <Pencil className="w-3.5 h-3.5" /> Edit
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDelete(sub.id); setTappedSubId(null); }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FF6B6B]/10 text-[#FF6B6B] text-[10px] font-bold hover:bg-[#FF6B6B]/20 transition-colors tap-highlight-fix ml-auto"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> Hapus
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -211,6 +315,14 @@ export default function SubscriptionCard({ user }) {
       </div>
 
       {showAdd && <AddSubscriptionModal onClose={() => setShowAdd(false)} onSave={handleAdd} />}
+      {editingSub && (
+        <EditSubscriptionModal
+          sub={editingSub}
+          onClose={() => setEditingSub(null)}
+          onSave={handleUpdate}
+          onDelete={handleDelete}
+        />
+      )}
       {confirmSub && (
         <ConfirmMarkDoneModal
           title={confirmSub.name}

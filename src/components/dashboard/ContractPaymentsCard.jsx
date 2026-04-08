@@ -114,11 +114,10 @@ export default function ContractPaymentsCard({ user }) {
           <div className="border-t border-[#F2F4F7]">
             {/* Summary strip */}
             {templates.length > 0 && (
-              <div className="grid grid-cols-3 divide-x divide-[#F2F4F7] bg-[#F8FAFC]">
+              <div className="grid grid-cols-2 divide-x divide-[#F2F4F7] bg-[#F8FAFC]">
                 {[
                   { label: "Masuk/bln", val: `+${formatCurrency(totalIncome)}`, color: "text-[#00C9A7]" },
                   { label: "Keluar/bln", val: `−${formatCurrency(totalExpense)}`, color: "text-[#FF6B6B]" },
-                  { label: "Net/bln", val: `${net >= 0 ? "+" : ""}${formatCurrency(net)}`, color: net >= 0 ? "text-[#00C9A7]" : "text-[#FF6B6B]" },
                 ].map(({ label, val, color }) => (
                   <div key={label} className="py-2 text-center">
                     <p className="text-[9px] text-[#8FA4C8]">{label}</p>
@@ -164,6 +163,7 @@ export default function ContractPaymentsCard({ user }) {
 }
 
 function Section({ label, items, isIncome, onMarkDone, onEdit, onDelete, formatCurrency, onAdd }) {
+  const [tappedId, setTappedId] = useState(null);
   return (
     <div className="border-t border-[#F2F4F7]">
       <div className="flex items-center justify-between px-4 py-2">
@@ -181,31 +181,52 @@ function Section({ label, items, isIncome, onMarkDone, onEdit, onDelete, formatC
       ) : (
         <div className="pb-1">
           {items.map((tx) => (
-            <div key={tx.id} className="flex items-center gap-2.5 px-4 py-2 hover:bg-[#F8FAFC] transition-colors">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-[#1A1A1A] truncate">{tx.note || (isIncome ? "Pendapatan" : "Tagihan")}</p>
-                <p className="text-[9px] text-[#8FA4C8] capitalize">
-                  {INTERVAL_LABEL[tx.recurring_interval] || tx.recurring_interval}
-                  {(tx.recurring_interval === 'monthly' || tx.recurring_interval === 'yearly') && tx.date
-                    ? ` · tgl ${new Date(tx.date + 'T12:00:00').getDate()}`
-                    : ''}
-                </p>
+            <div key={tx.id}>
+              <div
+                className={`flex items-center gap-2.5 px-4 py-2.5 cursor-pointer transition-colors tap-highlight-fix ${tappedId === tx.id ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
+                onClick={() => setTappedId(tappedId === tx.id ? null : tx.id)}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-[#1A1A1A] truncate">{tx.note || (isIncome ? "Pendapatan" : "Tagihan")}</p>
+                  <p className="text-[9px] text-[#8FA4C8] capitalize">
+                    {INTERVAL_LABEL[tx.recurring_interval] || tx.recurring_interval}
+                    {(tx.recurring_interval === 'monthly' || tx.recurring_interval === 'yearly') && tx.date
+                      ? ` · tgl ${new Date(tx.date + 'T12:00:00').getDate()}`
+                      : ''}
+                  </p>
+                </div>
+                <span className={`text-xs font-bold flex-shrink-0 ${isIncome ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+                  {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
+                </span>
+                <ChevronDown className={`w-3 h-3 text-[#8FA4C8] flex-shrink-0 transition-transform ${tappedId === tx.id ? "rotate-180" : ""}`} />
               </div>
-              <span className={`text-xs font-bold flex-shrink-0 ${isIncome ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
-              </span>
-              {/* Actions */}
-              <div className="flex items-center gap-0.5 flex-shrink-0">
-                <button onClick={() => onMarkDone(tx)} title="Tandai Selesai" className="p-1.5 rounded-lg bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20 transition-colors tap-highlight-fix">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => onEdit(tx.id)} title="Edit" className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#4F7CFF] hover:bg-[#F2F4F7] transition-colors tap-highlight-fix">
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => onDelete(tx.id)} title="Hapus" className="p-1.5 rounded-lg text-[#CBD5E0] hover:text-[#FF6B6B] hover:bg-[#FFF5F5] transition-colors tap-highlight-fix">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              {tappedId === tx.id && (
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-[#F8FAFC] border-t border-[#F2F4F7]">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onMarkDone(tx); setTappedId(null); }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-colors tap-highlight-fix ${
+                      isIncome
+                        ? "bg-[#00C9A7]/10 text-[#00C9A7] hover:bg-[#00C9A7]/20"
+                        : "bg-[#FF6B6B]/10 text-[#FF6B6B] hover:bg-[#FF6B6B]/20"
+                    }`}
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {isIncome ? "Terima" : "Bayar"}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEdit(tx.id); setTappedId(null); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4F7CFF]/10 text-[#4F7CFF] text-[10px] font-bold hover:bg-[#4F7CFF]/20 transition-colors tap-highlight-fix"
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(tx.id); setTappedId(null); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FF6B6B]/10 text-[#FF6B6B] text-[10px] font-bold hover:bg-[#FF6B6B]/20 transition-colors tap-highlight-fix ml-auto"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Hapus
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
