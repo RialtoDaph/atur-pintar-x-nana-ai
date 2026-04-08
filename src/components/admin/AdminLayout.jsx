@@ -9,12 +9,9 @@ import {
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, page: "AdminDashboard" },
   { label: "Users", icon: Users, page: "AdminUsers" },
-  { label: "Transactions", icon: ArrowLeftRight, page: "AdminTransactions" },
   { label: "Categories", icon: Tag, page: "AdminCategories" },
-  { label: "AI Insights", icon: Sparkles, page: "AdminAIInsights" },
   { label: "Subscriptions", icon: CreditCard, page: "AdminSubscriptions" },
   { label: "Notifications", icon: Bell, page: "AdminNotifications" },
-  { label: "Anomaly Detector", icon: AlertTriangle, page: "AdminAnomalies" },
   { label: "System Logs", icon: ScrollText, page: "AdminLogs" },
 ];
 

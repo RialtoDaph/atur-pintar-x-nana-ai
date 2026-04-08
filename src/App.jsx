@@ -18,6 +18,9 @@ import Accounts from '@/pages/Accounts';
 import SharedFinance from '@/pages/SharedFinance';
 import AdminDashboard from '@/pages/AdminDashboard';
 import AdminUsers from '@/pages/AdminUsers';
+import AdminLogs from '@/pages/AdminLogs';
+import AdminNotifications from '@/pages/AdminNotifications';
+import AdminCategories from '@/pages/AdminCategories';
 
 const { Pages, Layout } = pagesConfig;
 
@@ -68,7 +71,7 @@ const AuthenticatedApp = () => {
           <Dashboard />
         </LayoutWrapper>
       } />
-      {Object.entries(Pages).filter(([path]) => path !== 'Dashboard' && path !== 'LandingPage' && path !== 'Subscription' && path !== 'AdminSubscriptions' && path !== 'ProfileSettings' && path !== 'Investments' && path !== 'Reminders' && path !== 'Alerts' && path !== 'Notifications' && path !== 'Accounts' && path !== 'SharedFinance' && path !== 'AdminAIInsights' && path !== 'AdminAnomalies' && path !== 'AdminTransactions' && path !== 'AdminUsers').map(([path, Page]) => (
+      {Object.entries(Pages).filter(([path]) => path !== 'Dashboard' && path !== 'LandingPage' && path !== 'Subscription' && path !== 'AdminSubscriptions' && path !== 'ProfileSettings' && path !== 'Investments' && path !== 'Reminders' && path !== 'Alerts' && path !== 'Notifications' && path !== 'Accounts' && path !== 'SharedFinance' && path !== 'AdminUsers' && path !== 'AdminLogs' && path !== 'AdminNotifications' && path !== 'AdminCategories' && path !== 'AdminDashboard').map(([path, Page]) => (
         <Route
           key={path}
           path={`/${path}`}
@@ -88,6 +91,12 @@ const AuthenticatedApp = () => {
       <Route path="/SharedFinance" element={<LayoutWrapper currentPageName="SharedFinance"><SharedFinance /></LayoutWrapper>} />
       <Route path="/AdminDashboard" element={<LayoutWrapper currentPageName="AdminDashboard"><AdminDashboard /></LayoutWrapper>} />
       <Route path="/AdminUsers" element={<LayoutWrapper currentPageName="AdminUsers"><AdminUsers /></LayoutWrapper>} />
+      <Route path="/AdminLogs" element={<LayoutWrapper currentPageName="AdminLogs"><AdminLogs /></LayoutWrapper>} />
+      <Route path="/AdminNotifications" element={<LayoutWrapper currentPageName="AdminNotifications"><AdminNotifications /></LayoutWrapper>} />
+      <Route path="/AdminCategories" element={<LayoutWrapper currentPageName="AdminCategories"><AdminCategories /></LayoutWrapper>} />
+      <Route path="/AdminAIInsights" element={<Navigate to="/AdminDashboard" replace />} />
+      <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />
+      <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
       <Route path="*" element={<PageNotFound />} />
