@@ -56,14 +56,15 @@ export default function StreakWidget({ user, transactionCount, lastTxAddedAt }) 
     // Only update streak/activity date if user has actual transactions today
     if (transactionCount > 0) {
       if (last === today) {
-        // Already active today, award first_transaction achievement
+        // Already active today
         if (!p.achievements?.includes("first_transaction")) {
           updates.achievements = [...(p.achievements || []), "first_transaction"];
           updates.total_points = (p.total_points || 0) + 50;
-          setJustUpdated(true);
-          setStreakMessage("🎉 Transaksi pertama hari ini!");
-          setTimeout(() => setJustUpdated(false), 3000);
         }
+        // Always show animation when a new transaction is added
+        setJustUpdated(true);
+        setStreakMessage(`✅ Transaksi dicatat! Streak ${p.daily_streak} hari 🔥`);
+        setTimeout(() => setJustUpdated(false), 3000);
       } else if (last === yesterday) {
         // Continued streak!
         const newStreak = (p.daily_streak || 0) + 1;
