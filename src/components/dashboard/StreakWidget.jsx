@@ -50,9 +50,9 @@ export default function StreakWidget({ user, lastTxAddedAt }) {
     if (existing.length === 0) {
       const created = await base44.entities.GamificationProfile.create({
         daily_streak: 1,
-        longest_streak: 1,
+        longest_streak: 0,
         last_activity_date: today,
-        total_points: 10,
+        total_points: 0,
         level: 1,
         achievements: ["first_transaction"],
       });
