@@ -184,7 +184,7 @@ export default function AdminDashboard() {
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-xs text-[#8FA4C8] font-medium mb-2">Premium Rate</p>
-            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.totalUsers > 0 ? Math.round((stats.premiumUsers / stats.totalUsers) * 100) : 0}%</p>
+            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.totalUsers > 0 ? Math.round((stats?.premiumUsers / stats?.totalUsers) * 100) : 0}%</p>
             <p className="text-xs text-[#8FA4C8] mt-2">{stats?.premiumUsers}/{stats?.totalUsers} users</p>
           </div>
         </div>
