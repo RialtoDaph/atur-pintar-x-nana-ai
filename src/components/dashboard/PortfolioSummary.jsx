@@ -44,9 +44,9 @@ export default function PortfolioSummary({ user }) {
   // Pie chart data per type
   const byType = {};
   investments.forEach(inv => {
-    const t = inv.type || "lainnya";
-    if (!byType[t]) byType[t] = 0;
-    byType[t] += inv.current_value || 0;
+    const invType = inv.type || "lainnya";
+    if (!byType[invType]) byType[invType] = 0;
+    byType[invType] += inv.current_value || 0;
   });
   const pieData = Object.entries(byType).map(([key, value]) => ({
     name: INVESTMENT_TYPES[key]?.label || key,
