@@ -38,10 +38,42 @@ export default function AdminUsers() {
 
   async function approvePayment(paymentId, userEmail, amount) {
     try {
-      await base44.entities.SubscriptionPayment.update(paymentId, { status: "approved", approved_at: new Date().toISOString().split("T")[0] });
-      await base44.entities.User.filter({ email: userEmail }).then(u => {
-        if (u.length > 0) base44.entities.User.update(u[0].id, { subscription_plan: "premium_monthly", subscription_status: "active" });
+      const today = new Date().toISOString().split("T")[0];
+      const endDate = new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
+      // Update payment
+      await base44.entities.SubscriptionPayment.update(paymentId, { status: "approved", approved_at: today });
+
+      // Upgrade user subscription
+      const userList = await base44.entities.User.filter({ email: userEmail });
+      if (userList.length > 0) {
+        await base44.entities.User.update(userList[0].id, {
+          subscription_plan: "premium_monthly",
+          subscription_status: "active",
+          subscription_start_date: today,
+          subscription_end_date: endDate
+        });
+      }
+
+      // Send notification to user
+      await base44.entities.AdminNotification.create({
+        title: "🎉 Selamat! Akun kamu sudah Premium!",
+        message: "Pembayaran kamu sudah dikonfirmasi. Selamat menikmati fitur premium Atur Pintar!",
+        target_type: "specific",
+        target_email: userEmail,
+        is_read: false,
+        read_by: []
       });
+
+      // Log action
+      await base44.entities.SystemLog.create({
+        log_type: "activity",
+        user_email: userEmail,
+        action: "payment_approved",
+        severity: "info",
+        details: `Payment approved for ${userEmail}: Rp ${amount}`
+      });
+
       setSuccessMsg("Payment approved & user upgraded to premium");
       setTimeout(() => setSuccessMsg(""), 3000);
       await loadData();
@@ -53,7 +85,29 @@ export default function AdminUsers() {
   async function rejectPayment(paymentId) {
     if (!window.confirm("Reject this payment?")) return;
     try {
+      const payment = await base44.entities.SubscriptionPayment.filter({ id: paymentId });
+      const userEmail = payment.length > 0 ? payment[0].created_by : "user@example.com";
+
       await base44.entities.SubscriptionPayment.update(paymentId, { status: "rejected" });
+
+      // Send rejection notification
+      await base44.entities.AdminNotification.create({
+        title: "❌ Pembayaran Ditolak",
+        message: "Pembayaran upgrade kamu telah ditolak. Silakan periksa riwayat atau hubungi support.",
+        target_type: "specific",
+        target_email: userEmail,
+        is_read: false,
+        read_by: []
+      });
+
+      // Log action
+      await base44.entities.SystemLog.create({
+        log_type: "activity",
+        user_email: userEmail,
+        action: "payment_rejected",
+        severity: "info"
+      });
+
       setSuccessMsg("Payment rejected");
       setTimeout(() => setSuccessMsg(""), 3000);
       await loadData();
