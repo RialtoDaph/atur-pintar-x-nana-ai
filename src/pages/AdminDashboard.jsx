@@ -4,15 +4,14 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import AdminStatCard from "@/components/admin/AdminStatCard";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import AdminStreakManager from "@/components/admin/AdminStreakManager";
-import { Users, ArrowLeftRight, TrendingUp, TrendingDown, UserCheck, UserCheck2, RefreshCw } from "lucide-react";
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend,
-} from "recharts";
+import { Users, TrendingUp, DollarSign, Clock, AlertTriangle, RefreshCw } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [monthlyChartData, setMonthlyChartData] = useState([]);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -24,8 +23,73 @@ export default function AdminDashboard() {
 
   async function loadStats() {
     setLoading(true);
-    const res = await base44.functions.invoke("adminGetDashboardStats", {});
-    setStats(res.data);
+    try {
+      // Fetch all data in parallel
+      const [allUsers, allSubs, allTransactions, pendingPayments] = await Promise.all([
+        base44.entities.User.list(),
+        base44.entities.Subscription.list(),
+        base44.entities.Transaction.list(),
+        base44.entities.SubscriptionPayment.filter({ status: "pending" })
+      ]);
+
+      // Calculate metrics
+      const totalUsers = allUsers.length;
+      const premiumUsers = allUsers.filter(u => u.subscription_plan && u.subscription_plan !== "free").length;
+      const thisMonth = new Date().toISOString().slice(0, 7);
+      const newUsersThisMonth = allUsers.filter(u => u.created_date?.startsWith(thisMonth)).length;
+      
+      // Pending payments older than 3 days
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      const oldPendingCount = pendingPayments.filter(p => new Date(p.created_date) < threeDaysAgo).length;
+
+      // Monthly revenue (approved payments this month)
+      const approvedThisMonth = await base44.entities.SubscriptionPayment.filter({ status: "approved" });
+      const monthlyRevenue = approvedThisMonth
+        .filter(p => p.created_date?.startsWith(thisMonth))
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+      // Active users (transactions in last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const activeUsers = new Set(
+        allTransactions
+          .filter(t => new Date(t.created_date) > thirtyDaysAgo)
+          .map(t => t.created_by)
+      ).size;
+
+      // Onboarding completion rate
+      const completedOnboarding = allUsers.filter(u => u.onboarding_completed).length;
+      const onboardingRate = totalUsers > 0 ? Math.round((completedOnboarding / totalUsers) * 100) : 0;
+
+      // Generate monthly chart data (last 6 months)
+      const chartData = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const monthStr = d.toISOString().slice(0, 7);
+        const newCount = allUsers.filter(u => u.created_date?.startsWith(monthStr)).length;
+        chartData.push({
+          month: new Date(monthStr + "-01").toLocaleDateString("id-ID", { month: "short", year: "2-digit" }),
+          newUsers: newCount
+        });
+      }
+
+      setStats({
+        totalUsers,
+        premiumUsers,
+        newUsersThisMonth,
+        pendingPaymentCount: pendingPayments.length,
+        oldPendingCount,
+        monthlyRevenue: Math.round(monthlyRevenue),
+        activeUsers,
+        onboardingRate,
+        completedOnboarding
+      });
+      setMonthlyChartData(chartData);
+    } catch (error) {
+      console.error("Error loading stats:", error);
+    }
     setLoading(false);
   }
 
@@ -65,68 +129,61 @@ export default function AdminDashboard() {
         {/* Stat Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <AdminStatCard icon={Users} label="Total Pengguna" value={fmt(stats?.totalUsers)} color="orange" />
-          <AdminStatCard icon={UserCheck} label="Aktif (Bulan ini)" value={fmt(stats?.activeUsersMonthly)} sub={`${stats?.activeUsersDaily ?? 0} aktif hari ini`} color="blue" />
-          <AdminStatCard icon={ArrowLeftRight} label="Total Transaksi" value={fmt(stats?.totalTransactions)} color="purple" />
-          <AdminStatCard icon={TrendingUp} label="Total Pemasukan" value={`Rp ${fmt(stats?.totalIncome)}`} color="green" />
+          <AdminStatCard icon={TrendingUp} label="Premium Users" value={fmt(stats?.premiumUsers)} sub={`${stats?.newUsersThisMonth ?? 0} baru bulan ini`} color="blue" />
+          <AdminStatCard icon={DollarSign} label="Revenue (Bulan)" value={`Rp ${fmt(stats?.monthlyRevenue)}`} color="green" />
+          <AdminStatCard icon={Clock} label="Aktif (30 hari)" value={fmt(stats?.activeUsers)} sub={`${stats?.onboardingRate ?? 0}% selesai onboarding`} color="purple" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-[#8FA4C8] font-medium">Total Pengeluaran</p>
-              <TrendingDown className="w-4 h-4 text-red-400" />
+        {/* Alerts */}
+        {stats?.oldPendingCount > 0 && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-red-900">⚠️ {stats.oldPendingCount} pending payments older than 3 days</p>
+              <p className="text-sm text-red-700 mt-1">Review & approve/reject in Admin Users page</p>
             </div>
-            <p className="text-2xl font-bold text-red-500">Rp {fmt(stats?.totalExpense)}</p>
-            <p className="text-xs text-[#8FA4C8] mt-1">
-              Net: {stats?.totalIncome - stats?.totalExpense >= 0 ? "+" : ""}Rp {fmt(Math.abs((stats?.totalIncome ?? 0) - (stats?.totalExpense ?? 0)))}
-            </p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-[#8FA4C8] font-medium">Goals & Debts</p>
-              <UserCheck2 className="w-4 h-4 text-[#FF6A00]" />
-            </div>
-            <p className="text-2xl font-bold text-[#1A1A1A]">{stats?.totalGoals ?? 0} Goals</p>
-            <p className="text-xs text-[#8FA4C8] mt-1">{stats?.totalDebts ?? 0} Debts terdaftar</p>
+        )}
+
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+            <p className="text-xs text-[#8FA4C8] font-medium mb-2">Onboarding Completion</p>
+            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.onboardingRate}%</p>
+            <p className="text-xs text-[#8FA4C8] mt-2">{stats?.completedOnboarding}/{stats?.totalUsers} users</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+            <p className="text-xs text-[#8FA4C8] font-medium mb-2">Pending Payments</p>
+            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.pendingPaymentCount}</p>
+            <p className="text-xs text-red-600 mt-2">{stats?.oldPendingCount} overdue</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
+            <p className="text-xs text-[#8FA4C8] font-medium mb-2">Premium Rate</p>
+            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.totalUsers > 0 ? Math.round((stats.premiumUsers / stats.totalUsers) * 100) : 0}%</p>
+            <p className="text-xs text-[#8FA4C8] mt-2">{stats?.premiumUsers}/{stats?.totalUsers} users</p>
           </div>
         </div>
+
+        {/* Chart */}
+        {monthlyChartData.length > 0 && (
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-[#E2E8F0] mb-6">
+            <p className="text-sm font-semibold text-[#1A1A1A] mb-4">New Users (Last 6 Months)</p>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={monthlyChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip />
+                <Bar dataKey="newUsers" fill="#FF6A00" radius={[4, 4, 0, 0]} name="New Users" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {/* Streak Manager */}
         <div className="mt-6">
           <AdminStreakManager onActionComplete={loadStats} />
         </div>
-
-        {/* Charts */}
-        {stats?.chartData && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-            <div className="bg-white rounded-2xl p-5 shadow-sm">
-              <p className="text-sm font-semibold text-[#1A1A1A] mb-4">Pertumbuhan Transaksi (6 Bulan)</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={stats.chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="transactions" stroke="#FF6A00" fill="#FF6A00" fillOpacity={0.15} name="Transaksi" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="bg-white rounded-2xl p-5 shadow-sm">
-              <p className="text-sm font-semibold text-[#1A1A1A] mb-4">User Baru vs User Aktif (6 Bulan)</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={stats.chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="newUsers" fill="#FF6A00" name="User Baru" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="activeUsers" fill="#3B82F6" name="User Aktif" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
       </div>
     </AdminLayout>
   );

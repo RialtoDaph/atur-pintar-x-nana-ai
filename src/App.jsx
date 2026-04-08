@@ -17,6 +17,7 @@ import Notifications from '@/pages/Notifications';
 import Accounts from '@/pages/Accounts';
 import SharedFinance from '@/pages/SharedFinance';
 import AdminDashboard from '@/pages/AdminDashboard';
+import AdminUsers from '@/pages/AdminUsers';
 
 const { Pages, Layout } = pagesConfig;
 
@@ -67,7 +68,7 @@ const AuthenticatedApp = () => {
           <Dashboard />
         </LayoutWrapper>
       } />
-      {Object.entries(Pages).filter(([path]) => path !== 'Dashboard' && path !== 'LandingPage' && path !== 'Subscription' && path !== 'AdminSubscriptions' && path !== 'ProfileSettings' && path !== 'Investments' && path !== 'Reminders' && path !== 'Alerts' && path !== 'Notifications' && path !== 'Accounts' && path !== 'SharedFinance').map(([path, Page]) => (
+      {Object.entries(Pages).filter(([path]) => path !== 'Dashboard' && path !== 'LandingPage' && path !== 'Subscription' && path !== 'AdminSubscriptions' && path !== 'ProfileSettings' && path !== 'Investments' && path !== 'Reminders' && path !== 'Alerts' && path !== 'Notifications' && path !== 'Accounts' && path !== 'SharedFinance' && path !== 'AdminAIInsights' && path !== 'AdminAnomalies' && path !== 'AdminTransactions' && path !== 'AdminUsers').map(([path, Page]) => (
         <Route
           key={path}
           path={`/${path}`}
@@ -86,6 +87,7 @@ const AuthenticatedApp = () => {
       <Route path="/Accounts" element={<LayoutWrapper currentPageName="Accounts"><Accounts /></LayoutWrapper>} />
       <Route path="/SharedFinance" element={<LayoutWrapper currentPageName="SharedFinance"><SharedFinance /></LayoutWrapper>} />
       <Route path="/AdminDashboard" element={<LayoutWrapper currentPageName="AdminDashboard"><AdminDashboard /></LayoutWrapper>} />
+      <Route path="/AdminUsers" element={<LayoutWrapper currentPageName="AdminUsers"><AdminUsers /></LayoutWrapper>} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
       <Route path="*" element={<PageNotFound />} />

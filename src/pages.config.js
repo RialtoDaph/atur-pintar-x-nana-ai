@@ -47,15 +47,12 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import AdminAIInsights from './pages/AdminAIInsights';
-import AdminAnomalies from './pages/AdminAnomalies';
 import AdminCategories from './pages/AdminCategories';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogs from './pages/AdminLogs';
 import AdminNotifications from './pages/AdminNotifications';
 import AdminPanel from './pages/AdminPanel';
 import AdminSubscriptions from './pages/AdminSubscriptions';
-import AdminTransactions from './pages/AdminTransactions';
 import AdminUserSupport from './pages/AdminUserSupport';
 import AdminUsers from './pages/AdminUsers';
 import Alerts from './pages/Alerts';
@@ -78,15 +75,12 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "AdminAIInsights": AdminAIInsights,
-    "AdminAnomalies": AdminAnomalies,
     "AdminCategories": AdminCategories,
     "AdminDashboard": AdminDashboard,
     "AdminLogs": AdminLogs,
     "AdminNotifications": AdminNotifications,
     "AdminPanel": AdminPanel,
     "AdminSubscriptions": AdminSubscriptions,
-    "AdminTransactions": AdminTransactions,
     "AdminUserSupport": AdminUserSupport,
     "AdminUsers": AdminUsers,
     "Alerts": Alerts,

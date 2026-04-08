@@ -32,6 +32,29 @@ export default function AdminNotifications() {
     setLoading(false);
   }
 
+  async function sendToInactiveUsers() {
+    if (!window.confirm("Send notification to all users inactive >14 days?")) return;
+    setSending(true);
+    try {
+      const allUsers = await base44.entities.User.list();
+      const fourteenDaysAgo = new Date();
+      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      const inactive = allUsers.filter(u => new Date(u.updated_date || u.created_date) < fourteenDaysAgo);
+      for (const u of inactive) {
+        await base44.entities.AdminNotification.create({
+          title: "We miss you!",
+          message: "Haven't seen you in a while. Come back to Atur Pintar to manage your finances.",
+          target_type: "specific",
+          target_email: u.email,
+          is_read: false,
+          read_by: []
+        });
+      }
+      await loadData();
+    } catch (e) {}
+    setSending(false);
+  }
+
   async function handleSend() {
     if (!form.title.trim() || !form.message.trim()) return;
     if (form.target_type === "specific" && !form.target_email.trim()) return;
@@ -78,10 +101,16 @@ export default function AdminNotifications() {
             <button onClick={loadData} className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E2E8F0] rounded-xl text-sm font-medium hover:bg-[#F8FAFC] shadow-sm">
               <RefreshCw className="w-4 h-4" />
             </button>
-            <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-[#FF6A00] text-white rounded-xl text-sm font-medium hover:bg-[#E55A00] shadow-sm">
-              <Plus className="w-4 h-4" />
-              Kirim Notifikasi
-            </button>
+            <div className="flex gap-3">
+              <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-[#FF6A00] text-white rounded-xl text-sm font-medium hover:bg-[#E55A00] shadow-sm">
+                <Plus className="w-4 h-4" />
+                Kirim Notifikasi
+              </button>
+              <button onClick={sendToInactiveUsers} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 shadow-sm">
+                <Send className="w-4 h-4" />
+                Inactive Users
+              </button>
+            </div>
           </div>
         </div>
 

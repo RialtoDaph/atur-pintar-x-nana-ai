@@ -35,8 +35,12 @@ export default function AdminLogs() {
 
   async function loadLogs(type = "all") {
     setLoading(true);
-    const res = await base44.functions.invoke("adminGetLogs", { log_type: type });
-    setLogs(res.data?.logs || []);
+    try {
+      const allLogs = await base44.entities.SystemLog.list("-created_date", 50);
+      setLogs(allLogs);
+    } catch (e) {
+      setLogs([]);
+    }
     setLoading(false);
   }
 

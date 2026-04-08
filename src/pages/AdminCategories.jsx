@@ -14,7 +14,13 @@ const DEFAULT_CATEGORIES = [
   { name: "Hiburan", emoji: "🎮", color: "#F59E0B", type: "expense", is_default: true },
   { name: "Pendidikan", emoji: "📚", color: "#06B6D4", type: "expense", is_default: true },
   { name: "Tagihan", emoji: "⚡", color: "#EF4444", type: "expense", is_default: true },
-  { name: "Gaji", emoji: "💰", color: "#10B981", type: "income", is_default: true },
+  { name: "Sewa/Kos", emoji: "🏠", color: "#8B5CF6", type: "expense", is_default: true },
+  { name: "Investasi", emoji: "📈", color: "#10B981", type: "expense", is_default: true },
+  { name: "Asuransi", emoji: "🛡️", color: "#EF4444", type: "expense", is_default: true },
+  { name: "Donasi", emoji: "💝", color: "#EC4899", type: "expense", is_default: true },
+  { name: "Tabungan", emoji: "🏦", color: "#10B981", type: "expense", is_default: true },
+  { name: "Gaji", emoji: "💼", color: "#10B981", type: "income", is_default: true },
+  { name: "Bonus", emoji: "🎁", color: "#F59E0B", type: "income", is_default: true },
   { name: "Freelance", emoji: "💻", color: "#3B82F6", type: "income", is_default: true },
 ];
 
