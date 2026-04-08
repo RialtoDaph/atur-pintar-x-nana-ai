@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 import { useAppSettings } from "@/components/utils/useAppSettings";
@@ -157,6 +158,49 @@ export default function InvestmentDetail() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 -mt-6 space-y-4">
+        {/* Performance Chart */}
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-[#1A1A1A] mb-4">{lang === 'en' ? 'Performance' : 'Performa'}</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={[
+              {
+                name: lang === 'en' ? 'Amount' : 'Nominal',
+                'Modal Awal': investment.initial_amount,
+                'Nilai Sekarang': investment.current_value
+              }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="name" stroke="#8FA4C8" />
+              <YAxis stroke="#8FA4C8" />
+              <Tooltip
+                formatter={(value) => formatCurrency(value)}
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px' }}
+              />
+              <Legend />
+              <Bar dataKey="Modal Awal" fill="#4F7CFF" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Nilai Sekarang" fill={isPositive ? "#00C9A7" : "#FF6B6B"} radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+            <div>
+              <p className="text-xs text-[#8FA4C8] mb-1">{lang === 'en' ? 'Profit/Loss' : 'Profit/Loss'}</p>
+              <p className={`font-bold text-sm ${isPositive ? 'text-[#00C9A7]' : 'text-[#FF6B6B]'}`}>
+                {isPositive ? '+' : ''}{formatCurrency(gain)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-[#8FA4C8] mb-1">{lang === 'en' ? 'ROI' : 'ROI'}</p>
+              <p className={`font-bold text-sm ${isPositive ? 'text-[#00C9A7]' : 'text-[#FF6B6B]'}`}>
+                {isPositive ? '+' : ''}{gainPct}%
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-[#8FA4C8] mb-1">{lang === 'en' ? 'Duration' : 'Durasi'}</p>
+              <p className="font-bold text-sm text-[#1A1A1A]">{daysInvested} {lang === 'en' ? 'days' : 'hari'}</p>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <InvestmentHistory key={investmentId} investmentId={investmentId} formatCurrency={formatCurrency} />
         </div>

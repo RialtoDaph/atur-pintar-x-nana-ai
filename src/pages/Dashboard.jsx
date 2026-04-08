@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from "lucide-react";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
@@ -16,6 +16,8 @@ import { syncAccountBalance } from "@/components/utils/accountSync";
 import RecurringManager from "@/components/transactions/RecurringManager";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import StreakWidget from "@/components/dashboard/StreakWidget";
+import MonthOverMonthComparison from "@/components/dashboard/MonthOverMonthComparison";
+import SharedWalletCard from "@/components/dashboard/SharedWalletCard";
 
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
 
@@ -185,8 +187,14 @@ export default function Dashboard() {
           }} />
         )}
 
-        {/* Streak Widget */}
+        {/* Streak Widget - Now prominent */}
         {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} lastTxAddedAt={lastTxAddedAt} />}
+
+        {/* Shared Wallet Entry Point */}
+        {user?.onboarding_completed && <SharedWalletCard />}
+
+        {/* Month over Month Comparison */}
+        {user?.onboarding_completed && !loading && <MonthOverMonthComparison transactions={transactions} />}
 
         {/* Reminder Widget */}
         <ReminderWidget user={user} />
