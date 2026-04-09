@@ -290,7 +290,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Main content — add top padding on mobile for header */}
-      <div ref={mainContentRef} className="sm:ml-60 pt-14 sm:pt-0 overflow-y-auto">
+      <div ref={mainContentRef} className="sm:ml-60 pt-14 sm:pt-0 overflow-y-auto" style={{paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))'}}>
         <AnimatePresence mode="sync">
           <motion.div
             key={currentPageName}
@@ -305,7 +305,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Mobile bottom nav — hidden when any modal is open */}
-      {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{boxShadow: '0 -4px 24px rgba(0,0,0,0.5)'}} style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))'}}>
         {mobileMainNav.map((item) => {
           const active = currentPageName === item.page;
           return (

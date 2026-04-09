@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { CheckCircle, Trash2, HandCoins } from "lucide-react";
+import { CheckCircle, Trash2, HandCoins, Share2 } from "lucide-react";
 import { formatRupiah } from "@/components/utils/formatRupiah";
 
 export default function IOUSection() {
@@ -81,6 +81,14 @@ export default function IOUSection() {
                 <p className="text-[#FF6A00] font-bold text-sm">{formatRupiah(iou.amount)}</p>
               </div>
               <div className="flex gap-1 flex-shrink-0">
+                <button
+                  onClick={() => {
+                    const text = encodeURIComponent(`Hei ${iou.debtor_name}, bagian kamu di ${iou.store_name} tanggal ${iou.date} adalah Rp ${iou.amount?.toLocaleString('id-ID')}. Thanks! - via Atur Pintar`);
+                    window.open(`https://wa.me/?text=${text}`, '_blank');
+                  }}
+                  className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-600 hover:bg-green-100 transition-colors" title="Kirim ke WhatsApp">
+                  <Share2 className="w-3.5 h-3.5" />
+                </button>
                 <button onClick={() => markPaid(iou.id)} className="w-8 h-8 rounded-full bg-[#00C9A7]/10 flex items-center justify-center text-[#00C9A7] hover:bg-[#00C9A7]/20 transition-colors" title="Tandai sudah dibayar">
                   <CheckCircle className="w-4 h-4" />
                 </button>

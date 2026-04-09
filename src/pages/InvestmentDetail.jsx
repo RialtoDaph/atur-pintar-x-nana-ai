@@ -157,6 +157,42 @@ export default function InvestmentDetail() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 -mt-6 space-y-4">
+        {/* ROI Calculator */}
+        {investment.purchase_date && daysInvested > 0 && (
+          <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <h3 className="text-sm font-bold text-[#1A1A1A] mb-3">📊 Kalkulator ROI</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-[#F8FAFC] rounded-xl p-3">
+                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Return</p>
+                <p className={`text-base font-black ${gain >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {gain >= 0 ? '+' : ''}{formatCurrency(gain)}
+                </p>
+              </div>
+              <div className="bg-[#F8FAFC] rounded-xl p-3">
+                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Return %</p>
+                <p className={`text-base font-black ${gain >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {gain >= 0 ? '+' : ''}{gainPct}%
+                </p>
+              </div>
+              <div className="bg-[#F8FAFC] rounded-xl p-3">
+                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Annualized Return</p>
+                <p className={`text-base font-black ${gain >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {daysInvested > 0
+                    ? (() => {
+                        const ann = (Math.pow(investment.current_value / investment.initial_amount, 365 / daysInvested) - 1) * 100;
+                        return `${ann >= 0 ? '+' : ''}${ann.toFixed(2)}%`;
+                      })()
+                    : 'N/A'}
+                </p>
+              </div>
+              <div className="bg-[#F8FAFC] rounded-xl p-3">
+                <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Lama Invest</p>
+                <p className="text-base font-black text-[#1A1A1A]">{daysInvested} hari</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <InvestmentHistory key={investmentId} investmentId={investmentId} formatCurrency={formatCurrency} />
         </div>

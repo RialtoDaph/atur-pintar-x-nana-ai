@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Users, Plus, Copy, UserPlus, Crown, X, Check, Loader2, Link, Mail } from "lucide-react";
+import { Users, Plus, Copy, UserPlus, Crown, X, Check, Loader2, Link, Mail, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { toast } from "sonner";
 import PremiumGate from "@/components/subscription/PremiumGate";
 
@@ -90,16 +90,27 @@ export default function SharedFinance() {
   const [joinCode, setJoinCode] = useState("");
   const [saving, setSaving] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [sharedTxs, setSharedTxs] = useState([]);
 
   useEffect(() => {
     base44.auth.me().then(async u => {
       setUser(u);
-      // Load all wallets: owned + member of
       const all = await base44.entities.SharedWallet.list();
       const mine = all.filter(w =>
         (w.members || []).includes(u.email) || w.owner_email === u.email
       );
       setWallets(mine);
+      // Load transactions from all wallet members
+      if (mine.length > 0) {
+        const allMembers = [...new Set(mine.flatMap(w => w.members || []))];
+        const txsArr = await Promise.all(
+          allMembers.map(email =>
+            base44.entities.Transaction.filter({ created_by: email }, "-date", 20).catch(() => [])
+          )
+        );
+        const merged = txsArr.flat().sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 30);
+        setSharedTxs(merged);
+      }
     }).finally(() => setLoading(false));
   }, []);
 
@@ -217,6 +228,32 @@ export default function SharedFinance() {
           wallets.map(w => (
             <WalletCard key={w.id} wallet={w} currentUserEmail={user?.email} onLeave={handleLeave} />
           ))
+        )}
+
+        {/* Shared Transaction Feed */}
+        {sharedTxs.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#F2F4F7]">
+              <p className="text-sm font-bold text-[#1A1A1A]">Transaksi Anggota</p>
+              <p className="text-[10px] text-[#8FA4C8]">Terbaru dari semua anggota</p>
+            </div>
+            <div className="divide-y divide-[#F2F4F7]">
+              {sharedTxs.map(tx => (
+                <div key={tx.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${tx.type === 'income' ? 'bg-green-50' : 'bg-red-50'}`}>
+                    {tx.type === 'income' ? <ArrowUpRight className="w-3.5 h-3.5 text-green-600" /> : <ArrowDownLeft className="w-3.5 h-3.5 text-red-500" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-[#1A1A1A] truncate">{tx.note || tx.category || 'Transaksi'}</p>
+                    <p className="text-[10px] text-[#8FA4C8]">{tx.created_by?.split('@')[0]} · {new Date(tx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
+                  </div>
+                  <span className={`text-xs font-bold ${tx.type === 'income' ? 'text-green-600' : 'text-red-500'}`}>
+                    {tx.type === 'income' ? '+' : '−'}Rp {tx.amount?.toLocaleString('id-ID')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Info */}

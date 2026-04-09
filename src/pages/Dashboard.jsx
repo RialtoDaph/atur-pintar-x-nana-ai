@@ -14,6 +14,7 @@ import AccountsWidget from "@/components/dashboard/AccountsWidget";
 import { syncAccountBalance } from "@/components/utils/accountSync";
 
 import RecurringManager from "@/components/transactions/RecurringManager";
+import NetWorthCard from "@/components/dashboard/NetWorthCard";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import StreakWidget from "@/components/dashboard/StreakWidget";
 
@@ -50,6 +51,13 @@ export default function Dashboard() {
       setUser(u);
       if (!u?.onboarding_completed && !localStorage.getItem("onboarding_done")) {
         setShowOnboarding(true);
+      }
+      // Check subscription expiry on load
+      if (u?.subscription_status === "active" && u?.subscription_end_date) {
+        const today = new Date().toISOString().split("T")[0];
+        if (u.subscription_end_date < today) {
+          base44.auth.updateMe({ subscription_status: "expired", subscription_plan: "free" });
+        }
       }
     }).catch(() => {});
   }, []);
@@ -183,6 +191,23 @@ export default function Dashboard() {
             setShowSampleBanner(false);
             loadData();
           }} />
+        )}
+
+        {/* Net Worth Card */}
+        {user?.onboarding_completed && accounts.length > 0 && (
+          <NetWorthCard accounts={accounts} />
+        )}
+
+        {/* Subscription Expired Banner */}
+        {user?.subscription_status === "expired" && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3">
+            <span className="text-lg">⚠️</span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-700">Langganan kamu sudah berakhir</p>
+              <p className="text-xs text-red-500">Perpanjang untuk akses fitur premium</p>
+            </div>
+            <a href="/Subscription" className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold">Perpanjang</a>
+          </div>
         )}
 
         {/* Streak Widget */}

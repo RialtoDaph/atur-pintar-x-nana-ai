@@ -153,6 +153,19 @@ export default function SubscriptionCard({ user }) {
   async function handleAdd(data) {
     const created = await base44.entities.Subscription.create(data);
     setSubs((prev) => [...prev, created].sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date)));
+    // Auto-create linked Reminder
+    if (data.next_due_date && data.amount) {
+      const dueDay = new Date(data.next_due_date).getDate();
+      base44.entities.Reminder.create({
+        title: data.name,
+        type: "langganan",
+        amount: data.amount,
+        due_day: dueDay,
+        is_active: true,
+        icon: data.icon || "📦",
+        notes: `Auto-linked dari Langganan ${data.name}`,
+      }).catch(() => {});
+    }
     setShowAdd(false);
   }
 
