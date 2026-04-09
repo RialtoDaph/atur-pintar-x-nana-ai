@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { usePricing } from "@/hooks/usePricing";
 
 function MatrixBackground() {
   const canvasRef = useRef(null);
@@ -66,61 +67,67 @@ const FEATURES = [
 { icon: <MessageCircle className="w-5 h-5" />, title: "Nana AI", desc: "Kasih saran real berdasarkan data keuangan kamu." }];
 
 
-const PLANS = [
-{
-  name: "Free",
-  price: "Rp 0",
-  period: "Gratis selamanya",
-  features: [
-  "Catat transaksi (unlimited)",
-  "Dashboard keuangan",
-  "Chat Nana AI (30x/bulan)",
-  "Anggaran maks. 2 kategori",
-  "Goals maks. 2 tujuan",
-  "Analisis AI (3 bulan terakhir)"],
-
-  limits: ["❌ Fitur Investasi", "❌ Analitik lanjutan"],
-  cta: "Mulai Gratis",
-  highlight: false
-},
-{
-  name: "Premium",
-  price: "Rp 39.000",
-  period: "per bulan",
-  features: [
-  "Semua fitur Free",
-  "Anggaran & Goals unlimited",
-  "Nana AI chat unlimited",
-  "Fitur Investasi penuh",
-  "Analitik lanjutan semua kartu",
-  "Export PDF & Google Sheets",
-  "Custom kategori & widget"],
-
-  limits: [],
-  cta: "Coba Sekarang",
-  highlight: true,
-  badge: "Populer"
-},
-{
-  name: "Premium Tahunan",
-  price: "Rp 299.000",
-  period: "per tahun",
-  features: [
-  "Semua fitur Premium",
-  "Hemat 36% vs bulanan",
-  "Priority support"],
-
-  limits: [],
-  cta: "Coba Sekarang",
-  highlight: false,
-  badge: "Hemat 36%"
-}];
+// PLANS is now dynamic — built inside component using usePricing
 
 
 export default function LandingPage() {
   const howRef = useRef(null);
   const featuresRef = useRef(null);
   const pricingRef = useRef(null);
+  const { monthly, yearly, loading: pricingLoading, yearlySavingLabel } = usePricing();
+
+  const formatRp = (n) => 'Rp ' + (n || 0).toLocaleString('id-ID');
+
+  const PLANS = [
+    {
+      name: "Free",
+      price: "Rp 0",
+      period: "Gratis selamanya",
+      features: [
+        "Catat transaksi (unlimited)",
+        "Dashboard keuangan",
+        "Chat Nana AI (30x/bulan)",
+        "Anggaran maks. 2 kategori",
+        "Goals maks. 2 tujuan",
+        "Analisis AI (3 bulan terakhir)"
+      ],
+      limits: ["❌ Fitur Investasi", "❌ Analitik lanjutan"],
+      cta: "Mulai Gratis",
+      highlight: false
+    },
+    {
+      name: "Premium",
+      price: pricingLoading ? "..." : formatRp(monthly),
+      period: "per bulan",
+      features: [
+        "Semua fitur Free",
+        "Anggaran & Goals unlimited",
+        "Nana AI chat unlimited",
+        "Fitur Investasi penuh",
+        "Analitik lanjutan semua kartu",
+        "Export PDF & Google Sheets",
+        "Custom kategori & widget"
+      ],
+      limits: [],
+      cta: "Coba Sekarang",
+      highlight: true,
+      badge: "Populer"
+    },
+    {
+      name: "Premium Tahunan",
+      price: pricingLoading ? "..." : formatRp(yearly),
+      period: "per tahun",
+      features: [
+        "Semua fitur Premium",
+        yearlySavingLabel + " vs bulanan",
+        "Priority support"
+      ],
+      limits: [],
+      cta: "Coba Sekarang",
+      highlight: false,
+      badge: yearlySavingLabel
+    }
+  ];
 
   const handleCTA = () => {
     base44.auth.redirectToLogin();
