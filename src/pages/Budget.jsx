@@ -75,12 +75,21 @@ export default function BudgetPage() {
     })();
 
     try {
-      const [b, txAll, cats, g] = await Promise.all([
-        base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }),
+      const [bRaw, txAll, cats, g] = await Promise.all([
+        base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }, 'created_date'),
         base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300),
         base44.entities.CustomCategory.list("-created_date"),
         base44.entities.SavingsGoal.filter({ created_by: user.email, status: "active" }),
       ]);
+
+      // Dedup budgets: for each (category+month), keep only the OLDEST record
+      const seenCats = new Set();
+      const b = (bRaw || []).filter(bg => {
+        const key = `${bg.category}_${bg.month}`;
+        if (seenCats.has(key)) return false;
+        seenCats.add(key);
+        return true;
+      });
 
       const monthTx = txAll.filter(tx => tx.date >= monthStart && tx.date <= monthEnd && tx.type === "expense");
       const prev3Tx = txAll.filter(tx => tx.date >= threeMonthsAgo && tx.date < monthStart);
@@ -136,7 +145,13 @@ export default function BudgetPage() {
     if (editingBudget) {
       await base44.entities.Budget.update(editingBudget.id, { amount: data.amount });
     } else {
-      await base44.entities.Budget.create({ ...data, month: currentMonth });
+      // Check for existing budget with same category+month before creating
+      const existing = budgets.find(b => b.category === data.category && b.month === currentMonth);
+      if (existing) {
+        await base44.entities.Budget.update(existing.id, { amount: data.amount });
+      } else {
+        await base44.entities.Budget.create({ ...data, month: currentMonth });
+      }
     }
     setShowAdd(false);
     setEditingBudget(null);

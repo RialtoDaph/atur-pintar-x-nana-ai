@@ -50,11 +50,14 @@ export default function Dashboard() {
       if (!u?.onboarding_completed && !localStorage.getItem("onboarding_done")) {
         setShowOnboarding(true);
       }
-      // Check subscription expiry on load
-      if (u?.subscription_status === "active" && u?.subscription_end_date) {
-        const today = new Date().toISOString().split("T")[0];
-        if (u.subscription_end_date < today) {
-          base44.auth.updateMe({ subscription_status: "expired", subscription_plan: "free" });
+      // Check subscription expiry on load — skip for admin
+      if (u?.role !== 'admin' && u?.subscription_status === "active") {
+        const endDate = u?.subscription_end_date || u?.subscription_expiry;
+        if (endDate) {
+          const today = new Date().toISOString().split("T")[0];
+          if (endDate < today) {
+            base44.auth.updateMe({ subscription_status: "expired", subscription_plan: "free" }).catch(() => {});
+          }
         }
       }
       // Init GamificationProfile on first load if missing

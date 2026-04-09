@@ -1028,20 +1028,26 @@ export function AppSettingsProvider({ children }) {
     (async () => {
       try {
         const user = await base44.auth.me();
-        if (!user?.settings_id) {
+        // Always query existing settings first, sorted oldest-first
+        const allSettings = await base44.entities.AppSettings.filter({ created_by: user.email }, 'created_date');
+        if (allSettings.length > 0) {
+          // Use the OLDEST record (index 0 when sorted asc)
+          const userSettings = allSettings[0];
+          setSettings({ ...DEFAULT_SETTINGS, ...userSettings });
+          setSettingsId(userSettings.id);
+          // Sync settings_id on user if missing/stale
+          if (user.settings_id !== userSettings.id) {
+            await base44.auth.updateMe({ settings_id: userSettings.id }).catch(() => {});
+          }
+        } else {
+          // No settings exist yet — create one
           const newSettings = await base44.entities.AppSettings.create(DEFAULT_SETTINGS);
-          await base44.auth.updateMe({ settings_id: newSettings.id });
+          await base44.auth.updateMe({ settings_id: newSettings.id }).catch(() => {});
           setSettings({ ...DEFAULT_SETTINGS, ...newSettings });
           setSettingsId(newSettings.id);
-        } else {
-          const appSettings = await base44.entities.AppSettings.filter({ created_by: user.email });
-          const userSettings = appSettings.find(s => s.id === user.settings_id);
-          if (userSettings) {
-            setSettings({ ...DEFAULT_SETTINGS, ...userSettings });
-            setSettingsId(userSettings.id);
-          }
         }
       } catch (e) {
+        console.error('AppSettings load error:', e);
         setSettings(DEFAULT_SETTINGS);
       } finally {
         setLoading(false);

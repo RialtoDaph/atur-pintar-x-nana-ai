@@ -45,16 +45,19 @@ export default function AlertsDrawer({ onClose, user }) {
     Promise.all([
       base44.entities.Transaction.filter({ created_by: user.email }, "-date", 100),
       base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
-      base44.entities.Alert.filter({ created_by: user.email, status: "unread" }, "-created_date"),
+      base44.entities.Alert.filter({ created_by: user.email }, "-created_date", 50),
       base44.entities.AdminNotification.list(),
       base44.entities.Reminder.filter({ is_active: true, created_by: user.email }),
     ]).then(([tx, gl, alerts, notifs, rems]) => {
       setTransactions(tx);
       setGoals(gl);
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const seenTitles = new Set();
+      // Show: unread OR created within 7 days, deduped by title, max 10
       const dedupedAlerts = (alerts || []).filter(a => {
-        if (a.created_date && a.created_date < thirtyDaysAgo) return false;
+        const isUnread = a.status === 'unread';
+        const isRecent = a.created_date && a.created_date > sevenDaysAgo;
+        if (!isUnread && !isRecent) return false;
         if (seenTitles.has(a.title)) return false;
         seenTitles.add(a.title);
         return true;
@@ -70,7 +73,8 @@ export default function AlertsDrawer({ onClose, user }) {
       }).map(r => ({ ...r, daysLeft: getDaysUntilDue(r.due_day) })).sort((a, b) => a.daysLeft - b.daysLeft);
       setReminders(upcoming);
       setLoading(false);
-      alerts.forEach(a => base44.entities.Alert.update(a.id, { status: "read" }));
+      // Mark unread alerts as read
+      alerts.filter(a => a.status === 'unread').forEach(a => base44.entities.Alert.update(a.id, { status: "read" }));
       myNotifs.forEach(n => {
         base44.entities.AdminNotification.update(n.id, { read_by: [...(n.read_by || []), user.email] }).catch(() => {});
       });

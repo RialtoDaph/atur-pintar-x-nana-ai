@@ -43,15 +43,23 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const cameraRef = useRef(null);
 
   useEffect(() => {
-    base44.entities.Account.list().then(list => {
-      // Deduplicate accounts by name (keep first/oldest per name)
-      const seen = new Set();
-      const deduped = (list || []).filter(acc => {
-        if (seen.has(acc.name)) return false;
-        seen.add(acc.name);
-        return true;
-      });
-      setAccounts(deduped);
+    base44.auth.me().then(user => {
+      if (!user?.email) return;
+      base44.entities.Account.filter({ created_by: user.email }, 'created_date').then(list => {
+        // Deduplicate by name, keep oldest
+        const seen = new Set();
+        const deduped = (list || []).filter(acc => {
+          if (seen.has(acc.name)) return false;
+          seen.add(acc.name);
+          return true;
+        });
+        setAccounts(deduped);
+        // Auto-select default account
+        const defaultAcc = deduped.find(a => a.is_default) || deduped[0];
+        if (defaultAcc && !form.account_id) {
+          setForm(f => ({ ...f, account_id: defaultAcc.id }));
+        }
+      }).catch(() => {});
     }).catch(() => {});
   }, []);
 
