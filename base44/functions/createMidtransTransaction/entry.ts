@@ -15,56 +15,57 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid plan' }, { status: 400 });
     }
 
-    // Cek apakah sudah ada pending payment yang belum selesai
+    // Read price from AppConfig (admin-controlled)
+    let monthlyPrice = 49000;
+    let yearlyPrice = 490000;
+    try {
+      const configs = await base44.asServiceRole.entities.AppConfig.list();
+      if (configs && configs.length > 0) {
+        monthlyPrice = configs[0].premium_price_monthly || 49000;
+        yearlyPrice = configs[0].premium_price_yearly || 490000;
+      }
+    } catch (e) {
+      console.warn('Could not read AppConfig, using defaults');
+    }
+
+    const amount = plan === 'premium_monthly' ? monthlyPrice : yearlyPrice;
+
+    // Cek apakah ada pending payment yang masih valid (< 24 jam)
     const existingPending = await base44.asServiceRole.entities.SubscriptionPayment.filter({
       user_email: user.email,
       status: 'pending',
     });
 
-    // Kalau ada pending dengan snap token yang masih valid, return token lama
     if (existingPending.length > 0 && existingPending[0].midtrans_snap_token) {
       const existing = existingPending[0];
-      // Cek apakah order sudah lebih dari 24 jam (token Midtrans expired)
-      const createdAt = new Date(existing.created_date).getTime();
-      const ageHours = (Date.now() - createdAt) / (1000 * 60 * 60);
-      if (ageHours < 24) {
+      const ageHours = (Date.now() - new Date(existing.created_date).getTime()) / (1000 * 60 * 60);
+      if (ageHours < 24 && existing.plan === plan) {
         return Response.json({ token: existing.midtrans_snap_token, order_id: existing.midtrans_order_id });
       }
-      // Token expired, batalkan yang lama
       await base44.asServiceRole.entities.SubscriptionPayment.update(existing.id, { status: 'expired' });
     }
 
-    const amount = plan === 'premium_monthly' ? 39000 : 299000;
     const orderId = `AP-${user.id.slice(0, 8)}-${Date.now()}`;
-
     const serverKey = Deno.env.get("MIDTRANS_SERVER_KEY");
     const auth = btoa(`${serverKey}:`);
 
     const body = {
-      transaction_details: {
-        order_id: orderId,
-        gross_amount: amount,
-      },
+      transaction_details: { order_id: orderId, gross_amount: amount },
       customer_details: {
         first_name: user.full_name || user.email,
         email: user.email,
       },
-      item_details: [
-        {
-          id: plan,
-          price: amount,
-          quantity: 1,
-          name: plan === 'premium_monthly' ? 'Atur Pintar Premium Bulanan' : 'Atur Pintar Premium Tahunan',
-        }
-      ],
+      item_details: [{
+        id: plan,
+        price: amount,
+        quantity: 1,
+        name: plan === 'premium_monthly' ? 'Atur Pintar Premium Bulanan' : 'Atur Pintar Premium Tahunan',
+      }],
     };
 
     const midtransRes = await fetch('https://app.midtrans.com/snap/v1/transactions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${auth}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${auth}` },
       body: JSON.stringify(body),
     });
 
@@ -74,7 +75,6 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Failed to get Snap token', detail: snapData }, { status: 500 });
     }
 
-    // Simpan record pembayaran baru
     await base44.asServiceRole.entities.SubscriptionPayment.create({
       user_email: user.email,
       user_name: user.full_name,
