@@ -9,7 +9,7 @@ export function usePricing() {
   });
 
   useEffect(() => {
-    base44.asServiceRole.entities.AppConfig.list()
+    base44.entities.AppConfig.list()
       .then(configs => {
         const config = configs?.[0];
         setPricing({
