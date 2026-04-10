@@ -49,7 +49,7 @@ const AuthenticatedApp = () => {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
       // Allow landing page to be public
-      const publicPaths = ['/', '/PrivacyPolicy', '/TermsOfService'];
+      const publicPaths = ['/', '/LandingPage', '/PrivacyPolicy', '/TermsOfService'];
       if (publicPaths.includes(window.location.pathname)) {
         return (
           <Routes>
