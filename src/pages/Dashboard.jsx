@@ -15,17 +15,16 @@ import { syncAccountBalance } from "@/components/utils/accountSync";
 
 import RecurringManager from "@/components/transactions/RecurringManager";
 import StreakWidget from "@/components/dashboard/StreakWidget";
+import { useGamification } from "@/hooks/useGamification";
 
 import CashflowForecast from "@/components/dashboard/CashflowForecast";
 
 const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
-
 const BudgetAlertWidget = lazy(() => import("@/components/dashboard/BudgetAlertWidget"));
 
 const LazyFallback = () => (
   <div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />
 );
-
 
 function getWidgets() {
   const saved = localStorage.getItem("widgets");
@@ -44,6 +43,8 @@ export default function Dashboard() {
   const [showSampleBanner, setShowSampleBanner] = useState(hasSampleData);
   const [lastTxAddedAt, setLastTxAddedAt] = useState(null);
 
+  const gamification = useGamification(user);
+
   useEffect(() => {
     base44.auth.me().then(u => {
       setUser(u);
@@ -60,24 +61,20 @@ export default function Dashboard() {
           }
         }
       }
-      // Init GamificationProfile on first load if missing
-      if (u?.onboarding_completed) {
-        base44.entities.GamificationProfile.filter({ created_by: u.email }).then(profiles => {
-          if (profiles.length === 0) {
-            base44.entities.GamificationProfile.create({
-              daily_streak: 0, longest_streak: 0, total_points: 0, level: 1,
-              last_activity_date: new Date().toISOString().split("T")[0]
-            }).catch(() => {});
-          }
-        }).catch(() => {});
-        // Run deduplication once per session
-        if (!sessionStorage.getItem("dedup_done")) {
-          sessionStorage.setItem("dedup_done", "1");
-          base44.functions.invoke("deduplicateUserData", {}).catch(() => {});
-        }
+      // Run deduplication once per session
+      if (u?.onboarding_completed && !sessionStorage.getItem("dedup_done")) {
+        sessionStorage.setItem("dedup_done", "1");
+        base44.functions.invoke("deduplicateUserData", {}).catch(() => {});
       }
     }).catch(() => {});
   }, []);
+
+  // Check streak reset whenever user loads the dashboard
+  useEffect(() => {
+    if (user?.onboarding_completed) {
+      gamification.checkStreakOnLoad();
+    }
+  }, [user?.email]);
 
   useEffect(() => {
     const onStorage = () => setWidgets(getWidgets());
@@ -111,7 +108,7 @@ export default function Dashboard() {
     queryKey: ["goals", user?.email],
     queryFn: () => base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
     enabled,
-    staleTime: 2 * 60 * 1000, // 2 menit cache
+    staleTime: 2 * 60 * 1000,
   });
 
   const { data: transactions = [], isLoading: txLoading } = useQuery({
@@ -136,7 +133,6 @@ export default function Dashboard() {
   });
 
   const accountsTotal = accounts.reduce((s, a) => s + (a.balance || 0), 0);
-
   const loading = goalsLoading || txLoading || budgetsLoading;
 
   async function loadData() {
@@ -148,140 +144,123 @@ export default function Dashboard() {
   }
 
   const now = new Date();
-  // Exclude recurring templates (is_recurring=true, is_recurring_child=false) — they are NOT actual transactions
   const thisMonthTx = transactions.filter(t => {
     const d = new Date(t.date);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
       && !(t.is_recurring === true && !t.is_recurring_child);
   });
 
-  // Semua transaksi (bukan template recurring) untuk saldo keseluruhan
   const allTx = transactions.filter(t => !(t.is_recurring === true && !t.is_recurring_child));
   const monthIncome = allTx.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const monthExpense = allTx.filter(t => t.type === "expense" || t.type === "savings").reduce((s, t) => s + t.amount, 0);
   const totalSaved = goals.reduce((s, g) => s + (g.current_amount || 0), 0);
 
-  const handleRefresh = async () => {
-    await loadData();
-  };
-
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
+    <PullToRefresh onRefresh={loadData}>
       <div className="min-h-screen bg-[#F2F4F7] pb-8">
-      {user && <RecurringManager userEmail={user.email} />}
-      {/* Top Header */}
-      <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-6 pb-16">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[#8FA4C8] text-xs font-medium">{t('dashboard_greeting')}</p>
-              <h1 className="text-white text-xl font-bold mt-0.5">{t('dashboard_title')}</h1>
-            </div>
-            <button
-              data-tour="add-transaction-btn"
-              onClick={() => setShowAddTransaction(true)}
-              className="w-11 h-11 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] active:scale-95 transition-all duration-150 tap-highlight-fix"
-              style={{boxShadow: '0 4px 16px rgba(255,106,0,0.45)'}}
-            >
-              <Plus className="w-5 h-5 text-white" />
-            </button>
-          </div>
+        {user && <RecurringManager userEmail={user.email} />}
 
-          {/* Balance Card */}
-          <BalanceCard
-            income={monthIncome}
-            expense={monthExpense}
-            savings={totalSaved}
-            totalBalance={accounts.length > 0 ? accountsTotal : null}
-            loading={loading}
-          />
+        {/* Top Header */}
+        <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-6 pb-16">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[#8FA4C8] text-xs font-medium">{t('dashboard_greeting')}</p>
+                <h1 className="text-white text-xl font-bold mt-0.5">{t('dashboard_title')}</h1>
+              </div>
+              <button
+                data-tour="add-transaction-btn"
+                onClick={() => setShowAddTransaction(true)}
+                className="w-11 h-11 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] active:scale-95 transition-all duration-150 tap-highlight-fix"
+                style={{ boxShadow: '0 4px 16px rgba(255,106,0,0.45)' }}
+              >
+                <Plus className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            <BalanceCard
+              income={monthIncome}
+              expense={monthExpense}
+              savings={totalSaved}
+              totalBalance={accounts.length > 0 ? accountsTotal : null}
+              loading={loading}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-3">
+        <div className="max-w-2xl mx-auto px-4 -mt-6 space-y-3">
+          {showSampleBanner && (
+            <SampleDataBanner onDismiss={() => { setShowSampleBanner(false); loadData(); }} />
+          )}
 
-
-
-        {/* Sample Data Banner */}
-        {showSampleBanner && (
-          <SampleDataBanner onDismiss={() => {
-            setShowSampleBanner(false);
-            loadData();
-          }} />
-        )}
-
-
-
-        {/* Subscription Expired Banner */}
-        {user?.subscription_status === "expired" && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3">
-            <span className="text-lg">⚠️</span>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-red-700">Langganan kamu sudah berakhir</p>
-              <p className="text-xs text-red-500">Perpanjang untuk akses fitur premium</p>
+          {user?.subscription_status === "expired" && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3">
+              <span className="text-lg">⚠️</span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-red-700">Langganan kamu sudah berakhir</p>
+                <p className="text-xs text-red-500">Perpanjang untuk akses fitur premium</p>
+              </div>
+              <a href="/Subscription" className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold">Perpanjang</a>
             </div>
-            <a href="/Subscription" className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold">Perpanjang</a>
-          </div>
-        )}
+          )}
 
-        {/* Streak Widget */}
-        {user?.onboarding_completed && <StreakWidget user={user} transactionCount={thisMonthTx.length} lastTxAddedAt={lastTxAddedAt} />}
+          {/* Streak Widget */}
+          {user?.onboarding_completed && (
+            <StreakWidget
+              profile={gamification.profile}
+              streakPopup={gamification.streakPopup} setStreakPopup={gamification.setStreakPopup}
+              achievementPopup={gamification.achievementPopup} setAchievementPopup={gamification.setAchievementPopup}
+              levelUpPopup={gamification.levelUpPopup} setLevelUpPopup={gamification.setLevelUpPopup}
+              xpFloatMsg={gamification.xpFloatMsg}
+              streakResetMsg={gamification.streakResetMsg} setStreakResetMsg={gamification.setStreakResetMsg}
+            />
+          )}
 
-
-
-        {/* Budget Alert Widget */}
-        <Suspense fallback={<LazyFallback />}>
-          <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
-        </Suspense>
-
-
-
-        {/* Cashflow Forecast */}
-        {widgets.cashflowForecast && (
           <Suspense fallback={<LazyFallback />}>
-            <CashflowForecast transactions={transactions} loading={loading} user={user} />
+            <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
           </Suspense>
+
+          {widgets.cashflowForecast && (
+            <Suspense fallback={<LazyFallback />}>
+              <CashflowForecast transactions={transactions} loading={loading} user={user} />
+            </Suspense>
+          )}
+
+          {user?.onboarding_completed && <AccountsWidget user={user} />}
+
+          <div className="h-2" />
+        </div>
+
+        {showAddTransaction && (
+          <AddTransactionModal
+            goals={goals}
+            onClose={() => setShowAddTransaction(false)}
+            onSave={async (data) => {
+              await base44.entities.Transaction.create(data);
+              if (data.account_id) await syncAccountBalance(data.account_id, data.amount, data.type, 1);
+              setShowAddTransaction(false);
+              setLastTxAddedAt(Date.now());
+              gamification.onNewTransaction();
+              loadData();
+            }}
+          />
         )}
 
-        {/* Accounts Widget — bottom */}
-        {user?.onboarding_completed && <AccountsWidget user={user} />}
+        {showOnboarding && (
+          <div className="fixed inset-0 z-[100] bg-[#0A0A0A]">
+            <OnboardingQuestionnaire onClose={async () => {
+              setShowOnboarding(false);
+              localStorage.setItem("onboarding_done", "true");
+              await base44.auth.updateMe({ onboarding_completed: true });
+              loadData();
+              setShowNanaIntro(true);
+            }} />
+          </div>
+        )}
 
-        <div className="h-2" />
-
-      </div>
-
-      {showAddTransaction && (
-        <AddTransactionModal
-          goals={goals}
-          onClose={() => setShowAddTransaction(false)}
-          onSave={async (data) => {
-            const tx = await base44.entities.Transaction.create(data);
-            if (data.account_id) await syncAccountBalance(data.account_id, data.amount, data.type, 1);
-            setShowAddTransaction(false);
-            setLastTxAddedAt(Date.now());
-            loadData();
-          }}
-        />
-      )}
-
-      {showOnboarding && (
-        <div className="fixed inset-0 z-[100] bg-[#0A0A0A]">
-          <OnboardingQuestionnaire onClose={async () => {
-            setShowOnboarding(false);
-            localStorage.setItem("onboarding_done", "true");
-            await base44.auth.updateMe({ onboarding_completed: true });
-            loadData();
-            setShowNanaIntro(true);
-          }} />
-        </div>
-      )}
-
-      {showNanaIntro && (
-        <NanaIntroModal onClose={() => {
-          setShowNanaIntro(false);
-        }} />
-      )}
-
+        {showNanaIntro && (
+          <NanaIntroModal onClose={() => setShowNanaIntro(false)} />
+        )}
       </div>
     </PullToRefresh>
   );
