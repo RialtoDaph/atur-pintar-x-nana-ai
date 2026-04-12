@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { Users, Plus, Copy, UserPlus, Crown, X, Check, Loader2, Link, Mail, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { toast } from "sonner";
 import PremiumGate from "@/components/subscription/PremiumGate";
@@ -82,7 +83,7 @@ function WalletCard({ wallet, currentUserEmail, onLeave }) {
 }
 
 export default function SharedFinance() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [wallets, setWallets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -94,14 +95,13 @@ export default function SharedFinance() {
   const [sharedTxs, setSharedTxs] = useState([]);
 
   useEffect(() => {
-    base44.auth.me().then(async u => {
-      setUser(u);
+    if (!user) return;
+    const load = async () => {
       const all = await base44.entities.SharedWallet.list();
       const mine = all.filter(w =>
-        (w.members || []).includes(u.email) || w.owner_email === u.email
+        (w.members || []).includes(user.email) || w.owner_email === user.email
       );
       setWallets(mine);
-      // Load transactions from all wallet members
       if (mine.length > 0) {
         const allMembers = [...new Set(mine.flatMap(w => w.members || []))];
         const txsArr = await Promise.all(
@@ -112,8 +112,10 @@ export default function SharedFinance() {
         const merged = txsArr.flat().sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 30);
         setSharedTxs(merged);
       }
-    }).finally(() => setLoading(false));
-  }, []);
+      setLoading(false);
+    };
+    load();
+  }, [user]);
 
   async function handleCreate() {
     if (!createForm.name.trim() || !user) return;
