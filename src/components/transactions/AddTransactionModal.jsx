@@ -154,6 +154,14 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
     const finalCategory = form.category || 'other';
     const amount = parseRupiah(form.amount);
     if (amount <= 0) return;
+    // Check insufficient balance for expense/savings
+    if (tab === "expense" || tab === "savings") {
+      const acc = accounts.find(a => a.id === form.account_id);
+      if (acc && (acc.balance || 0) < amount) {
+        const ok = window.confirm(`⚠️ Saldo ${acc.name} tidak mencukupi. Saldo saat ini: ${"Rp " + Number(acc.balance || 0).toLocaleString("id-ID")}. Tetap lanjutkan?`);
+        if (!ok) return;
+      }
+    }
     setSaving(true);
     try {
       await onSave({

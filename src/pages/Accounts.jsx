@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Wallet, Plus, Pencil, Trash2, Star, CreditCard, Banknote, Smartphone, X, Check } from "lucide-react";
+import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 
 const ACCOUNT_TYPES = [
   { key: "bank", label: "Bank", icon: "🏦", color: "#1976D2" },
@@ -131,6 +132,9 @@ export default function Accounts() {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editAccount, setEditAccount] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteInfo, setDeleteInfo] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -141,14 +145,31 @@ export default function Accounts() {
     }).finally(() => setLoading(false));
   }, []);
 
-  async function handleDelete(id) {
-    // Optimistic update: remove from UI immediately
-    setAccounts(prev => prev.filter(a => a.id !== id));
+  async function confirmDelete(acc) {
+    if (acc.is_default && accounts.length > 1) {
+      toast.error("Tidak bisa menghapus rekening utama saat masih ada rekening lain.");
+      return;
+    }
+    const txs = await base44.entities.Transaction.filter({ account_id: acc.id });
+    setDeleteTarget(acc);
+    setDeleteInfo({ count: txs.length });
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await base44.entities.Account.delete(id);
+      const txs = await base44.entities.Transaction.filter({ account_id: deleteTarget.id });
+      await Promise.all(txs.map(tx => base44.entities.Transaction.update(tx.id, { account_id: null })));
+      await base44.entities.Account.delete(deleteTarget.id);
+      setAccounts(prev => prev.filter(a => a.id !== deleteTarget.id));
+      toast.success(`Rekening "${deleteTarget.name}" berhasil dihapus.`);
     } catch (error) {
-      // If delete fails (account already deleted), just keep it removed from UI
-      console.log('Account already deleted or cannot be deleted');
+      toast.error("Gagal menghapus rekening.");
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+      setDeleteInfo(null);
     }
   }
 
@@ -207,7 +228,10 @@ export default function Accounts() {
                     {acc.is_default && <span className="text-[10px] bg-[#FF6A00]/10 text-[#FF6A00] font-bold px-2 py-0.5 rounded-full">Utama</span>}
                   </div>
                   <p className="text-xs text-[#8FA4C8] mt-0.5">{typeLabel[acc.type] || acc.type}</p>
-                  <p className="text-base font-bold mt-1" style={{ color: acc.color || "#1A1A1A" }}>{formatRupiah(acc.balance)}</p>
+                  <p className="text-base font-bold mt-1" style={{ color: (acc.balance || 0) < 0 ? "#EF4444" : (acc.color || "#1A1A1A") }}>
+                    {formatRupiah(acc.balance)}
+                    {(acc.balance || 0) < 0 && <span className="ml-1 text-[10px] bg-red-100 text-red-500 font-bold px-1.5 py-0.5 rounded-full">Negatif</span>}
+                  </p>
                 </div>
                 <div className="flex items-center gap-1">
                   {!acc.is_default && (
@@ -218,7 +242,7 @@ export default function Accounts() {
                   <button onClick={() => { setEditAccount(acc); setShowModal(true); }} className="p-2 rounded-xl hover:bg-[#F2F4F7] text-[#8FA4C8] transition-colors">
                     <Pencil className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleDelete(acc.id)} className="p-2 rounded-xl hover:bg-red-50 text-[#8FA4C8] hover:text-red-500 transition-colors">
+                  <button onClick={() => confirmDelete(acc)} className="p-2 rounded-xl hover:bg-red-50 text-[#8FA4C8] hover:text-red-500 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -248,6 +272,35 @@ export default function Accounts() {
             setEditAccount(null);
           }}
         />
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <p className="font-bold text-[#1A1A1A]">Hapus Rekening?</p>
+            </div>
+            <p className="text-sm text-[#4A5568] mb-5">
+              Menghapus rekening <span className="font-semibold">"{deleteTarget.name}"</span> akan mempengaruhi{" "}
+              <span className="font-semibold text-red-500">{deleteInfo?.count || 0} transaksi</span> terkait.
+              Transaksi tersebut tidak akan terhapus, tapi tidak lagi terhubung ke rekening manapun.
+            </p>
+            <div className="flex gap-2">
+              <button onClick={() => { setDeleteTarget(null); setDeleteInfo(null); }}
+                className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#4A5568] hover:bg-[#F2F4F7] transition-colors">
+                Batal
+              </button>
+              <button onClick={handleDelete} disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-1">
+                {deleting ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : null}
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
