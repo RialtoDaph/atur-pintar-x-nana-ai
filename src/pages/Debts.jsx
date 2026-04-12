@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, CreditCard, CheckCircle, Pencil, Crown } from "lucide-react";
+import { Plus, Trash2, CreditCard, CheckCircle, Pencil, Crown, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import AddDebtModal from "@/components/debts/AddDebtModal.jsx";
 import PayDebtModal from "@/components/debts/PayDebtModal";
 import IOUSection from "@/components/splitbill/IOUSection";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import DebtNanaPanel from "@/components/debts/DebtNanaPanel";
+import DebtDetailModal from "@/components/debts/DebtDetailModal";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 import { toast } from "sonner";
 
@@ -30,6 +31,8 @@ export default function DebtsPage() {
   const [paymentModal, setPaymentModal] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [markPaidConfirm, setMarkPaidConfirm] = useState(null);
+  const [detailDebt, setDetailDebt] = useState(null);
+  const [activeTab, setActiveTab] = useState("active");
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -83,6 +86,26 @@ export default function DebtsPage() {
     } catch (error) {
       loadData();
     }
+  }
+
+  async function handleSaveNewDebt(data) {
+    const debt = await base44.entities.Debt.create(data);
+    // Auto-create recurring transaction if monthly_payment set
+    if (data.monthly_payment > 0) {
+      await base44.entities.Transaction.create({
+        type: "expense",
+        category: "cicilan",
+        amount: data.monthly_payment,
+        note: `Cicilan ${data.name}`,
+        date: data.due_date || new Date().toISOString().split("T")[0],
+        debt_id: debt.id,
+        is_recurring: true,
+        recurring_interval: "monthly",
+      });
+      toast.success(`Transaksi rutin cicilan ${data.name} berhasil dibuat.`);
+    }
+    setShowAdd(false);
+    loadData();
   }
 
   async function markPaid(debt) {
@@ -155,18 +178,35 @@ export default function DebtsPage() {
         )}
         <IOUSection />
         <DebtNanaPanel debts={debts} />
+        {/* Tabs */}
+        <div className="flex bg-white rounded-2xl p-1 shadow-sm">
+          <button onClick={() => setActiveTab("active")}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              activeTab === "active" ? "bg-[#FF6A00] text-white" : "text-[#8FA4C8]"
+            }`}>
+            Aktif ({activeDebts.length})
+          </button>
+          <button onClick={() => setActiveTab("paid")}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              activeTab === "paid" ? "bg-[#00C9A7] text-white" : "text-[#8FA4C8]"
+            }`}>
+            Lunas ({paidDebts.length})
+          </button>
+        </div>
+
         {loading ? (
           [...Array(2)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" />)
-        ) : activeDebts.length === 0 ? (
+        ) : activeTab === "active" && activeDebts.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
             <CreditCard className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
             <p className="text-[#4A5568] font-semibold">{t('debts_empty_title')}</p>
             <p className="text-[#8FA4C8] text-sm mt-1">{t('debts_empty_desc')}</p>
           </div>
-        ) : (
+        ) : activeTab === "active" ? (
           activeDebts.map(debt => {
             const type = DEBT_TYPES[debt.type] || DEBT_TYPES.lainnya;
             const progress = debt.total_amount > 0 ? ((debt.total_amount - debt.remaining_amount) / debt.total_amount) * 100 : 0;
+            const monthsLeft = debt.monthly_payment > 0 ? Math.ceil(debt.remaining_amount / debt.monthly_payment) : null;
             return (
               <div key={debt.id} className="bg-white rounded-2xl p-5 shadow-md border border-[#F0F2F5] hover:shadow-lg transition-all duration-200">
                 <div className="flex items-start justify-between mb-3">
@@ -180,7 +220,10 @@ export default function DebtsPage() {
                     </div>
                   </div>
                   <div className="flex gap-0.5 flex-shrink-0">
-                    <button onClick={() => setPaymentModal(debt.id)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors p-1.5" title="Make payment">
+                    <button onClick={() => setDetailDebt(debt)} className="text-[#CBD5E0] hover:text-[#8FA4C8] transition-colors p-1.5" title="Lihat Detail">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setPaymentModal(debt.id)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors p-1.5" title="Bayar cicilan">
                       <Plus className="w-4 h-4" />
                     </button>
                     <button onClick={() => setEditDebt(debt)} className="text-[#CBD5E0] hover:text-[#4F7CFF] transition-colors p-1.5" title="Edit">
@@ -196,48 +239,83 @@ export default function DebtsPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   <div className="bg-[#F8FAFC] rounded-xl p-2.5">
+                    <p className="text-[10px] text-[#8FA4C8] mb-0.5">Total Awal</p>
+                    <p className="font-bold text-sm text-[#1A1A1A]">{formatCurrency(debt.total_amount)}</p>
+                  </div>
+                  <div className="bg-[#F8FAFC] rounded-xl p-2.5">
                     <p className="text-[10px] text-[#8FA4C8] mb-0.5">{t('debts_remaining')}</p>
                     <p className="font-bold text-[#FF6B6B]">{formatCurrency(debt.remaining_amount)}</p>
                   </div>
-                  {debt.monthly_payment && (
+                  {debt.monthly_payment > 0 && (
                     <div className="bg-[#F8FAFC] rounded-xl p-2.5">
                       <p className="text-[10px] text-[#8FA4C8] mb-0.5">{t('debts_installment')}</p>
-                      <p className="font-bold text-[#1A1A1A]">{formatCurrency(debt.monthly_payment)}/m</p>
+                      <p className="font-bold text-[#1A1A1A]">{formatCurrency(debt.monthly_payment)}/bln</p>
+                    </div>
+                  )}
+                  {monthsLeft && (
+                    <div className="bg-[#4F7CFF]/10 rounded-xl p-2.5">
+                      <p className="text-[10px] text-[#4F7CFF] mb-0.5">Est. Lunas</p>
+                      <p className="font-bold text-[#4F7CFF]">{monthsLeft} bln lagi</p>
                     </div>
                   )}
                 </div>
                 <div className="w-full bg-[#F2F4F7] rounded-full h-2 mb-1">
-                  <div className="h-2 rounded-full bg-[#00C9A7] transition-all" style={{ width: `${progress}%` }} />
+                  <div className="h-2 rounded-full bg-[#00C9A7] transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
                 </div>
-                <p className="text-xs text-[#8FA4C8]">{Math.round(progress)}{t('debts_paid_pct')}</p>
+                <div className="flex justify-between text-xs text-[#8FA4C8]">
+                  <span>{Math.round(progress)}% terbayar</span>
+                  {debt.due_date && <span>Jatuh tempo: {new Date(debt.due_date).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}</span>}
+                </div>
               </div>
             );
           })
-        )}
-
-        {paidDebts.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm">
-            <p className="text-sm font-semibold text-[#8FA4C8] mb-2">✅ {t('debts_paid')} ({paidDebts.length})</p>
-            {paidDebts.map(debt => (
-              <div key={debt.id} className="flex items-center justify-between py-2 border-t border-[#F2F4F7] first:border-0">
-                <span className="text-sm text-[#4A5568] line-through">{debt.name}</span>
-                <button onClick={() => handleDelete(debt.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
-          </div>
+        ) : (
+          paidDebts.length === 0 ? (
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
+              <CheckCircle className="w-10 h-10 text-[#E2E8F0] mx-auto mb-3" />
+              <p className="text-[#4A5568] font-semibold">Belum ada utang yang lunas</p>
+            </div>
+          ) : (
+            paidDebts.map(debt => {
+              const paid = debt.total_amount - debt.remaining_amount;
+              return (
+                <div key={debt.id} className="bg-green-50 rounded-2xl p-5 shadow-sm border border-green-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-xl">
+                        {debt.icon || "✅"}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-green-900">{debt.name}</p>
+                          <span className="text-[10px] bg-green-500 text-white font-bold px-2 py-0.5 rounded-full">LUNAS</span>
+                        </div>
+                        <p className="text-xs text-green-700">Total dibayar: {formatCurrency(debt.total_amount)}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <button onClick={() => setDetailDebt(debt)} className="text-green-400 hover:text-green-600 transition-colors p-1.5">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => setDeleteConfirm(debt.id)} className="text-green-300 hover:text-red-400 transition-colors p-1.5">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="w-full bg-green-200 rounded-full h-2">
+                    <div className="h-2 rounded-full bg-green-500" style={{ width: "100%" }} />
+                  </div>
+                </div>
+              );
+            })
+          )
         )}
       </div>
 
       {showAdd && (
         <AddDebtModal
           onClose={() => setShowAdd(false)}
-          onSave={async (data) => {
-            await base44.entities.Debt.create(data);
-            setShowAdd(false);
-            loadData();
-          }}
+          onSave={handleSaveNewDebt}
         />
       )}
 
@@ -277,6 +355,8 @@ export default function DebtsPage() {
           </div>
         </div>
       )}
+
+      {detailDebt && <DebtDetailModal debt={detailDebt} onClose={() => setDetailDebt(null)} />}
 
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

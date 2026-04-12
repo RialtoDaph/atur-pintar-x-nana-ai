@@ -3,6 +3,26 @@ import { X } from "lucide-react";
 import BottomSheetSelect from "@/components/ui/BottomSheetSelect";
 import DateInput from "@/components/utils/DateInput";
 
+function parseNum(val) { return parseInt(String(val).replace(/\D/g, ""), 10) || 0; }
+function fmtNum(val) {
+  const n = parseNum(val);
+  return n > 0 ? n.toLocaleString("id-ID") : "";
+}
+function AmountInput({ label, value, onChange, placeholder }) {
+  return (
+    <div>
+      <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{label}</label>
+      <div className="relative">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] text-sm">Rp</span>
+        <input type="text" inputMode="numeric" placeholder={placeholder || "0"}
+          className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+          value={fmtNum(value)}
+          onChange={e => onChange(parseNum(e.target.value))} />
+      </div>
+    </div>
+  );
+}
+
 const DEBT_TYPES = [
 { key: "kpr", label: "KPR", emoji: "🏠" },
 { key: "kendaraan", label: "Kendaraan", emoji: "🚗" },
@@ -14,8 +34,8 @@ const DEBT_TYPES = [
 export default function AddDebtModal({ onClose, onSave, debt }) {
   const [form, setForm] = useState({
     name: debt?.name || "", type: debt?.type || "lainnya",
-    total_amount: debt?.total_amount || "", remaining_amount: debt?.remaining_amount || "",
-    interest_rate: debt?.interest_rate || "", monthly_payment: debt?.monthly_payment || "",
+    total_amount: debt?.total_amount || 0, remaining_amount: debt?.remaining_amount || 0,
+    interest_rate: debt?.interest_rate || "", monthly_payment: debt?.monthly_payment || 0,
     due_date: debt?.due_date || "", icon: debt?.icon || ""
   });
   const [saving, setSaving] = useState(false);
@@ -72,22 +92,23 @@ export default function AddDebtModal({ onClose, onSave, debt }) {
           </div>
 
           <div className="space-y-3 mb-6">
-            {[
-            { key: "name", label: "Nama Utang", placeholder: "e.g. KPR BCA, Kartu Kredit Mandiri", type: "text" },
-            { key: "total_amount", label: "Total Utang (Rp)", placeholder: "0", type: "number" },
-            { key: "remaining_amount", label: "Sisa Utang (Rp)", placeholder: "0", type: "number" },
-            { key: "monthly_payment", label: "Cicilan/Bulan (Rp)", placeholder: "0 (opsional)", type: "number" },
-            { key: "interest_rate", label: "Bunga per Tahun (%)", placeholder: "0 (opsional)", type: "number" }].
-            map((field) =>
-            <div key={field.key}>
-                <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">{field.label}</label>
-                <input type={field.type} placeholder={field.placeholder}
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
-              value={form[field.key]}
-              onChange={(e) => setForm((f) => ({ ...f, [field.key]: e.target.value }))} />
-              
-              </div>
-            )}
+            <div>
+              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Nama Utang</label>
+              <input type="text" placeholder="e.g. KPR BCA, Kartu Kredit Mandiri"
+                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+            </div>
+            <AmountInput label="Total Utang (Rp)" value={form.total_amount} onChange={v => setForm(f => ({ ...f, total_amount: v }))} />
+            <AmountInput label="Sisa Utang (Rp)" value={form.remaining_amount} onChange={v => setForm(f => ({ ...f, remaining_amount: v }))} />
+            <AmountInput label="Cicilan/Bulan (Rp)" value={form.monthly_payment} onChange={v => setForm(f => ({ ...f, monthly_payment: v }))} placeholder="0 (opsional)" />
+            <div>
+              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Bunga per Tahun (%)</label>
+              <input type="number" placeholder="0 (opsional)"
+                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
+                value={form.interest_rate}
+                onChange={e => setForm(f => ({ ...f, interest_rate: e.target.value }))} />
+            </div>
             <DateInput
               value={form.due_date}
               onChange={(date) => setForm((f) => ({ ...f, due_date: date }))}
