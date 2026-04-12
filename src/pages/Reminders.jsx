@@ -14,11 +14,8 @@ async function findLinkedRecurringTx(title, userEmail) {
 }
 
 const TYPE_CONFIG = {
-  tagihan:   { label: "Tagihan",   emoji: "🧾", color: "#FF6B6B" },
-  cicilan:   { label: "Cicilan",   emoji: "🏦", color: "#4F7CFF" },
-  tabungan:  { label: "Tabungan",  emoji: "🐷", color: "#00C9A7" },
-  langganan: { label: "Langganan", emoji: "📱", color: "#9B59B6" },
-  lainnya:   { label: "Lainnya",   emoji: "📌", color: "#F5A623" },
+  tagihan: { label: "Tagihan", emoji: "🧾", color: "#FF6B6B" },
+  lainnya: { label: "Lainnya", emoji: "📌", color: "#F5A623" },
 };
 
 function getDaysUntilDue(dueDay) {

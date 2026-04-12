@@ -10,9 +10,6 @@
       "type": "string",
       "enum": [
         "tagihan",
-        "cicilan",
-        "tabungan",
-        "langganan",
         "lainnya"
       ],
       "default": "tagihan",
@@ -20,7 +17,7 @@
     },
     "amount": {
       "type": "number",
-      "description": "Nominal yang perlu dibayar/ditabung"
+      "description": "Nominal yang perlu dibayar"
     },
     "due_day": {
       "type": "number",

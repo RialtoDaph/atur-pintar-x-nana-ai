@@ -68,6 +68,22 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Buat/update Subscription entity untuk Atur Pintar Premium
+      const existingSubs = await base44.asServiceRole.entities.Subscription.filter({ name: 'Atur Pintar Premium', created_by: payment.user_email }).catch(() => []);
+      const subData = {
+        name: 'Atur Pintar Premium',
+        icon: '⭐',
+        amount: payment.plan === 'premium_monthly' ? 39000 : 299000,
+        billing_cycle: payment.plan === 'premium_monthly' ? 'monthly' : 'yearly',
+        next_due_date: endDate.toISOString().split('T')[0],
+        status: 'active',
+      };
+      if (existingSubs.length > 0) {
+        await base44.asServiceRole.entities.Subscription.update(existingSubs[0].id, subData).catch(() => {});
+      } else {
+        await base44.asServiceRole.entities.Subscription.create({ ...subData, created_by: payment.user_email }).catch(() => {});
+      }
+
       // Kirim email notifikasi
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: payment.user_email,

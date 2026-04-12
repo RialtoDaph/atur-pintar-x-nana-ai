@@ -10,6 +10,7 @@ import PullToRefresh from "@/components/utils/PullToRefresh";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import ContractPaymentsCard from "@/components/dashboard/ContractPaymentsCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
+import ReminderWidget from "@/components/reminders/ReminderWidget";
 import { DEFAULT_CATEGORIES } from "@/components/utils/categoryConfig";
 
 export default function Transactions() {
@@ -285,6 +286,8 @@ export default function Transactions() {
         </div>
 
         <div className="max-w-2xl mx-auto px-5 mt-4 space-y-4">
+          {user && <ReminderWidget user={user} />}
+
           {!loading && transactions.length > 0 && (
             <DashboardInsights transactions={transactions} goals={goals} />
           )}

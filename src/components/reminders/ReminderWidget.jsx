@@ -16,7 +16,7 @@ function getDaysUntilDue(dueDay) {
 }
 
 const TYPE_EMOJI = {
-  tagihan: "🧾", cicilan: "🏦", tabungan: "🐷", langganan: "📱", lainnya: "📌",
+  tagihan: "🧾", lainnya: "📌",
 };
 
 export default function ReminderWidget({ user }) {

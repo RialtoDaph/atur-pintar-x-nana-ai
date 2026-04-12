@@ -3,11 +3,8 @@ import { X } from "lucide-react";
 import BottomSheetSelect from "@/components/ui/BottomSheetSelect";
 
 const TYPES = [
-  { key: "tagihan",   label: "Tagihan",   emoji: "🧾" },
-  { key: "cicilan",   label: "Cicilan",   emoji: "🏦" },
-  { key: "tabungan",  label: "Tabungan",  emoji: "🐷" },
-  { key: "langganan", label: "Langganan", emoji: "📱" },
-  { key: "lainnya",   label: "Lainnya",   emoji: "📌" },
+  { key: "tagihan", label: "Tagihan", emoji: "🧾" },
+  { key: "lainnya", label: "Lainnya", emoji: "📌" },
 ];
 
 const ICONS = ["🧾","🏦","🐷","📱","📌","💡","💧","📡","🚗","🏠","💳","📺","🎮","🍔","✈️","🏋️"];
