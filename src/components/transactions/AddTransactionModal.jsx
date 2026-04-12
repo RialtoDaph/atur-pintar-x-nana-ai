@@ -32,6 +32,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const [showSplitBill, setShowSplitBill] = useState(false);
   const [subCatPopup, setSubCatPopup] = useState(null);
   const [showGoalSelect, setShowGoalSelect] = useState(false);
+  const [accountError, setAccountError] = useState("");
   const fileRef = useRef(null);
   const cameraRef = useRef(null);
 
@@ -144,6 +145,11 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   }
 
   async function handleSave() {
+    if (!form.account_id) {
+      setAccountError("Pilih rekening terlebih dahulu");
+      return;
+    }
+    setAccountError("");
     if (!form.amount) return;
     const finalCategory = form.category || 'other';
     const amount = parseRupiah(form.amount);
@@ -282,27 +288,19 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
           {/* Account Selector */}
           {accounts.length > 0 && (
             <div className="mb-4">
-              <p className="text-xs font-semibold text-[#8FA4C8] mb-2">Rekening / Dompet</p>
+              <p className="text-xs font-semibold text-[#8FA4C8] mb-2">Rekening / Dompet <span className="text-red-500">*</span></p>
               <div className="flex gap-2 overflow-x-auto pb-1">
-                <button
-                  onClick={() => setForm(f => ({ ...f, account_id: "" }))}
-                  className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
-                    form.account_id === "" ? "bg-[#1A1A1A] text-white border-[#1A1A1A]" : "bg-[#F2F4F7] text-[#4A5568] border-transparent"
-                  }`}>
-                  Semua
-                </button>
                 {accounts.map(acc => (
                   <button
                     key={acc.id}
-                    onClick={() => setForm(f => ({ ...f, account_id: acc.id }))}
-                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
-                      form.account_id === acc.id ? "bg-[#FF6A00] text-white border-[#FF6A00]" : "bg-[#F2F4F7] text-[#4A5568] border-transparent"
-                    }`}>
+                    onClick={() => { setForm(f => ({ ...f, account_id: acc.id })); setAccountError(""); }}
+                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${form.account_id === acc.id ? "bg-[#FF6A00] text-white border-[#FF6A00]" : "bg-[#F2F4F7] text-[#4A5568] border-transparent"}`}>
                     <span>{acc.icon || "💳"}</span>
                     {acc.name}
                   </button>
                 ))}
               </div>
+              {accountError && <p className="text-xs text-red-500 mt-1">{accountError}</p>}
             </div>
           )}
 
