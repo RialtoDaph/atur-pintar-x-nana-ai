@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 
 const DEFAULTS = {
-  monthly: 49000,
-  yearly: 490000,
+  monthly: 39000,
+  yearly: 299000,
 };
 
 function formatRp(n) {

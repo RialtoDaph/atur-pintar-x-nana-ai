@@ -10,6 +10,11 @@
       ],
       "default": "user"
     },
+    "is_disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Apakah akun dinonaktifkan oleh admin"
+    },
     "subscription_plan": {
       "type": "string",
       "enum": [

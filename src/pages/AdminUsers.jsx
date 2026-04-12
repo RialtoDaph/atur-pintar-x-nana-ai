@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
-import { CheckCircle2, XCircle, Clock, AlertCircle, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, AlertCircle, RefreshCw, UserX, Shield } from "lucide-react";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -14,6 +14,7 @@ export default function AdminUsers() {
   const [errorMsg, setErrorMsg] = useState("");
   const [showStats, setShowStats] = useState(true);
   const [cleaningUp, setCleaningUp] = useState(false);
+  const [roleChangeModal, setRoleChangeModal] = useState(null); // { user, newRole }
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -36,6 +37,31 @@ export default function AdminUsers() {
       setErrorMsg("Error loading data: " + error.message);
     }
     setLoading(false);
+  }
+
+  async function changeUserRole(targetUser, newRole) {
+    if (newRole === 'admin' && !window.confirm(`Yakin ingin memberikan akses admin ke ${targetUser.email}? User ini akan punya akses penuh ke admin panel.`)) return;
+    try {
+      await base44.entities.User.update(targetUser.id, { role: newRole });
+      setSuccessMsg(`✓ Role ${targetUser.email} diubah ke ${newRole}`);
+      setTimeout(() => setSuccessMsg(""), 3000);
+      setRoleChangeModal(null);
+      await loadData();
+    } catch (error) {
+      setErrorMsg("Error changing role: " + error.message);
+    }
+  }
+
+  async function toggleUserDisabled(targetUser) {
+    const newState = !targetUser.is_disabled;
+    try {
+      await base44.entities.User.update(targetUser.id, { is_disabled: newState });
+      setSuccessMsg(`✓ Akun ${targetUser.email} ${newState ? 'dinonaktifkan' : 'diaktifkan kembali'}`);
+      setTimeout(() => setSuccessMsg(""), 3000);
+      await loadData();
+    } catch (error) {
+      setErrorMsg("Error toggling user: " + error.message);
+    }
   }
 
   async function approvePayment(paymentId, userEmail, plan, amount) {
@@ -342,6 +368,7 @@ export default function AdminUsers() {
                   <th className="text-center py-3 px-2 font-semibold text-[#1A1A1A]">Status</th>
                   <th className="text-center py-3 px-2 font-semibold text-[#1A1A1A]">Joined</th>
                   <th className="text-center py-3 px-2 font-semibold text-[#1A1A1A]">Last Active</th>
+                  <th className="text-center py-3 px-2 font-semibold text-[#1A1A1A]">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -363,6 +390,24 @@ export default function AdminUsers() {
                       </td>
                       <td className="py-3 px-2 text-center text-[#8FA4C8] text-xs">{new Date(u.created_date).toLocaleDateString("id-ID")}</td>
                       <td className="py-3 px-2 text-center text-[#8FA4C8] text-xs">{daysSinceActive}d ago</td>
+                      <td className="py-3 px-2 text-center">
+                        {u.email !== user?.email && (
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              onClick={() => setRoleChangeModal({ user: u, newRole: u.role === 'admin' ? 'user' : 'admin' })}
+                              title={u.role === 'admin' ? 'Turunkan ke user' : 'Jadikan admin'}
+                              className={`p-1.5 rounded-lg text-xs transition-colors ${u.role === 'admin' ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                              <Shield className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => toggleUserDisabled(u)}
+                              title={u.is_disabled ? 'Aktifkan akun' : 'Nonaktifkan akun'}
+                              className={`p-1.5 rounded-lg text-xs transition-colors ${u.is_disabled ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-600 hover:bg-red-200'}`}>
+                              <UserX className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -371,6 +416,26 @@ export default function AdminUsers() {
           </div>
         </div>
       </div>
+
+      {/* Role Change Confirmation Modal */}
+      {roleChangeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-[#1A1A1A] mb-2">Ubah Role User</h3>
+            <p className="text-sm text-[#8FA4C8] mb-4">
+              Ubah role <strong>{roleChangeModal.user.email}</strong> menjadi <strong>{roleChangeModal.newRole}</strong>?
+              {roleChangeModal.newRole === 'admin' && " User ini akan punya akses penuh ke admin panel."}
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setRoleChangeModal(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-medium hover:bg-[#F8FAFC]">Batal</button>
+              <button onClick={() => changeUserRole(roleChangeModal.user, roleChangeModal.newRole)}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6A00] text-white text-sm font-bold hover:bg-[#E55A00]">
+                Ya, Ubah Role
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

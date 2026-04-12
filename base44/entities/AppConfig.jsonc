@@ -27,11 +27,6 @@
       "default": true,
       "description": "Enable streaks and achievements"
     },
-    "feature_waiting_list": {
-      "type": "boolean",
-      "default": true,
-      "description": "Enable waiting list"
-    },
     "maintenance_mode": {
       "type": "boolean",
       "default": false,
@@ -39,12 +34,12 @@
     },
     "premium_price_monthly": {
       "type": "number",
-      "default": 49000,
+      "default": 39000,
       "description": "Monthly premium price in IDR"
     },
     "premium_price_yearly": {
       "type": "number",
-      "default": 490000,
+      "default": 299000,
       "description": "Yearly premium price in IDR"
     },
     "app_name": {

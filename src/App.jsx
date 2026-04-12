@@ -1,5 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
+import { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
+import { base44 } from '@/api/base44Client';
 import { queryClientInstance } from '@/lib/query-client'
 import { AppConfigProvider } from '@/components/utils/AppConfigContext'
 import { pagesConfig } from './pages.config'
@@ -23,6 +25,7 @@ import AdminLogs from '@/pages/AdminLogs';
 import AdminNotifications from '@/pages/AdminNotifications';
 import AdminCategories from '@/pages/AdminCategories';
 import AdminSettings from '@/pages/AdminSettings';
+import MaintenancePage from '@/pages/MaintenancePage';
 import AdminProtect from '@/components/admin/AdminProtect';
 
 const { Pages, Layout } = pagesConfig;
@@ -33,6 +36,17 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    base44.asServiceRole.entities.AppConfig.list().then(configs => {
+      if (configs && configs.length && configs[0].maintenance_mode === true) {
+        setMaintenanceMode(true);
+      }
+    }).catch(() => {});
+    base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
+  }, []);
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -41,6 +55,11 @@ const AuthenticatedApp = () => {
         <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  // Maintenance mode check
+  if (maintenanceMode && currentUser?.role !== 'admin') {
+    return <MaintenancePage />;
   }
 
   // Handle authentication errors
