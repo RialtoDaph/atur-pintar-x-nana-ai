@@ -14,6 +14,7 @@ import TourGuide from "@/components/onboarding/TourGuide";
 function LayoutInner({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showAlertsDrawer, setShowAlertsDrawer] = useState(false);
   const [anyModalOpen, setAnyModalOpen] = useState(false);
   const [unreadAlertCount, setUnreadAlertCount] = useState(0);
@@ -77,6 +78,17 @@ function LayoutInner({ children, currentPageName }) {
         setUnreadAlertCount(prev => prev + upcoming.length);
       }).catch(() => {});
     }).catch(() => {});
+  }, []);
+
+  // Keyboard height detection for mobile
+  useEffect(() => {
+    if (!window.visualViewport) return;
+    const handler = () => {
+      const keyH = Math.max(0, window.innerHeight - window.visualViewport.height);
+      setKeyboardHeight(keyH);
+    };
+    window.visualViewport.addEventListener('resize', handler);
+    return () => window.visualViewport.removeEventListener('resize', handler);
   }, []);
 
   // Dark mode: default light, only enable if user manually set it
@@ -185,7 +197,7 @@ function LayoutInner({ children, currentPageName }) {
   }, [currentPageName]);
 
   return (
-    <div className="min-h-screen font-sans bg-[#F2F4F7] sm:pb-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 64px)' }}>
+    <div className="min-h-screen font-sans bg-[#F2F4F7] sm:pb-0" style={{ paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : 'calc(env(safe-area-inset-bottom, 0px) + 64px)' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
