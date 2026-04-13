@@ -56,7 +56,8 @@ export default function Reminders() {
     setLoading(true);
     try {
       const data = await base44.entities.Reminder.filter({ created_by: user.email }, "-created_date");
-      setReminders(data);
+      const allowed = data.filter(r => !r.type || r.type === 'tagihan' || r.type === 'lainnya');
+      setReminders(allowed);
     } catch (e) {
       console.error("Failed to load reminders", e);
     }
