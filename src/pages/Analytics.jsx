@@ -1,24 +1,31 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppSettings } from "@/components/utils/useAppSettings";
-import { Calendar, ChevronDown } from "lucide-react";
+import PremiumGate from "@/components/subscription/PremiumGate";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { LayoutList, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Suspense, lazy } from "react";
+const PortfolioSummary = lazy(() => import("@/components/dashboard/PortfolioSummary"));
+const GoalsMiniList = lazy(() => import("@/components/dashboard/GoalsMiniList"));
+import AnalyticsCardManager from "@/components/analytics/AnalyticsCardManager";
+import PremiumBlurCard from "@/components/subscription/PremiumBlurCard";
+import NetWorthCard from "@/components/analytics/NetWorthCard";
+import AIFinancialNarrative from "@/components/analytics/AIFinancialNarrative";
 
-import SummaryCards from "@/components/analytics/SummaryCards";
-import DailyCashflowChart from "@/components/analytics/DailyCashflowChart";
-import MonthlyTrendChart from "@/components/analytics/MonthlyTrendChart";
-import CategoryBreakdown from "@/components/analytics/CategoryBreakdown";
-import BudgetVsActual from "@/components/analytics/BudgetVsActual";
-import NetWorthSnapshot from "@/components/analytics/NetWorthSnapshot";
-import TopTransactions from "@/components/analytics/TopTransactions";
-import SmartInsights from "@/components/analytics/SmartInsights";
+import FinancialCalendar from "@/components/analytics/FinancialCalendar";
+import DateRangeFilter from "@/components/analytics/DateRangeFilter";
+import DailySpendingCard from "@/components/analytics/DailySpendingCard";
+import SpendingChart from "@/components/dashboard/SpendingChart";
 
-const PERIOD_OPTIONS = [
-  { label: "Bulan ini", value: "this_month" },
-  { label: "3 Bulan Terakhir", value: "3" },
-  { label: "6 Bulan Terakhir", value: "6" },
-  { label: "Tahun ini", value: "this_year" },
-  { label: "Custom", value: "custom" },
+const DEFAULT_ANALYTICS_CARDS = [
+  { id: "net_worth", visible: true },
+  { id: "financial_calendar", visible: true },
+  { id: "daily_spending", visible: true },
+  { id: "spending_chart", visible: true },
+  { id: "portfolio_summary", visible: true },
 ];
 
 const DEFAULT_CATEGORIES_FLAT = [
@@ -33,65 +40,56 @@ const DEFAULT_CATEGORIES_FLAT = [
   { key: "freelance", i18nKey: "cat_freelance", emoji: "💻", color: "#34C87A" },
   { key: "savings", i18nKey: "cat_savings", emoji: "🐷", color: "#4F7CFF" },
   { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#8FA4C8" },
-  { key: "cicilan", i18nKey: "cat_cicilan", emoji: "💳", color: "#EF4444" },
 ];
 
-function getDateRange(period, customFrom, customTo) {
-  const now = new Date();
-  if (period === "this_month") {
-    return {
-      from: new Date(now.getFullYear(), now.getMonth(), 1),
-      to: now,
-    };
-  }
-  if (period === "this_year") {
-    return {
-      from: new Date(now.getFullYear(), 0, 1),
-      to: now,
-    };
-  }
-  if (period === "custom" && customFrom && customTo) {
-    return { from: new Date(customFrom), to: new Date(customTo + "T23:59:59") };
-  }
-  const months = parseInt(period) || 6;
-  return {
-    from: new Date(now.getFullYear(), now.getMonth() - (months - 1), 1),
-    to: now,
-  };
-}
-
 export default function Analytics() {
-  const { t, formatCurrency } = useAppSettings();
+  const { t, formatShortNumber, formatCurrency } = useAppSettings();
   const queryClient = useQueryClient();
-
-  const [period, setPeriod] = useState("this_month");
-  const [customFrom, setCustomFrom] = useState("");
-  const [customTo, setCustomTo] = useState("");
-  const [showPeriodMenu, setShowPeriodMenu] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [filterPeriod, setFilterPeriod] = useState("6");
+  const [customDateRange, setCustomDateRange] = useState(null);
   const [user, setUser] = useState(null);
+  const [analyticsCards, setAnalyticsCards] = useState(DEFAULT_ANALYTICS_CARDS);
+  const [appSettings, setAppSettings] = useState(null);
+  const [showCardManager, setShowCardManager] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(u => setUser(u)).catch(() => {});
   }, []);
 
+  // Real-time subscriptions — sama seperti Dashboard agar cache selalu sinkron
+  useEffect(() => {
+    if (!user?.email) return;
+    const unsub1 = base44.entities.Transaction.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ["transactions_analytics", user.email] });
+      queryClient.invalidateQueries({ queryKey: ["transactions_dashboard", user.email] });
+    });
+    const unsub2 = base44.entities.SavingsGoal.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ["goals", user.email] });
+    });
+    const unsub3 = base44.entities.Budget.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ["budgets", user.email] });
+    });
+    return () => { unsub1(); unsub2(); unsub3(); };
+  }, [user?.email]);
+
   const enabled = !!user?.email;
 
+  // Query key TERPISAH dari Dashboard agar limit 300 tidak konflik dengan cache 100
   const { data: rawTransactions = [], isLoading: txLoading } = useQuery({
     queryKey: ["transactions_analytics", user?.email],
-    queryFn: () => base44.entities.Transaction.filter({ created_by: user.email }, "-date", 500),
+    queryFn: () => base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300),
     enabled,
-    staleTime: 0,
+    staleTime: 0, // selalu ambil data terbaru
   });
 
-  const { data: goals = [] } = useQuery({
+  const { data: goals = [], isLoading: goalsLoading } = useQuery({
     queryKey: ["goals", user?.email],
-    queryFn: () => base44.entities.SavingsGoal.filter({ created_by: user.email }),
+    queryFn: () => base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
     enabled,
     staleTime: 2 * 60 * 1000,
   });
 
-  const { data: budgets = [] } = useQuery({
+  const { data: budgets = [], isLoading: budgetsLoading } = useQuery({
     queryKey: ["budgets", user?.email],
     queryFn: () => base44.entities.Budget.filter({ created_by: user.email }),
     enabled,
@@ -112,13 +110,6 @@ export default function Analytics() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: accounts = [] } = useQuery({
-    queryKey: ["accounts", user?.email],
-    queryFn: () => base44.entities.Account.filter({ created_by: user.email }),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  });
-
   const { data: customCategories = [] } = useQuery({
     queryKey: ["custom_categories"],
     queryFn: () => base44.entities.CustomCategory.list("-created_date"),
@@ -126,179 +117,294 @@ export default function Analytics() {
     staleTime: 10 * 60 * 1000,
   });
 
-  useEffect(() => {
-    if (!user?.email) return;
-    const unsub = base44.entities.Transaction.subscribe(() =>
-      queryClient.invalidateQueries({ queryKey: ["transactions_analytics", user.email] })
-    );
-    return unsub;
-  }, [user?.email]);
+  // Load analytics card settings from AppSettings
+  const { data: settingsList = [] } = useQuery({
+    queryKey: ["app_settings", user?.email],
+    queryFn: () => base44.entities.AppSettings.list(),
+    enabled,
+    staleTime: 10 * 60 * 1000,
+  });
 
-  // Clean transactions: exclude deleted, recurring templates, and opening_balance
-  const transactions = useMemo(() =>
-    rawTransactions.filter(tx =>
-      !tx.is_deleted &&
-      !(tx.is_recurring === true && !tx.is_recurring_child) &&
-      tx.category !== "opening_balance"
-    ),
-    [rawTransactions]
-  );
+  useEffect(() => {
+    const userSettings = settingsList?.find(s => s.id === user?.settings_id);
+    if (userSettings) {
+      setAppSettings(userSettings);
+      if (userSettings.analytics_cards && userSettings.analytics_cards.length > 0) {
+        setAnalyticsCards(userSettings.analytics_cards);
+      }
+    }
+  }, [settingsList, user?.settings_id]);
+
+  // Filter recurring templates (is_recurring=true & bukan child) dari semua kalkulasi
+  const transactions = rawTransactions.filter(t => !(t.is_recurring === true && !t.is_recurring_child));
+
+  const loading = txLoading || goalsLoading || budgetsLoading;
+
+  const localizedMonths = useMemo(() => {
+    return [
+      t('month_jan'), t('month_feb'), t('month_mar'), t('month_apr'),
+      t('month_may'), t('month_jun'), t('month_jul'), t('month_aug'),
+      t('month_sep'), t('month_oct'), t('month_nov'), t('month_dec')
+    ];
+  }, [t]);
 
   const allCategoriesConfig = useMemo(() => {
     const config = {};
     DEFAULT_CATEGORIES_FLAT.forEach(cat => {
-      config[cat.key] = { label: t(cat.i18nKey) || cat.key, emoji: cat.emoji, color: cat.color };
+      config[cat.key] = { label: t(cat.i18nKey), emoji: cat.emoji, color: cat.color };
     });
     customCategories.forEach(cat => {
-      config[`custom_${cat.id}`] = { label: cat.name, emoji: cat.emoji, color: cat.color || "#8FA4C8" };
+      config[`custom_${cat.id}`] = { label: cat.name, emoji: cat.emoji, color: cat.color };
     });
     return config;
   }, [customCategories, t]);
 
-  const dateRange = getDateRange(period, customFrom, customTo);
+  const handleFilterChange = (filter) => {
+    if (filter.type === "period") {
+      setFilterPeriod(filter.value);
+      setCustomDateRange(null);
+    } else if (filter.type === "custom") {
+      setCustomDateRange({
+        start: new Date(filter.startDate),
+        end: new Date(filter.endDate),
+      });
+    }
+  };
 
-  const periodTx = useMemo(() =>
-    transactions.filter(tx => {
-      if (!tx.date) return false;
-      const d = new Date(tx.date);
-      return d >= dateRange.from && d <= dateRange.to;
-    }),
-    [transactions, dateRange]
-  );
+  const formatYAxisTick = useCallback((value) => formatShortNumber(value), [formatShortNumber]);
 
-  // Apply category filter for display in category breakdown
-  const filteredForCategory = selectedCategory
-    ? periodTx.filter(tx => tx.category === selectedCategory)
-    : periodTx;
+  const isCardVisible = (id) => {
+    const card = analyticsCards.find(c => c.id === id);
+    return card ? card.visible : true;
+  };
 
-  const totalIncome = useMemo(() =>
-    periodTx.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0),
-    [periodTx]
-  );
-  const totalExpense = useMemo(() =>
-    periodTx.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0),
-    [periodTx]
-  );
-  const totalSavings = useMemo(() =>
-    periodTx.filter(t => t.type === "savings").reduce((s, t) => s + t.amount, 0),
-    [periodTx]
-  );
+  const handleSaveCards = async (newCards) => {
+    setAnalyticsCards(newCards);
+    if (appSettings) {
+      await base44.entities.AppSettings.update(appSettings.id, { analytics_cards: newCards });
+    } else {
+      const created = await base44.entities.AppSettings.create({ analytics_cards: newCards });
+      setAppSettings(created);
+    }
+  };
 
-  const periodLabel = PERIOD_OPTIONS.find(o => o.value === period)?.label || period;
-  const loading = txLoading;
+  const formatPeriodLabel = (period) => {
+    const months = parseInt(period);
+    if (months === 1) return t('this_month') || 'Bulan ini';
+    if (months === 3) return '3 bulan terakhir';
+    if (months === 6) return '6 bulan terakhir';
+    if (months === 12) return '12 bulan terakhir';
+    return `${months} bulan terakhir`;
+  };
+
+  const now = new Date();
+  const getMonthRange = () => {
+    if (customDateRange) {
+      return customDateRange;
+    }
+    const months = parseInt(filterPeriod);
+    return {
+      start: new Date(now.getFullYear(), now.getMonth() - (months - 1), 1),
+      end: now,
+    };
+  };
+
+  const monthRange = getMonthRange();
+  const monthDiff =
+    (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
+    (monthRange.end.getMonth() - monthRange.start.getMonth());
+
+  const trendData = Array.from({ length: monthDiff + 1 }, (_, i) => {
+    const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
+    const month = d.getMonth();
+    const year = d.getFullYear();
+    const monthTx = transactions.filter(t => {
+      const td = new Date(t.date);
+      return td.getMonth() === month && td.getFullYear() === year;
+    });
+    return {
+      name: localizedMonths[month],
+      Income: monthTx.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0),
+      Expenses: monthTx.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0),
+    };
+  });
+
+  const thisMonthTx = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "expense";
+  });
+
+  // Filtered expenses based on selected period (for category breakdown)
+  const filteredExpenses = transactions.filter(t => {
+    if (t.type !== "expense") return false;
+    const d = new Date(t.date);
+    return d >= monthRange.start && d <= monthRange.end;
+  });
+
+  const categoryMap = {};
+  filteredExpenses.forEach(t => {
+    const cat = t.category || "other";
+    categoryMap[cat] = (categoryMap[cat] || 0) + t.amount;
+  });
+
+  const pieData = Object.entries(categoryMap)
+    .map(([key, value]) => ({
+      name: allCategoriesConfig[key]?.label || key,
+      value,
+      color: allCategoriesConfig[key]?.color || "#8FA4C8",
+      emoji: allCategoriesConfig[key]?.emoji || "📦",
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  const totalExpenses = filteredExpenses.reduce((s, t) => s + t.amount, 0);
+
+
+
+  const budgetData = budgets.map(b => {
+    const catConfig = allCategoriesConfig[b.category] || {};
+    const spent = thisMonthTx.filter(t => t.category === b.category).reduce((s, t) => s + t.amount, 0);
+    return { name: (catConfig.emoji || "") + " " + (catConfig.label || b.category), budget: b.amount, spent };
+  });
+
+  const goalsData = goals.map(g => ({
+    name: g.name,
+    current: g.current_amount || 0,
+    target: g.target_amount,
+    progress: ((g.current_amount || 0) / (g.target_amount || 1)) * 100,
+    color: g.color || "#FF6A00"
+  }));
+
+  const totalInvested = investments.reduce((s, inv) => s + inv.initial_amount, 0);
+  const totalCurrentValue = investments.reduce((s, inv) => s + inv.current_value, 0);
+  const investmentReturn = totalCurrentValue - totalInvested;
+
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+
+  const totalIncome = trendData.reduce((sum, month) => sum + month.Income, 0);
+  const periodExpenses = trendData.reduce((sum, month) => sum + month.Expenses, 0);
+  const netCashflow = totalIncome - periodExpenses;
+  const savingsRate = totalIncome > 0 ? ((netCashflow / totalIncome) * 100).toFixed(1) : 0;
 
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-10">
       {/* Header */}
-      <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-10 pb-6">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-[#8FA4C8] text-sm font-medium">Analitik Keuangan</p>
-          <h1 className="text-white text-2xl font-bold mt-0.5">Statistik & Insight</h1>
-
-          {/* Period Filter */}
-          <div className="mt-4 relative">
-            <button
-              onClick={() => setShowPeriodMenu(v => !v)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-semibold transition-colors"
-            >
-              <Calendar className="w-4 h-4" />
-              {periodLabel}
-              <ChevronDown className={`w-4 h-4 transition-transform ${showPeriodMenu ? "rotate-180" : ""}`} />
-            </button>
-            {showPeriodMenu && (
-              <div className="absolute top-full mt-2 left-0 z-30 bg-white rounded-2xl shadow-xl border border-[#F0F2F5] overflow-hidden w-56">
-                {PERIOD_OPTIONS.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => { setPeriod(opt.value); setShowPeriodMenu(false); }}
-                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-[#F8FAFC] ${period === opt.value ? "text-[#F97316] font-bold bg-[#FFF7ED]" : "text-[#1A1A1A]"}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
+      <div className="bg-[#0A0A0A] px-5 pt-8 pb-6 sm:pt-10 sm:pb-8">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div>
+            <p className="text-[#8FA4C8] text-xs sm:text-sm font-medium">{t('analytics_overview')}</p>
+            <h1 className="text-white text-xl sm:text-2xl font-bold mt-1">{t('analytics_title')}</h1>
           </div>
-
-          {/* Custom Date Range */}
-          {period === "custom" && (
-            <div className="mt-3 flex gap-2">
-              <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
-                className="flex-1 px-3 py-2 bg-white/10 text-white text-xs rounded-xl border border-white/20 outline-none" />
-              <span className="text-white/60 self-center text-xs">s/d</span>
-              <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)}
-                className="flex-1 px-3 py-2 bg-white/10 text-white text-xs rounded-xl border border-white/20 outline-none" />
-            </div>
-          )}
+          <button
+            onClick={() => setShowCardManager(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white"
+            title="Kelola kartu"
+          >
+            <LayoutList className="w-4 h-4" />
+            <span className="text-xs font-medium hidden sm:block">Kelola</span>
+          </button>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 mt-4 space-y-4">
-        {loading ? (
-          <div className="space-y-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <>
-            {/* 1. Summary Cards */}
-            <SummaryCards income={totalIncome} expense={totalExpense} savings={totalSavings} />
+      <div className="max-w-4xl mx-auto px-5 mt-4 space-y-5">
 
-            {/* 2. Smart Insights */}
-            <SmartInsights
-              transactions={transactions}
-              budgets={budgets}
+        {/* Filter - Compact at top */}
+        <div className="relative">
+          <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
+        </div>
+
+        {/* AI Financial Narrative — visible to all, but free users only see 3 months */}
+        <AIFinancialNarrative
+          trendData={trendData}
+          pieData={pieData}
+          totalIncome={totalIncome}
+          totalExpenses={periodExpenses}
+          savingsRate={savingsRate}
+          periodLabel={formatPeriodLabel(isPremium ? filterPeriod : "3")}
+          goals={goals}
+        />
+
+        {/* Net Worth Card */}
+        {isCardVisible("net_worth") && (
+          isPremium ? (
+            <NetWorthCard
               goals={goals}
-              allCategoriesConfig={allCategoriesConfig}
-            />
-
-            {/* 3. Daily Cash Flow */}
-            <DailyCashflowChart transactions={periodTx} />
-
-            {/* 4. Monthly Trend (always 6 months) */}
-            <MonthlyTrendChart transactions={transactions} />
-
-            {/* 5. Category Breakdown */}
-            <CategoryBreakdown
-              expenses={periodTx.filter(tx => tx.type === "expense")}
-              allCategoriesConfig={allCategoriesConfig}
-              onCategoryClick={setSelectedCategory}
-              selectedCategory={selectedCategory}
-            />
-
-            {/* Filtered transactions by category (if selected) */}
-            {selectedCategory && (
-              <TopTransactions
-                transactions={filteredForCategory}
-                allCategoriesConfig={allCategoriesConfig}
-              />
-            )}
-
-            {/* 6. Budget vs Actual */}
-            <BudgetVsActual
-              budgets={budgets}
-              transactions={transactions}
-              allCategoriesConfig={allCategoriesConfig}
-            />
-
-            {/* 7. Net Worth */}
-            <NetWorthSnapshot
-              accounts={accounts}
               investments={investments}
               debts={debts}
+              transactions={transactions}
             />
-
-            {/* 8. Top 5 Transactions */}
-            {!selectedCategory && (
-              <TopTransactions
-                transactions={periodTx}
-                allCategoriesConfig={allCategoriesConfig}
-              />
-            )}
-          </>
+          ) : (
+            <PremiumBlurCard title="📊 Kekayaan Bersih (Net Worth)">
+              <NetWorthCard goals={goals} investments={investments} debts={debts} transactions={transactions} />
+            </PremiumBlurCard>
+          )
         )}
+
+
+
+        {/* Calendar Section */}
+        {isCardVisible("financial_calendar") && (
+          isPremium ? (
+            <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
+          ) : (
+            <PremiumBlurCard title="📅 Kalender Keuangan">
+              <FinancialCalendar transactions={transactions} debts={debts} goals={goals} />
+            </PremiumBlurCard>
+          )
+        )}
+
+        {/* Daily Spending Card */}
+        {isCardVisible("daily_spending") && (
+          isPremium ? (
+            <DailySpendingCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
+          ) : (
+            <PremiumBlurCard title="📈 Pengeluaran Harian">
+              <DailySpendingCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
+            </PremiumBlurCard>
+          )
+        )}
+
+        {/* Portfolio Summary */}
+        {isCardVisible("portfolio_summary") && (
+          isPremium ? (
+            <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
+              <PortfolioSummary user={user} />
+            </Suspense>
+          ) : (
+            <PremiumBlurCard title="💼 Ringkasan Portofolio Investasi">
+              <div className="bg-white rounded-2xl h-32 shadow-sm" />
+            </PremiumBlurCard>
+          )
+        )}
+
+        {/* Spending by Category */}
+        {isCardVisible("spending_chart") && (
+          isPremium ? (
+            <SpendingChart transactions={transactions.filter(t => {
+              const d = new Date(t.date);
+              return d >= monthRange.start && d <= monthRange.end;
+            })} loading={loading} />
+          ) : (
+            <PremiumBlurCard title="🛍️ Pengeluaran per Kategori">
+              <SpendingChart transactions={transactions.filter(t => {
+                const d = new Date(t.date);
+                return d >= monthRange.start && d <= monthRange.end;
+              })} loading={loading} />
+            </PremiumBlurCard>
+          )
+        )}
+
+
+
       </div>
+
+      {/* Card Manager Modal */}
+      {showCardManager && (
+        <AnalyticsCardManager
+          cards={analyticsCards}
+          onSave={handleSaveCards}
+          onClose={() => setShowCardManager(false)}
+        />
+      )}
     </div>
   );
 }
