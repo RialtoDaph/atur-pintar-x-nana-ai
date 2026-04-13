@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { LogOut, Trash2, Crown, ChevronDown, Pencil } from "lucide-react";
+import { LogOut, Trash2, Crown, ChevronDown, Pencil, Lock } from "lucide-react";
+import ChangePasswordModal from "@/components/profile/ChangePasswordModal";
 import EditProfileForm from "@/components/profile/EditProfileForm";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAppSettings } from "@/components/utils/useAppSettings";
@@ -16,6 +17,7 @@ export default function ProfileSettings() {
   const [deleting, setDeleting] = useState(false);
   const [expandedDropdown, setExpandedDropdown] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -148,6 +150,22 @@ export default function ProfileSettings() {
           )}
         </div>
 
+        {/* Security */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Keamanan</p>
+          </div>
+          <button
+            onClick={() => setShowChangePassword(true)}
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]">
+            <Lock className="w-5 h-5 text-[#FF6A00]" />
+            <div className="text-left flex-1">
+              <p className="font-medium text-[#1A1A1A] text-sm">Ganti Password</p>
+              <p className="text-xs text-[#8FA4C8]">Perbarui password akun kamu</p>
+            </div>
+          </button>
+        </div>
+
         {/* Account Management */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-5 pt-4 pb-2">
@@ -171,6 +189,8 @@ export default function ProfileSettings() {
 
         <p className="text-center text-xs text-[#8FA4C8] pb-4">{t('settings_version')}</p>
       </div>
+
+      {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
 
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
