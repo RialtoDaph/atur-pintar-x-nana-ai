@@ -282,10 +282,15 @@ export default function BudgetPage() {
             <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />
           ))
         ) : budgets.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-            <TrendingUp className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
-            <p className="text-[#4A5568] font-semibold">{t("budget_empty_title")}</p>
-            <p className="text-[#8FA4C8] text-sm mt-1">{t("budget_empty_desc")}</p>
+          <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
+            <div className="text-5xl mb-4">📊</div>
+            <p className="text-[#1A1A1A] font-bold text-base">Belum ada budget</p>
+            <p className="text-[#8FA4C8] text-sm mt-1 mb-5">Buat budget untuk mulai tracking pengeluaranmu tiap bulan!</p>
+            <button
+              onClick={() => setShowAdd(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF6A00] text-white rounded-xl font-bold text-sm hover:bg-[#e05e00] transition-colors">
+              <Plus className="w-4 h-4" /> Buat Budget Pertama
+            </button>
           </div>
         ) : (
           budgets.map(budget => (

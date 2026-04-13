@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { X, TrendingUp, AlertTriangle, CheckCircle, Zap, Info, Bell, Check } from "lucide-react";
+import { X, TrendingUp, AlertTriangle, CheckCircle, Zap, Info, Bell, Check, CheckCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import SmartAlertsPanel from "@/components/dashboard/SmartAlertsPanel";
 import AnomalyDetector from "@/components/analytics/AnomalyDetector";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const ALERT_CONFIG = {
@@ -36,6 +36,8 @@ export default function AlertsDrawer({ onClose, user }) {
   const [adminNotifs, setAdminNotifs] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [rawAlerts, setRawAlerts] = useState([]);
+  const navigate = useNavigate();
 
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -62,6 +64,7 @@ export default function AlertsDrawer({ onClose, user }) {
         seenTitles.add(a.title);
         return true;
       }).slice(0, 10);
+      setRawAlerts(alerts || []);
       setAlertRecords(dedupedAlerts);
       const myNotifs = (notifs || []).filter(n =>
         (n.target_type === 'all' || n.target_email === user.email) && !n.read_by?.includes(user.email)
@@ -73,8 +76,8 @@ export default function AlertsDrawer({ onClose, user }) {
       }).map(r => ({ ...r, daysLeft: getDaysUntilDue(r.due_day) })).sort((a, b) => a.daysLeft - b.daysLeft);
       setReminders(upcoming);
       setLoading(false);
-      // Mark unread alerts as read
-      alerts.filter(a => a.status === 'unread').forEach(a => base44.entities.Alert.update(a.id, { status: "read" }));
+      // Mark unread alerts as read (don't await, fire and forget)
+      alerts.filter(a => a.status === 'unread').forEach(a => base44.entities.Alert.update(a.id, { status: "read" }).catch(() => {}));
       myNotifs.forEach(n => {
         base44.entities.AdminNotification.update(n.id, { read_by: [...(n.read_by || []), user.email] }).catch(() => {});
       });
@@ -84,6 +87,18 @@ export default function AlertsDrawer({ onClose, user }) {
   async function dismissReminder(r) {
     await base44.entities.Reminder.update(r.id, { last_dismissed_month: currentMonth });
     setReminders(prev => prev.filter(x => x.id !== r.id));
+  }
+
+  async function markAllRead() {
+    await Promise.all(rawAlerts.filter(a => a.status === 'unread').map(a => base44.entities.Alert.update(a.id, { status: 'read' }).catch(() => {})));
+    setAlertRecords(prev => prev.map(a => ({ ...a, status: 'read' })));
+  }
+
+  function handleAlertClick(alert) {
+    if (alert.action_url) {
+      onClose();
+      navigate(alert.action_url);
+    }
   }
 
   return (
@@ -112,12 +127,16 @@ export default function AlertsDrawer({ onClose, user }) {
               <p className="text-white font-bold text-sm">Insights & Alerts</p>
               <p className="text-[#8FA4C8] text-xs mt-0.5">Ringkasan keuangan kamu</p>
             </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors tap-highlight-fix"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              {rawAlerts.some(a => a.status === 'unread') && (
+                <button onClick={markAllRead} className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/10 text-white/70 hover:bg-white/20 text-[10px] font-semibold transition-colors">
+                  <CheckCheck className="w-3 h-3" /> Baca Semua
+                </button>
+              )}
+              <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors tap-highlight-fix">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Content */}
@@ -182,7 +201,9 @@ export default function AlertsDrawer({ onClose, user }) {
                       const cfg = ALERT_CONFIG[alert.type] || ALERT_CONFIG.unusual_pattern;
                       const Icon = cfg.icon;
                       return (
-                        <div key={alert.id} className="bg-white rounded-2xl p-3 shadow-sm ring-2 ring-[#FF6A00]/20">
+                        <div key={alert.id}
+                          onClick={() => handleAlertClick(alert)}
+                          className={`bg-white rounded-2xl p-3 shadow-sm ring-2 ring-[#FF6A00]/20 ${alert.action_url ? 'cursor-pointer hover:bg-[#F8FAFC] active:scale-98 transition-colors' : ''}`}>
                           <div className="flex items-start gap-3">
                             <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
                               <Icon className={`w-4 h-4 ${cfg.color}`} />
