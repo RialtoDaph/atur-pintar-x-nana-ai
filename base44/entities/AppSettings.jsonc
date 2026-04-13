@@ -83,6 +83,14 @@
       "type": "boolean",
       "default": false,
       "description": "Apakah admin telah membuka kunci pengaturan bahasa & mata uang"
+    },
+    "favorite_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "ID kategori favorit user untuk quick-pick (maks 6)"
     }
   },
   "required": [],
