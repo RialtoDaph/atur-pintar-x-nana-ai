@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle } from "lucide-react";
+import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 const ACCOUNT_TYPES = [
@@ -135,6 +135,7 @@ export default function Accounts() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteInfo, setDeleteInfo] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -170,6 +171,24 @@ export default function Accounts() {
       setDeleting(false);
       setDeleteTarget(null);
       setDeleteInfo(null);
+    }
+  }
+
+  async function syncBalance(acc) {
+    setSyncing(acc.id);
+    try {
+      const txs = await base44.entities.Transaction.filter({ account_id: acc.id });
+      const income = txs.filter(tx => !tx.is_deleted && tx.type === 'income').reduce((s, tx) => s + (tx.amount || 0), 0);
+      const expense = txs.filter(tx => !tx.is_deleted && tx.type === 'expense').reduce((s, tx) => s + (tx.amount || 0), 0);
+      const savings = txs.filter(tx => !tx.is_deleted && tx.type === 'savings').reduce((s, tx) => s + (tx.amount || 0), 0);
+      const newBalance = income - expense - savings;
+      await base44.entities.Account.update(acc.id, { balance: newBalance });
+      setAccounts(prev => prev.map(a => a.id === acc.id ? { ...a, balance: newBalance } : a));
+      toast.success(`Saldo ${acc.name} disinkronkan: ${formatRupiah(newBalance)}`);
+    } catch {
+      toast.error('Gagal menyinkronkan saldo.');
+    } finally {
+      setSyncing(null);
     }
   }
 
@@ -234,6 +253,9 @@ export default function Accounts() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
+                  <button onClick={() => syncBalance(acc)} disabled={syncing === acc.id} className="p-2 rounded-xl hover:bg-blue-50 text-[#8FA4C8] hover:text-blue-500 transition-colors" title="Sinkronkan Saldo dari Transaksi">
+                    <RefreshCw className={`w-4 h-4 ${syncing === acc.id ? 'animate-spin' : ''}`} />
+                  </button>
                   {!acc.is_default && (
                     <button onClick={() => setDefault(acc)} className="p-2 rounded-xl hover:bg-amber-50 text-[#8FA4C8] hover:text-amber-500 transition-colors" title="Jadikan Utama">
                       <Star className="w-4 h-4" />

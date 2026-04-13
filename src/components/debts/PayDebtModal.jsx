@@ -2,11 +2,12 @@ import { useState } from "react";
 import { X, CreditCard } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
-export default function PayDebtModal({ debt, onClose, onConfirm }) {
+export default function PayDebtModal({ debt, accounts = [], onClose, onConfirm }) {
   const { formatCurrency } = useAppSettings();
   const [amount, setAmount] = useState(debt?.monthly_payment ? String(debt.monthly_payment) : "");
   const [note, setNote] = useState(`Cicilan ${debt?.name || ""}`);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [accountId, setAccountId] = useState(accounts.find(a => a.is_default)?.id || accounts[0]?.id || "");
   const [saving, setSaving] = useState(false);
 
   function formatInput(val) {
@@ -22,7 +23,7 @@ export default function PayDebtModal({ debt, onClose, onConfirm }) {
     const parsed = parseAmount(amount);
     if (!parsed || parsed <= 0) return;
     setSaving(true);
-    await onConfirm({ amount: parsed, note, date });
+    await onConfirm({ amount: parsed, note, date, accountId: accountId || undefined });
     setSaving(false);
   }
 
@@ -64,16 +65,31 @@ export default function PayDebtModal({ debt, onClose, onConfirm }) {
               placeholder="0"
               value={amount}
               onChange={e => setAmount(formatInput(e.target.value))}
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix font-bold text-base"
+              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC] tap-highlight-fix font-bold text-base"
             />
           </div>
+          {accounts.length > 0 && (
+            <div>
+              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Dari Rekening</label>
+              <select
+                value={accountId}
+                onChange={e => setAccountId(e.target.value)}
+                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC] tap-highlight-fix"
+              >
+                <option value="">-- Tanpa rekening --</option>
+                {accounts.map(acc => (
+                  <option key={acc.id} value={acc.id}>{acc.icon || ""} {acc.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Catatan</label>
             <input
               type="text"
               value={note}
               onChange={e => setNote(e.target.value)}
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
+              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC] tap-highlight-fix"
             />
           </div>
           <div>
@@ -82,7 +98,7 @@ export default function PayDebtModal({ debt, onClose, onConfirm }) {
               type="date"
               value={date}
               onChange={e => setDate(e.target.value)}
-              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix"
+              className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC] tap-highlight-fix"
             />
           </div>
         </div>

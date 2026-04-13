@@ -24,6 +24,7 @@ const DEBT_TYPES = {
 export default function DebtsPage() {
   const { t, formatCurrency } = useAppSettings();
   const [debts, setDebts] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editDebt, setEditDebt] = useState(null);
@@ -50,12 +51,16 @@ export default function DebtsPage() {
 
   async function loadData() {
     setLoading(true);
-    const d = await base44.entities.Debt.filter({ created_by: user.email }, "-created_date");
+    const [d, accs] = await Promise.all([
+      base44.entities.Debt.filter({ created_by: user.email }, "-created_date"),
+      base44.entities.Account.filter({ created_by: user.email }),
+    ]);
     setDebts(d);
+    setAccounts(accs || []);
     setLoading(false);
   }
 
-  async function handlePayment({ amount, note, date }) {
+  async function handlePayment({ amount, note, date, accountId }) {
     const debt = debts.find(d => d.id === paymentModal);
     if (!debt) return;
 
@@ -64,14 +69,24 @@ export default function DebtsPage() {
 
     setDebts(prev => prev.map(d => d.id === debt.id ? { ...d, remaining_amount: newRemaining, status: newStatus } : d));
     try {
+      const txData = {
+        amount,
+        type: "expense",
+        category: "cicilan",
+        note: note || `Cicilan ${debt.name}`,
+        date: date || new Date().toISOString().split("T")[0],
+        debt_id: debt.id,
+        ...(accountId ? { account_id: accountId } : {}),
+      };
       await Promise.all([
-        base44.entities.Transaction.create({
-          amount,
-          type: "expense",
-          category: "cicilan",
-          note: note || `Cicilan ${debt.name}`,
-          date: date || new Date().toISOString().split("T")[0],
-          debt_id: debt.id,
+        base44.entities.Transaction.create(txData).then(async (tx) => {
+          // Sync account balance if account selected
+          if (accountId) {
+            await base44.functions.invoke("syncTransactionChanges", {
+              action: "create",
+              transaction: txData,
+            });
+          }
         }),
         base44.entities.Debt.update(debt.id, {
           remaining_amount: newRemaining,
@@ -334,6 +349,7 @@ export default function DebtsPage() {
       {paymentModal && (
         <PayDebtModal
           debt={debts.find(d => d.id === paymentModal)}
+          accounts={accounts}
           onClose={() => setPaymentModal(null)}
           onConfirm={handlePayment}
         />

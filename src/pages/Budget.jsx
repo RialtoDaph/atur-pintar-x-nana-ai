@@ -91,7 +91,7 @@ export default function BudgetPage() {
         return true;
       });
 
-      const monthTx = txAll.filter(tx => tx.date >= monthStart && tx.date <= monthEnd && tx.type === "expense");
+      const monthTx = txAll.filter(tx => tx.date >= monthStart && tx.date <= monthEnd && tx.type === "expense" && !tx.is_deleted);
       const prev3Tx = txAll.filter(tx => tx.date >= threeMonthsAgo && tx.date < monthStart);
 
       setBudgets(b);
