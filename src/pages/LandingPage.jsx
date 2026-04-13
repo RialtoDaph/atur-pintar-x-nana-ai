@@ -44,7 +44,7 @@ function MatrixBackground() {
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, opacity: 0.45 }} />;
 }
 import { base44 } from "@/api/base44Client";
-import { CheckCircle, TrendingUp, Sparkles, Users, ArrowRight, Play, Zap, BarChart2, MessageCircle, Shield } from "lucide-react";
+import { CheckCircle, TrendingUp, Sparkles, Users, ArrowRight, Play, Zap, BarChart2, MessageCircle, Shield, Mail, Instagram, Twitter } from "lucide-react";
 
 const PROBLEMS = [
 { emoji: "💸", text: "Gaji masuk pagi, sore udah gak kerasa ada" },
@@ -61,10 +61,15 @@ const STEPS = [
 
 
 const FEATURES = [
-{ icon: <Zap className="w-5 h-5" />, title: "Pencatatan simpel", desc: "Gak ribet. Tambah transaksi dalam hitungan detik." },
-{ icon: <BarChart2 className="w-5 h-5" />, title: "Dashboard jelas", desc: "Langsung ngerti kondisi keuangan tanpa pusing." },
-{ icon: <TrendingUp className="w-5 h-5" />, title: "Analitik lengkap", desc: "Tau pola kebiasaan kamu dan kapan kamu boros." },
-{ icon: <MessageCircle className="w-5 h-5" />, title: "Nana AI", desc: "Kasih saran real berdasarkan data keuangan kamu." }];
+{ icon: "⚡", title: "Catat Transaksi", desc: "Income, expense, atau savings — dengan pilihan rekening bank, cash, atau e-wallet. Selesai dalam 3 detik." },
+{ icon: "🏦", title: "Rekening & Dompet", desc: "Kelola semua akun keuanganmu di satu tempat: bank, kas, e-wallet, investasi." },
+{ icon: "📊", title: "Budget Otomatis", desc: "Atur anggaran per kategori dan dapat alert otomatis saat mendekati limit." },
+{ icon: "💳", title: "Kelola Utang", desc: "Track semua cicilan dan utang dengan sisa saldo, jatuh tempo, dan history pembayaran." },
+{ icon: "🎯", title: "Tabungan Goals", desc: "Buat target tabungan spesifik dan pantau progress-nya setiap saat." },
+{ icon: "🔔", title: "Reminder Tagihan", desc: "Set pengingat untuk tagihan bulanan agar tidak pernah telat bayar lagi." },
+{ icon: "👥", title: "Shared Wallet", desc: "Kelola keuangan bersama pasangan, keluarga, atau teman satu kost." },
+{ icon: "🤖", title: "Nana AI", desc: "Asisten keuangan pintar yang kasih saran personal berdasarkan data keuangan nyata kamu." },
+{ icon: "🏆", title: "Gamifikasi", desc: "Streak harian, XP, dan achievement untuk menjaga motivasi kamu tetap tinggi." }];
 
 
 // PLANS is now dynamic — built inside component using usePricing
@@ -304,10 +309,10 @@ export default function LandingPage() {
             <p className="text-white/30 text-xs font-bold uppercase tracking-widest mb-2">Fitur utama</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Yang kamu dapetin</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {FEATURES.map((f, i) =>
             <div key={i} className="card-d rounded-2xl p-5 hover:border-[#FF6A00]/25 transition-colors group">
-                <div className="w-9 h-9 rounded-xl bg-[#FF6A00]/10 flex items-center justify-center text-[#FF6A00] mb-3 group-hover:bg-[#FF6A00]/20 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-[#FF6A00]/10 flex items-center justify-center text-2xl mb-3">
                   {f.icon}
                 </div>
                 <p className="text-white font-bold text-sm mb-1">{f.title}</p>
@@ -406,16 +411,49 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/5 py-8 px-5 sm:px-12 lg:px-20 relative z-10 text-center sm:text-left">
-        <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-5 h-5" />
-          <span className="text-sm font-black text-white">Atur Pintar</span>
-        </div>
-        <p className="text-white/20 text-xs mb-3">© 2026 Atur Pintar. Semua hak dilindungi.</p>
-        <div className="flex items-center justify-center sm:justify-start gap-4">
-          <Link to="/PrivacyPolicy" className="text-white/30 hover:text-white/60 text-xs transition-colors">Kebijakan Privasi</Link>
-          <span className="text-white/15 text-xs">·</span>
-          <Link to="/TermsOfService" className="text-white/30 hover:text-white/60 text-xs transition-colors">Syarat & Ketentuan</Link>
+      <footer className="border-t border-white/5 pt-10 pb-8 px-5 sm:px-12 lg:px-20 relative z-10">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-6 h-6" />
+                <span className="text-sm font-black text-white">Atur Pintar</span>
+              </div>
+              <p className="text-white/30 text-xs leading-relaxed">Aplikasi keuangan pribadi berbasis AI untuk membantu kamu mengatur uang dengan lebih cerdas.</p>
+            </div>
+            {/* Links */}
+            <div>
+              <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-3">Tautan</p>
+              <div className="space-y-2">
+                <div><Link to="/PrivacyPolicy" className="text-white/30 hover:text-white/70 text-xs transition-colors">Kebijakan Privasi</Link></div>
+                <div><Link to="/TermsOfService" className="text-white/30 hover:text-white/70 text-xs transition-colors">Syarat & Ketentuan</Link></div>
+                <div><button onClick={handleCTA} className="text-white/30 hover:text-white/70 text-xs transition-colors">Masuk / Daftar</button></div>
+              </div>
+            </div>
+            {/* Contact */}
+            <div>
+              <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-3">Kontak</p>
+              <a href="mailto:support@aturpintar.id" className="flex items-center gap-2 text-white/30 hover:text-white/70 text-xs transition-colors mb-3">
+                <Mail className="w-3.5 h-3.5" />
+                support@aturpintar.id
+              </a>
+              <div className="flex items-center gap-3">
+                <a href="https://instagram.com/aturpintar" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#FF6A00]/20 flex items-center justify-center text-white/40 hover:text-[#FF6A00] transition-colors">
+                  <Instagram className="w-3.5 h-3.5" />
+                </a>
+                <a href="https://tiktok.com/@aturpintar" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#FF6A00]/20 flex items-center justify-center text-white/40 hover:text-[#FF6A00] transition-colors">
+                  <span className="text-xs font-bold">TK</span>
+                </a>
+                <a href="https://x.com/aturpintar" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#FF6A00]/20 flex items-center justify-center text-white/40 hover:text-[#FF6A00] transition-colors">
+                  <Twitter className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-white/5 pt-5">
+            <p className="text-white/20 text-xs text-center">© 2025 Atur Pintar. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>);
