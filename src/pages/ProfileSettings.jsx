@@ -187,7 +187,11 @@ export default function ProfileSettings() {
           </button>
         </div>
 
-        <p className="text-center text-xs text-[#8FA4C8] pb-4">{t('settings_version')}</p>
+        <div className="text-center pb-4 space-y-1">
+          <p className="text-xs text-[#8FA4C8]">{t('settings_version')}</p>
+          <p className="text-[11px] text-[#8FA4C8]/60">Atur Pintar · PT Rideff Vreka Tech</p>
+          <p className="text-[10px] text-[#8FA4C8]/40 italic">"Kelola uangmu hari ini, raih kebebasan finansialmu esok hari."</p>
+        </div>
       </div>
 
       {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
