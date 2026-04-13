@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Save, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 
 const FEATURE_FLAGS = [
   { key: "feature_split_bill", label: "Split Bill", desc: "Aktifkan fitur Split Bill & IOU antar teman" },
@@ -109,10 +110,12 @@ export default function AdminSettings() {
         details: `Updated AppConfig by ${user?.email}`
       });
 
+      toast.success("Konfigurasi berhasil disimpan");
       setSuccessMsg("✓ Pengaturan berhasil disimpan!");
       setTimeout(() => setSuccessMsg(""), 4000);
     } catch (e) {
       console.error(e);
+      toast.error("Gagal menyimpan pengaturan: " + e.message);
       setErrorMsg("❌ Gagal menyimpan pengaturan: " + e.message);
     }
     setSaving(false);

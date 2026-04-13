@@ -279,14 +279,14 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
           {/* Type tabs */}
           <div className="flex bg-[#F2F4F7] rounded-xl p-1 mb-5">
-            {["expense", "income"].map((tabKey) => (
+            {["expense", "income", "savings"].map((tabKey) => (
               <button key={tabKey} onClick={() => { setTab(tabKey); setForm((f) => ({ ...f, category: "" })); }}
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                   tab === tabKey
-                    ? tabKey === "expense" ? "bg-[#FF6B6B] text-white shadow-sm" : "bg-[#00C9A7] text-white shadow-sm"
+                    ? tabKey === "expense" ? "bg-[#EF4444] text-white shadow-sm" : tabKey === "savings" ? "bg-[#3B82F6] text-white shadow-sm" : "bg-[#22C55E] text-white shadow-sm"
                     : "text-[#8FA4C8]"
                 }`}>
-                {tabKey === "expense" ? t('expense') : t('income')}
+                {tabKey === "expense" ? t('expense') : tabKey === "income" ? t('income') : "Tabungan"}
               </button>
             ))}
           </div>
@@ -329,7 +329,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
           <button onClick={handleSave} disabled={saving || !form.amount}
             className="w-full py-3.5 rounded-xl font-bold text-sm text-white disabled:opacity-40 transition-colors"
-            style={{ backgroundColor: tab === "expense" ? "#FF6B6B" : "#00C9A7" }}>
+            style={{ backgroundColor: tab === "expense" ? '#EF4444' : tab === "savings" ? '#3B82F6' : '#22C55E' }}>
             {saving ? t('saving') : `${t('add')} ${tab === "expense" ? t('expense') : t('income')}`}
           </button>
         </div>

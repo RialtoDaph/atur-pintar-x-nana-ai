@@ -465,8 +465,8 @@ export default function Transactions() {
                           <div className="px-4 py-2 bg-[#F8FAFC] border-b border-[#F2F4F7] flex items-center justify-between">
                             <p className="text-xs font-bold text-[#1A1A1A]">{group.label}</p>
                             <div className="flex gap-2 text-[11px]">
-                              {monthIncome > 0 && <span className="text-[#00C9A7] font-semibold">+{formatCurrency(monthIncome)}</span>}
-                              {monthExpense > 0 && <span className="text-[#FF6B6B] font-semibold">−{formatCurrency(monthExpense)}</span>}
+                              {monthIncome > 0 && <span className="text-[#22C55E] font-semibold">+{formatCurrency(monthIncome)}</span>}
+                              {monthExpense > 0 && <span className="text-[#EF4444] font-semibold">−{formatCurrency(monthExpense)}</span>}
                             </div>
                           </div>
                           {group.items.sort((a, b) => new Date(b.date) - new Date(a.date)).map(tx => {
@@ -500,7 +500,7 @@ export default function Transactions() {
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <span className="text-xs font-bold" style={{ color: isIncome ? "#00C9A7" : "#FF6B6B" }}>
+                                  <span className="text-xs font-bold" style={{ color: tx.type === 'income' ? '#22C55E' : tx.type === 'savings' ? '#3B82F6' : '#EF4444' }}>
                                     {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
                                   </span>
                                   {!selectMode && (

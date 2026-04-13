@@ -76,8 +76,8 @@ export default function IncomeExpenseChart({ transactions, loading }) {
             wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
             formatter={(value) => value === 'income' ? t('income_legend') : t('expense_legend')}
           />
-          <Bar dataKey="income" fill="#34C87A" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="expense" fill="#FF6B6B" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="income" fill="#22C55E" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="expense" fill="#EF4444" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
