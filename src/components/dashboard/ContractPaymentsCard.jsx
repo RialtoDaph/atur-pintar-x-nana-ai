@@ -36,7 +36,7 @@ export default function ContractPaymentsCard({ user }) {
     setLoading(false);
   }
 
-  async function doMarkDone(tx) {
+  async function doMarkDone(tx, accountId) {
     const today = new Date().toISOString().split("T")[0];
     // Cek apakah sudah ada child transaction hari ini dari parent ini
     const existing = await base44.entities.Transaction.filter({
@@ -45,11 +45,10 @@ export default function ContractPaymentsCard({ user }) {
       date: today,
     });
     if (existing && existing.length > 0) {
-      // Sudah ada, tidak perlu buat duplikat
       window.dispatchEvent(new Event("refresh-dashboard"));
       return;
     }
-    await base44.entities.Transaction.create({
+    const newTx = {
       amount: tx.amount,
       type: tx.type,
       category: tx.category,
@@ -58,7 +57,10 @@ export default function ContractPaymentsCard({ user }) {
       is_recurring: false,
       is_recurring_child: true,
       recurring_parent_id: tx.id,
-    });
+      ...(accountId ? { account_id: accountId } : {}),
+    };
+    await base44.entities.Transaction.create(newTx);
+    await base44.functions.invoke("syncTransactionChanges", { action: "create", transaction: newTx });
     // Update recurring_last_generated agar RecurringManager tidak generate duplikat
     try { await base44.entities.Transaction.update(tx.id, { recurring_last_generated: today }); } catch (_) {}
     window.dispatchEvent(new Event("refresh-dashboard"));
@@ -154,7 +156,7 @@ export default function ContractPaymentsCard({ user }) {
           title={confirmTx.note || "Transaksi Rutin"}
           amount={confirmTx.amount}
           formatCurrency={formatCurrency}
-          onConfirm={() => doMarkDone(confirmTx)}
+          onConfirm={(accountId) => doMarkDone(confirmTx, accountId)}
           onClose={() => setConfirmTx(null)}
         />
       )}
