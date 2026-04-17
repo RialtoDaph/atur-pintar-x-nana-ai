@@ -65,7 +65,7 @@ import InvestmentDetail from './pages/InvestmentDetail';
 import Investments from './pages/Investments';
 import LandingPage from './pages/LandingPage';
 import Menu from './pages/Menu';
-import Nana from './pages/Nana';
+import Nana from './pages/Nana.jsx';
 import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import SpendingDetail from './pages/SpendingDetail';
