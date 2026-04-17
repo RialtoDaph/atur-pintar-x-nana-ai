@@ -227,7 +227,7 @@ Sebelum mulai, aku mau kenalan dulu sama kamu. Cuma 2 menit. Janji.
 
 function ScreenQuizIntro({ onNext }) {
   return (
-    <div className="mt-2 px-6 py-8 text-center flex flex-col items-center">
+    <div className="mt-16 px-6 py-8 text-center flex flex-col items-center">
       <NanaAvatar size={80} animate />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
