@@ -235,11 +235,11 @@ function ScreenQuizIntro({ onNext }) {
         transition={{ delay: 0.3 }}
         className="mt-5">
         
-        <h2 className="text-2xl font-bold text-gray-900 mb-3">Kenalan dulu Yuk!</h2>
-        <p className="text-gray-500 text-sm leading-relaxed mb-6">
-          5 pertanyaan singkat biar Nana tau gimana cara terbaik bantu kamu.
-          <br /><br />
-          Tidak ada jawaban yang salah — yang salah itu kalau bohong ke diri sendiri. 😄
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">Kenalan dulu Yuk! 😊</h2>
+        <p className="text-[#000000] mb-6 text-sm leading-relaxed">5 pertanyaan singkat biar Nana tau gimana cara terbaik bantu kamu.
+
+Tidak ada jawaban yang salah — yang salah itu kalau bohong ke diri sendiri. 😄
+
         </p>
         <div className="flex justify-center gap-2 mb-8">
           {Array.from({ length: 5 }).map((_, i) =>
