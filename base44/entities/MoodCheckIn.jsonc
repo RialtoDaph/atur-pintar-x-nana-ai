@@ -1,0 +1,39 @@
+{
+  "name": "MoodCheckIn",
+  "type": "object",
+  "properties": {
+    "mood": {
+      "type": "string",
+      "enum": [
+        "stress",
+        "mager",
+        "happy",
+        "panik",
+        "normal"
+      ],
+      "description": "Mood user hari ini"
+    },
+    "mood_emoji": {
+      "type": "string",
+      "description": "Emoji mood"
+    },
+    "mood_label": {
+      "type": "string",
+      "description": "Label display mood"
+    },
+    "check_in_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal check-in (YYYY-MM-DD)"
+    }
+  },
+  "required": [
+    "mood",
+    "check_in_date"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

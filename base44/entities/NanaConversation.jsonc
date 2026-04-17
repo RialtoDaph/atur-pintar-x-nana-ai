@@ -1,0 +1,48 @@
+{
+  "name": "NanaConversation",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "nana"
+      ],
+      "description": "Siapa yang kirim pesan"
+    },
+    "message": {
+      "type": "string",
+      "description": "Isi pesan"
+    },
+    "session_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal sesi chat"
+    },
+    "mood": {
+      "type": "string",
+      "description": "Mood user saat pesan dikirim"
+    },
+    "message_type": {
+      "type": "string",
+      "enum": [
+        "chat",
+        "roast",
+        "analysis",
+        "mood_response"
+      ],
+      "default": "chat",
+      "description": "Tipe pesan"
+    }
+  },
+  "required": [
+    "role",
+    "message",
+    "session_date"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}
