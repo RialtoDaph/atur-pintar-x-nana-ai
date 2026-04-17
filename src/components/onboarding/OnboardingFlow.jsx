@@ -209,10 +209,10 @@ function ScreenWelcome({ onNext }) {
         className="mt-5">
         
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Halo! 👋</h1>
-        <p className="text-gray-500 text-sm leading-relaxed mb-8">
-          Aku <span className="text-[#FF6A00] font-bold">Nana</span> — dan aku bakal jadi teman finansial kamu yang paling jujur (dan paling lucu) yang pernah ada.
-          <br /><br />
-          Sebelum mulai, aku mau kenalan dulu sama kamu. Cuma 2 menit. Janji.
+        <p className="text-[#000000] mb-8 text-sm leading-relaxed">Aku Nana — dan aku bakal jadi teman finansial kamu yang paling jujur (dan paling lucu) yang pernah ada.
+
+Sebelum mulai, aku mau kenalan dulu sama kamu. Cuma 2 menit. Janji.
+
         </p>
         <button
           onClick={onNext}
