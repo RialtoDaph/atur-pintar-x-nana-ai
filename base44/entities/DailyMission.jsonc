@@ -1,0 +1,44 @@
+{
+  "name": "DailyMission",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal misi (YYYY-MM-DD)"
+    },
+    "mission_key": {
+      "type": "string",
+      "description": "Key unik misi: catat_transaksi, cek_budget, tanya_nana"
+    },
+    "title": {
+      "type": "string",
+      "description": "Judul misi yang tampil"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji icon misi"
+    },
+    "xp_reward": {
+      "type": "number",
+      "description": "XP yang didapat jika misi selesai",
+      "default": 10
+    },
+    "is_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Apakah misi sudah diselesaikan"
+    }
+  },
+  "required": [
+    "date",
+    "mission_key",
+    "title",
+    "xp_reward"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

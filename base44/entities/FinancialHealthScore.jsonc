@@ -1,0 +1,28 @@
+{
+  "name": "FinancialHealthScore",
+  "type": "object",
+  "properties": {
+    "month": {
+      "type": "string",
+      "description": "Bulan dalam format YYYY-MM"
+    },
+    "total_score": {
+      "type": "number",
+      "description": "Total skor kesehatan finansial (0-1000)",
+      "default": 0
+    },
+    "breakdown": {
+      "type": "object",
+      "description": "Breakdown skor per komponen"
+    }
+  },
+  "required": [
+    "month",
+    "total_score"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}
