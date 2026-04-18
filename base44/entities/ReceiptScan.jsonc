@@ -1,0 +1,54 @@
+{
+  "name": "ReceiptScan",
+  "type": "object",
+  "properties": {
+    "image_url": {
+      "type": "string",
+      "description": "URL gambar struk yang dipindai"
+    },
+    "merchant_name": {
+      "type": "string",
+      "description": "Nama toko/merchant"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Total belanja dari struk"
+    },
+    "scan_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal transaksi dari struk (YYYY-MM-DD)"
+    },
+    "suggested_category": {
+      "type": "string",
+      "description": "Saran kategori dari Nana AI"
+    },
+    "scanned_at": {
+      "type": "string",
+      "description": "Waktu struk dipindai (ISO string)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Status pindaian"
+    },
+    "transaction_id": {
+      "type": "string",
+      "description": "ID transaksi terkait jika sudah dikonfirmasi"
+    }
+  },
+  "required": [
+    "image_url",
+    "scanned_at"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

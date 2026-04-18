@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Bell, Trash2, ToggleLeft, Edit2, Check } from "lucide-react";
+import { Plus, Bell, Trash2, ToggleLeft, Edit2, Check, Sparkles } from "lucide-react";
 import AddReminderModal from "@/components/reminders/AddReminderModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
@@ -32,6 +32,47 @@ function getDaysUntilDue(dueDay) {
     return Math.ceil((nextMonth - today) / (1000 * 60 * 60 * 24));
   }
   return Math.ceil((thisMonth - today) / (1000 * 60 * 60 * 24));
+}
+
+function NanaReminderTip({ reminder, daysLeft }) {
+  const [tip, setTip] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [shown, setShown] = useState(false);
+
+  async function loadTip() {
+    if (shown || loading) return;
+    setLoading(true);
+    setShown(true);
+    try {
+      const res = await base44.integrations.Core.InvokeLLM({
+        prompt: `Saya punya tagihan "${reminder.title}" senilai ${reminder.amount ? `Rp${reminder.amount.toLocaleString("id-ID")}` : "tidak diketahui"} yang jatuh tempo dalam ${daysLeft} hari (tanggal ${reminder.due_day} setiap bulan). Berikan satu tips singkat (maks 1 kalimat, bahasa Indonesia santai) tentang cara menyiapkan atau mengelola tagihan ini. Langsung ke poinnya, tanpa pembuka.`,
+      });
+      setTip(typeof res === "string" ? res : null);
+    } catch {
+      setTip(null);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div className="mt-2">
+      {!shown && (
+        <button
+          onClick={loadTip}
+          className="flex items-center gap-1 text-[10px] font-semibold text-[#8FA4C8] hover:text-[#F97316] transition-colors"
+        >
+          <Sparkles className="w-3 h-3" /> Tanya Nana
+        </button>
+      )}
+      {loading && <p className="text-[10px] text-[#8FA4C8] animate-pulse">Nana sedang berpikir...</p>}
+      {tip && (
+        <div className="flex items-start gap-1.5 bg-[#FFF7ED] border border-[#FF6A00]/20 rounded-xl px-3 py-2 mt-1">
+          <Sparkles className="w-3 h-3 text-[#FF6A00] flex-shrink-0 mt-0.5" />
+          <p className="text-[11px] text-[#EA580C] leading-relaxed">{tip}</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Reminders() {
@@ -173,6 +214,7 @@ export default function Reminders() {
                            {r.amount ? ` · ${formatCurrency(r.amount)}` : ""}
                          </p>
                         {r.notes && <p className="text-xs text-[#8FA4C8] mt-0.5 truncate">{r.notes}</p>}
+                        <NanaReminderTip reminder={r} daysLeft={daysLeft} />
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mt-3">

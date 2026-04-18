@@ -21,6 +21,7 @@ import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
 import FinancialHealthCard from "@/components/dashboard/FinancialHealthCard";
 import NanaInsightCard from "@/components/dashboard/NanaInsightCard";
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
+import ReminderAlertWidget from "@/components/dashboard/ReminderAlertWidget";
 
 const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
 const BudgetAlertWidget = lazy(() => import("@/components/dashboard/BudgetAlertWidget"));
@@ -267,6 +268,8 @@ export default function Dashboard() {
               <CashflowForecast transactions={transactions} loading={loading} user={user} />
             </Suspense>
           )}
+
+          {user?.onboarding_completed && <ReminderAlertWidget user={user} />}
 
           {user?.onboarding_completed && <AccountsWidget user={user} />}
 

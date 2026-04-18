@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { X, Camera, Loader2, Scissors, Upload, Sparkles } from "lucide-react";
+import { X, Camera, Loader2, Scissors, Upload, Sparkles, History } from "lucide-react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
 import SplitBillModal from "./SplitBillModal";
@@ -182,12 +183,22 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
       const response = await base44.functions.invoke("extractReceiptData", { file_url });
       const extracted = response.data?.data;
       if (extracted?.total_amount) {
-        setReceiptData(extracted);
+        setReceiptData({ ...extracted, image_url: file_url });
         setTab("expense");
         setAmountRaw(String(Math.round(extracted.total_amount)));
         if (extracted.date) setDate(extracted.date);
         if (extracted.store_name) setNote(extracted.store_name);
         if (extracted.category) setCategory(extracted.category);
+        // Save to ReceiptScan entity
+        base44.entities.ReceiptScan.create({
+          image_url: file_url,
+          merchant_name: extracted.store_name || "",
+          total_amount: extracted.total_amount || 0,
+          scan_date: extracted.date || new Date().toLocaleDateString("en-CA"),
+          suggested_category: extracted.category || "",
+          scanned_at: new Date().toISOString(),
+          status: "pending",
+        }).catch(() => {});
         toast.success("Struk berhasil dipindai!");
       } else {
         toast.error("Gagal membaca struk.");
@@ -252,6 +263,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                   className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F2F4F7] text-[10px] font-semibold text-[#4A5568]">
                   <Upload className="w-3 h-3" /> Galeri
                 </button>
+                <Link to="/ReceiptScanHistory" onClick={onClose}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F2F4F7] text-[10px] font-semibold text-[#4A5568]">
+                  <History className="w-3 h-3" /> Riwayat
+                </Link>
               </div>
               <button onClick={onClose} className="p-1.5 hover:bg-[#F2F4F7] rounded-lg"><X className="w-4 h-4 text-[#8FA4C8]" /></button>
             </div>

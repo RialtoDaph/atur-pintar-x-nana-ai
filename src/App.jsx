@@ -28,6 +28,7 @@ import AdminSettings from '@/pages/AdminSettings';
 import MaintenancePage from '@/pages/MaintenancePage';
 import About from '@/pages/About';
 import Achievements from '@/pages/Achievements';
+import ReceiptScanHistory from '@/pages/ReceiptScanHistory';
 import AdminProtect from '@/components/admin/AdminProtect';
 
 const { Pages, Layout } = pagesConfig;
@@ -124,6 +125,7 @@ const AuthenticatedApp = () => {
       <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />
       <Route path="/About" element={<About />} />
       <Route path="/Achievements" element={<LayoutWrapper currentPageName="Achievements"><Achievements /></LayoutWrapper>} />
+      <Route path="/ReceiptScanHistory" element={<LayoutWrapper currentPageName="ReceiptScanHistory"><ReceiptScanHistory /></LayoutWrapper>} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
       <Route path="*" element={<PageNotFound />} />
