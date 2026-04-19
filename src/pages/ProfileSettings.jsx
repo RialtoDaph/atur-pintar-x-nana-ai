@@ -504,7 +504,7 @@ export default function ProfileSettings() {
             toast.success(`${acc.name} berhasil ditambahkan ✓`);
           }}
         />
-      )}}
+      )}
 
       {showAccountModal && (
         <AccountModal
