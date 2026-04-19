@@ -364,42 +364,39 @@ export default function ProfileSettings() {
               <div className="w-6 h-6 border-2 border-[#F2F4F7] border-t-[#F97316] rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="px-5 pb-5 space-y-4">
+            <div className="px-4 pb-4 space-y-3">
               {[
-                { key: "bank", label: "BANK", icon: "🏦", addLabel: "+ Tambah Bank" },
-                { key: "ewallet", label: "E-WALLET", icon: "📱", addLabel: "+ Tambah E-Wallet" },
-                { key: "cash", label: "CASH", icon: "💵", addLabel: "+ Tambah Cash" },
-                { key: "investasi", label: "INVESTASI", icon: "📈", addLabel: "+ Tambah Investasi" },
+                { key: "bank", label: "BANK", icon: "🏦" },
+                { key: "ewallet", label: "E-WALLET", icon: "📱" },
+                { key: "cash", label: "CASH", icon: "💵" },
               ].map(group => {
                 const groupAccounts = accounts.filter(a => a.type === group.key);
                 return (
                   <div key={group.key}>
-                    <p className="text-[10px] font-bold text-[#8FA4C8] uppercase tracking-widest mb-2">{group.label}</p>
-                    <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                    <p className="text-[9px] font-bold text-[#8FA4C8] uppercase tracking-widest mb-1.5">{group.label}</p>
+                    <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
                       {groupAccounts.map(acc => (
                         <button key={acc.id}
                           onClick={() => { setEditAccount(acc); setShowAccountModal(true); }}
-                          className="flex-shrink-0 w-32 bg-white border border-[#E2E8F0] rounded-2xl p-3 text-left hover:border-[#F97316]/50 hover:shadow-sm transition-all">
-                          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg mb-2"
+                          className="flex-shrink-0 bg-white border border-[#E2E8F0] rounded-xl px-2.5 py-2 text-left hover:border-[#F97316]/50 transition-all flex items-center gap-2 min-w-0"
+                          style={{ maxWidth: 140 }}>
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
                             style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
                             {acc.icon || group.icon}
                           </div>
-                          <p className="text-xs font-semibold text-[#1A1A1A] truncate leading-tight">{acc.name}</p>
-                          {acc.is_default && <span className="text-[8px] font-bold text-[#F97316]">Utama</span>}
-                          <p className="text-[10px] font-bold mt-1 truncate" style={{ color: (acc.balance || 0) < 0 ? "#EF4444" : "#27AE60" }}>
-                            {formatRupiah(acc.balance)}
-                          </p>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-semibold text-[#1A1A1A] truncate leading-tight">{acc.name}</p>
+                            <p className="text-[10px] font-bold truncate" style={{ color: (acc.balance || 0) < 0 ? "#EF4444" : "#27AE60" }}>
+                              {formatRupiah(acc.balance)}
+                            </p>
+                          </div>
                         </button>
                       ))}
-                      {/* Add card — opens bottom sheet */}
                       <button
-                        onClick={() => {
-                          setBottomSheetType(group.key);
-                          setShowAddBottomSheet(true);
-                        }}
-                        className="flex-shrink-0 w-32 border-2 border-dashed border-[#E2E8F0] rounded-2xl p-3 flex flex-col items-center justify-center gap-1 hover:border-[#F97316] hover:bg-[#FFF7ED] transition-all min-h-[88px]">
-                        <Plus className="w-4 h-4 text-[#8FA4C8]" />
-                        <p className="text-[10px] font-medium text-[#8FA4C8] text-center leading-tight">{group.addLabel}</p>
+                        onClick={() => { setBottomSheetType(group.key); setShowAddBottomSheet(true); }}
+                        className="flex-shrink-0 border border-dashed border-[#E2E8F0] rounded-xl px-3 py-2 flex items-center gap-1.5 hover:border-[#F97316] hover:bg-[#FFF7ED] transition-all">
+                        <Plus className="w-3.5 h-3.5 text-[#8FA4C8]" />
+                        <p className="text-[10px] font-medium text-[#8FA4C8] whitespace-nowrap">Tambah</p>
                       </button>
                     </div>
                   </div>
