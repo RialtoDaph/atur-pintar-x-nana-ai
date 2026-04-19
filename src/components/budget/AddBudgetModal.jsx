@@ -1,22 +1,10 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
-const DEFAULT_CATEGORIES = [
-{ key: "housing", label_id: "Rumah/Sewa", label_en: "Housing/Rent", emoji: "🏠", color: "#4F7CFF" },
-{ key: "food", label_id: "Makanan & Minuman", label_en: "Food & Drinks", emoji: "🍔", color: "#00C9A7" },
-{ key: "transport", label_id: "Transportasi", label_en: "Transport", emoji: "🚗", color: "#F5A623" },
-{ key: "health", label_id: "Kesehatan", label_en: "Health", emoji: "❤️", color: "#FF6B6B" },
-{ key: "entertainment", label_id: "Hiburan", label_en: "Entertainment", emoji: "🎬", color: "#9B59B6" },
-{ key: "shopping", label_id: "Belanja", label_en: "Shopping", emoji: "🛍️", color: "#E91E8C" },
-{ key: "subscriptions", label_id: "Langganan", label_en: "Subscriptions", emoji: "📱", color: "#1ABC9C" },
-{ key: "other", label_id: "Lainnya", label_en: "Other", emoji: "📦", color: "#95A5A6" }];
-
-
 export default function AddBudgetModal({ onClose, onSave, existingCategories, editBudget, existingBudgets = [], month }) {
-  const { t, settings, formatCurrency } = useAppSettings();
-  const lang = settings.language || "id";
+  const { t, formatCurrency } = useAppSettings();
 
   const [category, setCategory] = useState(editBudget?.category || "");
   const [rawAmount, setRawAmount] = useState(editBudget?.amount ? String(editBudget.amount) : "");
@@ -24,33 +12,29 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
   const [globalCategories, setGlobalCategories] = useState([]);
   const [customCategories, setCustomCategories] = useState([]);
   const [error, setError] = useState(null);
+  const [openParent, setOpenParent] = useState(null);
 
   useEffect(() => {
-    // Fetch GlobalCategory (admin-defined) for expense/both types
-    base44.entities.GlobalCategory.filter({ is_active: true }).then(cats => {
+    base44.entities.GlobalCategory.filter({ is_active: true }, "sort_order").then(cats => {
       setGlobalCategories((cats || []).filter(c => c.type === 'expense' || c.type === 'both'));
     }).catch(() => {});
-    // Also fetch user custom categories
     base44.entities.CustomCategory.list().then(cats => {
       setCustomCategories((cats || []).filter(c => c.type === 'expense' || c.type === 'both' || !c.type));
     }).catch(() => {});
   }, []);
 
-  // Use GlobalCategory id as key so it matches Transaction.category
-  const baseCategories = globalCategories.length > 0
-    ? globalCategories.map(c => ({ key: c.id, label: c.name, emoji: c.emoji || '📦', color: c.color || '#95A5A6' }))
-    : DEFAULT_CATEGORIES.map((c) => ({ key: c.key, label: lang === 'id' ? c.label_id : c.label_en, emoji: c.emoji, color: c.color }));
+  // Parents = is_subcategory false, sorted by sort_order
+  const parents = globalCategories.filter(c => !c.is_subcategory).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  // Subs = is_subcategory true
+  const subs = globalCategories.filter(c => c.is_subcategory === true).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
-  const allCategories = [
-    ...baseCategories,
-    ...customCategories.map((c) => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji, color: c.color || '#95A5A6' }))
-  ];
+  // Custom categories as extra group
+  const customCats = customCategories.map(c => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji || '📦', color: c.color || '#95A5A6' }));
 
-
-  // Filter out already-budgeted categories (except the one being edited)
-  const available = allCategories.filter(
-    (c) => !existingCategories.includes(c.key) || c.key === editBudget?.category
-  );
+  // Check if a category key is already budgeted (exclude current edit)
+  function isTaken(key) {
+    return existingCategories.includes(key) && key !== editBudget?.category;
+  }
 
   const isEditing = !!editBudget;
 
@@ -112,26 +96,72 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
           <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">
             {t("category")}
           </label>
-          {available.length === 0 ?
-          <p className="text-sm text-[#8FA4C8] text-center py-4">{t("budget_all_set")}</p> :
-
-          <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto">
-              {available.map((c) =>
-            <button
-              key={c.key}
-              onClick={() => setCategory(c.key)}
-              className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
-              category === c.key ?
-              "border-[#FF6A00] bg-[#FF6A00]/10" :
-              "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E0]"}`
-              }>
-              
-                  <span className="text-xl">{c.emoji}</span>
-                  <span className="text-[10px] font-medium text-[#4A5568] text-center leading-tight">{c.label}</span>
-                </button>
+          <div className="max-h-56 overflow-y-auto space-y-1 pr-0.5">
+            {parents.length === 0 && customCats.length === 0 && (
+              <p className="text-sm text-[#8FA4C8] text-center py-4">{t("budget_all_set")}</p>
             )}
-            </div>
-          }
+            {parents.map(parent => {
+              const children = subs.filter(s => s.parent_category === parent.name && !isTaken(s.id));
+              const isOpen = openParent === parent.id;
+              const isSelected = category === parent.id || children.some(c => c.id === category);
+              // skip parent if no children available and parent itself is taken
+              if (children.length === 0 && isTaken(parent.id)) return null;
+              return (
+                <div key={parent.id} className="rounded-xl overflow-hidden border transition-all"
+                  style={{ borderColor: isSelected ? "#FF6A0060" : "#E2E8F0" }}>
+                  {/* Parent row */}
+                  <button
+                    onClick={() => setOpenParent(isOpen ? null : parent.id)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors"
+                    style={{ backgroundColor: isSelected ? "#FF6A0010" : "#F8FAFC" }}>
+                    <span className="text-lg">{parent.emoji}</span>
+                    <span className="text-xs font-semibold flex-1" style={{ color: isSelected ? "#FF6A00" : "#1A1A1A" }}>{parent.name}</span>
+                    {children.some(c => c.id === category) && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#FF6A0020] text-[#FF6A00]">
+                        {children.find(c => c.id === category)?.name}
+                      </span>
+                    )}
+                    <ChevronDown className="w-3.5 h-3.5 text-[#8FA4C8] flex-shrink-0 transition-transform"
+                      style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
+                  </button>
+                  {/* Sub-categories */}
+                  {isOpen && children.length > 0 && (
+                    <div className="px-3 py-2 flex flex-wrap gap-1.5 border-t border-[#F2F4F7] bg-white">
+                      {children.map(sub => (
+                        <button key={sub.id} onClick={() => setCategory(sub.id)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold border transition-all"
+                          style={{
+                            backgroundColor: category === sub.id ? "#FF6A0020" : "#F2F4F7",
+                            borderColor: category === sub.id ? "#FF6A00" : "#E2E8F0",
+                            color: category === sub.id ? "#FF6A00" : "#4A5568"
+                          }}>
+                          <span>{sub.emoji}</span>{sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {/* Custom categories */}
+            {customCats.filter(c => !isTaken(c.key)).length > 0 && (
+              <div className="rounded-xl overflow-hidden border border-[#E2E8F0]">
+                <div className="px-3 py-2 bg-[#F8FAFC] flex flex-wrap gap-1.5">
+                  {customCats.filter(c => !isTaken(c.key)).map(c => (
+                    <button key={c.key} onClick={() => setCategory(c.key)}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold border transition-all"
+                      style={{
+                        backgroundColor: category === c.key ? "#FF6A0020" : "#F2F4F7",
+                        borderColor: category === c.key ? "#FF6A00" : "#E2E8F0",
+                        color: category === c.key ? "#FF6A00" : "#4A5568"
+                      }}>
+                      <span>{c.emoji}</span>{c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Amount input */}
