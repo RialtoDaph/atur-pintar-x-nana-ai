@@ -36,6 +36,16 @@
       "type": "number",
       "default": 0,
       "description": "Display order"
+    },
+    "is_subcategory": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this is a subcategory (child), false if parent"
+    },
+    "parent_category": {
+      "type": "string",
+      "default": "",
+      "description": "Name of the parent category (only for subcategories)"
     }
   },
   "required": [
