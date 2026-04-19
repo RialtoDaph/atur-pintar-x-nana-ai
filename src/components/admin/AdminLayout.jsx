@@ -3,13 +3,14 @@ import { createPageUrl } from "@/utils";
 import { useState } from "react";
 import {
   LayoutDashboard, Users, ArrowLeftRight, Tag, Sparkles,
-  CreditCard, Bell, ScrollText, AlertTriangle, ChevronRight, Shield, Menu, X, Settings
+  CreditCard, Bell, ScrollText, AlertTriangle, ChevronRight, Shield, Menu, X, Settings, Wallet
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, page: "AdminDashboard" },
   { label: "Users", icon: Users, page: "AdminUsers" },
   { label: "Categories", icon: Tag, page: "AdminCategories" },
+  { label: "Default Rekening", icon: Wallet, page: "AdminDefaultAccounts" },
   { label: "Subscriptions", icon: CreditCard, page: "AdminSubscriptions" },
   { label: "Notifications", icon: Bell, page: "AdminNotifications" },
   { label: "Settings", icon: Settings, page: "AdminSettings" },

@@ -25,6 +25,7 @@ import AdminLogs from '@/pages/AdminLogs';
 import AdminNotifications from '@/pages/AdminNotifications';
 import AdminCategories from '@/pages/AdminCategories';
 import AdminSettings from '@/pages/AdminSettings';
+import AdminDefaultAccounts from '@/pages/AdminDefaultAccounts';
 import MaintenancePage from '@/pages/MaintenancePage';
 import About from '@/pages/About';
 import Achievements from '@/pages/Achievements';
@@ -121,6 +122,7 @@ const AuthenticatedApp = () => {
       <Route path="/AdminNotifications" element={<LayoutWrapper currentPageName="AdminNotifications"><AdminProtect><AdminNotifications /></AdminProtect></LayoutWrapper>} />
       <Route path="/AdminCategories" element={<LayoutWrapper currentPageName="AdminCategories"><AdminProtect><AdminCategories /></AdminProtect></LayoutWrapper>} />
       <Route path="/AdminSettings" element={<LayoutWrapper currentPageName="AdminSettings"><AdminProtect><AdminSettings /></AdminProtect></LayoutWrapper>} />
+      <Route path="/AdminDefaultAccounts" element={<LayoutWrapper currentPageName="AdminDefaultAccounts"><AdminProtect><AdminDefaultAccounts /></AdminProtect></LayoutWrapper>} />
       <Route path="/AdminAIInsights" element={<Navigate to="/AdminDashboard" replace />} />
       <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />
       <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import ChangePasswordModal from "@/components/profile/ChangePasswordModal";
 import EditProfileForm from "@/components/profile/EditProfileForm";
+import AddAccountBottomSheet from "@/components/profile/AddAccountBottomSheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
@@ -196,6 +197,8 @@ export default function ProfileSettings() {
   const [syncing, setSyncing] = useState(null);
   const [presetOpen, setPresetOpen] = useState(null);
   const [defaultAccountType, setDefaultAccountType] = useState("bank");
+  const [showAddBottomSheet, setShowAddBottomSheet] = useState(false);
+  const [bottomSheetType, setBottomSheetType] = useState("bank");
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -366,7 +369,7 @@ export default function ProfileSettings() {
                 { key: "bank", label: "BANK", icon: "🏦", addLabel: "+ Tambah Bank" },
                 { key: "ewallet", label: "E-WALLET", icon: "📱", addLabel: "+ Tambah E-Wallet" },
                 { key: "cash", label: "CASH", icon: "💵", addLabel: "+ Tambah Cash" },
-                { key: "other", label: "LAINNYA", icon: "💳", addLabel: "+ Tambah Lainnya" },
+                { key: "investasi", label: "INVESTASI", icon: "📈", addLabel: "+ Tambah Investasi" },
               ].map(group => {
                 const groupAccounts = accounts.filter(a => a.type === group.key);
                 return (
@@ -388,12 +391,11 @@ export default function ProfileSettings() {
                           </p>
                         </button>
                       ))}
-                      {/* Add card */}
+                      {/* Add card — opens bottom sheet */}
                       <button
                         onClick={() => {
-                          setEditAccount(null);
-                          setDefaultAccountType(group.key);
-                          setShowAccountModal(true);
+                          setBottomSheetType(group.key);
+                          setShowAddBottomSheet(true);
                         }}
                         className="flex-shrink-0 w-32 border-2 border-dashed border-[#E2E8F0] rounded-2xl p-3 flex flex-col items-center justify-center gap-1 hover:border-[#F97316] hover:bg-[#FFF7ED] transition-all min-h-[88px]">
                         <Plus className="w-4 h-4 text-[#8FA4C8]" />
@@ -491,6 +493,18 @@ export default function ProfileSettings() {
 
       {/* ── Modals ──────────────────────────────────────────── */}
       {showChangePassword && <ChangePasswordModal onClose={() => setShowChangePassword(false)} />}
+
+      {showAddBottomSheet && (
+        <AddAccountBottomSheet
+          accountType={bottomSheetType}
+          onClose={() => setShowAddBottomSheet(false)}
+          onSave={(acc) => {
+            setAccounts(prev => [...prev, acc]);
+            setShowAddBottomSheet(false);
+            toast.success(`${acc.name} berhasil ditambahkan ✓`);
+          }}
+        />
+      )}}
 
       {showAccountModal && (
         <AccountModal
