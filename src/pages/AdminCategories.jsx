@@ -31,7 +31,7 @@ export default function AdminCategories() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ name: "", emoji: "🍔", color: "#FF6A00", type: "expense" });
+  const [form, setForm] = useState({ name: "", emoji: "🍔", color: "#FF6A00", type: "expense", is_subcategory: false, parent_category: "" });
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -74,7 +74,7 @@ export default function AdminCategories() {
     setSaving(false);
     setShowForm(false);
     setEditId(null);
-    setForm({ name: "", emoji: "🍔", color: "#FF6A00", type: "expense" });
+    setForm({ name: "", emoji: "🍔", color: "#FF6A00", type: "expense", is_subcategory: false, parent_category: "" });
   }
 
   async function handleDelete(id) {
@@ -110,9 +110,11 @@ export default function AdminCategories() {
     setCategories(newCats);
   }
 
+  const parentCategories = categories.filter(c => !c.is_subcategory);
+
   function startEdit(cat) {
     setEditId(cat.id);
-    setForm({ name: cat.name, emoji: cat.emoji, color: cat.color, type: cat.type });
+    setForm({ name: cat.name, emoji: cat.emoji, color: cat.color, type: cat.type, is_subcategory: cat.is_subcategory || false, parent_category: cat.parent_category || "" });
     setShowForm(true);
   }
 
@@ -133,7 +135,7 @@ export default function AdminCategories() {
             <p className="text-sm text-[#8FA4C8] mt-1">Perubahan langsung berlaku untuk semua user</p>
           </div>
           <button
-            onClick={() => { setShowForm(!showForm); setEditId(null); setForm({ name: "", emoji: "🍔", color: "#FF6A00", type: "expense" }); }}
+            onClick={() => { setShowForm(!showForm); setEditId(null); setForm({ name: "", emoji: "🍔", color: "#FF6A00", type: "expense", is_subcategory: false, parent_category: "" }); }}
             className="flex items-center gap-2 px-4 py-2.5 bg-[#FF6A00] text-white rounded-xl text-sm font-medium hover:bg-[#E55A00] shadow-sm"
           >
             <Plus className="w-4 h-4" />
@@ -160,6 +162,35 @@ export default function AdminCategories() {
                   <option value="both">Keduanya</option>
                 </select>
               </div>
+              <div className="md:col-span-2">
+                <label className="text-xs font-medium text-[#8FA4C8] mb-1.5 block">Jenis Kategori</label>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setForm(p => ({ ...p, is_subcategory: false, parent_category: "" }))}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all ${!form.is_subcategory ? "bg-[#FF6A00]/10 border-[#FF6A00] text-[#FF6A00]" : "bg-[#F2F4F7] border-transparent text-[#8FA4C8]"}`}>
+                    📁 Kategori Induk
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm(p => ({ ...p, is_subcategory: true }))}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all ${form.is_subcategory ? "bg-[#FF6A00]/10 border-[#FF6A00] text-[#FF6A00]" : "bg-[#F2F4F7] border-transparent text-[#8FA4C8]"}`}>
+                    📂 Subkategori
+                  </button>
+                </div>
+              </div>
+              {form.is_subcategory && (
+                <div className="md:col-span-2">
+                  <label className="text-xs font-medium text-[#8FA4C8] mb-1.5 block">Kategori Induk</label>
+                  <select value={form.parent_category} onChange={e => setForm(p => ({ ...p, parent_category: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-[#E2E8F0] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6A00]">
+                    <option value="">-- Pilih Kategori Induk --</option>
+                    {parentCategories.filter(p => !editId || p.id !== editId).map(p => (
+                      <option key={p.id} value={p.name}>{p.emoji} {p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="text-xs font-medium text-[#8FA4C8] mb-1.5 block">Emoji Icon</label>
                 <div className="flex flex-wrap gap-2">
@@ -230,6 +261,12 @@ export default function AdminCategories() {
                     cat.type === "expense" ? "bg-red-50 text-red-500" :
                     "bg-blue-50 text-blue-600"
                   }`}>{cat.type === "expense" ? "Pengeluaran" : cat.type === "income" ? "Pemasukan" : "Keduanya"}</span>
+                  {cat.is_subcategory && cat.parent_category && (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-50 text-orange-500">↳ {cat.parent_category}</span>
+                  )}
+                  {!cat.is_subcategory && categories.some(c => c.is_subcategory && c.parent_category === cat.name) && (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-50 text-purple-500">📁 Induk</span>
+                  )}
                   <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color || "#95A5A6" }} />
                 </div>
               </div>
