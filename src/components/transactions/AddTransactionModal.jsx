@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { X, Camera, Loader2, Scissors, Upload, Sparkles, History } from "lucide-react";
+import { X, Camera, Loader2, Scissors, Upload, Sparkles, History, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
@@ -38,6 +38,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const [globalCategories, setGlobalCategories] = useState([]);
   const [appSettings, setAppSettings] = useState(null);
   const [favTab, setFavTab] = useState("fav");
+  const [openParent, setOpenParent] = useState(null);
   const [suggestion, setSuggestion] = useState(null);
   const [saving, setSaving] = useState(false);
   const [scanning, setScanning] = useState(false);
@@ -366,32 +367,38 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                 const subs = filteredCats.filter(c => c.is_subcategory === true).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
                 if (parents.length > 0) {
                   return (
-                    <div className="space-y-4">
+                    <div className="space-y-1">
                       {parents.map(parent => {
                         const children = subs.filter(s => s.parent_category === parent.name);
+                        const isOpen = openParent === parent.id;
+                        const isParentSelected = category === parent.id || children.some(c => c.id === category);
                         return (
-                          <div key={parent.id}>
-                            {/* Parent header — tappable to select parent itself + fav star */}
-                            <div className="flex items-center justify-between mb-2">
+                          <div key={parent.id} className="rounded-xl overflow-hidden border transition-all"
+                            style={{ borderColor: isParentSelected ? typeColor + "60" : "#E2E8F0" }}>
+                            {/* Parent row */}
+                            <div className="flex items-center"
+                              style={{ backgroundColor: isParentSelected ? typeColor + "10" : "#F8FAFC" }}>
                               <button
-                                onClick={() => setCategory(category === parent.id ? "" : parent.id)}
-                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all"
-                                style={{
-                                  backgroundColor: category === parent.id ? typeColor + "15" : "#F2F4F7",
-                                  border: `1.5px solid ${category === parent.id ? typeColor : "transparent"}`
-                                }}>
-                                <span className="text-base">{parent.emoji}</span>
-                                <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: category === parent.id ? typeColor : "#4A5568" }}>{parent.name}</span>
+                                onClick={() => setOpenParent(isOpen ? null : parent.id)}
+                                className="flex-1 flex items-center gap-2 px-3 py-2.5">
+                                <span className="text-lg">{parent.emoji}</span>
+                                <span className="text-xs font-semibold flex-1 text-left" style={{ color: isParentSelected ? typeColor : "#1A1A1A" }}>{parent.name}</span>
+                                {children.some(c => c.id === category) && (
+                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ backgroundColor: typeColor + "20", color: typeColor }}>
+                                    {children.find(c => c.id === category)?.name}
+                                  </span>
+                                )}
+                                <ChevronDown className="w-3.5 h-3.5 transition-transform flex-shrink-0" style={{ color: "#8FA4C8", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
                               </button>
-                              <button onClick={() => updateFavorites(parent.id)} className="p-1 rounded-full transition-all active:scale-90">
-                                <span className={`text-base ${favIds.includes(parent.id) ? "text-yellow-400" : "text-[#CBD5E0]"}`}>★</span>
+                              <button onClick={() => updateFavorites(parent.id)} className="px-3 py-2.5 active:scale-90 transition-transform">
+                                <span style={{ color: favIds.includes(parent.id) ? "#FBBF24" : "#CBD5E0", fontSize: 16 }}>★</span>
                               </button>
                             </div>
-                            {/* Sub-chips */}
-                            {children.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5 pl-2 border-l-2 border-[#F2F4F7]">
+                            {/* Dropdown subcategories */}
+                            {isOpen && children.length > 0 && (
+                              <div className="px-3 py-2.5 flex flex-wrap gap-1.5 border-t border-[#F2F4F7] bg-white">
                                 {children.map(cat => (
-                                  <CatChip key={cat.id} cat={cat} selected={category === cat.id} typeColor={typeColor} isFav={favIds.includes(cat.id)} onSelect={() => setCategory(category === cat.id ? "" : cat.id)} onFavToggle={() => updateFavorites(cat.id)} />
+                                  <CatChip key={cat.id} cat={cat} selected={category === cat.id} typeColor={typeColor} isFav={favIds.includes(cat.id)} onSelect={() => { setCategory(category === cat.id ? "" : cat.id); setOpenParent(parent.id); }} onFavToggle={() => updateFavorites(cat.id)} />
                                 ))}
                               </div>
                             )}
@@ -401,7 +408,6 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                     </div>
                   );
                 }
-                // Fallback: flat list
                 return (
                   <div className="flex flex-wrap gap-1.5">
                     {filteredCats.map(cat => <CatChip key={cat.id} cat={cat} selected={category === cat.id} typeColor={typeColor} isFav={favIds.includes(cat.id)} onSelect={() => setCategory(category === cat.id ? "" : cat.id)} onFavToggle={() => updateFavorites(cat.id)} />)}
