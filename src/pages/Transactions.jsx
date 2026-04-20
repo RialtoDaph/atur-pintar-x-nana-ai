@@ -136,7 +136,7 @@ export default function Transactions() {
     let label;
     if (tx.date === today) label = "Hari ini";
     else if (tx.date === yesterday) label = "Kemarin";
-    else if (tx.date >= startOfWeekStr && tx.date < today) label = "Minggu ini";
+    else if (tx.date >= startOfWeekStr && tx.date < yesterday) label = "Minggu ini";
     else {
       const d = new Date(tx.date);
       label = d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" });
