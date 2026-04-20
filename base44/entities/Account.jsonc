@@ -29,6 +29,10 @@
       "type": "string",
       "description": "Warna kartu"
     },
+    "logo_url": {
+      "type": "string",
+      "description": "URL logo institusi"
+    },
     "is_default": {
       "type": "boolean",
       "default": false,
