@@ -292,7 +292,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                 </button>
                 <Link to="/ReceiptScanHistory" onClick={onClose}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F2F4F7] text-[10px] font-semibold text-[#4A5568]">
-                  <History className="w-3 h-3" /> Riwayat
+                  <History className="w-3 h-3" /> Riwayat scan
                 </Link>
               </div>
               <button onClick={onClose} className="p-1.5 hover:bg-[#F2F4F7] rounded-lg"><X className="w-4 h-4 text-[#8FA4C8]" /></button>
