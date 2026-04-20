@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { Upload, ChevronDown, Filter, Search, CheckSquare } from "lucide-react";
+import { Upload, Filter, Search, CheckSquare } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
@@ -38,7 +38,6 @@ export default function Transactions() {
   const [deleting, setDeleting] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [visibleCount, setVisibleCount] = useState(30);
-  const [historyOpen, setHistoryOpen] = useState(true);
   const [mainTab, setMainTab] = useState("history");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -230,203 +229,164 @@ export default function Transactions() {
   return (
     <PullToRefresh onRefresh={loadData}>
       <div className="min-h-screen bg-[#F2F4F7] pb-24">
+
         {/* Header */}
-        <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-10 pb-4">
-          <div className="max-w-2xl mx-auto flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[#8FA4C8] text-sm font-medium">{t('tx_history')}</p>
-              <h1 className="text-white text-2xl font-bold mt-0.5">{t('tx_title')}</h1>
-            </div>
+        <div className="bg-[#0A0A0A] px-5 pt-10 pb-0">
+          <div className="max-w-2xl mx-auto flex items-center justify-between mb-5">
+            <h1 className="text-white text-xl font-bold">Transaksi</h1>
             <button
               onClick={() => setShowCSVImport(true)}
-              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 tap-highlight-fix"
+              className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center tap-highlight-fix"
             >
               <Upload className="w-4 h-4 text-white" />
             </button>
           </div>
 
-          {/* Sub-tabs */}
-          <div className="max-w-2xl mx-auto flex border-t border-white/10">
-            {[["history", "Riwayat"], ["recurring", "Transaksi Rutin"], ["subscription", "Langganan"]].map(([key, label]) => (
+          {/* Main tabs */}
+          <div className="max-w-2xl mx-auto flex">
+            {[["history", "Riwayat"], ["recurring", "Rutin"], ["subscription", "Langganan"]].map(([key, label]) => (
               <button key={key} onClick={() => setMainTab(key)}
-                className={`flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${mainTab === key ? "text-[#F97316] border-[#F97316]" : "text-[#8FA4C8] border-transparent"}`}>
+                className={`flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${mainTab === key ? "text-[#F97316] border-[#F97316]" : "text-[#666] border-transparent"}`}>
                 {label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto px-4 mt-4">
+        <div className="max-w-2xl mx-auto px-4 pt-4">
           {mainTab === "recurring" && <RecurringTab user={user} globalCategories={globalCategories} />}
           {mainTab === "subscription" && <SubscriptionTab user={user} />}
+
           {mainTab === "history" && (
             <div className="space-y-3">
               {user && <ReminderWidget user={user} />}
-              {!loading && transactions.length > 0 && <DashboardInsights transactions={transactions} goals={goals} />}
 
-              <div data-tour="tx-history-card" className="bg-white rounded-2xl shadow-md overflow-hidden border border-[#F0F2F5]">
-
-                {/* Card header */}
-                <div className="flex items-center gap-2 px-4 py-3.5 border-b border-[#F2F4F7]">
-                  <button onClick={() => setHistoryOpen(o => !o)} className="flex items-center gap-2 flex-1 tap-highlight-fix min-w-0">
-                    <p className="text-sm font-bold text-[#1A1A1A] truncate">{t('tx_history')} {t('tx_title')}</p>
-                    <ChevronDown className={`w-4 h-4 text-[#8FA4C8] flex-shrink-0 transition-transform ${historyOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  <button
-                    onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix flex-shrink-0 ${selectMode ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}
-                  >
-                    {selectMode ? t('tx_cancel') : t('tx_select')}
-                  </button>
+              {/* Search + Filter */}
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
+                  <input type="search" placeholder="Cari transaksi..." value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="w-full border border-[#E2E8F0] rounded-xl pl-8 pr-3 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#F97316] bg-white tap-highlight-fix" />
                 </div>
+                <button
+                  onClick={() => setShowFilterPanel(v => !v)}
+                  className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold tap-highlight-fix transition-colors flex-shrink-0 ${hasActiveFilter ? "bg-[#F97316] text-white" : "bg-white text-[#4A5568] border border-[#E2E8F0]"}`}
+                >
+                  <Filter className="w-3.5 h-3.5" />
+                  {hasActiveFilter ? "Aktif" : "Filter"}
+                </button>
+              </div>
 
-                {historyOpen && (
-                  <>
-                    {/* Filter bar */}
-                    <div className="px-4 pt-3 pb-2 space-y-2">
-                      {/* Type tabs */}
-                      <div className="flex bg-[#F2F4F7] rounded-lg p-0.5" role="tablist">
-                        {FILTER_TABS.map(tab => (
-                          <button key={tab.key} role="tab" aria-selected={filter === tab.key}
-                            onClick={() => setFilter(tab.key)}
-                            className={`flex-1 py-2 rounded-md text-xs font-semibold capitalize transition-all tap-highlight-fix ${filter === tab.key ? "bg-[#F97316] text-white shadow-sm" : "text-[#8FA4C8]"}`}>
-                            {tab.label}
-                          </button>
-                        ))}
-                      </div>
+              {/* Type filter tabs */}
+              <div className="flex bg-white rounded-xl p-1 border border-[#F0F2F5]" role="tablist">
+                {FILTER_TABS.map(tab => (
+                  <button key={tab.key} role="tab" aria-selected={filter === tab.key}
+                    onClick={() => setFilter(tab.key)}
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all tap-highlight-fix ${filter === tab.key ? "bg-[#F97316] text-white shadow-sm" : "text-[#8FA4C8]"}`}>
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
 
-                      {/* Search + Filter button */}
-                      <div className="flex gap-2">
-                        <div className="relative flex-1">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
-                          <input type="search" placeholder={t('search_transactions')} value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            className="w-full border border-[#E2E8F0] rounded-xl pl-8 pr-3 py-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#F97316] bg-[#F8FAFC] tap-highlight-fix" />
+              {/* Summary strip — only when filtered */}
+              {!loading && filtered.length > 0 && (hasActiveFilter || searchQuery || filter !== "all") && (
+                <div className="flex gap-2">
+                  {summaryIncome > 0 && (
+                    <div className="flex-1 bg-[#F0FDF4] rounded-xl px-3 py-2 text-center">
+                      <p className="text-[10px] text-[#16A34A] font-medium">Masuk</p>
+                      <p className="text-xs font-bold text-[#16A34A]">+{formatCurrency(summaryIncome)}</p>
+                    </div>
+                  )}
+                  {summaryExpense > 0 && (
+                    <div className="flex-1 bg-[#FEF2F2] rounded-xl px-3 py-2 text-center">
+                      <p className="text-[10px] text-[#EF4444] font-medium">Keluar</p>
+                      <p className="text-xs font-bold text-[#EF4444]">−{formatCurrency(summaryExpense)}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Transaction list */}
+              <div data-tour="tx-history-card" className="bg-white rounded-2xl overflow-hidden border border-[#F0F2F5]">
+                {/* Select mode toggle — only show if there are transactions */}
+                {!loading && filtered.length > 0 && (
+                  <div className="flex justify-end px-4 pt-3 pb-1">
+                    <button
+                      onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-[#F97316] text-white" : "text-[#8FA4C8]"}`}
+                    >
+                      {selectMode ? "Batal" : "Pilih"}
+                    </button>
+                  </div>
+                )}
+
+                {loading ? (
+                  <div className="p-4 space-y-3">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#F2F4F7] animate-pulse flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-3/4" />
+                          <div className="h-2.5 bg-[#F2F4F7] rounded-full animate-pulse w-1/2" />
                         </div>
+                        <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-16" />
+                      </div>
+                    ))}
+                  </div>
+                ) : sortedGroups.length === 0 ? (
+                  <div className="p-10 text-center">
+                    <p className="text-4xl mb-3">📭</p>
+                    <p className="text-[#1A1A1A] font-semibold text-sm mb-1">{t('tx_empty_title')}</p>
+                    <p className="text-[#8FA4C8] text-xs">{t('tx_empty_desc')}</p>
+                  </div>
+                ) : (
+                  <>
+                    {sortedGroups.map(key => {
+                      const group = grouped[key];
+                      const monthIncome = group.items.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+                      const monthExpense = group.items.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+                      return (
+                        <div key={key}>
+                          <div className="px-4 py-2 bg-[#F8FAFC] border-y border-[#F2F4F7] flex items-center justify-between">
+                            <p className="text-xs font-bold text-[#1A1A1A]">{group.label}</p>
+                            <div className="flex gap-2 text-[11px]">
+                              {monthIncome > 0 && <span className="text-[#22C55E] font-semibold">+{formatCurrency(monthIncome)}</span>}
+                              {monthExpense > 0 && <span className="text-[#EF4444] font-semibold">−{formatCurrency(monthExpense)}</span>}
+                            </div>
+                          </div>
+                          {group.items.sort((a, b) => new Date(b.date) - new Date(a.date)).map(tx => {
+                            const cat = getCategoryConfig(tx.category);
+                            const linkedGoal = goals.find(g => g.id === tx.goal_id);
+                            return (
+                              <TransactionItem
+                                key={tx.id}
+                                tx={tx}
+                                cat={cat}
+                                linkedGoal={linkedGoal}
+                                selectMode={selectMode}
+                                selected={selectedIds.has(tx.id)}
+                                onSelect={() => toggleSelect(tx.id)}
+                                onEdit={() => setEditingTx(tx)}
+                                onDelete={() => handleDelete(tx.id)}
+                                formatCurrency={formatCurrency}
+                                locale={locale}
+                              />
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+
+                    {visibleCount < filtered.length && (
+                      <div className="p-4 border-t border-[#F2F4F7]">
                         <button
-                          onClick={() => setShowFilterPanel(v => !v)}
-                          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold tap-highlight-fix transition-colors flex-shrink-0 ${hasActiveFilter ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}
+                          onClick={() => setVisibleCount(c => c + 30)}
+                          className="w-full py-3 rounded-xl bg-[#F2F4F7] text-sm font-semibold text-[#4A5568] transition-colors tap-highlight-fix"
                         >
-                          <Filter className="w-3.5 h-3.5" />
-                          {hasActiveFilter ? "Aktif" : "Filter"}
+                          Muat lebih ({filtered.length - visibleCount} lagi)
                         </button>
                       </div>
-
-                      {/* Goals filter pills */}
-                      {goals.length > 0 && (
-                        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
-                          <button onClick={() => setGoalFilter(null)}
-                            className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-colors tap-highlight-fix flex-shrink-0 ${!goalFilter ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"}`}>
-                            {t('all_goals')}
-                          </button>
-                          {goals.map(goal => (
-                            <button key={goal.id} onClick={() => setGoalFilter(goal.id)}
-                              className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix flex-shrink-0 ${goalFilter === goal.id ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"}`}>
-                              {goal.icon} {goal.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Summary strip */}
-                      {!loading && filtered.length > 0 && (
-                        <div className="flex gap-2 pt-1">
-                          {summaryIncome > 0 && (
-                            <div className="flex-1 bg-[#F0FDF4] rounded-xl px-3 py-2 text-center">
-                              <p className="text-[10px] text-[#16A34A] font-medium">Pemasukan</p>
-                              <p className="text-xs font-bold text-[#16A34A]">+{formatCurrency(summaryIncome)}</p>
-                            </div>
-                          )}
-                          {summaryExpense > 0 && (
-                            <div className="flex-1 bg-[#FEF2F2] rounded-xl px-3 py-2 text-center">
-                              <p className="text-[10px] text-[#EF4444] font-medium">Pengeluaran</p>
-                              <p className="text-xs font-bold text-[#EF4444]">−{formatCurrency(summaryExpense)}</p>
-                            </div>
-                          )}
-                          <div className="flex-1 bg-[#F8FAFC] rounded-xl px-3 py-2 text-center">
-                            <p className="text-[10px] text-[#8FA4C8] font-medium">Transaksi</p>
-                            <p className="text-xs font-bold text-[#1A1A1A]">{filtered.length}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Transaction list */}
-                    {loading ? (
-                      <div className="p-4 space-y-3">
-                        {[1, 2, 3, 4, 5].map(i => (
-                          <div key={i} className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-[#F2F4F7] animate-pulse flex-shrink-0" />
-                            <div className="flex-1 space-y-2">
-                              <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-3/4" />
-                              <div className="h-2.5 bg-[#F2F4F7] rounded-full animate-pulse w-1/2" />
-                            </div>
-                            <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-16" />
-                          </div>
-                        ))}
-                      </div>
-                    ) : sortedGroups.length === 0 ? (
-                      <div className="p-10 text-center">
-                        <p className="text-4xl mb-3">📭</p>
-                        <p className="text-[#1A1A1A] font-semibold text-sm mb-1">{t('tx_empty_title')}</p>
-                        <p className="text-[#8FA4C8] text-xs mb-4">{t('tx_empty_desc')}</p>
-                        {!searchQuery && (
-                          <button onClick={() => setShowAddTx(true)}
-                            className="px-5 py-2.5 rounded-xl bg-[#F97316] text-white text-sm font-semibold tap-highlight-fix">
-                            + {t('add_transaction')}
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <>
-                        {sortedGroups.map(key => {
-                          const group = grouped[key];
-                          const monthIncome = group.items.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-                          const monthExpense = group.items.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-                          return (
-                            <div key={key}>
-                              <div className="px-4 py-2 bg-[#F8FAFC] border-y border-[#F2F4F7] flex items-center justify-between">
-                                <p className="text-xs font-bold text-[#1A1A1A]">{group.label}</p>
-                                <div className="flex gap-2 text-[11px]">
-                                  {monthIncome > 0 && <span className="text-[#22C55E] font-semibold">+{formatCurrency(monthIncome)}</span>}
-                                  {monthExpense > 0 && <span className="text-[#EF4444] font-semibold">−{formatCurrency(monthExpense)}</span>}
-                                </div>
-                              </div>
-                              {group.items.sort((a, b) => new Date(b.date) - new Date(a.date)).map(tx => {
-                                const cat = getCategoryConfig(tx.category);
-                                const linkedGoal = goals.find(g => g.id === tx.goal_id);
-                                return (
-                                  <TransactionItem
-                                    key={tx.id}
-                                    tx={tx}
-                                    cat={cat}
-                                    linkedGoal={linkedGoal}
-                                    selectMode={selectMode}
-                                    selected={selectedIds.has(tx.id)}
-                                    onSelect={() => toggleSelect(tx.id)}
-                                    onEdit={() => setEditingTx(tx)}
-                                    onDelete={() => handleDelete(tx.id)}
-                                    formatCurrency={formatCurrency}
-                                    locale={locale}
-                                  />
-                                );
-                              })}
-                            </div>
-                          );
-                        })}
-
-                        {/* Load more */}
-                        {visibleCount < filtered.length && (
-                          <div className="p-4 border-t border-[#F2F4F7]">
-                            <button
-                              onClick={() => setVisibleCount(c => c + 30)}
-                              className="w-full py-3 rounded-xl bg-[#F2F4F7] text-sm font-semibold text-[#4A5568] hover:bg-[#E2E8F0] transition-colors tap-highlight-fix"
-                            >
-                              Muat Lebih ({filtered.length - visibleCount} lagi)
-                            </button>
-                          </div>
-                        )}
-                      </>
                     )}
                   </>
                 )}
@@ -487,7 +447,6 @@ export default function Transactions() {
           <CSVImportModal onClose={() => setShowCSVImport(false)} onSuccess={loadData} />
         )}
 
-        {/* Filter bottom sheet */}
         <TransactionFilterSheet
           open={showFilterPanel}
           onClose={() => setShowFilterPanel(false)}
