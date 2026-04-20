@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Pencil, CheckSquare, Square, Repeat2, Target, Search, Upload, ChevronDown, Filter, X } from "lucide-react";
+import { Upload, ChevronDown, Filter, Search, CheckSquare } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
@@ -12,13 +12,16 @@ import PullToRefresh from "@/components/utils/PullToRefresh";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import ReminderWidget from "@/components/reminders/ReminderWidget";
 import { DEFAULT_CATEGORIES } from "@/components/utils/categoryConfig";
+import TransactionItem from "@/components/transactions/TransactionItem";
+import TransactionFilterSheet from "@/components/transactions/TransactionFilterSheet";
 
 export default function Transactions() {
   const { formatCurrency, t, settings } = useAppSettings();
   const FILTER_TABS = [
-  { key: "all", label: t('tx_filter_all') },
-  { key: "expense", label: t('tx_filter_expense') },
-  { key: "income", label: t('tx_filter_income') }];
+    { key: "all", label: t('tx_filter_all') },
+    { key: "expense", label: t('tx_filter_expense') },
+    { key: "income", label: t('tx_filter_income') },
+  ];
 
   const [transactions, setTransactions] = useState([]);
   const [customCategories, setCustomCategories] = useState([]);
@@ -34,7 +37,7 @@ export default function Transactions() {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
-  const [page, setPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(30);
   const [historyOpen, setHistoryOpen] = useState(true);
   const [mainTab, setMainTab] = useState("history");
   const [dateFrom, setDateFrom] = useState("");
@@ -42,20 +45,17 @@ export default function Transactions() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [globalCategories, setGlobalCategories] = useState([]);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
-  const PAGE_SIZE = 50;
 
   useEffect(() => {
     let isMounted = true;
-    base44.auth.me().then((u) => {
-      if (isMounted) setUser(u);
-    }).catch(() => {});
-    return () => {isMounted = false;};
+    base44.auth.me().then(u => { if (isMounted) setUser(u); }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
-  useEffect(() => {if (user) loadData();}, [user]);
+  useEffect(() => { if (user) loadData(); }, [user]);
 
   useEffect(() => {
-    const handler = () => {if (user) loadData();};
+    const handler = () => { if (user) loadData(); };
     window.addEventListener("refresh-dashboard", handler);
     return () => window.removeEventListener("refresh-dashboard", handler);
   }, [user]);
@@ -67,24 +67,25 @@ export default function Transactions() {
   }, [user?.email]);
 
   useEffect(() => {
-    base44.entities.GlobalCategory.list("sort_order").then((res) => {
-      setGlobalCategories((res || []).filter((c) => c.is_active !== false));
+    base44.entities.GlobalCategory.list("sort_order").then(res => {
+      setGlobalCategories((res || []).filter(c => c.is_active !== false));
     }).catch(() => {});
   }, []);
 
   function applyPreset(preset) {
     const todayStr = new Date().toLocaleDateString("en-CA");
     const now = new Date();
-    if (preset === "today") {setDateFrom(todayStr);setDateTo(todayStr);} else
-    if (preset === "7d") {
-      const d = new Date();d.setDate(d.getDate() - 7);
-      setDateFrom(d.toLocaleDateString("en-CA"));setDateTo(todayStr);
+    if (preset === "today") { setDateFrom(todayStr); setDateTo(todayStr); }
+    else if (preset === "7d") {
+      const d = new Date(); d.setDate(d.getDate() - 7);
+      setDateFrom(d.toLocaleDateString("en-CA")); setDateTo(todayStr);
     } else if (preset === "month") {
-      setDateFrom(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`);setDateTo(todayStr);
+      setDateFrom(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`);
+      setDateTo(todayStr);
     } else if (preset === "lastmonth") {
       const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       const lmEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-      setDateFrom(lm.toLocaleDateString("en-CA"));setDateTo(lmEnd.toLocaleDateString("en-CA"));
+      setDateFrom(lm.toLocaleDateString("en-CA")); setDateTo(lmEnd.toLocaleDateString("en-CA"));
     }
   }
 
@@ -92,14 +93,14 @@ export default function Transactions() {
     setLoading(true);
     try {
       const [txs, cats, gls] = await Promise.all([
-      base44.entities.Transaction.filter({ created_by: user.email }, "-date", 200),
-      base44.entities.CustomCategory.list("-created_date").catch(() => []),
-      base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date")]
-      );
+        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 200),
+        base44.entities.CustomCategory.list("-created_date").catch(() => []),
+        base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
+      ]);
       setTransactions(txs);
       setCustomCategories(cats);
       setGoals(gls);
-    } catch (error) {
+    } catch {
       toast.error(t('error_loading_data'));
     } finally {
       setLoading(false);
@@ -109,8 +110,8 @@ export default function Transactions() {
   async function handleDelete(id) {
     if (!confirm(t('tx_confirm_delete'))) return;
     setDeleting(true);
-    const tx = transactions.find((t) => t.id === id);
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+    const tx = transactions.find(t => t.id === id);
+    setTransactions(prev => prev.filter(t => t.id !== id));
     try {
       await base44.entities.Transaction.delete(id);
       await base44.functions.invoke("syncTransactionChanges", { action: "delete", oldTransaction: tx });
@@ -124,8 +125,8 @@ export default function Transactions() {
   }
 
   async function handleEdit(id, data) {
-    const oldTx = transactions.find((t) => t.id === id);
-    setTransactions((prev) => prev.map((t) => t.id === id ? { ...t, ...data } : t));
+    const oldTx = transactions.find(t => t.id === id);
+    setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...data } : t));
     try {
       await base44.entities.Transaction.update(id, data);
       await base44.functions.invoke("syncTransactionChanges", { action: "update", transaction: data, oldTransaction: oldTx });
@@ -138,7 +139,11 @@ export default function Transactions() {
   }
 
   function toggleSelect(id) {
-    setSelectedIds((prev) => {const next = new Set(prev);next.has(id) ? next.delete(id) : next.add(id);return next;});
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   }
 
   async function handleDeleteSelected() {
@@ -146,9 +151,9 @@ export default function Transactions() {
     if (!confirm(t('tx_confirm_delete_selected', { count: selectedIds.size }))) return;
     setDeleting(true);
     try {
-      await Promise.all([...selectedIds].map((id) => base44.entities.Transaction.delete(id)));
+      await Promise.all([...selectedIds].map(id => base44.entities.Transaction.delete(id)));
       toast.success(t('tx_delete_success'));
-      setSelectedIds(new Set());setSelectMode(false);
+      setSelectedIds(new Set()); setSelectMode(false);
       loadData();
     } catch {
       toast.error(t('tx_delete_error'));
@@ -158,17 +163,17 @@ export default function Transactions() {
 
   const getCategoryConfig = useCallback((key) => {
     if (key && key.startsWith('custom_')) {
-      const cat = customCategories.find((c) => c.id === key.substring(7));
+      const cat = customCategories.find(c => c.id === key.substring(7));
       if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color || "#888" };
     }
     const allCats = [...DEFAULT_CATEGORIES.expense, ...DEFAULT_CATEGORIES.income];
-    const defaultCat = allCats.find((c) => c.key === key) || { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" };
+    const defaultCat = allCats.find(c => c.key === key) || { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" };
     return { ...defaultCat, label: t(defaultCat.i18nKey) };
   }, [customCategories, t]);
 
   const locale = useMemo(() =>
-  settings.language === 'en' ? 'en-US' : settings.language === 'de' ? 'de-DE' : 'id-ID',
-  [settings.language]
+    settings.language === 'en' ? 'en-US' : settings.language === 'de' ? 'de-DE' : 'id-ID',
+    [settings.language]
   );
 
   const hasActiveFilter = !!(dateFrom || dateTo || categoryFilter);
@@ -176,34 +181,39 @@ export default function Transactions() {
   const filtered = useMemo(() => {
     const now = new Date();
     const currentMonthChildParentIds = new Set(
-      transactions.
-      filter((tx) => tx.is_recurring_child && (() => {const d = new Date(tx.date);return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();})()).
-      map((tx) => tx.recurring_parent_id).filter(Boolean)
+      transactions
+        .filter(tx => tx.is_recurring_child && (() => {
+          const d = new Date(tx.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        })())
+        .map(tx => tx.recurring_parent_id).filter(Boolean)
     );
-    let result = transactions.filter((tx) => {
+    let result = transactions.filter(tx => {
       if (tx.is_recurring && !tx.is_recurring_child) return !currentMonthChildParentIds.has(tx.id);
       return true;
     });
-    if (filter !== "all") result = result.filter((tx) => tx.type === filter);
-    if (goalFilter) result = result.filter((tx) => tx.goal_id === goalFilter);
-    if (dateFrom) result = result.filter((tx) => tx.date >= dateFrom);
-    if (dateTo) result = result.filter((tx) => tx.date <= dateTo);
-    if (categoryFilter) result = result.filter((tx) => tx.category === categoryFilter);
+    if (filter !== "all") result = result.filter(tx => tx.type === filter);
+    if (goalFilter) result = result.filter(tx => tx.goal_id === goalFilter);
+    if (dateFrom) result = result.filter(tx => tx.date >= dateFrom);
+    if (dateTo) result = result.filter(tx => tx.date <= dateTo);
+    if (categoryFilter) result = result.filter(tx => tx.category === categoryFilter);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((tx) => (tx.note || "").toLowerCase().includes(q) || getCategoryConfig(tx.category).label.toLowerCase().includes(q));
+      result = result.filter(tx =>
+        (tx.note || "").toLowerCase().includes(q) ||
+        getCategoryConfig(tx.category).label.toLowerCase().includes(q)
+      );
     }
     return result;
   }, [transactions, filter, goalFilter, searchQuery, dateFrom, dateTo, categoryFilter, customCategories, settings.language]);
 
-  useEffect(() => {setPage(1);}, [filter, goalFilter, searchQuery, dateFrom, dateTo, categoryFilter]);
+  useEffect(() => { setVisibleCount(30); }, [filter, goalFilter, searchQuery, dateFrom, dateTo, categoryFilter]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginatedFiltered = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
+  const visibleFiltered = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   const { grouped, sortedGroups } = useMemo(() => {
     const g = {};
-    paginatedFiltered.forEach((tx) => {
+    visibleFiltered.forEach(tx => {
       const d = new Date(tx.date);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       const label = d.toLocaleDateString(locale, { month: "long", year: "numeric" });
@@ -211,11 +221,15 @@ export default function Transactions() {
       g[key].items.push(tx);
     });
     return { grouped: g, sortedGroups: Object.keys(g).sort((a, b) => b.localeCompare(a)) };
-  }, [paginatedFiltered, locale]);
+  }, [visibleFiltered, locale]);
+
+  // Summary strip values
+  const summaryIncome = useMemo(() => filtered.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0), [filtered]);
+  const summaryExpense = useMemo(() => filtered.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0), [filtered]);
 
   return (
     <PullToRefresh onRefresh={loadData}>
-      <div className="min-h-screen bg-[#F2F4F7] pb-8">
+      <div className="min-h-screen bg-[#F2F4F7] pb-24">
         {/* Header */}
         <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-10 pb-4">
           <div className="max-w-2xl mx-auto flex items-center justify-between mb-4">
@@ -223,261 +237,269 @@ export default function Transactions() {
               <p className="text-[#8FA4C8] text-sm font-medium">{t('tx_history')}</p>
               <h1 className="text-white text-2xl font-bold mt-0.5">{t('tx_title')}</h1>
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowCSVImport(true)}
-              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 tap-highlight-fix">
-                <Upload className="w-4 h-4 text-white" />
-              </button>
-              
-
-
-
-              
-            </div>
+            <button
+              onClick={() => setShowCSVImport(true)}
+              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 tap-highlight-fix"
+            >
+              <Upload className="w-4 h-4 text-white" />
+            </button>
           </div>
 
           {/* Sub-tabs */}
           <div className="max-w-2xl mx-auto flex border-t border-white/10">
-            {[["history", "Riwayat"], ["recurring", "Transaksi Rutin"], ["subscription", "Langganan"]].map(([key, label]) =>
-            <button key={key} onClick={() => setMainTab(key)}
-            className={`flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${
-            mainTab === key ? "text-[#F97316] border-[#F97316]" : "text-[#8FA4C8] border-transparent"}`
-            }>{label}</button>
-            )}
+            {[["history", "Riwayat"], ["recurring", "Transaksi Rutin"], ["subscription", "Langganan"]].map(([key, label]) => (
+              <button key={key} onClick={() => setMainTab(key)}
+                className={`flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${mainTab === key ? "text-[#F97316] border-[#F97316]" : "text-[#8FA4C8] border-transparent"}`}>
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 mt-4">
           {mainTab === "recurring" && <RecurringTab user={user} globalCategories={globalCategories} />}
           {mainTab === "subscription" && <SubscriptionTab user={user} />}
-          {mainTab === "history" &&
-          <div className="space-y-4">
+          {mainTab === "history" && (
+            <div className="space-y-3">
               {user && <ReminderWidget user={user} />}
               {!loading && transactions.length > 0 && <DashboardInsights transactions={transactions} goals={goals} />}
 
               <div data-tour="tx-history-card" className="bg-white rounded-2xl shadow-md overflow-hidden border border-[#F0F2F5]">
-                <div className="flex items-center justify-between px-4 py-3.5">
-                  <button onClick={() => setHistoryOpen((o) => !o)} className="flex items-center gap-2 flex-1 tap-highlight-fix">
-                    <p className="text-sm font-bold text-[#1A1A1A]">{t('tx_history')} {t('tx_title')}</p>
-                    <ChevronDown className={`w-4 h-4 text-[#8FA4C8] transition-transform ${historyOpen ? "rotate-180" : ""}`} />
+
+                {/* Card header */}
+                <div className="flex items-center gap-2 px-4 py-3.5 border-b border-[#F2F4F7]">
+                  <button onClick={() => setHistoryOpen(o => !o)} className="flex items-center gap-2 flex-1 tap-highlight-fix min-w-0">
+                    <p className="text-sm font-bold text-[#1A1A1A] truncate">{t('tx_history')} {t('tx_title')}</p>
+                    <ChevronDown className={`w-4 h-4 text-[#8FA4C8] flex-shrink-0 transition-transform ${historyOpen ? "rotate-180" : ""}`} />
                   </button>
-                  {selectMode && selectedIds.size > 0 &&
-                <button onClick={handleDeleteSelected} disabled={deleting}
-                className="px-3 py-1.5 rounded-lg bg-[#FF6B6B] text-white text-xs font-bold disabled:opacity-50 tap-highlight-fix">
-                      {deleting ? t('tx_deleting') : `Hapus (${selectedIds.size})`}
-                    </button>
-                }
-                  {selectMode &&
-                <button onClick={() => setSelectedIds(new Set(paginatedFiltered.map((t) => t.id)))}
-                className="px-3 py-1.5 rounded-lg bg-[#F2F4F7] text-[#4A5568] text-xs font-semibold tap-highlight-fix">
-                      Pilih Semua
-                    </button>
-                }
-                  <button onClick={() => {setSelectMode((s) => !s);setSelectedIds(new Set());}}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}>
+                  <button
+                    onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix flex-shrink-0 ${selectMode ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}
+                  >
                     {selectMode ? t('tx_cancel') : t('tx_select')}
                   </button>
                 </div>
 
-                {historyOpen &&
-              <>
-                    <div className="px-4 pt-2 pb-2 space-y-2 border-t border-[#F2F4F7]">
+                {historyOpen && (
+                  <>
+                    {/* Filter bar */}
+                    <div className="px-4 pt-3 pb-2 space-y-2">
+                      {/* Type tabs */}
                       <div className="flex bg-[#F2F4F7] rounded-lg p-0.5" role="tablist">
-                        {FILTER_TABS.map((tab) =>
-                    <button key={tab.key} role="tab" aria-selected={filter === tab.key}
-                    onClick={() => setFilter(tab.key)}
-                    className={`flex-1 py-1.5 rounded-md text-xs font-semibold capitalize transition-all tap-highlight-fix ${filter === tab.key ? "bg-[#F97316] text-white shadow-sm" : "text-[#8FA4C8]"}`}>
+                        {FILTER_TABS.map(tab => (
+                          <button key={tab.key} role="tab" aria-selected={filter === tab.key}
+                            onClick={() => setFilter(tab.key)}
+                            className={`flex-1 py-2 rounded-md text-xs font-semibold capitalize transition-all tap-highlight-fix ${filter === tab.key ? "bg-[#F97316] text-white shadow-sm" : "text-[#8FA4C8]"}`}>
                             {tab.label}
                           </button>
-                    )}
+                        ))}
                       </div>
+
+                      {/* Search + Filter button */}
                       <div className="flex gap-2">
                         <div className="relative flex-1">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
                           <input type="search" placeholder={t('search_transactions')} value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full border border-[#E2E8F0] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#FF6A00] bg-[#F8FAFC] tap-highlight-fix" />
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="w-full border border-[#E2E8F0] rounded-xl pl-8 pr-3 py-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#F97316] bg-[#F8FAFC] tap-highlight-fix" />
                         </div>
-                        <button onClick={() => setShowFilterPanel((v) => !v)}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold tap-highlight-fix transition-colors ${showFilterPanel || hasActiveFilter ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}>
-                          <Filter className="w-3 h-3" />{hasActiveFilter ? "Aktif" : "Filter"}
+                        <button
+                          onClick={() => setShowFilterPanel(v => !v)}
+                          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold tap-highlight-fix transition-colors flex-shrink-0 ${hasActiveFilter ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}
+                        >
+                          <Filter className="w-3.5 h-3.5" />
+                          {hasActiveFilter ? "Aktif" : "Filter"}
                         </button>
                       </div>
 
-                      {showFilterPanel &&
-                  <div className="bg-[#F8FAFC] rounded-xl p-3 space-y-3 border border-[#E2E8F0]">
-                          <div>
-                            <p className="text-[10px] font-semibold text-[#8FA4C8] uppercase mb-1.5">Periode Cepat</p>
-                            <div className="flex gap-1.5 flex-wrap">
-                              {[["today", "Hari ini"], ["7d", "7 Hari"], ["month", "Bulan ini"], ["lastmonth", "Bulan lalu"]].map(([key, label]) =>
-                        <button key={key} onClick={() => applyPreset(key)}
-                        className="px-2.5 py-1 rounded-lg bg-white border border-[#E2E8F0] text-xs font-medium text-[#4A5568] hover:border-[#FF6A00] hover:text-[#FF6A00] transition-colors tap-highlight-fix">
-                                  {label}
-                                </button>
-                        )}
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <p className="text-[10px] font-semibold text-[#8FA4C8] mb-1">Dari Tanggal</p>
-                              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}
-                        className="w-full border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#FF6A00] bg-white" />
-                            </div>
-                            <div>
-                              <p className="text-[10px] font-semibold text-[#8FA4C8] mb-1">Sampai Tanggal</p>
-                              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)}
-                        className="w-full border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#FF6A00] bg-white" />
-                            </div>
-                          </div>
-                          {hasActiveFilter &&
-                    <button onClick={() => {setDateFrom("");setDateTo("");setCategoryFilter("");}}
-                    className="flex items-center gap-1 text-xs text-red-500 font-medium tap-highlight-fix">
-                              <X className="w-3 h-3" /> Reset Filter
-                            </button>
-                    }
-                        </div>
-                  }
-
-                      {goals.length > 0 &&
-                  <div className="flex gap-1.5 overflow-x-auto pb-1">
+                      {/* Goals filter pills */}
+                      {goals.length > 0 && (
+                        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
                           <button onClick={() => setGoalFilter(null)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors tap-highlight-fix ${!goalFilter ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"}`}>
+                            className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-colors tap-highlight-fix flex-shrink-0 ${!goalFilter ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"}`}>
                             {t('all_goals')}
                           </button>
-                          {goals.map((goal) =>
-                    <button key={goal.id} onClick={() => setGoalFilter(goal.id)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix ${goalFilter === goal.id ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"}`}>
+                          {goals.map(goal => (
+                            <button key={goal.id} onClick={() => setGoalFilter(goal.id)}
+                              className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1 tap-highlight-fix flex-shrink-0 ${goalFilter === goal.id ? "bg-[#F97316] text-white" : "bg-[#F2F4F7] text-[#8FA4C8]"}`}>
                               {goal.icon} {goal.name}
                             </button>
-                    )}
+                          ))}
                         </div>
-                  }
+                      )}
+
+                      {/* Summary strip */}
+                      {!loading && filtered.length > 0 && (
+                        <div className="flex gap-2 pt-1">
+                          {summaryIncome > 0 && (
+                            <div className="flex-1 bg-[#F0FDF4] rounded-xl px-3 py-2 text-center">
+                              <p className="text-[10px] text-[#16A34A] font-medium">Pemasukan</p>
+                              <p className="text-xs font-bold text-[#16A34A]">+{formatCurrency(summaryIncome)}</p>
+                            </div>
+                          )}
+                          {summaryExpense > 0 && (
+                            <div className="flex-1 bg-[#FEF2F2] rounded-xl px-3 py-2 text-center">
+                              <p className="text-[10px] text-[#EF4444] font-medium">Pengeluaran</p>
+                              <p className="text-xs font-bold text-[#EF4444]">−{formatCurrency(summaryExpense)}</p>
+                            </div>
+                          )}
+                          <div className="flex-1 bg-[#F8FAFC] rounded-xl px-3 py-2 text-center">
+                            <p className="text-[10px] text-[#8FA4C8] font-medium">Transaksi</p>
+                            <p className="text-xs font-bold text-[#1A1A1A]">{filtered.length}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {loading ?
-                <div className="p-4 space-y-2">{[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-12 bg-[#F2F4F7] rounded-xl animate-pulse" />)}</div> :
-                sortedGroups.length === 0 ?
-                <div className="p-10 text-center">
-                        <p className="text-3xl mb-2">📭</p>
+                    {/* Transaction list */}
+                    {loading ? (
+                      <div className="p-4 space-y-3">
+                        {[1, 2, 3, 4, 5].map(i => (
+                          <div key={i} className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-[#F2F4F7] animate-pulse flex-shrink-0" />
+                            <div className="flex-1 space-y-2">
+                              <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-3/4" />
+                              <div className="h-2.5 bg-[#F2F4F7] rounded-full animate-pulse w-1/2" />
+                            </div>
+                            <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-16" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : sortedGroups.length === 0 ? (
+                      <div className="p-10 text-center">
+                        <p className="text-4xl mb-3">📭</p>
                         <p className="text-[#1A1A1A] font-semibold text-sm mb-1">{t('tx_empty_title')}</p>
                         <p className="text-[#8FA4C8] text-xs mb-4">{t('tx_empty_desc')}</p>
-                        {!searchQuery &&
-                  <button onClick={() => setShowAddTx(true)}
-                  className="px-4 py-2 rounded-xl bg-[#F97316] text-white text-xs font-semibold tap-highlight-fix">
+                        {!searchQuery && (
+                          <button onClick={() => setShowAddTx(true)}
+                            className="px-5 py-2.5 rounded-xl bg-[#F97316] text-white text-sm font-semibold tap-highlight-fix">
                             + {t('add_transaction')}
                           </button>
-                  }
-                      </div> :
-
-                <>
-                        {sortedGroups.map((key) => {
-                    const group = grouped[key];
-                    const monthIncome = group.items.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
-                    const monthExpense = group.items.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-                    return (
-                      <div key={key}>
-                              <div className="px-4 py-2 bg-[#F8FAFC] border-b border-[#F2F4F7] flex items-center justify-between">
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        {sortedGroups.map(key => {
+                          const group = grouped[key];
+                          const monthIncome = group.items.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+                          const monthExpense = group.items.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+                          return (
+                            <div key={key}>
+                              <div className="px-4 py-2 bg-[#F8FAFC] border-y border-[#F2F4F7] flex items-center justify-between">
                                 <p className="text-xs font-bold text-[#1A1A1A]">{group.label}</p>
                                 <div className="flex gap-2 text-[11px]">
                                   {monthIncome > 0 && <span className="text-[#22C55E] font-semibold">+{formatCurrency(monthIncome)}</span>}
                                   {monthExpense > 0 && <span className="text-[#EF4444] font-semibold">−{formatCurrency(monthExpense)}</span>}
                                 </div>
                               </div>
-                              {group.items.sort((a, b) => new Date(b.date) - new Date(a.date)).map((tx) => {
-                          const cat = getCategoryConfig(tx.category);
-                          const isIncome = tx.type === "income";
-                          const linkedGoal = goals.find((g) => g.id === tx.goal_id);
-                          return (
-                            <div key={tx.id}
-                            className={`flex items-center gap-3 px-4 py-3 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-all duration-150 border-b border-[#F2F4F7] last:border-b-0 ${selectMode ? "cursor-pointer" : ""} ${selectedIds.has(tx.id) ? "bg-[#FF6A00]/5" : ""}`}
-                            onClick={selectMode ? () => toggleSelect(tx.id) : undefined}>
-                                    {selectMode &&
-                              <div className="flex-shrink-0">
-                                        {selectedIds.has(tx.id) ? <CheckSquare className="w-4 h-4 text-[#FF6A00]" /> : <Square className="w-4 h-4 text-[#CBD5E0]" />}
-                                      </div>
-                              }
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0" style={{ backgroundColor: cat.color + "18" }}>
-                                      {cat.emoji}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-1.5">
-                                        <p className="text-xs font-medium text-[#1A1A1A] truncate">{tx.note || cat.label}</p>
-                                        {tx.is_recurring && <Repeat2 className="w-3 h-3 text-[#4F7CFF] flex-shrink-0" />}
-                                        {linkedGoal && <Target className="w-3 h-3 text-[#FF6A00] flex-shrink-0" />}
-                                      </div>
-                                      <p className="text-[11px] text-[#8FA4C8]">
-                                        {new Date(tx.date).toLocaleDateString(locale, { month: "short", day: "numeric" })} · {cat.label}
-                                      </p>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <span className="text-xs font-bold" style={{ color: tx.type === 'income' ? '#22C55E' : tx.type === 'savings' ? '#3B82F6' : '#EF4444' }}>
-                                        {isIncome ? "+" : "−"}{formatCurrency(tx.amount)}
-                                      </span>
-                                      {!selectMode &&
-                                <>
-                                          <button onClick={() => setEditingTx(tx)} className="text-[#CBD5E0] hover:text-[#4F7CFF] p-1 tap-highlight-fix">
-                                            <Pencil className="w-3.5 h-3.5" />
-                                          </button>
-                                          <button onClick={() => handleDelete(tx.id)} disabled={deleting} className="text-[#CBD5E0] hover:text-[#FF6B6B] p-1 disabled:opacity-50 tap-highlight-fix">
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                          </button>
-                                        </>
-                                }
-                                    </div>
-                                  </div>);
-
+                              {group.items.sort((a, b) => new Date(b.date) - new Date(a.date)).map(tx => {
+                                const cat = getCategoryConfig(tx.category);
+                                const linkedGoal = goals.find(g => g.id === tx.goal_id);
+                                return (
+                                  <TransactionItem
+                                    key={tx.id}
+                                    tx={tx}
+                                    cat={cat}
+                                    linkedGoal={linkedGoal}
+                                    selectMode={selectMode}
+                                    selected={selectedIds.has(tx.id)}
+                                    onSelect={() => toggleSelect(tx.id)}
+                                    onEdit={() => setEditingTx(tx)}
+                                    onDelete={() => handleDelete(tx.id)}
+                                    formatCurrency={formatCurrency}
+                                    locale={locale}
+                                  />
+                                );
+                              })}
+                            </div>
+                          );
                         })}
-                            </div>);
 
-                  })}
-                        {totalPages > 1 &&
-                  <div className="p-3 flex items-center justify-center gap-1 border-t border-[#F2F4F7]">
-                            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
-                    className="px-3 py-1.5 rounded-lg bg-[#F2F4F7] text-xs font-semibold text-[#4A5568] hover:bg-[#E2E8F0] disabled:opacity-40 tap-highlight-fix">‹</button>
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).
-                    filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1).
-                    reduce((acc, p, idx, arr) => {if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');acc.push(p);return acc;}, []).
-                    map((p, idx) => p === '...' ?
-                    <span key={`e-${idx}`} className="px-1 text-xs text-[#8FA4C8]">…</span> :
-
-                    <button key={p} onClick={() => setPage(p)}
-                    className={`w-7 h-7 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix ${page === p ? "bg-[#0A0A0A] text-white" : "bg-[#F2F4F7] text-[#4A5568]"}`}>{p}</button>
-                    )}
-                            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                    className="px-3 py-1.5 rounded-lg bg-[#F2F4F7] text-xs font-semibold text-[#4A5568] hover:bg-[#E2E8F0] disabled:opacity-40 tap-highlight-fix">›</button>
+                        {/* Load more */}
+                        {visibleCount < filtered.length && (
+                          <div className="p-4 border-t border-[#F2F4F7]">
+                            <button
+                              onClick={() => setVisibleCount(c => c + 30)}
+                              className="w-full py-3 rounded-xl bg-[#F2F4F7] text-sm font-semibold text-[#4A5568] hover:bg-[#E2E8F0] transition-colors tap-highlight-fix"
+                            >
+                              Muat Lebih ({filtered.length - visibleCount} lagi)
+                            </button>
                           </div>
-                  }
+                        )}
                       </>
-                }
+                    )}
                   </>
-              }
+                )}
               </div>
             </div>
-          }
+          )}
         </div>
 
-        {showAddTx &&
-        <AddTransactionModal goals={goals} onClose={() => setShowAddTx(false)}
-        onSave={async (data) => {
-          setShowAddTx(false);
-          try {
-            await base44.entities.Transaction.create(data);
-            loadData();
-          } catch (error) {
-            toast.error(t('tx_create_error'));
-          }
-        }} />
-        }
+        {/* Sticky select action bar */}
+        {selectMode && (
+          <div className="fixed bottom-20 left-0 right-0 z-50 px-4">
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-[#0A0A0A] rounded-2xl p-3 flex items-center gap-2 shadow-2xl">
+                <button
+                  onClick={() => setSelectedIds(new Set(visibleFiltered.map(t => t.id)))}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 text-white text-xs font-semibold tap-highlight-fix flex-shrink-0"
+                >
+                  <CheckSquare className="w-3.5 h-3.5" />
+                  Semua
+                </button>
+                <p className="text-white/60 text-xs flex-1 text-center">
+                  {selectedIds.size > 0 ? `${selectedIds.size} dipilih` : "Ketuk untuk pilih"}
+                </p>
+                {selectedIds.size > 0 && (
+                  <button
+                    onClick={handleDeleteSelected}
+                    disabled={deleting}
+                    className="px-4 py-2 rounded-xl bg-[#FF6B6B] text-white text-xs font-bold disabled:opacity-50 tap-highlight-fix flex-shrink-0"
+                  >
+                    {deleting ? "Menghapus..." : `Hapus (${selectedIds.size})`}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
-        {editingTx &&
-        <EditTransactionModal transaction={editingTx} goals={goals}
-        onClose={() => setEditingTx(null)} onSave={handleEdit} />
-        }
+        {showAddTx && (
+          <AddTransactionModal goals={goals} onClose={() => setShowAddTx(false)}
+            onSave={async (data) => {
+              setShowAddTx(false);
+              try {
+                await base44.entities.Transaction.create(data);
+                loadData();
+              } catch {
+                toast.error(t('tx_create_error'));
+              }
+            }}
+          />
+        )}
 
-        {showCSVImport &&
-        <CSVImportModal onClose={() => setShowCSVImport(false)} onSuccess={loadData} />
-        }
+        {editingTx && (
+          <EditTransactionModal transaction={editingTx} goals={goals}
+            onClose={() => setEditingTx(null)} onSave={handleEdit} />
+        )}
+
+        {showCSVImport && (
+          <CSVImportModal onClose={() => setShowCSVImport(false)} onSuccess={loadData} />
+        )}
+
+        {/* Filter bottom sheet */}
+        <TransactionFilterSheet
+          open={showFilterPanel}
+          onClose={() => setShowFilterPanel(false)}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          setDateFrom={setDateFrom}
+          setDateTo={setDateTo}
+          onApplyPreset={applyPreset}
+          hasActiveFilter={hasActiveFilter}
+          onReset={() => { setDateFrom(""); setDateTo(""); setCategoryFilter(""); }}
+        />
       </div>
-    </PullToRefresh>);
-
+    </PullToRefresh>
+  );
 }
