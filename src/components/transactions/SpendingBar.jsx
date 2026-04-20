@@ -32,23 +32,24 @@ export default function SpendingBar({ transactions, categories }) {
   if (!data) return null;
 
   return (
-    <div className="mt-3">
+    <div className="px-4 pt-3 pb-2">
       {/* Bar */}
-      <div className="flex h-2 rounded-full overflow-hidden gap-0.5">
+      <div className="flex h-2.5 rounded-full overflow-hidden gap-px">
         {data.items.map(item => (
           <div
             key={item.key}
             style={{ width: `${item.pct}%`, backgroundColor: item.color }}
-            className="rounded-full"
+            className="first:rounded-l-full last:rounded-r-full"
           />
         ))}
       </div>
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+      {/* Legend — 2 columns grid */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-2.5">
         {data.items.map(item => (
-          <div key={item.key} className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-            <span className="text-[10px] text-[#8FA4C8]">{item.label} {item.pct}%</span>
+          <div key={item.key} className="flex items-center gap-1.5 min-w-0">
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+            <span className="text-[11px] text-[#8FA4C8] truncate">{item.label}</span>
+            <span className="text-[11px] font-semibold text-white ml-auto flex-shrink-0">{item.pct}%</span>
           </div>
         ))}
       </div>
