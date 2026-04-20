@@ -39,6 +39,11 @@
       "type": "string",
       "format": "date"
     },
+    "time": {
+      "type": "string",
+      "description": "Waktu transaksi dalam format HH:MM (24 jam)",
+      "default": null
+    },
     "is_recurring": {
       "type": "boolean",
       "default": false

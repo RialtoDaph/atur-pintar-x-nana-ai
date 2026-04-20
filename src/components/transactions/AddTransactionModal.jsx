@@ -31,6 +31,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const [category, setCategory] = useState(initialValues.category || "");
   const [note, setNote] = useState(initialValues.note || "");
   const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
+  const [time, setTime] = useState(() => {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  });
   const [accountId, setAccountId] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [interval, setInterval] = useState("monthly");
@@ -152,6 +156,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
         category: category || "other",
         note,
         account_id: accountId,
+        time: time || undefined,
         is_recurring: isRecurring,
         recurring_interval: isRecurring ? interval : undefined,
         is_recurring_child: false,
@@ -452,7 +457,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
               )}
             </div>
 
-            {/* Date & Note */}
+            {/* Date, Time & Note */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div>
                 <p className="text-[11px] text-[#8FA4C8] mb-1.5">tanggal</p>
@@ -461,10 +466,16 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                   style={{ "--tw-ring-color": typeColor }} />
               </div>
               <div>
-                <p className="text-[11px] text-[#8FA4C8] mb-1.5">catatan</p>
-                <input type="text" placeholder="opsional..." value={note} onChange={e => handleNoteChange(e.target.value)}
-                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-2 bg-[#F8FAFC]" />
+                <p className="text-[11px] text-[#8FA4C8] mb-1.5">waktu</p>
+                <input type="time" value={time} onChange={e => setTime(e.target.value)}
+                  className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-2 bg-[#F8FAFC]"
+                  style={{ "--tw-ring-color": typeColor }} />
               </div>
+            </div>
+            <div className="mb-4">
+              <p className="text-[11px] text-[#8FA4C8] mb-1.5">catatan</p>
+              <input type="text" placeholder="opsional..." value={note} onChange={e => handleNoteChange(e.target.value)}
+                className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-2 bg-[#F8FAFC]" />
             </div>
 
             {/* Recurring toggle */}
