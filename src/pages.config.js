@@ -70,7 +70,7 @@ import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
 import SpendingDetail from './pages/SpendingDetail';
 import Tips from './pages/Tips';
-import Transactions from './pages/Transactions';
+import Transactions from './pages/Transactions.jsx';
 import __Layout from './Layout.jsx';
 
 
