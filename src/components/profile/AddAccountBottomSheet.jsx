@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Check, ChevronRight } from "lucide-react";
+import AccountLogo from "@/components/transactions/AccountLogo";
 
 function formatRupiah(n) {
   if (!n) return "";
@@ -100,10 +101,14 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                     }}
                   >
                     <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                      style={{ backgroundColor: (acc.color || "#F97316") + "20" }}
+                      className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: acc.logo_url ? "transparent" : (acc.color || "#F97316") + "20" }}
                     >
-                      {acc.icon || "🏦"}
+                      {acc.logo_url ? (
+                        <img src={acc.logo_url} alt="Logo" className="w-full h-full object-contain rounded-xl" />
+                      ) : (
+                        <span className="text-xl">{acc.icon || "🏦"}</span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[#1A1A1A]">{acc.name}</p>
@@ -124,15 +129,19 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
 
           {/* Balance input — shown after selection */}
           {selected && (
-            <div className="px-5 pb-4 pt-2">
-              <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E2E8F0]">
-                <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                    style={{ backgroundColor: (selected.color || "#F97316") + "20" }}
-                  >
-                    {selected.icon || "🏦"}
-                  </div>
+           <div className="px-5 pb-4 pt-2">
+             <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E2E8F0]">
+               <div className="flex items-center gap-3 mb-4">
+                 <div
+                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                   style={{ backgroundColor: selected.logo_url ? "transparent" : (selected.color || "#F97316") + "20" }}
+                 >
+                   {selected.logo_url ? (
+                     <img src={selected.logo_url} alt="Logo" className="w-full h-full object-contain rounded-xl" />
+                   ) : (
+                     <span className="text-xl">{selected.icon || "🏦"}</span>
+                   )}
+                 </div>
                   <div>
                     <p className="text-sm font-bold text-[#1A1A1A]">{selected.name}</p>
                     <p className="text-xs text-[#8FA4C8]">Sudah dipilih ✓</p>

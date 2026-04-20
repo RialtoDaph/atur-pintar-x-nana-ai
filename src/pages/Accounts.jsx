@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import AccountLogo from "@/components/transactions/AccountLogo";
 
 const ACCOUNT_TYPES = [
   { key: "bank", label: "Bank", icon: "🏦", color: "#1976D2" },
@@ -238,8 +239,12 @@ export default function Accounts() {
           accounts.map(acc => (
             <div key={acc.id} className={`bg-white rounded-2xl p-4 border transition-all duration-200 hover:shadow-lg ${acc.is_default ? "border-[#F97316]/40 shadow-md" : "border-[#F0F2F5] shadow-md"}`}>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
-                  {acc.icon || "🏦"}
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: acc.logo_url ? "transparent" : (acc.color || "#FF6A00") + "20" }}>
+                  {acc.logo_url ? (
+                    <img src={acc.logo_url} alt="Logo" className="w-full h-full object-contain rounded-2xl" />
+                  ) : (
+                    <div className="text-2xl">{acc.icon || "🏦"}</div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
