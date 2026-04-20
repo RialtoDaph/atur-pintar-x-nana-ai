@@ -356,7 +356,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                           backgroundColor: active ? "#FFF7ED" : "#F8FAFC",
                           color: active ? "#EA580C" : "#4A5568"
                         }}>
-                        <span>{acc.icon || "💳"}</span>{acc.name}
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ backgroundColor: acc.color || "#FF6A00" }}>
+                          {acc.icon || "💳"}
+                        </div>
+                        {acc.name}
                       </button>
                     );
                   })}

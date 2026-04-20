@@ -68,7 +68,9 @@ export default function AccountPickerModal({ isOpen, onClose, onConfirm, title, 
                 return (
                   <button key={acc.id} onClick={() => setSelected(acc.id)}
                     className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left ${isSelected ? "border-[#FF6A00] bg-[#FFF5EB]" : "border-[#E2E8F0] hover:border-[#CBD5E0]"}`}>
-                    <span className="text-xl">{acc.icon || "💳"}</span>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0" style={{ backgroundColor: acc.color || "#FF6A00" }}>
+                      {acc.icon || "💳"}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[#1A1A1A]">{acc.name}</p>
                       <p className="text-xs text-[#8FA4C8]">{formatIDR(acc.balance || 0)}</p>
