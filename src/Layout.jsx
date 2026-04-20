@@ -43,12 +43,12 @@ function LayoutInner({ children, currentPageName }) {
       }
       // Log login
       base44.functions.invoke('logUserLogin', {}).catch(() => {});
-      
+
       // Fetch unread alerts only (badge count)
       base44.entities.Alert.filter({ created_by: u.email, status: "unread" }).then((alerts) => {
         const seenTitles = new Set();
         let count = 0;
-        for (const a of (alerts || [])) {
+        for (const a of alerts || []) {
           if (!seenTitles.has(a.title)) {
             seenTitles.add(a.title);
             count++;
@@ -56,12 +56,12 @@ function LayoutInner({ children, currentPageName }) {
         }
         setUnreadAlertCount(Math.min(count, 10));
       }).catch(() => {});
-      
+
       // Fetch unread admin notifications
       base44.entities.AdminNotification.list().then((notifs) => {
-        const relevant = notifs.filter(n => 
-          (n.target_type === 'all' || n.target_email === u.email) && 
-          (!n.read_by?.includes(u.email))
+        const relevant = notifs.filter((n) =>
+        (n.target_type === 'all' || n.target_email === u.email) &&
+        !n.read_by?.includes(u.email)
         );
         setUnreadAdminCount(relevant.length);
       }).catch(() => {});
@@ -70,14 +70,14 @@ function LayoutInner({ children, currentPageName }) {
       base44.entities.Reminder.filter({ is_active: true, created_by: u.email }).then((reminders) => {
         const now = new Date();
         const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-        const upcoming = reminders.filter(r => {
+        const upcoming = reminders.filter((r) => {
           if (r.last_dismissed_month === currentMonth) return false;
           const thisMonth = new Date(now.getFullYear(), now.getMonth(), r.due_day);
           const target = thisMonth < now ? new Date(now.getFullYear(), now.getMonth() + 1, r.due_day) : thisMonth;
           const days = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
           return days <= 7;
         });
-        setUnreadAlertCount(prev => prev + upcoming.length);
+        setUnreadAlertCount((prev) => prev + upcoming.length);
       }).catch(() => {});
     }).catch(() => {});
   }, []);
@@ -209,7 +209,7 @@ function LayoutInner({ children, currentPageName }) {
       `}</style>
 
       {/* Desktop sidebar */}
-      <div className="hidden sm:flex fixed left-0 top-0 h-full w-60 bg-[#0A0A0A] flex-col px-5 py-8 z-40" style={{boxShadow: '4px 0 24px rgba(0,0,0,0.5)'}}>
+      <div className="hidden sm:flex fixed left-0 top-0 h-full w-60 bg-[#0A0A0A] flex-col px-5 py-8 z-40" style={{ boxShadow: '4px 0 24px rgba(0,0,0,0.5)' }}>
         {/* Logo */}
         <div className="mb-8 px-2 flex items-center gap-2">
           <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-10 h10" />
@@ -303,13 +303,13 @@ function LayoutInner({ children, currentPageName }) {
           }
 
           <div className="flex items-center gap-2">
-            <button onClick={() => { setShowAlertsDrawer(true); setUnreadAlertCount(0); }} className="relative w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
+            <button onClick={() => {setShowAlertsDrawer(true);setUnreadAlertCount(0);}} className="relative w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
               <Bell className="w-4 h-4" />
-              {(unreadAlertCount + unreadAdminCount) > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-white text-[9px] font-bold flex items-center justify-center">
-                  {(unreadAlertCount + unreadAdminCount) > 9 ? "9+" : (unreadAlertCount + unreadAdminCount)}
+              {unreadAlertCount + unreadAdminCount > 0 &&
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-white text-[9px] font-bold flex items-center justify-center">
+                  {unreadAlertCount + unreadAdminCount > 9 ? "9+" : unreadAlertCount + unreadAdminCount}
                 </span>
-              )}
+              }
             </button>
             <button onClick={() => setShowSearch(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
               <Search className="w-4 h-4" />
@@ -322,7 +322,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Main content — add top padding on mobile for header */}
-      <div ref={mainContentRef} className="sm:ml-60 pt-14 sm:pt-0 overflow-y-auto" style={{paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))'}}>
+      <div ref={mainContentRef} className="sm:ml-60 pt-14 sm:pt-0 overflow-y-auto" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
         <AnimatePresence mode="sync">
           <motion.div
             key={currentPageName}
@@ -337,7 +337,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Mobile bottom nav — hidden when any modal is open */}
-      {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))'}}>
+      {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
         {mobileMainNav.map((item) => {
           const active = currentPageName === item.page;
           return (
@@ -366,49 +366,49 @@ function LayoutInner({ children, currentPageName }) {
       </div>}
 
       {/* FAB - Add Transaction */}
-      {!anyModalOpen && !isNestedPage && (
-        <button
-          onClick={() => setShowAddTransaction(true)}
-          data-tour="add-transaction-btn"
-          className="fixed z-[55] bg-[#FF6B35] flex items-center justify-center rounded-full shadow-lg active:scale-95 transition-all duration-150 tap-highlight-fix sm:hidden"
-          style={{
-            width: 44, height: 44,
-            bottom: 'calc(76px + env(safe-area-inset-bottom, 0px))',
-            right: 16,
-            boxShadow: '0 2px 12px rgba(255,107,53,0.4)'
-          }}
-        >
+      {!anyModalOpen && !isNestedPage &&
+      <button
+        onClick={() => setShowAddTransaction(true)}
+        data-tour="add-transaction-btn" className="bg-[#FF6B35] py-4 rounded-full fixed z-[55] flex items-center justify-center shadow-lg active:scale-95 transition-all duration-150 tap-highlight-fix sm:hidden"
+
+        style={{
+          width: 44, height: 44,
+          bottom: 'calc(76px + env(safe-area-inset-bottom, 0px))',
+          right: 16,
+          boxShadow: '0 2px 12px rgba(255,107,53,0.4)'
+        }}>
+        
           <Plus className="w-5 h-5 text-white" />
         </button>
-      )}
+      }
 
       {/* FAB for desktop */}
-      {!anyModalOpen && (
-        <button
-          onClick={() => setShowAddTransaction(true)}
-          className="fixed z-[55] bg-[#FF6B35] items-center justify-center rounded-full shadow-lg active:scale-95 transition-all duration-150 tap-highlight-fix hidden sm:flex"
-          style={{
-            width: 48, height: 48,
-            bottom: 24,
-            right: 24,
-            boxShadow: '0 2px 12px rgba(255,107,53,0.4)'
-          }}
-        >
+      {!anyModalOpen &&
+      <button
+        onClick={() => setShowAddTransaction(true)}
+        className="fixed z-[55] bg-[#FF6B35] items-center justify-center rounded-full shadow-lg active:scale-95 transition-all duration-150 tap-highlight-fix hidden sm:flex"
+        style={{
+          width: 48, height: 48,
+          bottom: 24,
+          right: 24,
+          boxShadow: '0 2px 12px rgba(255,107,53,0.4)'
+        }}>
+        
           <Plus className="w-5 h-5 text-white" />
         </button>
-      )}
+      }
 
-      {showAddTransaction && (
-        <AddTransactionModal
-          goals={[]}
-          onClose={() => setShowAddTransaction(false)}
-          onSave={async (data) => {
-            await base44.entities.Transaction.create(data);
-            setShowAddTransaction(false);
-            window.dispatchEvent(new Event("refresh-dashboard"));
-          }}
-        />
-      )}
+      {showAddTransaction &&
+      <AddTransactionModal
+        goals={[]}
+        onClose={() => setShowAddTransaction(false)}
+        onSave={async (data) => {
+          await base44.entities.Transaction.create(data);
+          setShowAddTransaction(false);
+          window.dispatchEvent(new Event("refresh-dashboard"));
+        }} />
+
+      }
 
       {/* Reminder Notification Popup */}
       <ReminderNotificationPopup user={user} />
@@ -418,7 +418,7 @@ function LayoutInner({ children, currentPageName }) {
 
 
       {/* Alerts & Notifications Drawer */}
-      {showAlertsDrawer && <AlertsDrawer onClose={() => { setShowAlertsDrawer(false); setUnreadAdminCount(0); }} user={user} />}
+      {showAlertsDrawer && <AlertsDrawer onClose={() => {setShowAlertsDrawer(false);setUnreadAdminCount(0);}} user={user} />}
 
       {/* Global Search */}
       {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
