@@ -73,7 +73,8 @@ export default function Transactions() {
 
   // Resolve category for a transaction
   function resolveCategory(tx) {
-    const cat = globalCategories.find(c => c.id === tx.category);
+    // Match by ID or by name (for legacy data)
+    const cat = globalCategories.find(c => c.id === tx.category || c.name?.toLowerCase() === tx.category?.toLowerCase());
     if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color };
     // Fallbacks for legacy keys
     const legacyMap = {
@@ -169,10 +170,11 @@ export default function Transactions() {
   return (
     <div className="min-h-screen bg-[#F2F4F7]">
       {/* Header */}
-      <div className="bg-[#0A0A0A] px-4 pt-4 pb-3">
+      <div className="bg-[#0A0A0A] px-4 pt-3 pb-3">
+        {/* Top row: title + actions */}
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-white text-lg font-bold">Transaksi</p>
+            <p className="text-white text-base font-bold">Transaksi</p>
             <p className="text-[#8FA4C8] text-xs">{MONTHS[filters.month]} {filters.year}</p>
           </div>
           <div className="flex items-center gap-2">
@@ -193,14 +195,14 @@ export default function Transactions() {
 
         {/* Search bar */}
         {showSearch && (
-          <div className="relative mb-2">
+          <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
             <input
               autoFocus
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Cari transaksi..."
-              className="w-full bg-white/10 text-white placeholder-[#8FA4C8] rounded-xl pl-9 pr-9 py-2 text-sm focus:outline-none"
+              className="w-full bg-white/10 text-white placeholder-[#8FA4C8] rounded-xl pl-9 pr-9 py-2.5 text-sm focus:outline-none"
             />
             {search && (
               <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -210,19 +212,19 @@ export default function Transactions() {
           </div>
         )}
 
-        {/* Month summary pills */}
-        <div className="flex gap-2">
-          <div className="flex-1 bg-white/10 rounded-xl px-3 py-2">
-            <p className="text-[10px] text-[#8FA4C8]">Pemasukan</p>
-            <p className="text-sm font-bold text-[#4ADE80]">{formatCurrency(totalIncome)}</p>
+        {/* Month summary — 3 equal cards */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-white/10 rounded-xl px-2.5 py-2">
+            <p className="text-[9px] text-[#8FA4C8] mb-0.5">Masuk</p>
+            <p className="text-xs font-bold text-[#4ADE80] truncate">{formatCurrency(totalIncome)}</p>
           </div>
-          <div className="flex-1 bg-white/10 rounded-xl px-3 py-2">
-            <p className="text-[10px] text-[#8FA4C8]">Pengeluaran</p>
-            <p className="text-sm font-bold text-[#F87171]">{formatCurrency(totalExpense)}</p>
+          <div className="bg-white/10 rounded-xl px-2.5 py-2">
+            <p className="text-[9px] text-[#8FA4C8] mb-0.5">Keluar</p>
+            <p className="text-xs font-bold text-[#F87171] truncate">{formatCurrency(totalExpense)}</p>
           </div>
-          <div className="flex-1 bg-white/10 rounded-xl px-3 py-2">
-            <p className="text-[10px] text-[#8FA4C8]">Selisih</p>
-            <p className={`text-sm font-bold ${totalIncome - totalExpense >= 0 ? "text-[#4ADE80]" : "text-[#F87171]"}`}>
+          <div className="bg-white/10 rounded-xl px-2.5 py-2">
+            <p className="text-[9px] text-[#8FA4C8] mb-0.5">Selisih</p>
+            <p className={`text-xs font-bold truncate ${totalIncome - totalExpense >= 0 ? "text-[#4ADE80]" : "text-[#F87171]"}`}>
               {formatCurrency(Math.abs(totalIncome - totalExpense))}
             </p>
           </div>
