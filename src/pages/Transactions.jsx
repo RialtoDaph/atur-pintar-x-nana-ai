@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Upload, Filter, Search, CheckSquare } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
@@ -9,94 +9,49 @@ import CSVImportModal from "@/components/transactions/CSVImportModal";
 import RecurringTab from "@/components/transactions/RecurringTab";
 import SubscriptionTab from "@/components/transactions/SubscriptionTab";
 import PullToRefresh from "@/components/utils/PullToRefresh";
+import DashboardInsights from "@/components/dashboard/DashboardInsights";
+import ReminderWidget from "@/components/reminders/ReminderWidget";
+import { DEFAULT_CATEGORIES } from "@/components/utils/categoryConfig";
 import TransactionItem from "@/components/transactions/TransactionItem";
-import TransactionDetailSheet from "@/components/transactions/TransactionDetailSheet";
-import TransactionAdvancedFilter from "@/components/transactions/TransactionAdvancedFilter";
-
-const SESSION_KEY = "tx_filters_v2";
-
-const DEFAULT_FILTERS = {
-  type: "all",
-  month: "",
-  categories: [],
-  accountId: "",
-};
-
-function getStoredFilters() {
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    return raw ? { ...DEFAULT_FILTERS, ...JSON.parse(raw) } : { ...DEFAULT_FILTERS };
-  } catch { return { ...DEFAULT_FILTERS }; }
-}
-
-function storeFilters(f) {
-  try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(f)); } catch {}
-}
-
-// Date grouping helpers
-function getDateLabel(dateStr) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-  const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 6);
-  const d = new Date(dateStr + "T00:00:00");
-
-  if (d.getTime() === today.getTime()) return { key: "today", label: "Hari Ini", order: 0 };
-  if (d.getTime() === yesterday.getTime()) return { key: "yesterday", label: "Kemarin", order: 1 };
-  if (d >= weekAgo && d < yesterday) return {
-    key: "week_" + dateStr,
-    label: d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" }),
-    order: 2
-  };
-  return {
-    key: dateStr,
-    label: d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }),
-    order: 3
-  };
-}
+import TransactionFilterSheet from "@/components/transactions/TransactionFilterSheet";
 
 export default function Transactions() {
   const { formatCurrency, t, settings } = useAppSettings();
+  const FILTER_TABS = [
+    { key: "all", label: t('tx_filter_all') },
+    { key: "expense", label: t('tx_filter_expense') },
+    { key: "income", label: t('tx_filter_income') },
+  ];
 
   const [transactions, setTransactions] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [globalCategories, setGlobalCategories] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-
-  // Search
-  const [showSearch, setShowSearch] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [goalFilter, setGoalFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const searchInputRef = useRef(null);
-
-  // Filter pill (quick)
-  const [quickType, setQuickType] = useState("all");
-
-  // Advanced filter
-  const [showAdvFilter, setShowAdvFilter] = useState(false);
-  const [filters, setFilters] = useState(getStoredFilters);
-
-  // Modals
+  const [showAddTx, setShowAddTx] = useState(false);
   const [editingTx, setEditingTx] = useState(null);
-  const [detailTx, setDetailTx] = useState(null);
+  const [user, setUser] = useState(null);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [deleting, setDeleting] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
-
-  // Tabs
-  const [mainTab, setMainTab] = useState("history");
-
-  // Pagination
   const [visibleCount, setVisibleCount] = useState(30);
-  const loaderRef = useRef(null);
+  const [mainTab, setMainTab] = useState("history");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [globalCategories, setGlobalCategories] = useState([]);
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
 
-  // ---- Auth & load ----
   useEffect(() => {
-    base44.auth.me().then(u => setUser(u)).catch(() => {});
+    let isMounted = true;
+    base44.auth.me().then(u => { if (isMounted) setUser(u); }).catch(() => {});
+    return () => { isMounted = false; };
   }, []);
 
-  useEffect(() => {
-    if (user) loadData();
-  }, [user]);
+  useEffect(() => { if (user) loadData(); }, [user]);
 
   useEffect(() => {
     const handler = () => { if (user) loadData(); };
@@ -110,134 +65,61 @@ export default function Transactions() {
     return unsub;
   }, [user?.email]);
 
+  useEffect(() => {
+    base44.entities.GlobalCategory.list("sort_order").then(res => {
+      setGlobalCategories((res || []).filter(c => c.is_active !== false));
+    }).catch(() => {});
+  }, []);
+
+  function applyPreset(preset) {
+    const todayStr = new Date().toLocaleDateString("en-CA");
+    const now = new Date();
+    if (preset === "today") { setDateFrom(todayStr); setDateTo(todayStr); }
+    else if (preset === "7d") {
+      const d = new Date(); d.setDate(d.getDate() - 7);
+      setDateFrom(d.toLocaleDateString("en-CA")); setDateTo(todayStr);
+    } else if (preset === "month") {
+      setDateFrom(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`);
+      setDateTo(todayStr);
+    } else if (preset === "lastmonth") {
+      const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const lmEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+      setDateFrom(lm.toLocaleDateString("en-CA")); setDateTo(lmEnd.toLocaleDateString("en-CA"));
+    }
+  }
+
   async function loadData() {
     setLoading(true);
     try {
-      const [txs, accs, cats, gls] = await Promise.all([
-        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 500),
-        base44.entities.Account.filter({ created_by: user.email }, "name"),
-        base44.entities.GlobalCategory.list("sort_order"),
-        base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date").catch(() => []),
+      const [txs, cats, gls] = await Promise.all([
+        base44.entities.Transaction.filter({ created_by: user.email }, "-date", 200),
+        base44.entities.CustomCategory.list("-created_date").catch(() => []),
+        base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
       ]);
-      setTransactions((txs || []).filter(tx => !tx.is_deleted));
-      // dedupe accounts
-      const seen = new Set();
-      setAccounts((accs || []).filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true; }));
-      setGlobalCategories((cats || []).filter(c => c.is_active !== false));
-      setGoals(gls || []);
+      setTransactions(txs);
+      setCustomCategories(cats);
+      setGoals(gls);
     } catch {
-      toast.error("Gagal memuat data");
+      toast.error(t('error_loading_data'));
     } finally {
       setLoading(false);
     }
   }
 
-  // ---- Category lookup ----
-  const getCategoryConfig = useCallback((key) => {
-    if (!key) return { emoji: "📦", label: "Lainnya", color: "#95A5A6" };
-    // Match by ID first (GlobalCategory id)
-    const byId = globalCategories.find(c => c.id === key);
-    if (byId) return { emoji: byId.emoji, label: byId.name, color: byId.color || "#888" };
-    // Fallback key match
-    const byKey = globalCategories.find(c => c.name?.toLowerCase() === key?.toLowerCase());
-    if (byKey) return { emoji: byKey.emoji, label: byKey.name, color: byKey.color || "#888" };
-    return { emoji: "📦", label: key, color: "#95A5A6" };
-  }, [globalCategories]);
-
-  const getAccountName = useCallback((accountId) => {
-    if (!accountId) return null;
-    const acc = accounts.find(a => a.id === accountId);
-    return acc ? `${acc.icon || ""} ${acc.name}`.trim() : null;
-  }, [accounts]);
-
-  // ---- Derived month summary ----
-  const now = new Date();
-  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const monthSummary = useMemo(() => {
-    const thisMonth = transactions.filter(tx => tx.date?.startsWith(currentMonthStr));
-    return {
-      income: thisMonth.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0),
-      expense: thisMonth.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0),
-    };
-  }, [transactions, currentMonthStr]);
-
-  // ---- Filtering ----
-  const activeFilterCount = useMemo(() => {
-    let n = 0;
-    if (filters.month && filters.month !== currentMonthStr) n++;
-    if (filters.categories?.length) n++;
-    if (filters.accountId) n++;
-    if (filters.type !== "all") n++;
-    return n;
-  }, [filters, currentMonthStr]);
-
-  const filtered = useMemo(() => {
-    let result = [...transactions];
-    // Quick type pill (overrides advanced type filter if set)
-    const typeFilter = quickType !== "all" ? quickType : filters.type !== "all" ? filters.type : null;
-    if (typeFilter) result = result.filter(tx => tx.type === typeFilter);
-    // Month filter
-    if (filters.month) result = result.filter(tx => tx.date?.startsWith(filters.month));
-    // Category filter
-    if (filters.categories?.length) result = result.filter(tx => filters.categories.includes(tx.category));
-    // Account filter
-    if (filters.accountId) result = result.filter(tx => tx.account_id === filters.accountId);
-    // Search
-    if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      result = result.filter(tx =>
-        (tx.note || "").toLowerCase().includes(q) ||
-        String(tx.amount).includes(q)
-      );
-    }
-    return result;
-  }, [transactions, quickType, filters, searchQuery]);
-
-  // Reset pagination when filters change
-  useEffect(() => { setVisibleCount(30); }, [quickType, filters, searchQuery]);
-
-  const visibleFiltered = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
-
-  // Infinite scroll observer
-  useEffect(() => {
-    if (!loaderRef.current) return;
-    const obs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && visibleCount < filtered.length) {
-        setVisibleCount(c => c + 30);
-      }
-    }, { threshold: 0.5 });
-    obs.observe(loaderRef.current);
-    return () => obs.disconnect();
-  }, [visibleCount, filtered.length]);
-
-  // ---- Grouping ----
-  const { groups, sortedKeys } = useMemo(() => {
-    const g = {};
-    visibleFiltered.forEach(tx => {
-      const { key, label, order } = getDateLabel(tx.date);
-      if (!g[key]) g[key] = { label, order, items: [] };
-      g[key].items.push(tx);
-    });
-    const sortedKeys = Object.keys(g).sort((a, b) => {
-      // Sort by first item date desc
-      const aDate = g[a].items[0]?.date || "";
-      const bDate = g[b].items[0]?.date || "";
-      return bDate.localeCompare(aDate);
-    });
-    return { groups: g, sortedKeys };
-  }, [visibleFiltered]);
-
-  // ---- Actions ----
-  async function handleDelete(tx) {
-    if (!confirm("Hapus transaksi ini?")) return;
-    setTransactions(prev => prev.filter(t => t.id !== tx.id));
+  async function handleDelete(id) {
+    if (!confirm(t('tx_confirm_delete'))) return;
+    setDeleting(true);
+    const tx = transactions.find(t => t.id === id);
+    setTransactions(prev => prev.filter(t => t.id !== id));
     try {
-      await base44.entities.Transaction.update(tx.id, { is_deleted: true });
-      await base44.functions.invoke("syncTransactionChanges", { action: "delete", oldTransaction: tx }).catch(() => {});
-      toast.success("Transaksi dihapus");
+      await base44.entities.Transaction.delete(id);
+      await base44.functions.invoke("syncTransactionChanges", { action: "delete", oldTransaction: tx });
+      toast.success(t('tx_delete_success'));
     } catch {
-      toast.error("Gagal menghapus");
+      toast.error(t('tx_delete_error'));
       loadData();
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -246,97 +128,128 @@ export default function Transactions() {
     setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...data } : t));
     try {
       await base44.entities.Transaction.update(id, data);
-      await base44.functions.invoke("syncTransactionChanges", { action: "update", transaction: data, oldTransaction: oldTx }).catch(() => {});
-      toast.success("Transaksi diperbarui");
+      await base44.functions.invoke("syncTransactionChanges", { action: "update", transaction: data, oldTransaction: oldTx });
+      toast.success(t('tx_update_success'));
       setEditingTx(null);
     } catch {
-      toast.error("Gagal memperbarui");
+      toast.error(t('tx_update_error'));
       loadData();
     }
   }
 
-  function handleApplyFilter(f) {
-    setFilters(f);
-    storeFilters(f);
-  }
-
-  function handleResetFilter() {
-    setFilters({ ...DEFAULT_FILTERS });
-    storeFilters({ ...DEFAULT_FILTERS });
-    setQuickType("all");
-  }
-
-  function handleSearchToggle() {
-    setShowSearch(v => {
-      if (!v) setTimeout(() => searchInputRef.current?.focus(), 100);
-      return !v;
+  function toggleSelect(id) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
     });
-    setSearchQuery("");
   }
 
-  // ---- Render ----
+  async function handleDeleteSelected() {
+    if (selectedIds.size === 0) return;
+    if (!confirm(t('tx_confirm_delete_selected', { count: selectedIds.size }))) return;
+    setDeleting(true);
+    try {
+      await Promise.all([...selectedIds].map(id => base44.entities.Transaction.delete(id)));
+      toast.success(t('tx_delete_success'));
+      setSelectedIds(new Set()); setSelectMode(false);
+      loadData();
+    } catch {
+      toast.error(t('tx_delete_error'));
+      setDeleting(false);
+    }
+  }
+
+  const getCategoryConfig = useCallback((key) => {
+    if (key && key.startsWith('custom_')) {
+      const cat = customCategories.find(c => c.id === key.substring(7));
+      if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color || "#888" };
+    }
+    const allCats = [...DEFAULT_CATEGORIES.expense, ...DEFAULT_CATEGORIES.income];
+    const defaultCat = allCats.find(c => c.key === key) || { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" };
+    return { ...defaultCat, label: t(defaultCat.i18nKey) };
+  }, [customCategories, t]);
+
+  const locale = useMemo(() =>
+    settings.language === 'en' ? 'en-US' : settings.language === 'de' ? 'de-DE' : 'id-ID',
+    [settings.language]
+  );
+
+  const hasActiveFilter = !!(dateFrom || dateTo || categoryFilter);
+
+  const filtered = useMemo(() => {
+    const now = new Date();
+    const currentMonthChildParentIds = new Set(
+      transactions
+        .filter(tx => tx.is_recurring_child && (() => {
+          const d = new Date(tx.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        })())
+        .map(tx => tx.recurring_parent_id).filter(Boolean)
+    );
+    let result = transactions.filter(tx => {
+      if (tx.is_recurring && !tx.is_recurring_child) return !currentMonthChildParentIds.has(tx.id);
+      return true;
+    });
+    if (filter !== "all") result = result.filter(tx => tx.type === filter);
+    if (goalFilter) result = result.filter(tx => tx.goal_id === goalFilter);
+    if (dateFrom) result = result.filter(tx => tx.date >= dateFrom);
+    if (dateTo) result = result.filter(tx => tx.date <= dateTo);
+    if (categoryFilter) result = result.filter(tx => tx.category === categoryFilter);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(tx =>
+        (tx.note || "").toLowerCase().includes(q) ||
+        getCategoryConfig(tx.category).label.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [transactions, filter, goalFilter, searchQuery, dateFrom, dateTo, categoryFilter, customCategories, settings.language]);
+
+  useEffect(() => { setVisibleCount(30); }, [filter, goalFilter, searchQuery, dateFrom, dateTo, categoryFilter]);
+
+  const visibleFiltered = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+
+  const { grouped, sortedGroups } = useMemo(() => {
+    const g = {};
+    visibleFiltered.forEach(tx => {
+      const d = new Date(tx.date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString(locale, { month: "long", year: "numeric" });
+      if (!g[key]) g[key] = { label, items: [] };
+      g[key].items.push(tx);
+    });
+    return { grouped: g, sortedGroups: Object.keys(g).sort((a, b) => b.localeCompare(a)) };
+  }, [visibleFiltered, locale]);
+
+  // Summary strip values
+  const summaryIncome = useMemo(() => filtered.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0), [filtered]);
+  const summaryExpense = useMemo(() => filtered.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0), [filtered]);
+
   return (
     <PullToRefresh onRefresh={loadData}>
-      <div className="min-h-screen bg-[#F2F4F7] pb-28">
+      <div className="min-h-screen bg-[#F2F4F7] pb-24">
 
-        {/* HEADER */}
+        {/* Header */}
         <div className="bg-[#0A0A0A] px-5 pt-10 pb-0">
-          <div className="max-w-2xl mx-auto">
-            {/* Title row */}
-            <div className="flex items-center justify-between mb-4">
-              {/* Filter icon (left) */}
-              <button
-                onClick={() => setShowAdvFilter(true)}
-                className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center relative tap-highlight-fix"
-              >
-                <SlidersHorizontal className="w-4 h-4 text-white" />
-                {activeFilterCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#F97316] text-[9px] text-white font-bold flex items-center justify-center">
-                    {activeFilterCount}
-                  </span>
-                )}
+          <div className="max-w-2xl mx-auto flex items-center justify-between mb-5">
+            <h1 className="text-white text-xl font-bold">Transaksi</h1>
+            <button
+              onClick={() => setShowCSVImport(true)}
+              className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center tap-highlight-fix"
+            >
+              <Upload className="w-4 h-4 text-white" />
+            </button>
+          </div>
+
+          {/* Main tabs */}
+          <div className="max-w-2xl mx-auto flex">
+            {[["history", "Riwayat"], ["recurring", "Rutin"], ["subscription", "Langganan"]].map(([key, label]) => (
+              <button key={key} onClick={() => setMainTab(key)}
+                className={`flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${mainTab === key ? "text-[#F97316] border-[#F97316]" : "text-[#666] border-transparent"}`}>
+                {label}
               </button>
-
-              <h1 className="text-white text-lg font-bold">Transaksi</h1>
-
-              {/* Search icon (right) */}
-              <button
-                onClick={handleSearchToggle}
-                className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center tap-highlight-fix"
-              >
-                {showSearch ? <X className="w-4 h-4 text-white" /> : <Search className="w-4 h-4 text-white" />}
-              </button>
-            </div>
-
-            {/* Search bar */}
-            {showSearch && (
-              <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
-                <input
-                  ref={searchInputRef}
-                  type="search"
-                  placeholder="Cari catatan atau nominal..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl pl-9 pr-9 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[#F97316]"
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 tap-highlight-fix">
-                    <X className="w-3.5 h-3.5 text-white/60" />
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Main tabs */}
-            <div className="flex">
-              {[["history", "Riwayat"], ["recurring", "Rutin"], ["subscription", "Langganan"]].map(([key, label]) => (
-                <button key={key} onClick={() => setMainTab(key)}
-                  className={`flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${mainTab === key ? "text-[#F97316] border-[#F97316]" : "text-[#666] border-transparent"}`}>
-                  {label}
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
@@ -346,162 +259,204 @@ export default function Transactions() {
 
           {mainTab === "history" && (
             <div className="space-y-3">
+              {user && <ReminderWidget user={user} />}
 
-              {/* Quick type pills */}
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {[["all", "Semua"], ["income", "Pemasukan"], ["expense", "Pengeluaran"]].map(([key, label]) => (
-                  <button key={key}
-                    onClick={() => setQuickType(key)}
-                    className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all tap-highlight-fix ${quickType === key ? "bg-[#F97316] text-white" : "bg-white text-[#4A5568] border border-[#E2E8F0]"}`}>
-                    {label}
+              {/* Search + Filter */}
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
+                  <input type="search" placeholder="Cari transaksi..." value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="w-full border border-[#E2E8F0] rounded-xl pl-8 pr-3 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#F97316] bg-white tap-highlight-fix" />
+                </div>
+                <button
+                  onClick={() => setShowFilterPanel(v => !v)}
+                  className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold tap-highlight-fix transition-colors flex-shrink-0 ${hasActiveFilter ? "bg-[#F97316] text-white" : "bg-white text-[#4A5568] border border-[#E2E8F0]"}`}
+                >
+                  <Filter className="w-3.5 h-3.5" />
+                  {hasActiveFilter ? "Aktif" : "Filter"}
+                </button>
+              </div>
+
+              {/* Type filter tabs */}
+              <div className="flex bg-white rounded-xl p-1 border border-[#F0F2F5]" role="tablist">
+                {FILTER_TABS.map(tab => (
+                  <button key={tab.key} role="tab" aria-selected={filter === tab.key}
+                    onClick={() => setFilter(tab.key)}
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all tap-highlight-fix ${filter === tab.key ? "bg-[#F97316] text-white shadow-sm" : "text-[#8FA4C8]"}`}>
+                    {tab.label}
                   </button>
                 ))}
               </div>
 
-              {/* Month summary */}
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-white rounded-2xl px-4 py-3 border border-[#F0F2F5]">
-                  <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Pemasukan bulan ini</p>
-                  <p className="text-sm font-bold text-[#16A34A]">+{formatCurrency(monthSummary.income)}</p>
-                </div>
-                <div className="bg-white rounded-2xl px-4 py-3 border border-[#F0F2F5]">
-                  <p className="text-[10px] text-[#8FA4C8] font-medium mb-1">Pengeluaran bulan ini</p>
-                  <p className="text-sm font-bold text-[#DC2626]">−{formatCurrency(monthSummary.expense)}</p>
-                </div>
-              </div>
-
-              {/* Active filter chips */}
-              {(activeFilterCount > 0 || quickType !== "all") && (
-                <div className="flex items-center gap-2">
-                  <p className="text-[10px] text-[#8FA4C8]">Filter aktif</p>
-                  <button onClick={handleResetFilter}
-                    className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#F97316]/10 text-[#F97316] text-[10px] font-semibold tap-highlight-fix">
-                    <X className="w-2.5 h-2.5" /> Reset semua
-                  </button>
+              {/* Summary strip — only when filtered */}
+              {!loading && filtered.length > 0 && (hasActiveFilter || searchQuery || filter !== "all") && (
+                <div className="flex gap-2">
+                  {summaryIncome > 0 && (
+                    <div className="flex-1 bg-[#F0FDF4] rounded-xl px-3 py-2 text-center">
+                      <p className="text-[10px] text-[#16A34A] font-medium">Masuk</p>
+                      <p className="text-xs font-bold text-[#16A34A]">+{formatCurrency(summaryIncome)}</p>
+                    </div>
+                  )}
+                  {summaryExpense > 0 && (
+                    <div className="flex-1 bg-[#FEF2F2] rounded-xl px-3 py-2 text-center">
+                      <p className="text-[10px] text-[#EF4444] font-medium">Keluar</p>
+                      <p className="text-xs font-bold text-[#EF4444]">−{formatCurrency(summaryExpense)}</p>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* Transactions */}
-              {loading ? (
-                <div className="bg-white rounded-2xl p-4 space-y-4">
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#F2F4F7] animate-pulse flex-shrink-0" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-2/3" />
-                        <div className="h-2.5 bg-[#F2F4F7] rounded-full animate-pulse w-1/2" />
+              {/* Transaction list */}
+              <div data-tour="tx-history-card" className="bg-white rounded-2xl overflow-hidden border border-[#F0F2F5]">
+                {/* Select mode toggle — only show if there are transactions */}
+                {!loading && filtered.length > 0 && (
+                  <div className="flex justify-end px-4 pt-3 pb-1">
+                    <button
+                      onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors tap-highlight-fix ${selectMode ? "bg-[#F97316] text-white" : "text-[#8FA4C8]"}`}
+                    >
+                      {selectMode ? "Batal" : "Pilih"}
+                    </button>
+                  </div>
+                )}
+
+                {loading ? (
+                  <div className="p-4 space-y-3">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#F2F4F7] animate-pulse flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-3/4" />
+                          <div className="h-2.5 bg-[#F2F4F7] rounded-full animate-pulse w-1/2" />
+                        </div>
+                        <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-16" />
                       </div>
-                      <div className="h-3 bg-[#F2F4F7] rounded-full animate-pulse w-16" />
-                    </div>
-                  ))}
-                </div>
-              ) : filtered.length === 0 ? (
-                <div className="bg-white rounded-2xl p-12 text-center">
-                  <p className="text-4xl mb-3">{searchQuery ? "🔍" : "📭"}</p>
-                  <p className="text-[#1A1A1A] font-semibold text-sm mb-1">
-                    {searchQuery ? "Transaksi tidak ditemukan" : "Belum ada transaksi"}
-                  </p>
-                  <p className="text-[#8FA4C8] text-xs">
-                    {searchQuery ? `Tidak ada hasil untuk "${searchQuery}"` : "Tap tombol + untuk menambah transaksi pertama"}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {sortedKeys.map(key => {
-                    const group = groups[key];
-                    const gIncome = group.items.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-                    const gExpense = group.items.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-                    return (
-                      <div key={key}>
-                        {/* Group header */}
-                        <div className="flex items-center justify-between px-1 mb-1.5">
-                          <p className="text-[11px] font-bold text-[#8FA4C8]">{group.label}</p>
-                          <div className="flex gap-2 text-[10px]">
-                            {gIncome > 0 && <span className="text-[#16A34A] font-semibold">+{formatCurrency(gIncome)}</span>}
-                            {gExpense > 0 && <span className="text-[#DC2626] font-semibold">−{formatCurrency(gExpense)}</span>}
+                    ))}
+                  </div>
+                ) : sortedGroups.length === 0 ? (
+                  <div className="p-10 text-center">
+                    <p className="text-4xl mb-3">📭</p>
+                    <p className="text-[#1A1A1A] font-semibold text-sm mb-1">{t('tx_empty_title')}</p>
+                    <p className="text-[#8FA4C8] text-xs">{t('tx_empty_desc')}</p>
+                  </div>
+                ) : (
+                  <>
+                    {sortedGroups.map(key => {
+                      const group = grouped[key];
+                      const monthIncome = group.items.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+                      const monthExpense = group.items.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+                      return (
+                        <div key={key}>
+                          <div className="px-4 py-2 bg-[#F8FAFC] border-y border-[#F2F4F7] flex items-center justify-between">
+                            <p className="text-xs font-bold text-[#1A1A1A]">{group.label}</p>
+                            <div className="flex gap-2 text-[11px]">
+                              {monthIncome > 0 && <span className="text-[#22C55E] font-semibold">+{formatCurrency(monthIncome)}</span>}
+                              {monthExpense > 0 && <span className="text-[#EF4444] font-semibold">−{formatCurrency(monthExpense)}</span>}
+                            </div>
                           </div>
+                          {group.items.sort((a, b) => new Date(b.date) - new Date(a.date)).map(tx => {
+                            const cat = getCategoryConfig(tx.category);
+                            const linkedGoal = goals.find(g => g.id === tx.goal_id);
+                            return (
+                              <TransactionItem
+                                key={tx.id}
+                                tx={tx}
+                                cat={cat}
+                                linkedGoal={linkedGoal}
+                                selectMode={selectMode}
+                                selected={selectedIds.has(tx.id)}
+                                onSelect={() => toggleSelect(tx.id)}
+                                onEdit={() => setEditingTx(tx)}
+                                onDelete={() => handleDelete(tx.id)}
+                                formatCurrency={formatCurrency}
+                                locale={locale}
+                              />
+                            );
+                          })}
                         </div>
+                      );
+                    })}
 
-                        {/* Items card */}
-                        <div className="bg-white rounded-2xl overflow-hidden border border-[#F0F2F5] divide-y divide-[#F8FAFC]">
-                          {group.items
-                            .sort((a, b) => {
-                              // Sort by time desc within same date
-                              const aT = (a.date + (a.time ? "T" + a.time : "T23:59"));
-                              const bT = (b.date + (b.time ? "T" + b.time : "T23:59"));
-                              return bT.localeCompare(aT);
-                            })
-                            .map(tx => {
-                              const cat = getCategoryConfig(tx.category);
-                              const accountName = getAccountName(tx.account_id);
-                              return (
-                                <TransactionItem
-                                  key={tx.id}
-                                  tx={tx}
-                                  cat={cat}
-                                  accountName={accountName}
-                                  onTap={() => setDetailTx(tx)}
-                                  onEdit={() => setEditingTx(tx)}
-                                  onDelete={() => handleDelete(tx)}
-                                  formatCurrency={formatCurrency}
-                                />
-                              );
-                            })}
-                        </div>
+                    {visibleCount < filtered.length && (
+                      <div className="p-4 border-t border-[#F2F4F7]">
+                        <button
+                          onClick={() => setVisibleCount(c => c + 30)}
+                          className="w-full py-3 rounded-xl bg-[#F2F4F7] text-sm font-semibold text-[#4A5568] transition-colors tap-highlight-fix"
+                        >
+                          Muat lebih ({filtered.length - visibleCount} lagi)
+                        </button>
                       </div>
-                    );
-                  })}
-
-                  {/* Infinite scroll loader */}
-                  {visibleCount < filtered.length && (
-                    <div ref={loaderRef} className="flex justify-center py-4">
-                      <div className="w-5 h-5 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  )}
-
-                  {visibleCount >= filtered.length && filtered.length > 30 && (
-                    <p className="text-center text-[11px] text-[#CBD5E0] py-2">
-                      Semua {filtered.length} transaksi ditampilkan
-                    </p>
-                  )}
-                </div>
-              )}
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Modals */}
-        {editingTx && (
-          <EditTransactionModal
-            transaction={editingTx}
-            goals={goals}
-            onClose={() => setEditingTx(null)}
-            onSave={handleEdit}
+        {/* Sticky select action bar */}
+        {selectMode && (
+          <div className="fixed bottom-20 left-0 right-0 z-50 px-4">
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-[#0A0A0A] rounded-2xl p-3 flex items-center gap-2 shadow-2xl">
+                <button
+                  onClick={() => setSelectedIds(new Set(visibleFiltered.map(t => t.id)))}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 text-white text-xs font-semibold tap-highlight-fix flex-shrink-0"
+                >
+                  <CheckSquare className="w-3.5 h-3.5" />
+                  Semua
+                </button>
+                <p className="text-white/60 text-xs flex-1 text-center">
+                  {selectedIds.size > 0 ? `${selectedIds.size} dipilih` : "Ketuk untuk pilih"}
+                </p>
+                {selectedIds.size > 0 && (
+                  <button
+                    onClick={handleDeleteSelected}
+                    disabled={deleting}
+                    className="px-4 py-2 rounded-xl bg-[#FF6B6B] text-white text-xs font-bold disabled:opacity-50 tap-highlight-fix flex-shrink-0"
+                  >
+                    {deleting ? "Menghapus..." : `Hapus (${selectedIds.size})`}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAddTx && (
+          <AddTransactionModal goals={goals} onClose={() => setShowAddTx(false)}
+            onSave={async (data) => {
+              setShowAddTx(false);
+              try {
+                await base44.entities.Transaction.create(data);
+                loadData();
+              } catch {
+                toast.error(t('tx_create_error'));
+              }
+            }}
           />
+        )}
+
+        {editingTx && (
+          <EditTransactionModal transaction={editingTx} goals={goals}
+            onClose={() => setEditingTx(null)} onSave={handleEdit} />
         )}
 
         {showCSVImport && (
           <CSVImportModal onClose={() => setShowCSVImport(false)} onSuccess={loadData} />
         )}
 
-        {detailTx && (
-          <TransactionDetailSheet
-            tx={detailTx}
-            cat={getCategoryConfig(detailTx.category)}
-            accountName={getAccountName(detailTx.account_id)}
-            onClose={() => setDetailTx(null)}
-            onEdit={() => { setDetailTx(null); setEditingTx(detailTx); }}
-            onDelete={() => { setDetailTx(null); handleDelete(detailTx); }}
-            formatCurrency={formatCurrency}
-          />
-        )}
-
-        <TransactionAdvancedFilter
-          open={showAdvFilter}
-          onClose={() => setShowAdvFilter(false)}
-          filters={filters}
-          onApply={handleApplyFilter}
-          onReset={handleResetFilter}
+        <TransactionFilterSheet
+          open={showFilterPanel}
+          onClose={() => setShowFilterPanel(false)}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          setDateFrom={setDateFrom}
+          setDateTo={setDateTo}
+          onApplyPreset={applyPreset}
+          hasActiveFilter={hasActiveFilter}
+          onReset={() => { setDateFrom(""); setDateTo(""); setCategoryFilter(""); }}
         />
       </div>
     </PullToRefresh>
