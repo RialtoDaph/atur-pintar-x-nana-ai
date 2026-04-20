@@ -31,7 +31,6 @@ import About from '@/pages/About';
 import Achievements from '@/pages/Achievements';
 import ReceiptScanHistory from '@/pages/ReceiptScanHistory';
 import Gamifikasi from '@/pages/Gamifikasi';
-import Investments from '@/pages/Investments';
 import AdminProtect from '@/components/admin/AdminProtect';
 
 const { Pages, Layout } = pagesConfig;
@@ -131,7 +130,6 @@ const AuthenticatedApp = () => {
       <Route path="/Achievements" element={<LayoutWrapper currentPageName="Achievements"><Achievements /></LayoutWrapper>} />
       <Route path="/ReceiptScanHistory" element={<LayoutWrapper currentPageName="ReceiptScanHistory"><ReceiptScanHistory /></LayoutWrapper>} />
       <Route path="/Gamifikasi" element={<LayoutWrapper currentPageName="Gamifikasi"><Gamifikasi /></LayoutWrapper>} />
-      <Route path="/Investments" element={<LayoutWrapper currentPageName="Investments"><Investments /></LayoutWrapper>} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
       <Route path="*" element={<PageNotFound />} />
