@@ -33,6 +33,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
     note: transaction.note || "",
     date: transaction.date || new Date().toISOString().split("T")[0],
     goal_id: transaction.goal_id || "",
+    account_id: transaction.account_id || "",
   });
   const [saving, setSaving] = useState(false);
   const [customCats, setCustomCats] = useState([]);
@@ -40,10 +41,21 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const [catOrder, setCatOrder] = useState([]);
   const [appSettings, setAppSettings] = useState(null);
   const [subCatPopup, setSubCatPopup] = useState(null);
+  const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
     loadCustomCats();
     loadAppSettings();
+    base44.auth.me().then(u => {
+      if (u?.email) {
+        base44.entities.Account.filter({ created_by: u.email }, "name").then(accs => {
+          const deduped = [];
+          const seen = new Set();
+          for (const a of (accs || [])) { if (!seen.has(a.name)) { seen.add(a.name); deduped.push(a); } }
+          setAccounts(deduped);
+        });
+      }
+    });
   }, []);
 
   async function loadAppSettings() {
@@ -67,13 +79,14 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   }
 
   async function handleSave() {
-    if (!form.amount || !form.category) return;
+    if (!form.amount || !form.category || !form.account_id) return;
     setSaving(true);
     await onSave(transaction.id, {
       ...form,
       type: tab,
       amount: parseRupiah(form.amount),
       goal_id: form.goal_id || undefined,
+      account_id: form.account_id,
     });
     setSaving(false);
   }
@@ -155,6 +168,23 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
               </button>
             ))}
           </div>
+
+          {/* Account */}
+          {accounts.length > 0 && (
+            <div className="mb-4">
+              <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Rekening</label>
+              <select
+                value={form.account_id}
+                onChange={(e) => setForm({ ...form, account_id: e.target.value })}
+                className="w-full border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+              >
+                <option value="">Pilih rekening</option>
+                {accounts.map(acc => (
+                  <option key={acc.id} value={acc.id}>{acc.icon || "💳"} {acc.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Amount */}
           <div className="mb-4">
@@ -279,7 +309,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
             )}
           </div>
 
-          <button onClick={handleSave} disabled={saving || !form.amount || !form.category}
+          <button onClick={handleSave} disabled={saving || !form.amount || !form.category || !form.account_id}
             className="w-full py-3 rounded-xl font-bold text-sm text-white disabled:opacity-40 transition-colors"
             style={{ backgroundColor: tab === "expense" ? "#FF6B6B" : "#00C9A7" }}>
             {saving ? t('saving') : t('save_changes')}
