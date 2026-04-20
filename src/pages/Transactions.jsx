@@ -1,15 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { SlidersHorizontal, Search, X, Upload, Plus } from "lucide-react";
-import TransactionItem from "@/components/transactions/TransactionItem";
-import TransactionDetailSheet from "@/components/transactions/TransactionDetailSheet";
-import TxFilterBottomSheet from "@/components/transactions/TxFilterBottomSheet";
-import EditTransactionModal from "@/components/transactions/EditTransactionModal";
-import CSVImportModal from "@/components/transactions/CSVImportModal";
-import AddTransactionModal from "@/components/transactions/AddTransactionModal";
+import { SlidersHorizontal, Search, X, Upload } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAppSettings } from "@/components/utils/useAppSettings";
+import SpendingBar from "@/components/transactions/SpendingBar";
+import TxRiwayatTab from "@/components/transactions/TxRiwayatTab";
+import TxRutinTab from "@/components/transactions/TxRutinTab";
+import TxLanggananTab from "@/components/transactions/TxLanggananTab";
+import TxFilterBottomSheet from "@/components/transactions/TxFilterBottomSheet";
+import CSVImportModal from "@/components/transactions/CSVImportModal";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+const TABS = [
+  { key: "riwayat", label: "Riwayat", icon: "📋" },
+  { key: "rutin", label: "Rutin", icon: "🔁" },
+  { key: "langganan", label: "Langganan", icon: "💳" },
+];
 
 function getDefaultFilters() {
   const now = new Date();
@@ -29,17 +36,17 @@ function saveFilters(f) {
 
 export default function Transactions() {
   const { settings } = useAppSettings();
+  const [activeTab, setActiveTab] = useState("riwayat");
   const [transactions, setTransactions] = useState([]);
-  const [globalCategories, setGlobalCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [debts, setDebts] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
   const [filters, setFilters] = useState(loadFilters);
   const [search, setSearch] = useState("");
-  const [showFilter, setShowFilter] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedTx, setSelectedTx] = useState(null);
-  const [editingTx, setEditingTx] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
   const [showCSV, setShowCSV] = useState(false);
-  const [showAdd, setShowAdd] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const formatCurrency = useCallback((amount) => {
@@ -52,54 +59,36 @@ export default function Transactions() {
 
   async function fetchData() {
     setLoading(true);
-    const user = await base44.auth.me();
-    const [txs, cats, accs] = await Promise.all([
-      base44.entities.Transaction.filter({ created_by: user.email, is_deleted: false }, "-date"),
-      base44.entities.GlobalCategory.list("sort_order"),
-      base44.entities.Account.filter({ created_by: user.email }, "name"),
-    ]);
-    setTransactions(txs || []);
-    setGlobalCategories((cats || []).filter(c => c.is_active !== false));
-    setAccounts(accs || []);
-    setLoading(false);
+    try {
+      const user = await base44.auth.me();
+      const [txs, cats, accs] = await Promise.all([
+        base44.entities.Transaction.filter({ created_by: user.email, is_deleted: false }, "-date"),
+        base44.entities.GlobalCategory.list("sort_order"),
+        base44.entities.Account.filter({ created_by: user.email }, "name"),
+      ]);
+      setTransactions(txs || []);
+      setCategories((cats || []).filter(c => c.is_active !== false));
+      setAccounts(accs || []);
+
+      // Fetch debts and subscriptions separately (can fail silently)
+      const [dts, subs] = await Promise.all([
+        base44.entities.Debt.filter({ created_by: user.email }).catch(() => []),
+        base44.entities.Subscription.filter({ created_by: user.email }).catch(() => []),
+      ]);
+      setDebts((dts || []).filter(d => d.status === "active"));
+      setSubscriptions((subs || []).filter(s => s.status !== "cancelled").sort((a, b) => {
+        if (!a.next_due_date) return 1;
+        if (!b.next_due_date) return -1;
+        return new Date(a.next_due_date) - new Date(b.next_due_date);
+      }));
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { fetchData(); }, []);
 
-  function handleApplyFilters(f) {
-    setFilters(f);
-    saveFilters(f);
-  }
-
-  // Resolve category for a transaction
-  function resolveCategory(tx) {
-    // Match by ID or by name (for legacy data)
-    const cat = globalCategories.find(c => c.id === tx.category || c.name?.toLowerCase() === tx.category?.toLowerCase());
-    if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color };
-    // Fallbacks for legacy keys
-    const legacyMap = {
-      food: { emoji: "🍔", label: "Makanan", color: "#00C9A7" },
-      transport: { emoji: "🚗", label: "Transport", color: "#F5A623" },
-      housing: { emoji: "🏠", label: "Rumah", color: "#4F7CFF" },
-      health: { emoji: "❤️", label: "Kesehatan", color: "#FF6B6B" },
-      entertainment: { emoji: "🎬", label: "Hiburan", color: "#9B59B6" },
-      shopping: { emoji: "🛍️", label: "Belanja", color: "#E91E8C" },
-      subscriptions: { emoji: "📱", label: "Langganan", color: "#1ABC9C" },
-      salary: { emoji: "💼", label: "Gaji", color: "#27AE60" },
-      freelance: { emoji: "💻", label: "Freelance", color: "#2ECC71" },
-      savings: { emoji: "🐷", label: "Tabungan", color: "#3B82F6" },
-      other: { emoji: "📦", label: "Lainnya", color: "#95A5A6" },
-    };
-    if (tx.category && legacyMap[tx.category]) return legacyMap[tx.category];
-    if (tx.category?.startsWith("custom_")) {
-      const id = tx.category.replace("custom_", "");
-      const custom = globalCategories.find(c => c.id === id);
-      if (custom) return { emoji: custom.emoji, label: custom.name, color: custom.color };
-    }
-    return { emoji: "📦", label: tx.category || "Lainnya", color: "#95A5A6" };
-  }
-
-  // Filter transactions
+  // Filtered transactions for Riwayat tab
   const filtered = transactions.filter(tx => {
     if (!tx.date) return false;
     const d = new Date(tx.date);
@@ -109,65 +98,25 @@ export default function Transactions() {
     if (filters.accountId && tx.account_id !== filters.accountId) return false;
     if (search.trim()) {
       const q = search.toLowerCase();
-      const cat = resolveCategory(tx);
-      if (!tx.note?.toLowerCase().includes(q) && !cat.label?.toLowerCase().includes(q)) return false;
+      if (!tx.note?.toLowerCase().includes(q)) return false;
     }
     return true;
   }).sort((a, b) => {
-    const dateCompare = new Date(b.date) - new Date(a.date);
-    if (dateCompare !== 0) return dateCompare;
+    const dc = new Date(b.date) - new Date(a.date);
+    if (dc !== 0) return dc;
     if (a.time && b.time) return b.time.localeCompare(a.time);
     return 0;
   });
 
-  // Group by date label
-  const grouped = [];
-  let lastLabel = null;
-  const now = new Date();
-  const today = now.toLocaleDateString("en-CA");
-  const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-CA");
-  // Start of this week (Monday)
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - ((now.getDay() + 6) % 7)); // Monday
-  startOfWeek.setHours(0, 0, 0, 0);
-  const startOfWeekStr = startOfWeek.toLocaleDateString("en-CA");
+  // Recurring transactions for Rutin tab
+  const recurringTxs = transactions.filter(tx => tx.is_recurring && !tx.is_recurring_child);
 
-  filtered.forEach(tx => {
-    let label;
-    if (tx.date === today) label = "Hari ini";
-    else if (tx.date === yesterday) label = "Kemarin";
-    else if (tx.date >= startOfWeekStr && tx.date < yesterday) label = "Minggu ini";
-    else {
-      const d = new Date(tx.date);
-      label = d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" });
-    }
-    if (label !== lastLabel) { grouped.push({ type: "header", label }); lastLabel = label; }
-    grouped.push({ type: "tx", tx });
+  // Spending data for SpendingBar (current month expenses)
+  const monthExpenses = transactions.filter(tx => {
+    if (!tx.date || tx.type !== "expense") return false;
+    const d = new Date(tx.date);
+    return d.getMonth() === filters.month && d.getFullYear() === filters.year;
   });
-
-  // Summary
-  const totalIncome = filtered.filter(t => t.type === "income").reduce((s, t) => s + (t.amount || 0), 0);
-  const totalExpense = filtered.filter(t => t.type === "expense").reduce((s, t) => s + (t.amount || 0), 0);
-
-  async function handleDelete(tx) {
-    await base44.entities.Transaction.update(tx.id, { is_deleted: true });
-    setTransactions(prev => prev.filter(t => t.id !== tx.id));
-    setSelectedTx(null);
-    // Reverse account balance
-    if (tx.account_id) {
-      const acc = accounts.find(a => a.id === tx.account_id);
-      if (acc) {
-        const newBal = tx.type === "expense" ? (acc.balance || 0) + tx.amount : (acc.balance || 0) - tx.amount;
-        await base44.entities.Account.update(tx.account_id, { balance: newBal });
-      }
-    }
-  }
-
-  async function handleSaveEdit(id, data) {
-    await base44.entities.Transaction.update(id, data);
-    setEditingTx(null);
-    fetchData();
-  }
 
   const activeFilterCount = [
     (filters.categories || []).length > 0,
@@ -177,22 +126,28 @@ export default function Transactions() {
 
   return (
     <div className="min-h-screen bg-[#F2F4F7]">
-      {/* Header */}
-      <div className="bg-[#0A0A0A] px-4 pt-3 pb-3">
-        {/* Top row: title + actions */}
+      {/* ===== HEADER ===== */}
+      <div className="bg-[#0A0A0A] px-4 pt-3 pb-0">
+        {/* Top row */}
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-white text-base font-bold">Transaksi</p>
             <p className="text-[#8FA4C8] text-xs">{MONTHS[filters.month]} {filters.year}</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowSearch(s => !s)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
+            <button
+              onClick={() => setShowSearch(s => !s)}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors tap-highlight-fix ${showSearch ? "bg-[#F97316]" : "bg-white/10"} text-white`}
+            >
               <Search className="w-4 h-4" />
             </button>
             <button onClick={() => setShowCSV(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
               <Upload className="w-4 h-4" />
             </button>
-            <button onClick={() => setShowFilter(true)} className="relative w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
+            <button
+              onClick={() => setShowFilter(true)}
+              className="relative w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix"
+            >
               <SlidersHorizontal className="w-4 h-4" />
               {activeFilterCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#F97316] text-white text-[9px] font-bold flex items-center justify-center">{activeFilterCount}</span>
@@ -201,128 +156,106 @@ export default function Transactions() {
           </div>
         </div>
 
-        {/* Search bar */}
-        {showSearch && (
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
-            <input
-              autoFocus
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Cari transaksi..."
-              className="w-full bg-white/10 text-white placeholder-[#8FA4C8] rounded-xl pl-9 pr-9 py-2.5 text-sm focus:outline-none"
-            />
-            {search && (
-              <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
-                <X className="w-3.5 h-3.5 text-[#8FA4C8]" />
-              </button>
-            )}
-          </div>
+        {/* Search bar — animated slide down */}
+        <AnimatePresence>
+          {showSearch && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8FA4C8]" />
+                <input
+                  autoFocus
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Cari berdasarkan catatan..."
+                  className="w-full bg-white/10 text-white placeholder-[#8FA4C8] rounded-xl pl-9 pr-9 py-2.5 text-sm focus:outline-none"
+                />
+                {search && (
+                  <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 tap-highlight-fix">
+                    <X className="w-3.5 h-3.5 text-[#8FA4C8]" />
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Spending bar — only on Riwayat tab */}
+        {activeTab === "riwayat" && monthExpenses.length > 0 && (
+          <SpendingBar transactions={monthExpenses} categories={categories} />
         )}
 
-        {/* Month summary — 3 equal cards */}
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-white/10 rounded-xl px-2.5 py-2">
-            <p className="text-[9px] text-[#8FA4C8] mb-0.5">Masuk</p>
-            <p className="text-xs font-bold text-[#4ADE80] truncate">{formatCurrency(totalIncome)}</p>
-          </div>
-          <div className="bg-white/10 rounded-xl px-2.5 py-2">
-            <p className="text-[9px] text-[#8FA4C8] mb-0.5">Keluar</p>
-            <p className="text-xs font-bold text-[#F87171] truncate">{formatCurrency(totalExpense)}</p>
-          </div>
-          <div className="bg-white/10 rounded-xl px-2.5 py-2">
-            <p className="text-[9px] text-[#8FA4C8] mb-0.5">Selisih</p>
-            <p className={`text-xs font-bold truncate ${totalIncome - totalExpense >= 0 ? "text-[#4ADE80]" : "text-[#F87171]"}`}>
-              {formatCurrency(Math.abs(totalIncome - totalExpense))}
-            </p>
-          </div>
+        {/* Tabs */}
+        <div className="flex mt-3">
+          {TABS.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors tap-highlight-fix border-b-2 ${
+                activeTab === tab.key
+                  ? "text-[#F97316] border-[#F97316]"
+                  : "text-[#8FA4C8] border-transparent"
+              }`}
+            >
+              <span>{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Transaction list */}
-      <div className="pb-28">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="w-6 h-6 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 px-6">
-            <p className="text-4xl mb-3">📭</p>
-            <p className="text-sm font-semibold text-[#4A5568]">Tidak ada transaksi</p>
-            <p className="text-xs text-[#8FA4C8] mt-1">Coba ubah filter atau tambah transaksi baru</p>
-            <button onClick={() => setShowAdd(true)} className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-[#F97316] text-white text-sm font-bold rounded-xl mx-auto tap-highlight-fix">
-              <Plus className="w-4 h-4" /> Tambah Transaksi
-            </button>
-          </div>
-        ) : (
-          <div className="mt-3 mx-3 bg-white rounded-2xl overflow-hidden shadow-sm divide-y divide-[#F2F4F7]">
-            {grouped.map((item, idx) => {
-              if (item.type === "header") {
-                return (
-                  <div key={`h-${idx}`} className="px-4 py-2 bg-[#F8FAFC]">
-                    <p className="text-[11px] font-bold text-[#8FA4C8] uppercase tracking-wider">{item.label}</p>
-                  </div>
-                );
-              }
-              const tx = item.tx;
-              const cat = resolveCategory(tx);
-              const acc = accounts.find(a => a.id === tx.account_id);
-              return (
-                <TransactionItem
-                  key={tx.id}
-                  tx={tx}
-                  cat={cat}
-                  accountName={acc?.name}
-                  formatCurrency={formatCurrency}
-                  onTap={() => setSelectedTx(tx)}
-                  onEdit={() => setEditingTx(tx)}
-                  onDelete={() => handleDelete(tx)}
-                />
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Detail sheet */}
-      {selectedTx && (
-        <TransactionDetailSheet
-          tx={selectedTx}
-          cat={resolveCategory(selectedTx)}
-          accountName={accounts.find(a => a.id === selectedTx.account_id)?.name}
-          formatCurrency={formatCurrency}
-          onClose={() => setSelectedTx(null)}
-          onEdit={() => { setEditingTx(selectedTx); setSelectedTx(null); }}
-          onDelete={() => handleDelete(selectedTx)}
-        />
-      )}
+      {/* ===== TAB CONTENT ===== */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-6 h-6 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : activeTab === "riwayat" ? (
+            <TxRiwayatTab
+              transactions={filtered}
+              categories={categories}
+              accounts={accounts}
+              formatCurrency={formatCurrency}
+              onRefresh={fetchData}
+            />
+          ) : activeTab === "rutin" ? (
+            <TxRutinTab
+              debts={debts}
+              recurringTxs={recurringTxs}
+              categories={categories}
+              formatCurrency={formatCurrency}
+            />
+          ) : (
+            <TxLanggananTab
+              subscriptions={subscriptions}
+              formatCurrency={formatCurrency}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Filter sheet */}
-      <TxFilterBottomSheet open={showFilter} filters={filters} onApply={handleApplyFilters} onClose={() => setShowFilter(false)} />
-
-      {/* Edit modal */}
-      {editingTx && (
-        <EditTransactionModal
-          transaction={editingTx}
-          onClose={() => setEditingTx(null)}
-          onSave={handleSaveEdit}
-        />
-      )}
+      <TxFilterBottomSheet
+        open={showFilter}
+        filters={filters}
+        onApply={f => { setFilters(f); saveFilters(f); }}
+        onClose={() => setShowFilter(false)}
+      />
 
       {/* CSV Import */}
       {showCSV && <CSVImportModal onClose={() => { setShowCSV(false); fetchData(); }} />}
-
-      {/* Add Transaction */}
-      {showAdd && (
-        <AddTransactionModal
-          onClose={() => setShowAdd(false)}
-          onSave={async (data) => {
-            await base44.entities.Transaction.create(data);
-            setShowAdd(false);
-            fetchData();
-          }}
-        />
-      )}
     </div>
   );
 }
