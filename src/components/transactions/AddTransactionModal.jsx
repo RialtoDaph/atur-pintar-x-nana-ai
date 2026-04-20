@@ -341,28 +341,35 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
               />
             </div>
 
-            {/* Account pills */}
-            {accounts.length > 0 && (
-              <div className="mb-4">
-                <p className="text-[11px] text-[#8FA4C8] mb-2">dari rekening</p>
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {accounts.map(acc => {
-                    const active = accountId === acc.id;
-                    return (
-                      <button key={acc.id} onClick={() => setAccountId(acc.id)}
-                        className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border-[1.5px] transition-all"
-                        style={{
-                          borderColor: active ? "#F97316" : "#E2E8F0",
-                          backgroundColor: active ? "#FFF7ED" : "#F8FAFC",
-                          color: active ? "#EA580C" : "#4A5568"
-                        }}>
-                        <span>{acc.icon || "💳"}</span>{acc.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            {/* Account selector */}
+             {accounts.length > 0 && (
+               <div className="mb-4">
+                 <p className="text-[11px] text-[#8FA4C8] mb-2">dari rekening</p>
+                 <div className="flex gap-2 overflow-x-auto pb-1">
+                   {accounts.map(acc => {
+                     const active = accountId === acc.id;
+                     return (
+                       <button key={acc.id} onClick={() => setAccountId(acc.id)}
+                         className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border-[1.5px] transition-all"
+                         style={{
+                           borderColor: active ? "#F97316" : "#E2E8F0",
+                           backgroundColor: active ? "#FFF7ED" : "#F8FAFC",
+                           color: active ? "#EA580C" : "#4A5568"
+                         }}>
+                         <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: acc.color || "#F97316" }}>
+                           {acc.logo_url ? (
+                             <img src={acc.logo_url} alt={acc.name} className="w-full h-full object-contain rounded-full" onError={(e) => { e.target.style.display = "none"; }} />
+                           ) : (
+                             <span className="text-[10px]">{acc.icon || "💳"}</span>
+                           )}
+                         </div>
+                         {acc.name}
+                       </button>
+                     );
+                   })}
+                 </div>
+               </div>
+             )}
 
             {/* Category */}
             <div className="mb-4">
