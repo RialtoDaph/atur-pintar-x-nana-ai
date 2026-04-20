@@ -277,10 +277,10 @@ export default function Transactions() {
 
   return (
     <PullToRefresh onRefresh={loadData}>
-      <div className="min-h-screen pb-24" style={{ backgroundColor: "#0F1114" }}>
+      <div className="min-h-screen pb-24 bg-[#0F1114]">
 
         {/* Header */}
-        <div className="sticky top-0 z-30" style={{ backgroundColor: "#0A0A0A" }}>
+        <div className="sticky top-0 z-30 bg-[#0A0A0A]">
           {/* Top bar */}
           <div className="px-5 pt-4 pb-3 flex items-center justify-between">
             {/* Filter icon with badge */}
