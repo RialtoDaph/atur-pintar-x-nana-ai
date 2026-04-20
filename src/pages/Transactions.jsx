@@ -123,12 +123,20 @@ export default function Transactions() {
   // Group by date label
   const grouped = [];
   let lastLabel = null;
-  const today = new Date().toLocaleDateString("en-CA");
+  const now = new Date();
+  const today = now.toLocaleDateString("en-CA");
   const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-CA");
+  // Start of this week (Monday)
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - ((now.getDay() + 6) % 7)); // Monday
+  startOfWeek.setHours(0, 0, 0, 0);
+  const startOfWeekStr = startOfWeek.toLocaleDateString("en-CA");
+
   filtered.forEach(tx => {
     let label;
     if (tx.date === today) label = "Hari ini";
     else if (tx.date === yesterday) label = "Kemarin";
+    else if (tx.date >= startOfWeekStr && tx.date < today) label = "Minggu ini";
     else {
       const d = new Date(tx.date);
       label = d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" });
