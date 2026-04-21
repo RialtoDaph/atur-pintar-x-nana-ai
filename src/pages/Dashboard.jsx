@@ -136,7 +136,8 @@ export default function Dashboard() {
     queryKey: ["accounts_dashboard", user?.email],
     queryFn: () => base44.entities.Account.filter({ created_by: user.email }),
     enabled,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const { data: gamProfiles = [] } = useQuery({
