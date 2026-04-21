@@ -167,6 +167,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["goals", user?.email] }),
       queryClient.invalidateQueries({ queryKey: ["transactions_dashboard", user?.email] }),
       queryClient.invalidateQueries({ queryKey: ["budgets", user?.email] }),
+      queryClient.invalidateQueries({ queryKey: ["accounts_dashboard", user?.email] }),
     ]);
   }
 

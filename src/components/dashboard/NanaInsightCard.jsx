@@ -15,9 +15,9 @@ export default function NanaInsightCard({ todayExpense }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 flex items-start gap-3">
       <img 
-        src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" 
-        alt="Nana" 
-        className="w-9 h-9 rounded-full flex-shrink-0 shadow"
+        src="https://media.base44.com/images/public/69a82e8090f60786b869983c/ab05aaeb5_generated_image.png" 
+        alt="Nana AI" 
+        className="w-9 h-9 rounded-full flex-shrink-0 shadow object-cover"
       />
       <div className="flex-1 min-w-0">
         {hasData ? (
