@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
 import ReminderNotificationPopup from "@/components/reminders/ReminderNotificationPopup";
+import { syncAccountBalance } from "@/components/utils/accountSync";
 import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSettingsContext";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { AnimatePresence, motion } from "framer-motion";
@@ -404,6 +405,7 @@ function LayoutInner({ children, currentPageName }) {
         onClose={() => setShowAddTransaction(false)}
         onSave={async (data) => {
           await base44.entities.Transaction.create(data);
+          if (data.account_id) await syncAccountBalance(data.account_id, data.amount, data.type, 1);
           setShowAddTransaction(false);
           window.dispatchEvent(new Event("refresh-dashboard"));
         }} />

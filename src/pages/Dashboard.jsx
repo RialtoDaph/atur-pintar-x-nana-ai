@@ -281,7 +281,7 @@ export default function Dashboard() {
               setShowAddTransaction(false);
               setLastTxAddedAt(Date.now());
               gamification.onNewTransaction();
-              loadData();
+              await loadData();
             }}
           />
         )}
