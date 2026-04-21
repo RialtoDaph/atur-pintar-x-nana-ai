@@ -23,8 +23,8 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
     if (touchStartX.current === null || touchEndX.current === null) return;
     const diff = touchStartX.current - touchEndX.current;
     if (Math.abs(diff) > 40) {
-      if (diff > 0) setCurrentSlide(s => (s + 1) % slides.length);
-      else setCurrentSlide(s => (s - 1 + slides.length) % slides.length);
+      if (diff > 0) setCurrentSlide((s) => (s + 1) % slides.length);else
+      setCurrentSlide((s) => (s - 1 + slides.length) % slides.length);
     }
     touchStartX.current = null;
     touchEndX.current = null;
@@ -34,31 +34,31 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
   const monthName = now.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
   const totalBalance = accounts.reduce((s, a) => s + (a.balance || 0), 0);
   const selisih = income - expense;
-  const savingRate = income > 0 ? Math.round((selisih / income) * 100) : 0;
+  const savingRate = income > 0 ? Math.round(selisih / income * 100) : 0;
 
   if (loading) {
     return <div className="rounded-2xl animate-pulse h-36 bg-white/10" />;
   }
 
   const slides = [
-    {
-      key: "monthly",
-      content: (
-        <div>
+  {
+    key: "monthly",
+    content:
+    <div>
           <p className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-1">Bulan Ini · {monthName}</p>
           <div className="flex items-end justify-between mb-4">
             <div>
-              <p className="text-white/60 text-xs mb-0.5">Net Cashflow Bulan Ini</p>
+              <p className="text-white/60 text-xs mb-0.5 hidden">Net Cashflow Bulan Ini</p>
               <p className={`text-3xl font-black tracking-tight ${selisih >= 0 ? "text-white" : "text-red-400"}`}>
                 Rp {compactRupiah(selisih)}
               </p>
             </div>
-            {income > 0 && (
-              <div className="text-right">
+            {income > 0 &&
+        <div className="text-right">
                 <p className="text-white/50 text-[10px] mb-0.5">Saving rate</p>
                 <p className={`text-lg font-bold ${savingRate >= 0 ? "text-[#99ff80]" : "text-red-400"}`}>{savingRate}%</p>
               </div>
-            )}
+        }
           </div>
           <div className="flex gap-3">
             <div className="flex-1 flex items-center gap-2 bg-white/8 rounded-xl px-3 py-2">
@@ -81,12 +81,12 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
             </div>
           </div>
         </div>
-      )
-    },
-    {
-      key: "total",
-      content: (
-        <div>
+
+  },
+  {
+    key: "total",
+    content:
+    <div>
           <p className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-1">Semua Rekening</p>
           <div className="flex items-end justify-between mb-4">
             <div>
@@ -101,40 +101,40 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
             </div>
           </div>
           <div className="flex gap-2 flex-wrap">
-            {accounts.slice(0, 3).map(a => (
-              <div key={a.id} className="flex items-center gap-1.5 bg-white/8 rounded-lg px-2.5 py-1.5">
-                {a.logo_url ? (
-                  <AccountAvatar logoUrl={a.logo_url} name={a.name} color={a.color || "#FF6A00"} size="h-5 w-5" />
-                ) : (
-                  <span className="text-xs">{a.icon || "💳"}</span>
-                )}
+            {accounts.slice(0, 3).map((a) =>
+        <div key={a.id} className="flex items-center gap-1.5 bg-white/8 rounded-lg px-2.5 py-1.5">
+                {a.logo_url ?
+          <AccountAvatar logoUrl={a.logo_url} name={a.name} color={a.color || "#FF6A00"} size="h-5 w-5" /> :
+
+          <span className="text-xs">{a.icon || "💳"}</span>
+          }
                 <div>
                   <p className="text-white/60 text-[9px]">{a.name}</p>
                   <p className="text-white text-[10px] font-bold">Rp {compactRupiah(a.balance || 0)}</p>
                 </div>
               </div>
-            ))}
-            {accounts.length > 3 && (
-              <button
-                onClick={() => navigate("/Accounts")}
-                className="flex items-center gap-1 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-2.5 py-1.5 text-[#FF9A50] text-[10px] font-semibold"
-              >
+        )}
+            {accounts.length > 3 &&
+        <button
+          onClick={() => navigate("/Accounts")}
+          className="flex items-center gap-1 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-2.5 py-1.5 text-[#FF9A50] text-[10px] font-semibold">
+          
                 +{accounts.length - 3} lagi
               </button>
-            )}
-            {accounts.length === 0 && (
-              <button
-                onClick={() => navigate("/Accounts")}
-                className="flex items-center gap-1.5 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-3 py-1.5 text-[#FF9A50] text-xs font-semibold"
-              >
+        }
+            {accounts.length === 0 &&
+        <button
+          onClick={() => navigate("/Accounts")}
+          className="flex items-center gap-1.5 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-3 py-1.5 text-[#FF9A50] text-xs font-semibold">
+          
                 + Tambah Rekening
               </button>
-            )}
+        }
           </div>
         </div>
-      )
-    }
-  ];
+
+  }];
+
 
   return (
     <div data-tour="balance-card" className="relative">
@@ -149,11 +149,11 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        onClick={() => setCurrentSlide(s => (s + 1) % slides.length)}
-      >
+        onClick={() => setCurrentSlide((s) => (s + 1) % slides.length)}>
+        
         {/* Subtle orange glow top-right */}
         <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full opacity-10 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #FF6A00 0%, transparent 70%)' }} />
+        style={{ background: 'radial-gradient(circle, #FF6A00 0%, transparent 70%)' }} />
 
         {/* Content */}
         {slides[currentSlide].content}
@@ -161,16 +161,16 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
 
       {/* Dot indicators */}
       <div className="flex justify-center gap-1.5 mt-2">
-        {slides.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentSlide(idx)}
-            className={`rounded-full transition-all duration-200 ${
-              idx === currentSlide ? "w-5 h-1.5 bg-[#FF6A00]" : "w-1.5 h-1.5 bg-white/25"
-            }`}
-          />
-        ))}
+        {slides.map((_, idx) =>
+        <button
+          key={idx}
+          onClick={() => setCurrentSlide(idx)}
+          className={`rounded-full transition-all duration-200 ${
+          idx === currentSlide ? "w-5 h-1.5 bg-[#FF6A00]" : "w-1.5 h-1.5 bg-white/25"}`
+          } />
+
+        )}
       </div>
-    </div>
-  );
+    </div>);
+
 }
