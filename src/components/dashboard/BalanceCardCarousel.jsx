@@ -48,7 +48,7 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
           <p className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-1">Bulan Ini · {monthName}</p>
           <div className="flex items-end justify-between mb-4">
             <div>
-              <p className="text-white/60 text-xs mb-0.5 hidden">Net Cashflow Bulan Ini</p>
+              
               <p className={`text-3xl font-black tracking-tight ${selisih >= 0 ? "text-white" : "text-red-400"}`}>
                 Rp {compactRupiah(selisih)}
               </p>
