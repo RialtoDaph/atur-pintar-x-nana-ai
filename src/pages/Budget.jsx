@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, ChevronLeft, ChevronRight, TrendingUp, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -52,16 +52,22 @@ export default function BudgetPage() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  const debounceRef = useRef(null);
+  const debouncedLoad = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => loadData(), 1500);
+  }, []);
+
   useEffect(() => {
     if (user) loadData();
   }, [user, currentMonth]);
 
   useEffect(() => {
     if (!user?.email) return;
-    const unsub1 = base44.entities.Budget.subscribe(() => loadData());
-    const unsub2 = base44.entities.Transaction.subscribe(() => loadData());
-    return () => { unsub1(); unsub2(); };
-  }, [user?.email]);
+    const unsub1 = base44.entities.Budget.subscribe(() => debouncedLoad());
+    const unsub2 = base44.entities.Transaction.subscribe(() => debouncedLoad());
+    return () => { unsub1(); unsub2(); clearTimeout(debounceRef.current); };
+  }, [user?.email, debouncedLoad]);
 
   async function loadData() {
     setLoading(true);
