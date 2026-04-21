@@ -123,7 +123,7 @@ function LayoutInner({ children, currentPageName }) {
   // Mobile: 4 main items + "Lainnya" (Budget moved to Menu)
   const mobileMainNav = [
   { name: "Dashboard", label: t('nav_home'), icon: LayoutDashboard, page: "Dashboard" },
-  { name: "Nana", label: "Nana AI", icon: null, page: "Nana" },
+  { name: "Nana", label: "Nana AI", icon: Sparkles, page: "Nana" },
   { name: "Analytics", label: t('nav_analytics'), icon: BarChart2, page: "Analytics" },
   { name: "Transactions", label: t('nav_transactions'), icon: ArrowLeftRight, page: "Transactions" }];
 
@@ -347,15 +347,7 @@ function LayoutInner({ children, currentPageName }) {
               className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
               active ? "text-[#F97316]" : "text-[#888]"}`}>
               
-              {item.name === "Nana" ? (
-                <img
-                  src="https://media.base44.com/images/public/69a82e8090f60786b869983c/ab05aaeb5_generated_image.png"
-                  alt="Nana"
-                  className={`w-5 h-5 rounded-full object-cover ${active ? "ring-2 ring-[#F97316]" : ""}`}
-                />
-              ) : (
-                <item.icon className="w-5 h-5" />
-              )}
+              <item.icon className="w-5 h-5" />
               {item.label}
             </button>);
 
