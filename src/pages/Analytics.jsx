@@ -13,6 +13,9 @@ import AIFinancialNarrative from "@/components/analytics/AIFinancialNarrative";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
 import DailySpendingCard from "@/components/analytics/DailySpendingCard";
 import SpendingChart from "@/components/dashboard/SpendingChart";
+import HeroSummaryCard from "@/components/analytics/HeroSummaryCard";
+import CategoryBreakdownChart from "@/components/analytics/CategoryBreakdownChart";
+import BudgetActualWidget from "@/components/analytics/BudgetActualWidget";
 
 const DEFAULT_ANALYTICS_CARDS = [
   { id: "net_worth", visible: true },
@@ -304,6 +307,15 @@ export default function Analytics() {
           <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
         </div>
 
+        {/* Hero Summary Card — selalu tampil di paling atas */}
+        <HeroSummaryCard
+          goals={goals}
+          investments={investments}
+          debts={debts}
+          transactions={transactions}
+          user={user}
+        />
+
         {/* AI Financial Narrative */}
         <AIFinancialNarrative
           trendData={trendData}
@@ -362,19 +374,33 @@ export default function Analytics() {
           )
         )}
 
-        {/* Spending by Category */}
+        {/* Category Breakdown (Expense + Income tabs) — gantikan SpendingChart */}
         {isCardVisible("spending_chart") && (
           isPremium ? (
-            <SpendingChart
+            <CategoryBreakdownChart
               transactions={filteredTxForPeriod}
               loading={loading}
               periodSubtitle={periodSubtitle}
             />
           ) : (
-            <PremiumBlurCard title="🛍️ Pengeluaran per Kategori">
-              <SpendingChart transactions={filteredTxForPeriod} loading={loading} periodSubtitle={periodSubtitle} />
+            <PremiumBlurCard title="🛍️ Kategori Keuangan">
+              <CategoryBreakdownChart transactions={filteredTxForPeriod} loading={loading} periodSubtitle={periodSubtitle} />
             </PremiumBlurCard>
           )
+        )}
+
+        {/* Budget vs Aktual */}
+        {isPremium ? (
+          <BudgetActualWidget
+            budgets={budgets}
+            transactions={transactions}
+            allCategoriesConfig={allCategoriesConfig}
+            periodSubtitle={periodSubtitle}
+          />
+        ) : (
+          <PremiumBlurCard title="💸 Budget vs Aktual">
+            <BudgetActualWidget budgets={budgets} transactions={transactions} allCategoriesConfig={allCategoriesConfig} periodSubtitle={periodSubtitle} />
+          </PremiumBlurCard>
         )}
 
       </div>
