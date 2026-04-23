@@ -3,9 +3,25 @@ import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Flame, TrendingUp, TrendingDown, Wallet, Target } from "lucide-react";
+import { Flame, TrendingUp, TrendingDown, Wallet, Target, ArrowUp, ArrowDown } from "lucide-react";
 
-export default function HeroSummaryCard({ goals, investments, debts, transactions, user }) {
+function DeltaBadge({ current, prev, higherIsBetter = true }) {
+  if (prev == null || prev === 0) return null;
+  const diff = current - prev;
+  const pct = Math.abs((diff / prev) * 100).toFixed(1);
+  if (Math.abs(diff) < 0.01) return null;
+  const isPositive = diff > 0;
+  // good = green, bad = red
+  const isGood = higherIsBetter ? isPositive : !isPositive;
+  return (
+    <span className={`flex items-center gap-0.5 text-[9px] font-semibold ${isGood ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+      {isPositive ? <ArrowUp className="w-2.5 h-2.5" /> : <ArrowDown className="w-2.5 h-2.5" />}
+      {pct}% <span className="font-normal text-[#8FA4C8]">vs lalu</span>
+    </span>
+  );
+}
+
+export default function HeroSummaryCard({ goals, investments, debts, transactions, user, hasPrevData, prevIncome, prevExpenses, prevSavingsRate }) {
   const { formatShortNumber, formatCurrency } = useAppSettings();
   const [gamification, setGamification] = useState(null);
   const [healthScore, setHealthScore] = useState(null);
@@ -57,6 +73,7 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
       label: "Kekayaan Bersih",
       value: formatShortNumber(netWorth),
       valueColor: netWorthPositive ? "text-[#00C9A7]" : "text-[#FF6B6B]",
+      delta: null, // net worth delta tidak bisa dihitung dari tx saja
     },
     {
       icon: Target,
@@ -65,6 +82,7 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
       label: "Saving Rate",
       value: savingRate !== null ? `${savingRate.toFixed(1)}%` : "0%",
       valueColor: savingRateColor,
+      deltaProps: hasPrevData && prevSavingsRate != null ? { current: savingRate ?? 0, prev: prevSavingsRate, higherIsBetter: true } : null,
     },
     {
       icon: Wallet,
@@ -73,6 +91,7 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
       label: "Pengeluaran Bulan Ini",
       value: formatShortNumber(thisMonthExpense),
       valueColor: "text-[#FF6B6B]",
+      deltaProps: hasPrevData && prevExpenses != null ? { current: thisMonthExpense, prev: prevExpenses, higherIsBetter: false } : null,
     },
     {
       icon: Flame,
@@ -81,6 +100,7 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
       label: "Streak Aktif",
       value: streak > 0 ? `${streak} Hari` : "Mulai Streak!",
       valueColor: streak > 0 ? "text-[#FF6A00]" : "text-[#8FA4C8]",
+      deltaProps: null,
     },
   ];
 
@@ -96,6 +116,7 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
               </div>
               <p className="text-[10px] text-[#8FA4C8] font-medium leading-tight">{m.label}</p>
               <p className={`text-sm font-bold ${m.valueColor} leading-tight`}>{m.value}</p>
+              {m.deltaProps && <DeltaBadge {...m.deltaProps} />}
             </div>
           );
         })}

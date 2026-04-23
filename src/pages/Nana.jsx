@@ -148,6 +148,13 @@ export default function Nana() {
       }
     } catch {}
     setLoading(false);
+
+    // Check for prefilled message from Analytics widgets
+    const prefilledMsg = sessionStorage.getItem("nana_prefilled_message");
+    if (prefilledMsg) {
+      sessionStorage.removeItem("nana_prefilled_message");
+      setInput(prefilledMsg);
+    }
   }
 
   async function newConversation() {

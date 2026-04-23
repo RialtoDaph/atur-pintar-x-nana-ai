@@ -9,8 +9,24 @@ import {
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { ArrowUp, ArrowDown } from "lucide-react";
 
-export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [] }) {
+function DeltaTag({ current, prev, higherIsBetter = true }) {
+  if (prev == null || prev === 0) return null;
+  const diff = current - prev;
+  const pct = Math.abs((diff / prev) * 100).toFixed(0);
+  if (Math.abs(diff) < 0.01) return null;
+  const isPositive = diff > 0;
+  const isGood = higherIsBetter ? isPositive : !isPositive;
+  return (
+    <span className={`flex items-center gap-0.5 text-[8px] font-semibold mt-0.5 justify-center ${isGood ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+      {isPositive ? <ArrowUp className="w-2 h-2" /> : <ArrowDown className="w-2 h-2" />}
+      {pct}%
+    </span>
+  );
+}
+
+export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [], hasPrevData, prevIncome, prevExpenses, prevSavingsRate }) {
   const { formatCurrency, formatShortNumber } = useAppSettings();
   const [narrative, setNarrative] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -188,10 +204,12 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                 <div className="bg-[#F2F4F7] rounded-lg p-2 text-center">
                   <p className="text-[9px] text-[#8FA4C8] mb-0.5">Pemasukan</p>
                   <p className="text-xs font-bold text-[#00C9A7]">{formatShortNumber(totalIncome)}</p>
+                  {hasPrevData && <DeltaTag current={totalIncome} prev={prevIncome} higherIsBetter={true} />}
                 </div>
                 <div className="bg-[#F2F4F7] rounded-lg p-2 text-center">
                   <p className="text-[9px] text-[#8FA4C8] mb-0.5">Pengeluaran</p>
                   <p className="text-xs font-bold text-[#FF6B6B]">{formatShortNumber(totalExpenses)}</p>
+                  {hasPrevData && <DeltaTag current={totalExpenses} prev={prevExpenses} higherIsBetter={false} />}
                 </div>
                 <div className={`rounded-lg p-2 text-center ${netFlow >= 0 ? "bg-[#00C9A7]/10" : "bg-[#FF6B6B]/10"}`}>
                   <p className="text-[9px] text-[#8FA4C8] mb-0.5">Net Flow</p>
@@ -202,6 +220,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                 <div className="bg-[#4F7CFF]/10 rounded-lg p-2 text-center">
                   <p className="text-[9px] text-[#8FA4C8] mb-0.5">Tabungan</p>
                   <p className="text-xs font-bold text-[#4F7CFF]">{savingsRate}%</p>
+                  {hasPrevData && prevSavingsRate != null && <DeltaTag current={parseFloat(savingsRate)} prev={prevSavingsRate} higherIsBetter={true} />}
                 </div>
               </div>
 
