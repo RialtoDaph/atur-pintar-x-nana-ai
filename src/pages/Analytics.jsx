@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { LayoutList } from "lucide-react";
 import { createPageUrl } from "@/utils";
+import { Link } from "react-router-dom";
 import { Suspense, lazy } from "react";
 const PortfolioSummary = lazy(() => import("@/components/dashboard/PortfolioSummary"));
 import AnalyticsCardManager from "@/components/analytics/AnalyticsCardManager";
@@ -16,6 +17,8 @@ import SpendingChart from "@/components/dashboard/SpendingChart";
 import HeroSummaryCard from "@/components/analytics/HeroSummaryCard";
 import CategoryBreakdownChart from "@/components/analytics/CategoryBreakdownChart";
 import BudgetActualWidget from "@/components/analytics/BudgetActualWidget";
+import NanaDailyNarrative from "@/components/analytics/NanaDailyNarrative";
+import { Flame } from "lucide-react";
 
 const DEFAULT_ANALYTICS_CARDS = [
   { id: "net_worth", visible: true },
@@ -69,10 +72,20 @@ export default function Analytics() {
   const [analyticsCards, setAnalyticsCards] = useState(DEFAULT_ANALYTICS_CARDS);
   const [appSettings, setAppSettings] = useState(null);
   const [showCardManager, setShowCardManager] = useState(false);
+  const [gamification, setGamification] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then(u => setUser(u)).catch(() => {});
+    base44.auth.me().then(u => {
+      setUser(u);
+    }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    base44.entities.GamificationProfile.filter({ created_by: user.email })
+      .then(data => { if (data.length > 0) setGamification(data[0]); })
+      .catch(() => {});
+  }, [user?.email]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -276,6 +289,22 @@ export default function Analytics() {
 
   const periodSubtitle = buildPeriodSubtitle(filterPeriod, customDateRange);
 
+  // Data untuk NanaDailyNarrative
+  const streak = gamification?.daily_streak || 0;
+  const thisMonthIncome = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "income";
+  }).reduce((s, t) => s + t.amount, 0);
+  const thisMonthExpenseAmt = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "expense";
+  }).reduce((s, t) => s + t.amount, 0);
+  const thisSavingRate = thisMonthIncome > 0 ? ((thisMonthIncome - thisMonthExpenseAmt) / thisMonthIncome) * 100 : null;
+  const totalSavings = goals.reduce((s, g) => s + (g.current_amount || 0), 0);
+  const totalInvestmentValue = investments.reduce((s, i) => s + (i.current_value || 0), 0);
+  const totalDebtsAmt = debts.filter(d => d.status === "active").reduce((s, d) => s + (d.remaining_amount || 0), 0);
+  const netWorthValue = totalSavings + totalInvestmentValue - totalDebtsAmt;
+
   const filteredTxForPeriod = transactions.filter(t => {
     const d = new Date(t.date);
     return d >= monthRange.start && d <= monthRange.end;
@@ -288,7 +317,21 @@ export default function Analytics() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div>
             <p className="text-[#8FA4C8] text-xs sm:text-sm font-medium">{t('analytics_overview')}</p>
-            <h1 className="text-white text-xl sm:text-2xl font-bold mt-1">{t('analytics_title')}</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <h1 className="text-white text-xl sm:text-2xl font-bold">{t('analytics_title')}</h1>
+              {/* Streak mini-banner */}
+              <Link
+                to={createPageUrl("Gamifikasi")}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all tap-highlight-fix ${
+                  streak > 0
+                    ? "bg-[#FF6A00] text-white"
+                    : "bg-white/10 text-[#8FA4C8]"
+                }`}
+              >
+                <Flame className="w-3 h-3" />
+                {streak > 0 ? `${streak} hari` : "Mulai streak!"}
+              </Link>
+            </div>
           </div>
           <button
             onClick={() => setShowCardManager(true)}
@@ -306,6 +349,18 @@ export default function Analytics() {
         <div className="relative">
           <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
         </div>
+
+        {/* Nana Daily Narrative */}
+        <NanaDailyNarrative
+          user={user}
+          savingRate={thisSavingRate}
+          budgets={budgets}
+          transactions={transactions}
+          streak={streak}
+          netWorth={netWorthValue}
+          debts={debts}
+          allCategoriesConfig={allCategoriesConfig}
+        />
 
         {/* Hero Summary Card — selalu tampil di paling atas */}
         <HeroSummaryCard
