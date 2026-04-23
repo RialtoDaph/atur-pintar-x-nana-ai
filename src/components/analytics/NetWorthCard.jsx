@@ -4,8 +4,14 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
+function formatNetWorth(value, formatCurrency, formatShortNumber) {
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return formatShortNumber(value);
+  return (value < 0 ? "-" : "") + formatCurrency(abs);
+}
+
 export default function NetWorthCard({ goals, investments, debts, transactions, periodSubtitle }) {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, formatShortNumber } = useAppSettings();
   const [expanded, setExpanded] = useState(true);
 
   // Assets
@@ -48,7 +54,7 @@ export default function NetWorthCard({ goals, investments, debts, transactions, 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 sm:p-5">
+      <div className="flex items-center justify-between p-4 sm:p-5 pr-14">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#4F7CFF] to-[#9B59B6] flex items-center justify-center flex-shrink-0">
             {isPositive
@@ -90,7 +96,7 @@ export default function NetWorthCard({ goals, investments, debts, transactions, 
                 Skor {score} · {scoreLabel.label}
               </div>
               <p className={`text-xl font-bold ${isPositive ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                {isPositive ? "" : "-"}{formatCurrency(Math.abs(netWorth))}
+                {netWorth < 0 ? "-" : ""}{formatShortNumber(Math.abs(netWorth))}
               </p>
             </div>
 

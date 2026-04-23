@@ -36,7 +36,7 @@ export default function PortfolioSummary({ user, periodSubtitle }) {
   if (investments.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between px-4 pt-4 pb-2 pr-14">
           <div>
             <h2 className="font-bold text-[#0A0A0A] text-sm">{t('portfolio_title')}</h2>
             {periodSubtitle && <p className="text-xs text-[#8FA4C8] mt-0.5">{periodSubtitle}</p>}
@@ -90,7 +90,7 @@ export default function PortfolioSummary({ user, periodSubtitle }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 pr-14">
         <div>
           <h2 className="font-bold text-[#0A0A0A] text-sm">{t('portfolio_title')}</h2>
           {periodSubtitle && <p className="text-xs text-[#8FA4C8] mt-0.5">{periodSubtitle}</p>}

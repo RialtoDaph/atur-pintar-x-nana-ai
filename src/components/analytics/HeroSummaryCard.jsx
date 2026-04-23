@@ -71,7 +71,7 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
       iconBg: netWorthPositive ? "bg-[#00C9A7]/15" : "bg-[#FF6B6B]/15",
       iconColor: netWorthPositive ? "text-[#00C9A7]" : "text-[#FF6B6B]",
       label: "Kekayaan Bersih",
-      value: formatShortNumber(netWorth),
+      value: (netWorth < 0 ? "-" : "") + formatShortNumber(Math.abs(netWorth)),
       valueColor: netWorthPositive ? "text-[#00C9A7]" : "text-[#FF6B6B]",
       delta: null, // net worth delta tidak bisa dihitung dari tx saja
     },
@@ -105,7 +105,7 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5">
+    <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 pr-14">
       <div className="grid grid-cols-2 gap-3 mb-3">
         {metrics.map((m, i) => {
           const Icon = m.icon;

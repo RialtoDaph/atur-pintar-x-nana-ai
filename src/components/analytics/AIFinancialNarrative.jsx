@@ -83,7 +83,7 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 sm:p-5">
+      <div className="flex items-center justify-between p-4 sm:p-5 pr-14">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#FF6A00]">
             <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png" alt="Nana" className="w-full h-full object-contain" />

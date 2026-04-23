@@ -90,7 +90,7 @@ export default function DailySpendingCard({
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 sm:p-5">
+      <div className="flex items-center justify-between p-4 sm:p-5 pr-14">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B6B] to-[#FF9A3C] flex items-center justify-center flex-shrink-0">
             <TrendingUp className="w-4 h-4 text-white" />
@@ -144,6 +144,9 @@ export default function DailySpendingCard({
               <p className="text-sm text-[#8FA4C8]">Ø</p>
               <p className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">{formatShortNumber(currentDailyAvg)}</p>
               <p className="text-sm text-[#8FA4C8]">/Hari</p>
+            </div>
+            <div className="px-4 sm:px-5 mt-0.5">
+              <p className="text-[10px] text-[#8FA4C8]">Rata-rata dari {totalDays} hari periode aktif · Total {formatShortNumber(currentTotal)}</p>
             </div>
 
             {/* Trend */}
