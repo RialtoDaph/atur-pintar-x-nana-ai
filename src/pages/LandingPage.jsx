@@ -13,8 +13,8 @@ function MatrixBackground() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    let w = (canvas.width = window.innerWidth);
-    let h = (canvas.height = window.innerHeight);
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
     const cols = Math.floor(w / 18);
     const drops = Array(cols).fill(1);
     const chars = "01アイウエオカキクケコABCDEF∑∆∫πΩ";
@@ -26,9 +26,9 @@ function MatrixBackground() {
       drops.forEach((y, i) => {
         const char = chars[Math.floor(Math.random() * chars.length)];
         const progress = y / (h / 13);
-        if (progress < 0.3) ctx.fillStyle = `rgba(255,106,0,${0.6 + Math.random() * 0.4})`;
-        else if (progress < 0.6) ctx.fillStyle = `rgba(255,179,71,${0.3 + Math.random() * 0.3})`;
-        else ctx.fillStyle = `rgba(255,106,0,${0.05 + Math.random() * 0.15})`;
+        if (progress < 0.3) ctx.fillStyle = `rgba(255,106,0,${0.6 + Math.random() * 0.4})`;else
+        if (progress < 0.6) ctx.fillStyle = `rgba(255,179,71,${0.3 + Math.random() * 0.3})`;else
+        ctx.fillStyle = `rgba(255,106,0,${0.05 + Math.random() * 0.15})`;
         ctx.fillText(char, i * 18, y * 13);
         if (y * 13 > h && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
@@ -36,9 +36,9 @@ function MatrixBackground() {
       raf = requestAnimationFrame(draw);
     };
     draw();
-    const onResize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
+    const onResize = () => {w = canvas.width = window.innerWidth;h = canvas.height = window.innerHeight;};
     window.addEventListener("resize", onResize);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
+    return () => {cancelAnimationFrame(raf);window.removeEventListener("resize", onResize);};
   }, []);
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, opacity: 0.45 }} />;
 }
@@ -50,7 +50,7 @@ function useReveal() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.12 });
+    const obs = new IntersectionObserver(([e]) => {if (e.isIntersecting) {setVisible(true);obs.disconnect();}}, { threshold: 0.12 });
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
@@ -62,17 +62,17 @@ function Reveal({ children, delay = 0, className = "" }) {
   return (
     <div ref={ref} className={className} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(28px)", transition: `opacity 0.55s ease ${delay}ms, transform 0.55s ease ${delay}ms` }}>
       {children}
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── FOMO Toast ───────────────────────────────────────────────────────────────
-const MALE_NAMES = ["Rizky","Fajar","Dimas","Aldi","Bagas","Reza","Hafiz","Arif","Yusuf","Bima","Gilang","Radit","Ihsan","Naufal","Kevin","Andre","Daffa","Rangga","Wahyu","Hanif","Rio","Fikri","Zaky","Galih","Yoga"];
-const FEMALE_NAMES = ["Devina","Ayu","Siti","Nadia","Rania","Putri","Tiara","Salsa","Fira","Mega","Indah","Desi","Rina","Wulan","Anggi","Cindy","Della","Vina","Yanti","Hana","Shinta","Laras","Mira","Fitri","Nurul"];
-const CITIES = ["Jakarta","Bandung","Surabaya","Medan","Yogyakarta","Semarang","Bali","Makassar"];
-const TIME_LABELS = ["barusan","1 mnt lalu","2 mnt lalu","3 mnt lalu","5 mnt lalu","7 mnt lalu","8 mnt lalu","10 mnt lalu","12 mnt lalu","15 mnt lalu"];
+const MALE_NAMES = ["Rizky", "Fajar", "Dimas", "Aldi", "Bagas", "Reza", "Hafiz", "Arif", "Yusuf", "Bima", "Gilang", "Radit", "Ihsan", "Naufal", "Kevin", "Andre", "Daffa", "Rangga", "Wahyu", "Hanif", "Rio", "Fikri", "Zaky", "Galih", "Yoga"];
+const FEMALE_NAMES = ["Devina", "Ayu", "Siti", "Nadia", "Rania", "Putri", "Tiara", "Salsa", "Fira", "Mega", "Indah", "Desi", "Rina", "Wulan", "Anggi", "Cindy", "Della", "Vina", "Yanti", "Hana", "Shinta", "Laras", "Mira", "Fitri", "Nurul"];
+const CITIES = ["Jakarta", "Bandung", "Surabaya", "Medan", "Yogyakarta", "Semarang", "Bali", "Makassar"];
+const TIME_LABELS = ["barusan", "1 mnt lalu", "2 mnt lalu", "3 mnt lalu", "5 mnt lalu", "7 mnt lalu", "8 mnt lalu", "10 mnt lalu", "12 mnt lalu", "15 mnt lalu"];
 
-function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+function shuffle(arr) {return [...arr].sort(() => Math.random() - 0.5);}
 
 function FomoToast({ data, visible }) {
   return (
@@ -83,7 +83,7 @@ function FomoToast({ data, visible }) {
       opacity: visible ? 1 : 0,
       transform: visible ? "translateY(0)" : "translateY(20px)",
       transition: "opacity 0.4s ease, transform 0.4s ease",
-      pointerEvents: "none",
+      pointerEvents: "none"
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", marginTop: 4, flexShrink: 0 }} />
@@ -95,60 +95,60 @@ function FomoToast({ data, visible }) {
           <p style={{ margin: "2px 0 0", fontSize: 10, color: "#666" }}>{data.time}</p>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── NANA Chat Demo ───────────────────────────────────────────────────────────
 const NANA_RESPONSES = [
-  { keywords: ["nabung","tabung","saving"], reply: "Dari pola yang sering aku lihat, nabung itu lebih berhasil kalau langsung disisihkan di awal bulan — bukan nunggu sisa akhir bulan. Coba tentukan nominal tetap dulu, sekecil apapun itu. Konsistensi lebih penting dari jumlahnya." },
-  { keywords: ["boros","hemat","pengeluaran berlebih"], reply: "Ngerasa boros itu wajar — biasanya bukan soal jumlah pengeluarannya, tapi karena belum ada tracking yang jelas. Coba catat pengeluaran selama 3 hari aja dulu. Dari situ biasanya langsung kelihatan polanya." },
-  { keywords: ["investasi","invest","saham","reksa"], reply: "Sebelum investasi, pastikan dulu kamu punya dana darurat minimal 3 bulan pengeluaran. Kalau sudah ada, reksa dana pasar uang bisa jadi titik mulai yang aman — risikonya rendah dan bisa dicairkan kapan saja." },
-  { keywords: ["gaji","salary","penghasilan","income"], reply: "Gaji berapapun bisa diatur kalau sistemnya sudah jelas. Formula 50-30-20 bisa jadi titik awal — 50% untuk kebutuhan, 30% keinginan, 20% tabungan. Proporsinya bisa disesuaikan dengan kondisi kamu." },
-  { keywords: ["hutang","utang","cicilan","kredit"], reply: "Ada dua strategi yang umum dipakai. Pertama, bayar yang bunga paling besar dulu — debt avalanche, paling hemat secara matematis. Kedua, bayar yang nominal paling kecil dulu — debt snowball, lebih terasa progresnya. Pilih yang paling cocok sama psikologi kamu." },
-  { keywords: ["budget","anggaran","planning"], reply: "Mulai dari catat semua pengeluaran bulan lalu — dari situ kamu bisa lihat mana yang fixed dan mana yang variable. Setelah itu baru tentukan batas untuk tiap kategori. Jangan terlalu ketat di awal, nanti susah diikutin." },
-  { keywords: ["darurat","emergency"], reply: "Standarnya 3–6 bulan pengeluaran bulanan kamu. Simpan di tempat yang likuid — rekening tabungan biasa atau reksa dana pasar uang, bukan deposito yang ada jatuh temponya." },
-  { keywords: ["belanja","shopee","tokopedia","lazada","online"], reply: "Platform belanja online memang dirancang supaya kamu impulsif. Coba pakai teknik wishlist 24 jam: kalau mau beli sesuatu, masukin wishlist dulu. Tunggu sehari. Kalau masih mau, baru beli. Lebih dari 60% biasanya sudah tidak jadi." },
-  { keywords: ["motor","mobil","rumah","kpr","beli"], reply: "Bagus punya tujuan yang spesifik. Tentukan harga targetnya, lalu bagi dengan berapa bulan kamu mau mencapainya — itu nominal yang harus disisihkan tiap bulan. Yang penting angkanya jelas dulu." },
-];
+{ keywords: ["nabung", "tabung", "saving"], reply: "Dari pola yang sering aku lihat, nabung itu lebih berhasil kalau langsung disisihkan di awal bulan — bukan nunggu sisa akhir bulan. Coba tentukan nominal tetap dulu, sekecil apapun itu. Konsistensi lebih penting dari jumlahnya." },
+{ keywords: ["boros", "hemat", "pengeluaran berlebih"], reply: "Ngerasa boros itu wajar — biasanya bukan soal jumlah pengeluarannya, tapi karena belum ada tracking yang jelas. Coba catat pengeluaran selama 3 hari aja dulu. Dari situ biasanya langsung kelihatan polanya." },
+{ keywords: ["investasi", "invest", "saham", "reksa"], reply: "Sebelum investasi, pastikan dulu kamu punya dana darurat minimal 3 bulan pengeluaran. Kalau sudah ada, reksa dana pasar uang bisa jadi titik mulai yang aman — risikonya rendah dan bisa dicairkan kapan saja." },
+{ keywords: ["gaji", "salary", "penghasilan", "income"], reply: "Gaji berapapun bisa diatur kalau sistemnya sudah jelas. Formula 50-30-20 bisa jadi titik awal — 50% untuk kebutuhan, 30% keinginan, 20% tabungan. Proporsinya bisa disesuaikan dengan kondisi kamu." },
+{ keywords: ["hutang", "utang", "cicilan", "kredit"], reply: "Ada dua strategi yang umum dipakai. Pertama, bayar yang bunga paling besar dulu — debt avalanche, paling hemat secara matematis. Kedua, bayar yang nominal paling kecil dulu — debt snowball, lebih terasa progresnya. Pilih yang paling cocok sama psikologi kamu." },
+{ keywords: ["budget", "anggaran", "planning"], reply: "Mulai dari catat semua pengeluaran bulan lalu — dari situ kamu bisa lihat mana yang fixed dan mana yang variable. Setelah itu baru tentukan batas untuk tiap kategori. Jangan terlalu ketat di awal, nanti susah diikutin." },
+{ keywords: ["darurat", "emergency"], reply: "Standarnya 3–6 bulan pengeluaran bulanan kamu. Simpan di tempat yang likuid — rekening tabungan biasa atau reksa dana pasar uang, bukan deposito yang ada jatuh temponya." },
+{ keywords: ["belanja", "shopee", "tokopedia", "lazada", "online"], reply: "Platform belanja online memang dirancang supaya kamu impulsif. Coba pakai teknik wishlist 24 jam: kalau mau beli sesuatu, masukin wishlist dulu. Tunggu sehari. Kalau masih mau, baru beli. Lebih dari 60% biasanya sudah tidak jadi." },
+{ keywords: ["motor", "mobil", "rumah", "kpr", "beli"], reply: "Bagus punya tujuan yang spesifik. Tentukan harga targetnya, lalu bagi dengan berapa bulan kamu mau mencapainya — itu nominal yang harus disisihkan tiap bulan. Yang penting angkanya jelas dulu." }];
+
 
 function getNanaReply(input) {
   const lower = input.toLowerCase();
   for (const { keywords, reply } of NANA_RESPONSES) {
-    if (keywords.some(k => lower.includes(k))) return reply;
+    if (keywords.some((k) => lower.includes(k))) return reply;
   }
   return "Pertanyaan yang bagus! Tapi untuk jawaban yang benar-benar personal, aku butuh lihat kondisi keuangan kamu yang sesungguhnya. Daftar dulu — begitu akses dibuka, kita bisa ngobrol lebih dalam dengan data yang nyata.";
 }
 
 function NanaChatDemo({ scrollToWaitingList }) {
   const [messages, setMessages] = useState([
-    { role: "nana", text: "Halo! Aku Nana, asisten keuangan kamu 👋 Tanya apa saja soal keuangan — nabung, investasi, hutang, atau apapun yang lagi bikin pusing." }
-  ]);
+  { role: "nana", text: "Halo! Aku Nana, asisten keuangan kamu 👋 Tanya apa saja soal keuangan — nabung, investasi, hutang, atau apapun yang lagi bikin pusing." }]
+  );
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [questionsLeft, setQuestionsLeft] = useState(2);
   const [done, setDone] = useState(false);
   const bottomRef = useRef(null);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
+  useEffect(() => {bottomRef.current?.scrollIntoView({ behavior: "smooth" });}, [messages, typing]);
 
   const handleSend = () => {
     if (!input.trim() || typing || done) return;
     const userText = input.trim();
     setInput("");
-    setMessages(prev => [...prev, { role: "user", text: userText }]);
+    setMessages((prev) => [...prev, { role: "user", text: userText }]);
     setTyping(true);
 
     setTimeout(() => {
       const reply = getNanaReply(userText);
-      setMessages(prev => [...prev, { role: "nana", text: reply }]);
+      setMessages((prev) => [...prev, { role: "nana", text: reply }]);
       setTyping(false);
       const newLeft = questionsLeft - 1;
       setQuestionsLeft(newLeft);
       if (newLeft <= 0) {
         setDone(true);
         setTimeout(() => {
-          setMessages(prev => [...prev, { role: "nana", text: "Penasaran kan? Aku sudah tunjukkan sedikit dari yang bisa aku lakukan. Kalau kamu daftar, aku bisa lihat kondisi keuangan kamu yang sebenarnya dan bantu lebih dalam. Amankan tempatmu sekarang ya 🧡" }]);
+          setMessages((prev) => [...prev, { role: "nana", text: "Penasaran kan? Aku sudah tunjukkan sedikit dari yang bisa aku lakukan. Kalau kamu daftar, aku bisa lihat kondisi keuangan kamu yang sebenarnya dan bantu lebih dalam. Amankan tempatmu sekarang ya 🧡" }]);
         }, 800);
       }
     }, 1500);
@@ -168,7 +168,7 @@ function NanaChatDemo({ scrollToWaitingList }) {
             {/* Header */}
             <div className="flex items-center gap-3 p-4 border-b border-white/8">
               <div className="w-9 h-9 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
-                {NANA_AVATAR_URL ? <img src={NANA_AVATAR_URL} alt="Nana" className="w-full h-full object-cover" onError={e => { e.target.style.display="none"; }} /> : <span className="text-white font-black text-sm">N</span>}
+                {NANA_AVATAR_URL ? <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="Nana" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} /> : <span className="text-white font-black text-sm">N</span>}
               </div>
               <div>
                 <p className="text-white text-xs font-bold">Nana AI</p>
@@ -177,66 +177,66 @@ function NanaChatDemo({ scrollToWaitingList }) {
                   <p className="text-white/40 text-[10px]">Online</p>
                 </div>
               </div>
-              {questionsLeft > 0 && (
-                <div className="ml-auto text-[10px] text-white/30">{questionsLeft} pertanyaan tersisa</div>
-              )}
+              {questionsLeft > 0 &&
+              <div className="ml-auto text-[10px] text-white/30">{questionsLeft} pertanyaan tersisa</div>
+              }
             </div>
 
             {/* Messages */}
             <div className="p-4 space-y-3 max-h-72 overflow-y-auto">
-              {messages.map((m, i) => (
-                <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : ""}`}>
-                  {m.role === "nana" && (
-                    <div className="w-7 h-7 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
-                      <img src={NANA_AVATAR_URL} alt="N" className="w-full h-full object-cover" onError={e => { e.target.style.display="none"; }} />
+              {messages.map((m, i) =>
+              <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : ""}`}>
+                  {m.role === "nana" &&
+                <div className="w-7 h-7 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
+                      <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="N" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
                     </div>
-                  )}
+                }
                   <div className={`rounded-2xl px-4 py-3 max-w-[85%] text-xs leading-relaxed ${m.role === "nana" ? "bg-white/8 rounded-tl-sm text-white/85" : "bg-[#FF6A00] rounded-tr-sm text-white"}`}>
                     {m.text}
                   </div>
-                  {m.role === "user" && (
-                    <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-[10px] flex-shrink-0">K</div>
-                  )}
+                  {m.role === "user" &&
+                <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-[10px] flex-shrink-0">K</div>
+                }
                 </div>
-              ))}
-              {typing && (
-                <div className="flex gap-2.5">
+              )}
+              {typing &&
+              <div className="flex gap-2.5">
                   <div className="w-7 h-7 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
-                    <img src={NANA_AVATAR_URL} alt="N" className="w-full h-full object-cover" onError={e => { e.target.style.display="none"; }} />
+                    <img src={NANA_AVATAR_URL} alt="N" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
                   </div>
                   <div className="bg-white/8 rounded-2xl rounded-tl-sm px-4 py-3">
                     <span className="text-white/50 text-xs">Nana sedang mengetik<span className="typing-dots">...</span></span>
                   </div>
                 </div>
-              )}
+              }
               <div ref={bottomRef} />
             </div>
 
             {/* Input */}
             <div className="p-3 border-t border-white/8">
-              {done ? (
-                <button onClick={scrollToWaitingList} className="w-full py-3 bg-[#FF6A00] rounded-xl text-white text-sm font-bold hover:bg-[#e05e00] transition-colors">
+              {done ?
+              <button onClick={scrollToWaitingList} className="w-full py-3 bg-[#FF6A00] rounded-xl text-white text-sm font-bold hover:bg-[#e05e00] transition-colors">
                   Amankan Tempatku →
-                </button>
-              ) : (
-                <div className="flex gap-2">
+                </button> :
+
+              <div className="flex gap-2">
                   <input
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleSend()}
-                    placeholder="Tulis pertanyaanmu..."
-                    disabled={typing || done}
-                    className="flex-1 bg-white/6 border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs placeholder-white/30 outline-none focus:border-[#FF6A00]/50 disabled:opacity-40"
-                  />
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  placeholder="Tulis pertanyaanmu..."
+                  disabled={typing || done}
+                  className="flex-1 bg-white/6 border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs placeholder-white/30 outline-none focus:border-[#FF6A00]/50 disabled:opacity-40" />
+                
                   <button
-                    onClick={handleSend}
-                    disabled={typing || !input.trim() || done}
-                    className="w-10 h-10 rounded-xl bg-[#FF6A00] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40"
-                  >
+                  onClick={handleSend}
+                  disabled={typing || !input.trim() || done}
+                  className="w-10 h-10 rounded-xl bg-[#FF6A00] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40">
+                  
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-              )}
+              }
             </div>
           </div>
         </Reveal>
@@ -245,19 +245,19 @@ function NanaChatDemo({ scrollToWaitingList }) {
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
         .typing-dots { animation: blink 1.2s infinite; }
       `}</style>
-    </section>
-  );
+    </section>);
+
 }
 
 // ─── FAQ Accordion ────────────────────────────────────────────────────────────
 const FAQS = [
-  { q: "Apakah Atur Pintar gratis?", a: "Ya, ada versi gratis selamanya. Kamu bisa catat transaksi, pakai Nana AI 5x sehari, dan akses fitur gamifikasi tanpa bayar apapun." },
-  { q: "Apakah data keuangan saya aman?", a: "Data kamu dienkripsi dan tidak pernah dijual ke pihak ketiga. Atur Pintar tidak punya akses ke rekening bank kamu — semua diinput manual oleh kamu sendiri." },
-  { q: "Bisa dipakai di HP?", a: "Bisa langsung dari browser HP kamu — tidak perlu install apapun. Versi iOS dan Android sedang dalam pengembangan." },
-  { q: "Kenapa harus join waiting list?", a: "Kami ingin onboarding yang personal — bukan ramai-ramai sekaligus. Dengan waiting list, kamu dapat perhatian lebih dan akses sebelum semua orang." },
-  { q: "Apa yang didapat saat akses dibuka?", a: "Early access sebelum publik, badge Founding Member permanen di profil kamu, dan 30 hari Premium gratis." },
-  { q: "Kapan akses dibuka?", a: "Kami kirim akses via email berurutan sesuai nomor antrian. Semakin cepat daftar, semakin awal kamu bisa pakai." },
-];
+{ q: "Apakah Atur Pintar gratis?", a: "Ya, ada versi gratis selamanya. Kamu bisa catat transaksi, pakai Nana AI 5x sehari, dan akses fitur gamifikasi tanpa bayar apapun." },
+{ q: "Apakah data keuangan saya aman?", a: "Data kamu dienkripsi dan tidak pernah dijual ke pihak ketiga. Atur Pintar tidak punya akses ke rekening bank kamu — semua diinput manual oleh kamu sendiri." },
+{ q: "Bisa dipakai di HP?", a: "Bisa langsung dari browser HP kamu — tidak perlu install apapun. Versi iOS dan Android sedang dalam pengembangan." },
+{ q: "Kenapa harus join waiting list?", a: "Kami ingin onboarding yang personal — bukan ramai-ramai sekaligus. Dengan waiting list, kamu dapat perhatian lebih dan akses sebelum semua orang." },
+{ q: "Apa yang didapat saat akses dibuka?", a: "Early access sebelum publik, badge Founding Member permanen di profil kamu, dan 30 hari Premium gratis." },
+{ q: "Kapan akses dibuka?", a: "Kami kirim akses via email berurutan sesuai nomor antrian. Semakin cepat daftar, semakin awal kamu bisa pakai." }];
+
 
 function FaqSection() {
   const [open, setOpen] = useState(null);
@@ -271,28 +271,28 @@ function FaqSection() {
           <p className="text-center text-white/40 text-sm mb-8">Kalau masih ada yang belum jelas, tanya langsung aja.</p>
         </Reveal>
         <div className="space-y-3">
-          {FAQS.map((faq, i) => (
-            <Reveal key={i} delay={i * 50}>
+          {FAQS.map((faq, i) =>
+          <Reveal key={i} delay={i * 50}>
               <div className="card-d rounded-2xl overflow-hidden">
                 <button
-                  onClick={() => setOpen(open === i ? null : i)}
-                  className="w-full flex items-center justify-between p-5 text-left gap-4"
-                >
+                onClick={() => setOpen(open === i ? null : i)}
+                className="w-full flex items-center justify-between p-5 text-left gap-4">
+                
                   <span className="text-white font-semibold text-sm">{faq.q}</span>
                   {open === i ? <ChevronUp className="w-4 h-4 text-[#FF6A00] flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
                 </button>
-                {open === i && (
-                  <div className="px-5 pb-5">
+                {open === i &&
+              <div className="px-5 pb-5">
                     <p className="text-white/60 text-sm leading-relaxed">{faq.a}</p>
                   </div>
-                )}
+              }
               </div>
             </Reveal>
-          ))}
+          )}
         </div>
       </div>
-    </section>
-  );
+    </section>);
+
 }
 
 // ─── Waiting List Form ────────────────────────────────────────────────────────
@@ -314,7 +314,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
         city: form.city,
         biggest_money_problem: form.biggest_money_problem || undefined,
         current_finance_tracking_method: form.current_finance_tracking_method,
-        early_access_interest: form.early_access_interest,
+        early_access_interest: form.early_access_interest
       });
       const qNum = fomoCounter + 1;
       setQueueNumber(qNum);
@@ -323,7 +323,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
       // Send confirmation email
       base44.functions.invoke("sendWaitingListEmail", { name: form.name, email: form.email, queueNumber: qNum }).catch(() => {});
       // Mini confetti
-      if (window.confetti) window.confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#FF6A00","#FFB347","#ffffff"] });
+      if (window.confetti) window.confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#FF6A00", "#FFB347", "#ffffff"] });
     } catch (err) {
       alert("Gagal mendaftar, coba lagi ya.");
     } finally {
@@ -344,8 +344,8 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
             Kami sudah kirim email konfirmasi ke <span className="text-white font-semibold">{form.email}</span>. Pantau terus ya!
           </p>
         </div>
-      </section>
-    );
+      </section>);
+
   }
 
   return (
@@ -357,12 +357,12 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
             <p className="text-[#FF6A00] font-bold text-lg mb-3">Amankan tempatmu sekarang.</p>
             <p className="text-white/50 text-sm">Semakin cepat daftar — semakin awal dapat akses.</p>
             <div className="mt-5 space-y-2 text-left max-w-xs mx-auto">
-              {["Early access sebelum publik","Badge \"Founding Member\" permanen di profilmu","30 hari Premium gratis"].map((b, i) => (
-                <div key={i} className="flex items-center gap-2.5">
+              {["Early access sebelum publik", "Badge \"Founding Member\" permanen di profilmu", "30 hari Premium gratis"].map((b, i) =>
+              <div key={i} className="flex items-center gap-2.5">
                   <span className="text-green-400 text-sm">✅</span>
                   <span className="text-white/70 text-sm">{b}</span>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </Reveal>
@@ -379,31 +379,31 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
           <form onSubmit={handleSubmit} className="card-d rounded-2xl p-6 space-y-4">
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Nama lengkap *</label>
-              <input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} placeholder="Nama kamu" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nama kamu" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Email aktif *</label>
-              <input required type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} placeholder="email@kamu.com" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="email@kamu.com" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Nomor WhatsApp (opsional)</label>
-              <input value={form.whatsapp} onChange={e => setForm(f => ({...f, whatsapp: e.target.value}))} placeholder="08xxxxxxxxxx" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input value={form.whatsapp} onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))} placeholder="08xxxxxxxxxx" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Pekerjaan *</label>
-              <input required value={form.job} onChange={e => setForm(f => ({...f, job: e.target.value}))} placeholder="Karyawan, pelajar, freelancer..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required value={form.job} onChange={(e) => setForm((f) => ({ ...f, job: e.target.value }))} placeholder="Karyawan, pelajar, freelancer..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Kota domisili *</label>
-              <input required value={form.city} onChange={e => setForm(f => ({...f, city: e.target.value}))} placeholder="Jakarta, Bandung, dll..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="Jakarta, Bandung, dll..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Tantangan terbesar mengatur uang saat ini (opsional)</label>
-              <textarea value={form.biggest_money_problem} onChange={e => setForm(f => ({...f, biggest_money_problem: e.target.value}))} placeholder="Ceritakan kondisimu..." rows={3} className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50 resize-none" />
+              <textarea value={form.biggest_money_problem} onChange={(e) => setForm((f) => ({ ...f, biggest_money_problem: e.target.value }))} placeholder="Ceritakan kondisimu..." rows={3} className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50 resize-none" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Cara catat keuangan sekarang *</label>
-              <select required value={form.current_finance_tracking_method} onChange={e => setForm(f => ({...f, current_finance_tracking_method: e.target.value}))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#FF6A00]/50">
+              <select required value={form.current_finance_tracking_method} onChange={(e) => setForm((f) => ({ ...f, current_finance_tracking_method: e.target.value }))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#FF6A00]/50">
                 <option value="" disabled>Pilih...</option>
                 <option value="Tidak mencatat">Tidak mencatat</option>
                 <option value="Notes di HP">Notes di HP</option>
@@ -413,7 +413,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Tertarik coba versi awal? *</label>
-              <select required value={form.early_access_interest} onChange={e => setForm(f => ({...f, early_access_interest: e.target.value}))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#FF6A00]/50">
+              <select required value={form.early_access_interest} onChange={(e) => setForm((f) => ({ ...f, early_access_interest: e.target.value }))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#FF6A00]/50">
                 <option value="" disabled>Pilih...</option>
                 <option value="Ya">Ya</option>
                 <option value="Mungkin">Mungkin</option>
@@ -427,8 +427,8 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
           </form>
         </Reveal>
       </div>
-    </section>
-  );
+    </section>);
+
 }
 
 // ─── AnimatedCounter ──────────────────────────────────────────────────────────
@@ -466,7 +466,7 @@ export default function LandingPage() {
 
   // Load AppConfig
   useEffect(() => {
-    base44.entities.AppConfig.list().then(configs => {
+    base44.entities.AppConfig.list().then((configs) => {
       if (configs?.length) setFeatureWaitingList(configs[0].feature_waiting_list ?? true);
     }).catch(() => {});
   }, []);
@@ -485,10 +485,10 @@ export default function LandingPage() {
       const name = allNames[count % allNames.length];
       const city = allCities[cityIdx % allCities.length];
       const time = allTimes[timeIdx % allTimes.length];
-      cityIdx++; timeIdx++;
+      cityIdx++;timeIdx++;
       setFomoToast({ name, city, time });
       setFomoVisible(true);
-      setFomoCounter(prev => prev + 1);
+      setFomoCounter((prev) => prev + 1);
       count++;
       setTimeout(() => setFomoVisible(false), 5000);
     };
@@ -497,7 +497,7 @@ export default function LandingPage() {
       showToast();
       if (count < 10) {
         const interval = setInterval(() => {
-          if (count >= 10) { clearInterval(interval); return; }
+          if (count >= 10) {clearInterval(interval);return;}
           showToast();
         }, 20000 + Math.random() * 10000);
         return () => clearInterval(interval);
@@ -511,16 +511,16 @@ export default function LandingPage() {
     document.getElementById("waiting-list-section")?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  const incrementCounter = useCallback(() => setFomoCounter(prev => prev + 1), []);
+  const incrementCounter = useCallback(() => setFomoCounter((prev) => prev + 1), []);
 
   const LEVELS = [
-    { icon: "🌱", level: "Lv.1", label: "Newbie Ngatur" },
-    { icon: "💸", level: "Lv.2", label: "Si Pencatat" },
-    { icon: "🎯", level: "Lv.3", label: "Budgeter Muda" },
-    { icon: "🤝", level: "Lv.4", label: "Social Saver" },
-    { icon: "🧠", level: "Lv.5", label: "Financial Aware" },
-    { icon: "🏆", level: "Lv.7", label: "Atur Pintar Pro" },
-  ];
+  { icon: "🌱", level: "Lv.1", label: "Newbie Ngatur" },
+  { icon: "💸", level: "Lv.2", label: "Si Pencatat" },
+  { icon: "🎯", level: "Lv.3", label: "Budgeter Muda" },
+  { icon: "🤝", level: "Lv.4", label: "Social Saver" },
+  { icon: "🧠", level: "Lv.5", label: "Financial Aware" },
+  { icon: "🏆", level: "Lv.7", label: "Atur Pintar Pro" }];
+
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden">
@@ -546,21 +546,21 @@ export default function LandingPage() {
         </div>
         <div className="hidden sm:flex items-center gap-6 ml-10">
           <button onClick={() => howRef.current?.scrollIntoView({ behavior: "smooth" })} className="text-xs text-white/50 hover:text-white transition-colors">Fitur</button>
-          {!featureWaitingList && (
-            <button onClick={() => pricingRef.current?.scrollIntoView({ behavior: "smooth" })} className="text-xs text-white/50 hover:text-white transition-colors">Harga</button>
-          )}
+          {!featureWaitingList &&
+          <button onClick={() => pricingRef.current?.scrollIntoView({ behavior: "smooth" })} className="text-xs text-white/50 hover:text-white transition-colors">Harga</button>
+          }
           <Link to="/About" className="text-xs text-white/50 hover:text-white transition-colors">Tentang</Link>
         </div>
-        {!featureWaitingList && (
-          <button onClick={() => base44.auth.redirectToLogin()} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
+        {!featureWaitingList &&
+        <button onClick={() => base44.auth.redirectToLogin()} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
             Masuk / Daftar
           </button>
-        )}
-        {featureWaitingList && (
-          <button onClick={scrollToWaitingList} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
+        }
+        {featureWaitingList &&
+        <button onClick={scrollToWaitingList} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
             Amankan Tempatku →
           </button>
-        )}
+        }
       </nav>
 
       {/* ── HERO ── */}
@@ -593,15 +593,15 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start mb-8">
               <button
                 onClick={scrollToWaitingList}
-                className="group flex items-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center"
-              >
+                className="group flex items-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center">
+                
                 Amankan Tempatku — Gratis →
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
               <button
                 onClick={() => howRef.current?.scrollIntoView({ behavior: "smooth" })}
-                className="flex items-center gap-2 text-white/60 hover:text-white border border-white/10 hover:border-white/25 font-semibold text-sm px-6 py-4 rounded-2xl transition-all w-full sm:w-auto justify-center"
-              >
+                className="flex items-center gap-2 text-white/60 hover:text-white border border-white/10 hover:border-white/25 font-semibold text-sm px-6 py-4 rounded-2xl transition-all w-full sm:w-auto justify-center">
+                
                 Lihat cara kerjanya dulu ↓
               </button>
             </div>
@@ -628,17 +628,17 @@ export default function LandingPage() {
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {[
-              { emoji: "😮‍💨", text: "Tiap awal bulan niat nabung.\nTiap akhir bulan bingung duitnya ke mana." },
-              { emoji: "📱", text: "Udah download 5 aplikasi keuangan.\nSemuanya dibuka sekali, terus lupa." },
-              { emoji: "😬", text: "Ngerti teorinya sih.\nTapi eksekusinya... nanti deh." },
-            ].map((c, i) => (
-              <Reveal key={i} delay={i * 80}>
+            { emoji: "😮‍💨", text: "Tiap awal bulan niat nabung.\nTiap akhir bulan bingung duitnya ke mana." },
+            { emoji: "📱", text: "Udah download 5 aplikasi keuangan.\nSemuanya dibuka sekali, terus lupa." },
+            { emoji: "😬", text: "Ngerti teorinya sih.\nTapi eksekusinya... nanti deh." }].
+            map((c, i) =>
+            <Reveal key={i} delay={i * 80}>
                 <div className="card-d rounded-2xl p-6 text-center h-full flex flex-col items-center gap-4">
                   <span className="text-4xl">{c.emoji}</span>
                   <p className="text-white/70 text-sm leading-relaxed whitespace-pre-line">{c.text}</p>
                 </div>
               </Reveal>
-            ))}
+            )}
           </div>
           <Reveal delay={200}>
             <p className="text-center text-white/45 text-sm italic max-w-lg mx-auto leading-relaxed">
@@ -659,19 +659,19 @@ export default function LandingPage() {
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: "🎮", title: "Keuangan yang terasa kayak game.", desc: "Setiap kebiasaan finansial yang kamu lakuin = XP. Naik level, unlock fitur baru, jaga streak harianmu. Duit diatur sambil ngerasa menang tiap hari." },
-              { icon: "✨", title: "Kenalan sama Nana — AI bestie finansialmu.", desc: "Bukan chatbot kaku. Nana tau pola pengeluaranmu, kasih insight yang jujur, dan cukup lucu buat bikin kamu gak mager buka app. Dia di pihak kamu — selalu." },
-              { icon: "🏆", title: "Saingan nabung sama teman.", desc: "Shared wallet, leaderboard, dan challenge bareng. Karena kadang yang bikin kamu konsisten bukan aplikasinya — tapi tahu temenmu lagi ngejar juga." },
-              { icon: "🔥", title: "Kebiasaan kecil, hasil nyata.", desc: "Daily missions yang ringan, achievable, dan numpuk jadi perubahan besar. Satu habit per hari sudah cukup untuk mulai." },
-            ].map((f, i) => (
-              <Reveal key={i} delay={i * 70}>
+            { icon: "🎮", title: "Keuangan yang terasa kayak game.", desc: "Setiap kebiasaan finansial yang kamu lakuin = XP. Naik level, unlock fitur baru, jaga streak harianmu. Duit diatur sambil ngerasa menang tiap hari." },
+            { icon: "✨", title: "Kenalan sama Nana — AI bestie finansialmu.", desc: "Bukan chatbot kaku. Nana tau pola pengeluaranmu, kasih insight yang jujur, dan cukup lucu buat bikin kamu gak mager buka app. Dia di pihak kamu — selalu." },
+            { icon: "🏆", title: "Saingan nabung sama teman.", desc: "Shared wallet, leaderboard, dan challenge bareng. Karena kadang yang bikin kamu konsisten bukan aplikasinya — tapi tahu temenmu lagi ngejar juga." },
+            { icon: "🔥", title: "Kebiasaan kecil, hasil nyata.", desc: "Daily missions yang ringan, achievable, dan numpuk jadi perubahan besar. Satu habit per hari sudah cukup untuk mulai." }].
+            map((f, i) =>
+            <Reveal key={i} delay={i * 70}>
                 <div className="card-d rounded-2xl p-5 hover:border-[#F97316]/30 transition-all h-full flex flex-col gap-3">
                   <span className="text-3xl">{f.icon}</span>
                   <p className="text-white font-bold text-sm leading-snug">{f.title}</p>
                   <p className="text-white/45 text-xs leading-relaxed flex-1">{f.desc}</p>
                 </div>
               </Reveal>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -690,11 +690,11 @@ export default function LandingPage() {
           </Reveal>
           <Reveal delay={100}>
             <div className="flex items-center justify-center flex-wrap gap-2 mb-8">
-              {LEVELS.map((lv, i) => (
-                <div key={i} className="flex items-center gap-2">
+              {LEVELS.map((lv, i) =>
+              <div key={i} className="flex items-center gap-2">
                   <div className="flex flex-col items-center gap-1">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-xl shadow-md"
-                      style={{ background: `linear-gradient(135deg, hsl(${120 - i * 20},80%,${50 - i * 2}%) 0%, #FF6A00 100%)`, opacity: 0.85 + i * 0.025 }}>
+                  style={{ background: `linear-gradient(135deg, hsl(${120 - i * 20},80%,${50 - i * 2}%) 0%, #FF6A00 100%)`, opacity: 0.85 + i * 0.025 }}>
                       {lv.icon}
                     </div>
                     <p className="text-[9px] font-bold text-[#0A0A0A]">{lv.level}</p>
@@ -702,7 +702,7 @@ export default function LandingPage() {
                   </div>
                   {i < LEVELS.length - 1 && <ChevronRight className="w-4 h-4 text-[#F97316] flex-shrink-0 mb-6" />}
                 </div>
-              ))}
+              )}
             </div>
           </Reveal>
           <Reveal delay={200}>
@@ -735,8 +735,8 @@ export default function LandingPage() {
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  title="Demo Atur Pintar"
-                />
+                  title="Demo Atur Pintar" />
+                
               </div>
             </div>
             <p className="text-white/25 text-xs mt-5">iOS & Android segera hadir.</p>
@@ -748,8 +748,8 @@ export default function LandingPage() {
       <FaqSection />
 
       {/* ── PRICING (hidden when feature_waiting_list) ── */}
-      {!featureWaitingList && (
-        <section ref={pricingRef} className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+      {!featureWaitingList &&
+      <section ref={pricingRef} className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
           <div className="max-w-3xl mx-auto">
             <Reveal>
               <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 text-center">Mulai gratis. Upgrade kalau udah ketagihan.</h2>
@@ -762,12 +762,12 @@ export default function LandingPage() {
                   <p className="text-3xl font-black text-white mb-0.5">Rp 0</p>
                   <p className="text-white/35 text-xs mb-6">per bulan</p>
                   <div className="space-y-2.5 flex-1 mb-7">
-                    {["Expense & income tracker","Daily missions & XP","Nana AI basic (5 chat/hari)","Leaderboard teman","1 financial goal"].map((f, i) => (
-                      <div key={i} className="flex items-center gap-2">
+                    {["Expense & income tracker", "Daily missions & XP", "Nana AI basic (5 chat/hari)", "Leaderboard teman", "1 financial goal"].map((f, i) =>
+                  <div key={i} className="flex items-center gap-2">
                         <CheckCircle className="w-3.5 h-3.5 text-[#F97316] flex-shrink-0" />
                         <p className="text-white/60 text-xs">{f}</p>
                       </div>
-                    ))}
+                  )}
                   </div>
                   <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 rounded-xl border border-[#F97316]/50 text-[#F97316] font-bold text-sm hover:bg-[#F97316]/10 transition-colors">
                     Mulai Gratis →
@@ -782,12 +782,12 @@ export default function LandingPage() {
                   <p className="text-white/70 text-xs mb-1">per bulan</p>
                   <p className="text-white/60 text-[11px] mb-6">atau Rp 399.000/tahun <span className="text-white font-bold">(hemat ~32%)</span></p>
                   <div className="space-y-2.5 flex-1 mb-7">
-                    {["Semua fitur Free","Nana AI unlimited chat","Advanced spending analytics","Shared wallet unlimited","Semua level unlocked","Badge & skin eksklusif","Laporan PDF bulanan"].map((f, i) => (
-                      <div key={i} className="flex items-center gap-2">
+                    {["Semua fitur Free", "Nana AI unlimited chat", "Advanced spending analytics", "Shared wallet unlimited", "Semua level unlocked", "Badge & skin eksklusif", "Laporan PDF bulanan"].map((f, i) =>
+                  <div key={i} className="flex items-center gap-2">
                         <span className="text-white text-xs">⭐</span>
                         <p className="text-white/90 text-xs">{f}</p>
                       </div>
-                    ))}
+                  )}
                   </div>
                   <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 rounded-xl bg-white text-[#FF6A00] font-bold text-sm hover:bg-white/90 transition-colors">
                     Coba 30 Hari Gratis →
@@ -800,14 +800,14 @@ export default function LandingPage() {
             </Reveal>
           </div>
         </section>
-      )}
+      }
 
       {/* ── WAITING LIST ── */}
       <WaitingListSection fomoCounter={fomoCounter} incrementCounter={incrementCounter} />
 
       {/* ── FINAL CTA (hidden when feature_waiting_list) ── */}
-      {!featureWaitingList && (
-        <section className="pb-0 px-5 sm:px-12 lg:px-20 relative z-10">
+      {!featureWaitingList &&
+      <section className="pb-0 px-5 sm:px-12 lg:px-20 relative z-10">
           <div className="relative rounded-3xl overflow-hidden py-20 px-8 sm:px-16 text-center" style={{ background: "#1A1A2E" }}>
             <div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#FF6A00]/10 blur-[80px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
             <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[#FF6A00]/8 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
@@ -832,7 +832,7 @@ export default function LandingPage() {
             </Reveal>
           </div>
         </section>
-      )}
+      }
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-white/5 pt-10 pb-8 px-5 sm:px-12 lg:px-20 relative z-10 mt-16">
@@ -875,6 +875,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 }
