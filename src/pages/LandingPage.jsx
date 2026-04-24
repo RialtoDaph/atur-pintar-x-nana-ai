@@ -1,9 +1,13 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowRight, CheckCircle, Mail, Instagram, Twitter, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowRight, CheckCircle, Mail, Instagram, Twitter, Sparkles, ChevronRight, ChevronDown, ChevronUp, X } from "lucide-react";
 
-// ─── Matrix background (same as before) ───────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
+const NANA_AVATAR_URL = "https://api.dicebear.com/7.x/adventurer/svg?seed=Nana&backgroundColor=f97316";
+const VIDEO_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
+
+// ─── Matrix background ────────────────────────────────────────────────────────
 function MatrixBackground() {
   const canvasRef = useRef(null);
   useEffect(() => {
@@ -32,17 +36,14 @@ function MatrixBackground() {
       raf = requestAnimationFrame(draw);
     };
     draw();
-    const onResize = () => {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    };
+    const onResize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
     window.addEventListener("resize", onResize);
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
   }, []);
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, opacity: 0.45 }} />;
 }
 
-// ─── Scroll reveal hook ────────────────────────────────────────────────────────
+// ─── Scroll reveal ────────────────────────────────────────────────────────────
 function useReveal() {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -59,67 +60,458 @@ function useReveal() {
 function Reveal({ children, delay = 0, className = "" }) {
   const { ref, visible } = useReveal();
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(28px)",
-        transition: `opacity 0.55s ease ${delay}ms, transform 0.55s ease ${delay}ms`,
-      }}
-    >
+    <div ref={ref} className={className} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(28px)", transition: `opacity 0.55s ease ${delay}ms, transform 0.55s ease ${delay}ms` }}>
       {children}
     </div>
   );
 }
 
-// ─── Live counter ──────────────────────────────────────────────────────────────
-const COUNTER_KEY = "ap_visitor_count";
-const COUNTER_TS_KEY = "ap_visitor_ts";
-const BASE_COUNT = 1247;
-const INCREMENT_INTERVAL_MS = 2 * 60 * 1000; // 2 menit
+// ─── FOMO Toast ───────────────────────────────────────────────────────────────
+const MALE_NAMES = ["Rizky","Fajar","Dimas","Aldi","Bagas","Reza","Hafiz","Arif","Yusuf","Bima","Gilang","Radit","Ihsan","Naufal","Kevin","Andre","Daffa","Rangga","Wahyu","Hanif","Rio","Fikri","Zaky","Galih","Yoga"];
+const FEMALE_NAMES = ["Devina","Ayu","Siti","Nadia","Rania","Putri","Tiara","Salsa","Fira","Mega","Indah","Desi","Rina","Wulan","Anggi","Cindy","Della","Vina","Yanti","Hana","Shinta","Laras","Mira","Fitri","Nurul"];
+const CITIES = ["Jakarta","Bandung","Surabaya","Medan","Yogyakarta","Semarang","Bali","Makassar"];
+const TIME_LABELS = ["barusan","1 mnt lalu","2 mnt lalu","3 mnt lalu","5 mnt lalu","7 mnt lalu","8 mnt lalu","10 mnt lalu","12 mnt lalu","15 mnt lalu"];
 
-function useLiveCount() {
-  const [count, setCount] = useState(() => {
-    try {
-      const stored = parseInt(localStorage.getItem(COUNTER_KEY), 10);
-      const ts = parseInt(localStorage.getItem(COUNTER_TS_KEY), 10);
-      if (!stored || !ts) return BASE_COUNT;
-      const elapsed = Date.now() - ts;
-      const increments = Math.floor(elapsed / INCREMENT_INTERVAL_MS);
-      return stored + increments;
-    } catch {
-      return BASE_COUNT;
-    }
-  });
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-  useEffect(() => {
-    // Save initial if not stored
-    if (!localStorage.getItem(COUNTER_KEY)) {
-      localStorage.setItem(COUNTER_KEY, String(BASE_COUNT));
-      localStorage.setItem(COUNTER_TS_KEY, String(Date.now()));
-    }
-    const interval = setInterval(() => {
-      setCount(prev => {
-        const next = prev + 1;
-        localStorage.setItem(COUNTER_KEY, String(next));
-        localStorage.setItem(COUNTER_TS_KEY, String(Date.now()));
-        return next;
-      });
-    }, INCREMENT_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, []);
-
-  return count;
+function FomoToast({ data, visible }) {
+  return (
+    <div style={{
+      position: "fixed", bottom: 24, left: 16, zIndex: 9999, maxWidth: 280,
+      background: "#1c1c1e", borderRadius: 14, padding: "12px 16px",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(20px)",
+      transition: "opacity 0.4s ease, transform 0.4s ease",
+      pointerEvents: "none",
+    }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", marginTop: 4, flexShrink: 0 }} />
+        <div>
+          <p style={{ margin: 0, fontSize: 12, color: "#fff", lineHeight: 1.5 }}>
+            <span style={{ color: "#f97316", fontWeight: 700 }}>{data.name}</span>
+            {" "}dari {data.city} baru saja bergabung 🎉
+          </p>
+          <p style={{ margin: "2px 0 0", fontSize: 10, color: "#666" }}>{data.time}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-// ─── MAIN COMPONENT ────────────────────────────────────────────────────────────
+// ─── NANA Chat Demo ───────────────────────────────────────────────────────────
+const NANA_RESPONSES = [
+  { keywords: ["nabung","tabung","saving"], reply: "Dari pola yang sering aku lihat, nabung itu lebih berhasil kalau langsung disisihkan di awal bulan — bukan nunggu sisa akhir bulan. Coba tentukan nominal tetap dulu, sekecil apapun itu. Konsistensi lebih penting dari jumlahnya." },
+  { keywords: ["boros","hemat","pengeluaran berlebih"], reply: "Ngerasa boros itu wajar — biasanya bukan soal jumlah pengeluarannya, tapi karena belum ada tracking yang jelas. Coba catat pengeluaran selama 3 hari aja dulu. Dari situ biasanya langsung kelihatan polanya." },
+  { keywords: ["investasi","invest","saham","reksa"], reply: "Sebelum investasi, pastikan dulu kamu punya dana darurat minimal 3 bulan pengeluaran. Kalau sudah ada, reksa dana pasar uang bisa jadi titik mulai yang aman — risikonya rendah dan bisa dicairkan kapan saja." },
+  { keywords: ["gaji","salary","penghasilan","income"], reply: "Gaji berapapun bisa diatur kalau sistemnya sudah jelas. Formula 50-30-20 bisa jadi titik awal — 50% untuk kebutuhan, 30% keinginan, 20% tabungan. Proporsinya bisa disesuaikan dengan kondisi kamu." },
+  { keywords: ["hutang","utang","cicilan","kredit"], reply: "Ada dua strategi yang umum dipakai. Pertama, bayar yang bunga paling besar dulu — debt avalanche, paling hemat secara matematis. Kedua, bayar yang nominal paling kecil dulu — debt snowball, lebih terasa progresnya. Pilih yang paling cocok sama psikologi kamu." },
+  { keywords: ["budget","anggaran","planning"], reply: "Mulai dari catat semua pengeluaran bulan lalu — dari situ kamu bisa lihat mana yang fixed dan mana yang variable. Setelah itu baru tentukan batas untuk tiap kategori. Jangan terlalu ketat di awal, nanti susah diikutin." },
+  { keywords: ["darurat","emergency"], reply: "Standarnya 3–6 bulan pengeluaran bulanan kamu. Simpan di tempat yang likuid — rekening tabungan biasa atau reksa dana pasar uang, bukan deposito yang ada jatuh temponya." },
+  { keywords: ["belanja","shopee","tokopedia","lazada","online"], reply: "Platform belanja online memang dirancang supaya kamu impulsif. Coba pakai teknik wishlist 24 jam: kalau mau beli sesuatu, masukin wishlist dulu. Tunggu sehari. Kalau masih mau, baru beli. Lebih dari 60% biasanya sudah tidak jadi." },
+  { keywords: ["motor","mobil","rumah","kpr","beli"], reply: "Bagus punya tujuan yang spesifik. Tentukan harga targetnya, lalu bagi dengan berapa bulan kamu mau mencapainya — itu nominal yang harus disisihkan tiap bulan. Yang penting angkanya jelas dulu." },
+];
+
+function getNanaReply(input) {
+  const lower = input.toLowerCase();
+  for (const { keywords, reply } of NANA_RESPONSES) {
+    if (keywords.some(k => lower.includes(k))) return reply;
+  }
+  return "Pertanyaan yang bagus! Tapi untuk jawaban yang benar-benar personal, aku butuh lihat kondisi keuangan kamu yang sesungguhnya. Daftar dulu — begitu akses dibuka, kita bisa ngobrol lebih dalam dengan data yang nyata.";
+}
+
+function NanaChatDemo({ scrollToWaitingList }) {
+  const [messages, setMessages] = useState([
+    { role: "nana", text: "Halo! Aku Nana, asisten keuangan kamu 👋 Tanya apa saja soal keuangan — nabung, investasi, hutang, atau apapun yang lagi bikin pusing." }
+  ]);
+  const [input, setInput] = useState("");
+  const [typing, setTyping] = useState(false);
+  const [questionsLeft, setQuestionsLeft] = useState(2);
+  const [done, setDone] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
+
+  const handleSend = () => {
+    if (!input.trim() || typing || done) return;
+    const userText = input.trim();
+    setInput("");
+    setMessages(prev => [...prev, { role: "user", text: userText }]);
+    setTyping(true);
+
+    setTimeout(() => {
+      const reply = getNanaReply(userText);
+      setMessages(prev => [...prev, { role: "nana", text: reply }]);
+      setTyping(false);
+      const newLeft = questionsLeft - 1;
+      setQuestionsLeft(newLeft);
+      if (newLeft <= 0) {
+        setDone(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, { role: "nana", text: "Penasaran kan? Aku sudah tunjukkan sedikit dari yang bisa aku lakukan. Kalau kamu daftar, aku bisa lihat kondisi keuangan kamu yang sebenarnya dan bantu lebih dalam. Amankan tempatmu sekarang ya 🧡" }]);
+        }, 800);
+      }
+    }, 1500);
+  };
+
+  return (
+    <section id="nana-demo" className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+      <div className="max-w-2xl mx-auto">
+        <Reveal>
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 text-center">Kenalan sama Nana — AI bestie finansialmu.</h2>
+        </Reveal>
+        <Reveal delay={60}>
+          <p className="text-center text-white/40 text-sm mb-8">Tanya apa saja soal keuangan. Nana siap bantu.</p>
+        </Reveal>
+        <Reveal delay={120}>
+          <div className="card-d rounded-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center gap-3 p-4 border-b border-white/8">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
+                {NANA_AVATAR_URL ? <img src={NANA_AVATAR_URL} alt="Nana" className="w-full h-full object-cover" onError={e => { e.target.style.display="none"; }} /> : <span className="text-white font-black text-sm">N</span>}
+              </div>
+              <div>
+                <p className="text-white text-xs font-bold">Nana AI</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <p className="text-white/40 text-[10px]">Online</p>
+                </div>
+              </div>
+              {questionsLeft > 0 && (
+                <div className="ml-auto text-[10px] text-white/30">{questionsLeft} pertanyaan tersisa</div>
+              )}
+            </div>
+
+            {/* Messages */}
+            <div className="p-4 space-y-3 max-h-72 overflow-y-auto">
+              {messages.map((m, i) => (
+                <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : ""}`}>
+                  {m.role === "nana" && (
+                    <div className="w-7 h-7 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
+                      <img src={NANA_AVATAR_URL} alt="N" className="w-full h-full object-cover" onError={e => { e.target.style.display="none"; }} />
+                    </div>
+                  )}
+                  <div className={`rounded-2xl px-4 py-3 max-w-[85%] text-xs leading-relaxed ${m.role === "nana" ? "bg-white/8 rounded-tl-sm text-white/85" : "bg-[#FF6A00] rounded-tr-sm text-white"}`}>
+                    {m.text}
+                  </div>
+                  {m.role === "user" && (
+                    <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-[10px] flex-shrink-0">K</div>
+                  )}
+                </div>
+              ))}
+              {typing && (
+                <div className="flex gap-2.5">
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
+                    <img src={NANA_AVATAR_URL} alt="N" className="w-full h-full object-cover" onError={e => { e.target.style.display="none"; }} />
+                  </div>
+                  <div className="bg-white/8 rounded-2xl rounded-tl-sm px-4 py-3">
+                    <span className="text-white/50 text-xs">Nana sedang mengetik<span className="typing-dots">...</span></span>
+                  </div>
+                </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+
+            {/* Input */}
+            <div className="p-3 border-t border-white/8">
+              {done ? (
+                <button onClick={scrollToWaitingList} className="w-full py-3 bg-[#FF6A00] rounded-xl text-white text-sm font-bold hover:bg-[#e05e00] transition-colors">
+                  Amankan Tempatku →
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleSend()}
+                    placeholder="Tulis pertanyaanmu..."
+                    disabled={typing || done}
+                    className="flex-1 bg-white/6 border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs placeholder-white/30 outline-none focus:border-[#FF6A00]/50 disabled:opacity-40"
+                  />
+                  <button
+                    onClick={handleSend}
+                    disabled={typing || !input.trim() || done}
+                    className="w-10 h-10 rounded-xl bg-[#FF6A00] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </Reveal>
+      </div>
+      <style>{`
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .typing-dots { animation: blink 1.2s infinite; }
+      `}</style>
+    </section>
+  );
+}
+
+// ─── FAQ Accordion ────────────────────────────────────────────────────────────
+const FAQS = [
+  { q: "Apakah Atur Pintar gratis?", a: "Ya, ada versi gratis selamanya. Kamu bisa catat transaksi, pakai Nana AI 5x sehari, dan akses fitur gamifikasi tanpa bayar apapun." },
+  { q: "Apakah data keuangan saya aman?", a: "Data kamu dienkripsi dan tidak pernah dijual ke pihak ketiga. Atur Pintar tidak punya akses ke rekening bank kamu — semua diinput manual oleh kamu sendiri." },
+  { q: "Bisa dipakai di HP?", a: "Bisa langsung dari browser HP kamu — tidak perlu install apapun. Versi iOS dan Android sedang dalam pengembangan." },
+  { q: "Kenapa harus join waiting list?", a: "Kami ingin onboarding yang personal — bukan ramai-ramai sekaligus. Dengan waiting list, kamu dapat perhatian lebih dan akses sebelum semua orang." },
+  { q: "Apa yang didapat saat akses dibuka?", a: "Early access sebelum publik, badge Founding Member permanen di profil kamu, dan 30 hari Premium gratis." },
+  { q: "Kapan akses dibuka?", a: "Kami kirim akses via email berurutan sesuai nomor antrian. Semakin cepat daftar, semakin awal kamu bisa pakai." },
+];
+
+function FaqSection() {
+  const [open, setOpen] = useState(null);
+  return (
+    <section className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+      <div className="max-w-2xl mx-auto">
+        <Reveal>
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 text-center">Pertanyaan yang sering ditanya.</h2>
+        </Reveal>
+        <Reveal delay={60}>
+          <p className="text-center text-white/40 text-sm mb-8">Kalau masih ada yang belum jelas, tanya langsung aja.</p>
+        </Reveal>
+        <div className="space-y-3">
+          {FAQS.map((faq, i) => (
+            <Reveal key={i} delay={i * 50}>
+              <div className="card-d rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="w-full flex items-center justify-between p-5 text-left gap-4"
+                >
+                  <span className="text-white font-semibold text-sm">{faq.q}</span>
+                  {open === i ? <ChevronUp className="w-4 h-4 text-[#FF6A00] flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
+                </button>
+                {open === i && (
+                  <div className="px-5 pb-5">
+                    <p className="text-white/60 text-sm leading-relaxed">{faq.a}</p>
+                  </div>
+                )}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Waiting List Form ────────────────────────────────────────────────────────
+function WaitingListSection({ fomoCounter, incrementCounter }) {
+  const [form, setForm] = useState({ name: "", email: "", whatsapp: "", job: "", city: "", biggest_money_problem: "", current_finance_tracking_method: "", early_access_interest: "" });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [queueNumber, setQueueNumber] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await base44.entities.WaitingList.create({
+        name: form.name,
+        email: form.email,
+        whatsapp: form.whatsapp || undefined,
+        job: form.job,
+        city: form.city,
+        biggest_money_problem: form.biggest_money_problem || undefined,
+        current_finance_tracking_method: form.current_finance_tracking_method,
+        early_access_interest: form.early_access_interest,
+      });
+      const qNum = fomoCounter + 1;
+      setQueueNumber(qNum);
+      incrementCounter();
+      setSuccess(true);
+      // Send confirmation email
+      base44.functions.invoke("sendWaitingListEmail", { name: form.name, email: form.email, queueNumber: qNum }).catch(() => {});
+      // Mini confetti
+      if (window.confetti) window.confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#FF6A00","#FFB347","#ffffff"] });
+    } catch (err) {
+      alert("Gagal mendaftar, coba lagi ya.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <section id="waiting-list-section" className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+        <div className="max-w-lg mx-auto card-d rounded-3xl p-10 text-center">
+          <div className="w-16 h-16 rounded-full bg-[#FF6A00]/20 flex items-center justify-center mx-auto mb-5">
+            <CheckCircle className="w-8 h-8 text-[#FF6A00]" />
+          </div>
+          <h2 className="text-2xl font-black text-white mb-2">Selamat, {form.name}! 🎉</h2>
+          <p className="text-[#FF6A00] font-bold text-lg mb-2">Kamu #{queueNumber} dalam antrian.</p>
+          <p className="text-white/50 text-sm leading-relaxed">
+            Kami sudah kirim email konfirmasi ke <span className="text-white font-semibold">{form.email}</span>. Pantau terus ya!
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="waiting-list-section" className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+      <div className="max-w-lg mx-auto">
+        <Reveal>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Kamu yang pertama.</h2>
+            <p className="text-[#FF6A00] font-bold text-lg mb-3">Amankan tempatmu sekarang.</p>
+            <p className="text-white/50 text-sm">Semakin cepat daftar — semakin awal dapat akses.</p>
+            <div className="mt-5 space-y-2 text-left max-w-xs mx-auto">
+              {["Early access sebelum publik","Badge \"Founding Member\" permanen di profilmu","30 hari Premium gratis"].map((b, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <span className="text-green-400 text-sm">✅</span>
+                  <span className="text-white/70 text-sm">{b}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={80}>
+          <div className="card-d rounded-2xl p-2 mb-4 text-center">
+            <p className="text-white/50 text-xs">Kamu akan jadi</p>
+            <p className="text-[#FF6A00] font-black text-2xl">#{fomoCounter + 1}</p>
+            <p className="text-white/50 text-xs">dalam antrian</p>
+          </div>
+        </Reveal>
+
+        <Reveal delay={120}>
+          <form onSubmit={handleSubmit} className="card-d rounded-2xl p-6 space-y-4">
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Nama lengkap *</label>
+              <input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} placeholder="Nama kamu" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+            </div>
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Email aktif *</label>
+              <input required type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} placeholder="email@kamu.com" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+            </div>
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Nomor WhatsApp (opsional)</label>
+              <input value={form.whatsapp} onChange={e => setForm(f => ({...f, whatsapp: e.target.value}))} placeholder="08xxxxxxxxxx" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+            </div>
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Pekerjaan *</label>
+              <input required value={form.job} onChange={e => setForm(f => ({...f, job: e.target.value}))} placeholder="Karyawan, pelajar, freelancer..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+            </div>
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Kota domisili *</label>
+              <input required value={form.city} onChange={e => setForm(f => ({...f, city: e.target.value}))} placeholder="Jakarta, Bandung, dll..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+            </div>
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Tantangan terbesar mengatur uang saat ini (opsional)</label>
+              <textarea value={form.biggest_money_problem} onChange={e => setForm(f => ({...f, biggest_money_problem: e.target.value}))} placeholder="Ceritakan kondisimu..." rows={3} className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50 resize-none" />
+            </div>
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Cara catat keuangan sekarang *</label>
+              <select required value={form.current_finance_tracking_method} onChange={e => setForm(f => ({...f, current_finance_tracking_method: e.target.value}))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#FF6A00]/50">
+                <option value="" disabled>Pilih...</option>
+                <option value="Tidak mencatat">Tidak mencatat</option>
+                <option value="Notes di HP">Notes di HP</option>
+                <option value="Excel / Spreadsheet">Excel / Spreadsheet</option>
+                <option value="Aplikasi lain">Aplikasi lain</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-white/60 text-xs mb-1.5 block">Tertarik coba versi awal? *</label>
+              <select required value={form.early_access_interest} onChange={e => setForm(f => ({...f, early_access_interest: e.target.value}))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#FF6A00]/50">
+                <option value="" disabled>Pilih...</option>
+                <option value="Ya">Ya</option>
+                <option value="Mungkin">Mungkin</option>
+                <option value="Belum yakin">Belum yakin</option>
+              </select>
+            </div>
+            <button type="submit" disabled={loading} className="w-full py-4 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-black text-base rounded-full transition-all disabled:opacity-60 mt-2">
+              {loading ? "Mendaftarkan..." : "Amankan Tempatku →"}
+            </button>
+            <p className="text-center text-white/30 text-xs">Gratis. Tanpa kartu kredit. Tanpa syarat tersembunyi.</p>
+          </form>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ─── AnimatedCounter ──────────────────────────────────────────────────────────
+function AnimatedCounter({ value }) {
+  const [display, setDisplay] = useState(value);
+  const prev = useRef(value);
+  useEffect(() => {
+    if (value === prev.current) return;
+    const start = prev.current;
+    const end = value;
+    const duration = 600;
+    const startTime = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      setDisplay(Math.round(start + (end - start) * progress));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    prev.current = value;
+  }, [value]);
+  return <span>{display.toLocaleString("id-ID")}</span>;
+}
+
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function LandingPage() {
   const pricingRef = useRef(null);
   const howRef = useRef(null);
-  const liveCount = useLiveCount();
+  const waitingListRef = useRef(null);
 
-  const handleCTA = () => base44.auth.redirectToLogin();
+  const [featureWaitingList, setFeatureWaitingList] = useState(true);
+  const [fomoCounter, setFomoCounter] = useState(637);
+  const [fomoToast, setFomoToast] = useState(null);
+  const [fomoVisible, setFomoVisible] = useState(false);
+
+  // Load AppConfig
+  useEffect(() => {
+    base44.entities.AppConfig.list().then(configs => {
+      if (configs?.length) setFeatureWaitingList(configs[0].feature_waiting_list ?? true);
+    }).catch(() => {});
+  }, []);
+
+  // FOMO toast logic
+  useEffect(() => {
+    const allNames = shuffle([...MALE_NAMES, ...FEMALE_NAMES]);
+    const allCities = shuffle(CITIES);
+    const allTimes = shuffle(TIME_LABELS);
+    let count = 0;
+    let cityIdx = 0;
+    let timeIdx = 0;
+
+    const showToast = () => {
+      if (count >= 10) return;
+      const name = allNames[count % allNames.length];
+      const city = allCities[cityIdx % allCities.length];
+      const time = allTimes[timeIdx % allTimes.length];
+      cityIdx++; timeIdx++;
+      setFomoToast({ name, city, time });
+      setFomoVisible(true);
+      setFomoCounter(prev => prev + 1);
+      count++;
+      setTimeout(() => setFomoVisible(false), 5000);
+    };
+
+    const firstTimer = setTimeout(() => {
+      showToast();
+      if (count < 10) {
+        const interval = setInterval(() => {
+          if (count >= 10) { clearInterval(interval); return; }
+          showToast();
+        }, 20000 + Math.random() * 10000);
+        return () => clearInterval(interval);
+      }
+    }, 8000);
+
+    return () => clearTimeout(firstTimer);
+  }, []);
+
+  const scrollToWaitingList = useCallback(() => {
+    document.getElementById("waiting-list-section")?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  const incrementCounter = useCallback(() => setFomoCounter(prev => prev + 1), []);
 
   const LEVELS = [
     { icon: "🌱", level: "Lv.1", label: "Newbie Ngatur" },
@@ -139,7 +531,12 @@ export default function LandingPage() {
         .g-text { background: linear-gradient(135deg,#FF6A00 0%,#FFB347 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .glow { box-shadow: 0 0 40px rgba(255,106,0,0.28); }
         .card-d { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+        .iphone-frame { background:#111; border-radius:44px; border:3px solid #333; position:relative; padding:14px; box-shadow:0 30px 80px rgba(0,0,0,0.7),inset 0 0 0 1px #222; }
+        .iphone-notch { width:90px; height:22px; background:#111; border-radius:0 0 14px 14px; margin:0 auto -8px; position:relative; z-index:1; }
       `}</style>
+
+      {/* FOMO Toast */}
+      {fomoToast && <FomoToast data={fomoToast} visible={fomoVisible} />}
 
       {/* ── NAV ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center px-5 sm:px-12 lg:px-20 py-3 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5">
@@ -149,17 +546,24 @@ export default function LandingPage() {
         </div>
         <div className="hidden sm:flex items-center gap-6 ml-10">
           <button onClick={() => howRef.current?.scrollIntoView({ behavior: "smooth" })} className="text-xs text-white/50 hover:text-white transition-colors">Fitur</button>
-          <button onClick={() => pricingRef.current?.scrollIntoView({ behavior: "smooth" })} className="text-xs text-white/50 hover:text-white transition-colors">Harga</button>
+          {!featureWaitingList && (
+            <button onClick={() => pricingRef.current?.scrollIntoView({ behavior: "smooth" })} className="text-xs text-white/50 hover:text-white transition-colors">Harga</button>
+          )}
           <Link to="/About" className="text-xs text-white/50 hover:text-white transition-colors">Tentang</Link>
         </div>
-        <button onClick={handleCTA} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
-          Masuk / Daftar
-        </button>
+        {!featureWaitingList && (
+          <button onClick={() => base44.auth.redirectToLogin()} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
+            Masuk / Daftar
+          </button>
+        )}
+        {featureWaitingList && (
+          <button onClick={scrollToWaitingList} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
+            Amankan Tempatku →
+          </button>
+        )}
       </nav>
 
-      {/* ══════════════════════════════════════════════
-          SECTION 1 — HERO
-      ══════════════════════════════════════════════ */}
+      {/* ── HERO ── */}
       <section className="pt-28 pb-24 px-5 sm:px-12 lg:px-20 relative z-10 text-center sm:text-left">
         <div className="absolute top-10 left-0 w-[600px] h-[500px] rounded-full bg-[#FF6A00]/6 blur-[140px] pointer-events-none" />
         <div className="max-w-3xl mx-auto sm:mx-0">
@@ -188,10 +592,10 @@ export default function LandingPage() {
           <Reveal delay={240}>
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start mb-8">
               <button
-                onClick={handleCTA}
+                onClick={scrollToWaitingList}
                 className="group flex items-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center"
               >
-                Mulai Gratis Sekarang
+                Amankan Tempatku — Gratis →
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
               <button
@@ -204,18 +608,19 @@ export default function LandingPage() {
           </Reveal>
 
           <Reveal delay={300}>
-            <p className="text-white/40 text-sm">
-              Bergabung dengan{" "}
-              <span className="text-[#FF6A00] font-bold tabular-nums">{liveCount.toLocaleString("id-ID")}</span>{" "}
-              orang yang udah mulai atur duitnya dengan cara beda.
-            </p>
+            <div className="text-sm text-white/50 text-center sm:text-left">
+              <span className="text-[#FF6A00] font-black text-lg tabular-nums">
+                <AnimatedCounter value={fomoCounter} />
+              </span>{" "}
+              <span className="text-white/60 font-semibold">orang sudah antre duluan.</span>
+              <br />
+              <span className="text-white/35 text-xs">Kamu mau nomor berapa?</span>
+            </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          SECTION 2 — PAIN POINT
-      ══════════════════════════════════════════════ */}
+      {/* ── PAIN POINT ── */}
       <section className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
         <div className="max-w-3xl mx-auto">
           <Reveal>
@@ -243,9 +648,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          SECTION 3 — FITUR UTAMA
-      ══════════════════════════════════════════════ */}
+      {/* ── FITUR UTAMA ── */}
       <section ref={howRef} className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
         <div className="max-w-4xl mx-auto">
           <Reveal>
@@ -256,29 +659,13 @@ export default function LandingPage() {
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              {
-                icon: "🎮",
-                title: "Keuangan yang terasa kayak game.",
-                desc: "Setiap kebiasaan finansial yang kamu lakuin = XP. Naik level, unlock fitur baru, jaga streak harianmu. Duit diatur sambil ngerasa menang tiap hari.",
-              },
-              {
-                icon: "✨",
-                title: "Kenalan sama Nana — AI bestie finansialmu.",
-                desc: "Bukan chatbot kaku. Nana tau pola pengeluaranmu, kasih insight yang jujur, dan cukup lucu buat bikin kamu gak mager buka app. Dia di pihak kamu — selalu.",
-              },
-              {
-                icon: "🏆",
-                title: "Saingan nabung sama teman.",
-                desc: "Shared wallet, leaderboard, dan challenge bareng. Karena kadang yang bikin kamu konsisten bukan aplikasinya — tapi tahu temenmu lagi ngejar juga.",
-              },
-              {
-                icon: "🔥",
-                title: "Kebiasaan kecil, hasil nyata.",
-                desc: "Daily missions yang ringan, achievable, dan numpuk jadi perubahan besar. Satu habit per hari sudah cukup untuk mulai.",
-              },
+              { icon: "🎮", title: "Keuangan yang terasa kayak game.", desc: "Setiap kebiasaan finansial yang kamu lakuin = XP. Naik level, unlock fitur baru, jaga streak harianmu. Duit diatur sambil ngerasa menang tiap hari." },
+              { icon: "✨", title: "Kenalan sama Nana — AI bestie finansialmu.", desc: "Bukan chatbot kaku. Nana tau pola pengeluaranmu, kasih insight yang jujur, dan cukup lucu buat bikin kamu gak mager buka app. Dia di pihak kamu — selalu." },
+              { icon: "🏆", title: "Saingan nabung sama teman.", desc: "Shared wallet, leaderboard, dan challenge bareng. Karena kadang yang bikin kamu konsisten bukan aplikasinya — tapi tahu temenmu lagi ngejar juga." },
+              { icon: "🔥", title: "Kebiasaan kecil, hasil nyata.", desc: "Daily missions yang ringan, achievable, dan numpuk jadi perubahan besar. Satu habit per hari sudah cukup untuk mulai." },
             ].map((f, i) => (
               <Reveal key={i} delay={i * 70}>
-                <div className="card-d rounded-2xl p-5 hover:border-[#F97316]/30 transition-all group h-full flex flex-col gap-3">
+                <div className="card-d rounded-2xl p-5 hover:border-[#F97316]/30 transition-all h-full flex flex-col gap-3">
                   <span className="text-3xl">{f.icon}</span>
                   <p className="text-white font-bold text-sm leading-snug">{f.title}</p>
                   <p className="text-white/45 text-xs leading-relaxed flex-1">{f.desc}</p>
@@ -289,95 +676,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          SECTION 4 — NANA AI SPOTLIGHT
-      ══════════════════════════════════════════════ */}
-      <section className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
-        <div className="max-w-5xl mx-auto">
-          <div className="card-d rounded-3xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#FF6A00]/5 blur-[100px] pointer-events-none" />
+      {/* ── NANA CHAT DEMO ── */}
+      <NanaChatDemo scrollToWaitingList={scrollToWaitingList} />
 
-            {/* Left */}
-            <Reveal>
-              <div className="relative">
-                <span className="text-[11px] font-black text-[#FF6A00] uppercase tracking-widest mb-3 block">Nana AI</span>
-                <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 leading-tight">Halo, aku Nana. 👋</h2>
-                <p className="text-white/55 text-sm leading-relaxed mb-6">
-                  Aku bukan robot yang bakal ceramahin kamu soal investasi setiap pagi. Aku AI yang beneran tau kondisi keuanganmu — dan bakal jujur soal itu, tapi dengan cara yang gak bikin kamu pengen uninstall.
-                </p>
-                <div className="space-y-2.5 mb-6">
-                  {[
-                    "Analisa pola pengeluaran personal",
-                    "Insight dari data kamu sendiri",
-                    "Mood-based advice",
-                    "Konteks lokal: THR, kondangan, kost, e-wallet",
-                  ].map((b, i) => (
-                    <div key={i} className="flex items-center gap-2.5">
-                      <span className="text-[#FF6A00] text-xs font-black">✦</span>
-                      <p className="text-white/70 text-sm">{b}</p>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[#FF6A00] text-xs italic font-semibold">
-                  "Nana AI — financial bestie yang jujur, tapi tetap asik."
-                </p>
-              </div>
-            </Reveal>
-
-            {/* Right — Chat simulation */}
-            <Reveal delay={150}>
-              <div className="bg-[#0A0A0A] rounded-2xl p-5 border border-white/10 space-y-3">
-                {/* Header */}
-                <div className="flex items-center gap-3 pb-3 border-b border-white/8">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6A00] to-[#FFB347] flex items-center justify-center text-white font-black text-sm">N</div>
-                  <div>
-                    <p className="text-white text-xs font-bold">Nana AI</p>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                      <p className="text-white/40 text-[10px]">Online</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bubble Nana 1 */}
-                <div className="flex gap-2.5">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#FF6A00] to-[#FFB347] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0">N</div>
-                  <div className="bg-white/7 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
-                    <p className="text-white/85 text-xs leading-relaxed">
-                      Oke gue liat data kamu... GrabFood bulan ini <span className="text-[#FF6A00] font-bold">Rp 680rb</span> (16% total). Gabungin sama kopi = hampir sejuta. Kalau dikurangi 30% aja, setahun bisa nabung <span className="text-[#FF6A00] font-bold">Rp 2,4 juta extra</span>. Masih mau order jam 12 malem? 👀
-                    </p>
-                  </div>
-                </div>
-
-                {/* Bubble User */}
-                <div className="flex justify-end">
-                  <div className="bg-[#FF6A00] rounded-2xl rounded-tr-sm px-4 py-3 max-w-[75%]">
-                    <p className="text-white text-xs leading-relaxed">Oke Nana, gue mau berubah 😅</p>
-                  </div>
-                </div>
-
-                {/* Bubble Nana 2 */}
-                <div className="flex gap-2.5">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#FF6A00] to-[#FFB347] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0">N</div>
-                  <div className="bg-white/7 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
-                    <p className="text-white/85 text-xs leading-relaxed">
-                      Sip! Gue udah siapkan challenge 7 hari pertama kamu. Gas? 🔥
-                    </p>
-                  </div>
-                </div>
-
-                <button onClick={handleCTA} className="w-full mt-2 py-2.5 bg-[#FF6A00] rounded-xl text-white text-xs font-bold hover:bg-[#e05e00] transition-colors">
-                  Coba Ngobrol sama Nana →
-                </button>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          SECTION 5 — GAMIFIKASI
-      ══════════════════════════════════════════════ */}
+      {/* ── GAMIFIKASI ── */}
       <section className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
         <div className="max-w-5xl mx-auto bg-white rounded-3xl p-8 sm:p-12 text-center overflow-hidden">
           <Reveal>
@@ -386,162 +688,154 @@ export default function LandingPage() {
               Di Atur Pintar, setiap kebiasaan finansial yang kamu lakuin punya reward nyata.
             </p>
           </Reveal>
-
-          {/* Level progression */}
           <Reveal delay={100}>
             <div className="flex items-center justify-center flex-wrap gap-2 mb-8">
               {LEVELS.map((lv, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <div className="flex flex-col items-center gap-1">
-                    <div
-                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-xl shadow-md"
-                      style={{
-                        background: `linear-gradient(135deg, hsl(${120 - i * 20},80%,${50 - i * 2}%) 0%, #FF6A00 100%)`,
-                        opacity: 0.85 + i * 0.025,
-                      }}
-                    >
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-xl shadow-md"
+                      style={{ background: `linear-gradient(135deg, hsl(${120 - i * 20},80%,${50 - i * 2}%) 0%, #FF6A00 100%)`, opacity: 0.85 + i * 0.025 }}>
                       {lv.icon}
                     </div>
                     <p className="text-[9px] font-bold text-[#0A0A0A]">{lv.level}</p>
                     <p className="text-[8px] text-[#8FA4C8] max-w-[64px] leading-tight">{lv.label}</p>
                   </div>
-                  {i < LEVELS.length - 1 && (
-                    <ChevronRight className="w-4 h-4 text-[#F97316] flex-shrink-0 mb-6" />
-                  )}
+                  {i < LEVELS.length - 1 && <ChevronRight className="w-4 h-4 text-[#F97316] flex-shrink-0 mb-6" />}
                 </div>
               ))}
             </div>
           </Reveal>
-
           <Reveal delay={200}>
             <p className="text-[#8FA4C8] text-sm max-w-lg mx-auto leading-relaxed mb-6">
               XP kamu nambah setiap kali catat pengeluaran, jaga streak, selesaikan challenge, atau dengerin saran Nana.
               <br /><span className="text-[#0A0A0A] font-semibold">Karena konsistensi harusnya ada rewardnya.</span>
             </p>
-            <button onClick={handleCTA} className="inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105">
-              Mulai Naik Level →
+            <button onClick={scrollToWaitingList} className="inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105">
+              Amankan Tempatku →
             </button>
           </Reveal>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          SECTION 6 — PRICING
-      ══════════════════════════════════════════════ */}
-      <section ref={pricingRef} className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
-        <div className="max-w-3xl mx-auto">
+      {/* ── VIDEO SECTION ── */}
+      <section id="video-section" className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+        <div className="max-w-md mx-auto text-center">
           <Reveal>
-            <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 text-center">Mulai gratis. Upgrade kalau udah ketagihan.</h2>
-            <p className="text-center text-white/40 text-sm mb-10">Tanpa kartu kredit. Tanpa syarat tersembunyi.</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Lihat langsung cara kerjanya.</h2>
           </Reveal>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {/* FREE */}
-            <Reveal delay={60}>
-              <div className="card-d rounded-2xl p-7 flex flex-col h-full">
-                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-3">Gratis</span>
-                <p className="text-3xl font-black text-white mb-0.5">Rp 0</p>
-                <p className="text-white/35 text-xs mb-6">per bulan</p>
-                <div className="space-y-2.5 flex-1 mb-7">
-                  {[
-                    "Expense & income tracker",
-                    "Daily missions & XP",
-                    "Nana AI basic (5 chat/hari)",
-                    "Leaderboard teman",
-                    "1 financial goal",
-                  ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <CheckCircle className="w-3.5 h-3.5 text-[#F97316] flex-shrink-0" />
-                      <p className="text-white/60 text-xs">{f}</p>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={handleCTA} className="w-full py-3 rounded-xl border border-[#F97316]/50 text-[#F97316] font-bold text-sm hover:bg-[#F97316]/10 transition-colors">
-                  Mulai Gratis →
-                </button>
+          <Reveal delay={60}>
+            <p className="text-white/40 text-sm mb-10">Web app — buka browser, langsung bisa. Tanpa install apapun.</p>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="iphone-frame mx-auto" style={{ width: 280 }}>
+              <div className="iphone-notch" />
+              <div className="overflow-hidden rounded-[30px] bg-black" style={{ aspectRatio: "9/16" }}>
+                <iframe
+                  src={VIDEO_URL}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Demo Atur Pintar"
+                />
               </div>
+            </div>
+            <p className="text-white/25 text-xs mt-5">iOS & Android segera hadir.</p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <FaqSection />
+
+      {/* ── PRICING (hidden when feature_waiting_list) ── */}
+      {!featureWaitingList && (
+        <section ref={pricingRef} className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+          <div className="max-w-3xl mx-auto">
+            <Reveal>
+              <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 text-center">Mulai gratis. Upgrade kalau udah ketagihan.</h2>
+              <p className="text-center text-white/40 text-sm mb-10">Tanpa kartu kredit. Tanpa syarat tersembunyi.</p>
             </Reveal>
-
-            {/* PLUS */}
-            <Reveal delay={120}>
-              <div className="relative rounded-2xl p-7 flex flex-col h-full bg-[#FF6A00] border-2 border-[#FF6A00]">
-                <div className="absolute -top-3.5 left-6 bg-white text-[#FF6A00] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                  POPULER ⭐
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <Reveal delay={60}>
+                <div className="card-d rounded-2xl p-7 flex flex-col h-full">
+                  <span className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-3">Gratis</span>
+                  <p className="text-3xl font-black text-white mb-0.5">Rp 0</p>
+                  <p className="text-white/35 text-xs mb-6">per bulan</p>
+                  <div className="space-y-2.5 flex-1 mb-7">
+                    {["Expense & income tracker","Daily missions & XP","Nana AI basic (5 chat/hari)","Leaderboard teman","1 financial goal"].map((f, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <CheckCircle className="w-3.5 h-3.5 text-[#F97316] flex-shrink-0" />
+                        <p className="text-white/60 text-xs">{f}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 rounded-xl border border-[#F97316]/50 text-[#F97316] font-bold text-sm hover:bg-[#F97316]/10 transition-colors">
+                    Mulai Gratis →
+                  </button>
                 </div>
-                <span className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-3">Plus</span>
-                <p className="text-3xl font-black text-white mb-0.5">Rp 49.000</p>
-                <p className="text-white/70 text-xs mb-1">per bulan</p>
-                <p className="text-white/60 text-[11px] mb-6">atau Rp 399.000/tahun <span className="text-white font-bold">(hemat ~32%)</span></p>
-                <div className="space-y-2.5 flex-1 mb-7">
-                  {[
-                    "Semua fitur Free",
-                    "Nana AI unlimited chat",
-                    "Advanced spending analytics",
-                    "Shared wallet unlimited",
-                    "Semua level unlocked",
-                    "Badge & skin eksklusif",
-                    "Laporan PDF bulanan",
-                  ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <span className="text-white text-xs">⭐</span>
-                      <p className="text-white/90 text-xs">{f}</p>
-                    </div>
-                  ))}
+              </Reveal>
+              <Reveal delay={120}>
+                <div className="relative rounded-2xl p-7 flex flex-col h-full bg-[#FF6A00] border-2 border-[#FF6A00]">
+                  <div className="absolute -top-3.5 left-6 bg-white text-[#FF6A00] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">POPULER ⭐</div>
+                  <span className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-3">Plus</span>
+                  <p className="text-3xl font-black text-white mb-0.5">Rp 49.000</p>
+                  <p className="text-white/70 text-xs mb-1">per bulan</p>
+                  <p className="text-white/60 text-[11px] mb-6">atau Rp 399.000/tahun <span className="text-white font-bold">(hemat ~32%)</span></p>
+                  <div className="space-y-2.5 flex-1 mb-7">
+                    {["Semua fitur Free","Nana AI unlimited chat","Advanced spending analytics","Shared wallet unlimited","Semua level unlocked","Badge & skin eksklusif","Laporan PDF bulanan"].map((f, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <span className="text-white text-xs">⭐</span>
+                        <p className="text-white/90 text-xs">{f}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 rounded-xl bg-white text-[#FF6A00] font-bold text-sm hover:bg-white/90 transition-colors">
+                    Coba 30 Hari Gratis →
+                  </button>
                 </div>
-                <button onClick={handleCTA} className="w-full py-3 rounded-xl bg-white text-[#FF6A00] font-bold text-sm hover:bg-white/90 transition-colors">
-                  Coba 30 Hari Gratis →
-                </button>
-              </div>
+              </Reveal>
+            </div>
+            <Reveal delay={200}>
+              <p className="text-center text-white/30 text-xs mt-5 italic">Lebih murah dari kopi yang kamu beli tadi pagi. ☕</p>
             </Reveal>
           </div>
+        </section>
+      )}
 
-          <Reveal delay={200}>
-            <p className="text-center text-white/30 text-xs mt-5 italic">
-              Lebih murah dari kopi yang kamu beli tadi pagi. ☕
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      {/* ── WAITING LIST ── */}
+      <WaitingListSection fomoCounter={fomoCounter} incrementCounter={incrementCounter} />
 
-      {/* ══════════════════════════════════════════════
-          SECTION 7 — FINAL CTA
-      ══════════════════════════════════════════════ */}
-      <section className="pb-0 px-5 sm:px-12 lg:px-20 relative z-10">
-        <div className="relative rounded-3xl overflow-hidden py-20 px-8 sm:px-16 text-center" style={{ background: "#1A1A2E" }}>
-          {/* Decorative blobs */}
-          <div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#FF6A00]/10 blur-[80px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[#FF6A00]/8 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
-
-          <Reveal>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black g-text mb-4 leading-tight">
-              Duit bukan musuh.<br />Malas yang musuh.
-            </h2>
-          </Reveal>
-          <Reveal delay={100}>
-            <p className="text-white/60 text-base mb-10 max-w-md mx-auto">
-              Dan Atur Pintar ada buat lawan mager bareng kamu.
-            </p>
-          </Reveal>
-          <Reveal delay={180}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button onClick={handleCTA}
-                className="group flex items-center justify-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95">
-                Download Sekarang — Gratis →
-              </button>
-              <button onClick={() => pricingRef.current?.scrollIntoView({ behavior: "smooth" })}
-                className="flex items-center justify-center gap-2 text-white border border-white/20 hover:border-white/40 font-semibold text-sm px-6 py-4 rounded-2xl transition-all hover:text-white">
-                Lihat cara kerjanya dulu ↓
-              </button>
-            </div>
-          </Reveal>
-          <Reveal delay={250}>
-            <p className="text-white/25 text-xs mt-8">Tersedia sebagai web app. iOS & Android segera hadir.</p>
-          </Reveal>
-        </div>
-      </section>
+      {/* ── FINAL CTA (hidden when feature_waiting_list) ── */}
+      {!featureWaitingList && (
+        <section className="pb-0 px-5 sm:px-12 lg:px-20 relative z-10">
+          <div className="relative rounded-3xl overflow-hidden py-20 px-8 sm:px-16 text-center" style={{ background: "#1A1A2E" }}>
+            <div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#FF6A00]/10 blur-[80px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[#FF6A00]/8 blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
+            <Reveal>
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black g-text mb-4 leading-tight">Duit bukan musuh.<br />Malas yang musuh.</h2>
+            </Reveal>
+            <Reveal delay={100}>
+              <p className="text-white/60 text-base mb-10 max-w-md mx-auto">Dan Atur Pintar ada buat lawan mager bareng kamu.</p>
+            </Reveal>
+            <Reveal delay={180}>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onClick={() => base44.auth.redirectToLogin()} className="group flex items-center justify-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95">
+                  Download Sekarang — Gratis →
+                </button>
+                <button onClick={() => pricingRef.current?.scrollIntoView({ behavior: "smooth" })} className="flex items-center justify-center gap-2 text-white border border-white/20 hover:border-white/40 font-semibold text-sm px-6 py-4 rounded-2xl transition-all">
+                  Lihat cara kerjanya dulu ↓
+                </button>
+              </div>
+            </Reveal>
+            <Reveal delay={250}>
+              <p className="text-white/25 text-xs mt-8">Tersedia sebagai web app. iOS & Android segera hadir.</p>
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-white/5 pt-10 pb-8 px-5 sm:px-12 lg:px-20 relative z-10 mt-0">
+      <footer className="border-t border-white/5 pt-10 pb-8 px-5 sm:px-12 lg:px-20 relative z-10 mt-16">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
             <div>
@@ -556,7 +850,7 @@ export default function LandingPage() {
               <div className="space-y-2">
                 <div><Link to="/PrivacyPolicy" className="text-white/30 hover:text-white/70 text-xs transition-colors">Privacy Policy</Link></div>
                 <div><Link to="/TermsOfService" className="text-white/30 hover:text-white/70 text-xs transition-colors">Terms of Service</Link></div>
-                <div><button onClick={handleCTA} className="text-white/30 hover:text-white/70 text-xs transition-colors">Hubungi Kami</button></div>
+                <div><button onClick={() => base44.auth.redirectToLogin()} className="text-white/30 hover:text-white/70 text-xs transition-colors">Hubungi Kami</button></div>
               </div>
             </div>
             <div>
@@ -567,12 +861,10 @@ export default function LandingPage() {
               </a>
               <p className="text-white/20 text-[11px]">aturpintar.app</p>
               <div className="flex items-center gap-3 mt-3">
-                <a href="https://instagram.com/aturpintar" target="_blank" rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
+                <a href="https://instagram.com/aturpintar" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
                   <Instagram className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://x.com/aturpintar" target="_blank" rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
+                <a href="https://x.com/aturpintar" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
                   <Twitter className="w-3.5 h-3.5" />
                 </a>
               </div>
