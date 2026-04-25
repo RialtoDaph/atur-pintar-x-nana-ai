@@ -225,8 +225,8 @@ function NanaChatDemo({ scrollToWaitingList }) {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Tulis pertanyaanmu..."
-                  disabled={typing || done}
-                  className="flex-1 bg-white/6 border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs placeholder-white/30 outline-none focus:border-[#FF6A00]/50 disabled:opacity-40" />
+                  disabled={typing || done} className="bg-[hsl(var(--card-foreground))] text-white px-4 py-2.5 text-xs rounded-xl flex-1 border border-white/10 placeholder-white/30 outline-none focus:border-[#FF6A00]/50 disabled:opacity-40" />
+                
                 
                   <button
                   onClick={handleSend}
