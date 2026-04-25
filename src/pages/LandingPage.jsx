@@ -597,7 +597,7 @@ export default function LandingPage() {
                 onClick={scrollToWaitingList}
                 className="group flex items-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center">
                 
-                Amankan Tempatku — Gratis →
+                Amankan Tempatku — Gratis
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
               <button
