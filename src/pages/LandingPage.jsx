@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle, Mail, Instagram, Twitter, Sparkles, ChevronRig
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const NANA_AVATAR_URL = "https://api.dicebear.com/7.x/adventurer/svg?seed=Nana&backgroundColor=f97316";
-const VIDEO_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
+const VIDEO_URL = "https://youtu.be/ujynkJ193P0";
 
 // ─── Matrix background ────────────────────────────────────────────────────────
 function MatrixBackground() {
