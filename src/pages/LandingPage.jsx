@@ -341,7 +341,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await base44.entities.WaitingList.create({
+      await base44.unauthenticated.entities.WaitingList.create({
         name: form.name,
         email: form.email,
         whatsapp: form.whatsapp || undefined,
