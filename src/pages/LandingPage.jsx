@@ -379,23 +379,23 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
           <form onSubmit={handleSubmit} className="card-d rounded-2xl p-6 space-y-4">
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Nama lengkap *</label>
-              <input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nama kamu" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nama kamu" className="bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border border-white/10 placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Email aktif *</label>
-              <input required type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="email@kamu.com" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="email@kamu.com" className="bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border border-white/10 placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Nomor WhatsApp (opsional)</label>
-              <input value={form.whatsapp} onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))} placeholder="08xxxxxxxxxx" className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input value={form.whatsapp} onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))} placeholder="08xxxxxxxxxx" className="bg-[hsl(var(--card-foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border border-white/10 placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Pekerjaan *</label>
-              <input required value={form.job} onChange={(e) => setForm((f) => ({ ...f, job: e.target.value }))} placeholder="Karyawan, pelajar, freelancer..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required value={form.job} onChange={(e) => setForm((f) => ({ ...f, job: e.target.value }))} placeholder="Karyawan, pelajar, freelancer..." className="bg-[hsl(var(--card-foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border border-white/10 placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Kota domisili *</label>
-              <input required value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="Jakarta, Bandung, dll..." className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
+              <input required value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="Jakarta, Bandung, dll..." className="bg-[hsl(var(--card-foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border border-white/10 placeholder-white/25 outline-none focus:border-[#FF6A00]/50" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Tantangan terbesar mengatur uang saat ini (opsional)</label>
