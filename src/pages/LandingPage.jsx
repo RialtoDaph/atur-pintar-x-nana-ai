@@ -77,22 +77,22 @@ function shuffle(arr) {return [...arr].sort(() => Math.random() - 0.5);}
 function FomoToast({ data, visible }) {
   return (
     <div style={{
-      position: "fixed", bottom: 24, left: 16, zIndex: 9999, maxWidth: 280,
-      background: "#1c1c1e", borderRadius: 14, padding: "12px 16px",
-      boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+      position: "fixed", top: 68, left: 12, zIndex: 9999, maxWidth: 210,
+      background: "#1c1c1e", borderRadius: 10, padding: "7px 11px",
+      boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(20px)",
-      transition: "opacity 0.4s ease, transform 0.4s ease",
+      transform: visible ? "translateY(0)" : "translateY(-8px)",
+      transition: "opacity 0.35s ease, transform 0.35s ease",
       pointerEvents: "none"
     }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", marginTop: 4, flexShrink: 0 }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
         <div>
-          <p style={{ margin: 0, fontSize: 12, color: "#fff", lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 10, color: "#fff", lineHeight: 1.4 }}>
             <span style={{ color: "#f97316", fontWeight: 700 }}>{data.name}</span>
-            {" "}dari {data.city} baru saja bergabung 🎉
+            {" "}dari {data.city} bergabung 🎉
           </p>
-          <p style={{ margin: "2px 0 0", fontSize: 10, color: "#666" }}>{data.time}</p>
+          <p style={{ margin: "1px 0 0", fontSize: 9, color: "#555" }}>{data.time}</p>
         </div>
       </div>
     </div>);
@@ -399,7 +399,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Tantangan terbesar mengatur uang saat ini (opsional)</label>
-              <textarea value={form.biggest_money_problem} onChange={(e) => setForm((f) => ({ ...f, biggest_money_problem: e.target.value }))} placeholder="Ceritakan kondisimu..." rows={3} className="w-full bg-white/6 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50 resize-none" />
+              <textarea value={form.biggest_money_problem} onChange={(e) => setForm((f) => ({ ...f, biggest_money_problem: e.target.value }))} placeholder="Ceritakan kondisimu..." rows={3} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 outline-none focus:border-[#FF6A00]/50 resize-none" />
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Cara catat keuangan sekarang *</label>
@@ -458,6 +458,8 @@ export default function LandingPage() {
   const pricingRef = useRef(null);
   const howRef = useRef(null);
   const waitingListRef = useRef(null);
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const [featureWaitingList, setFeatureWaitingList] = useState(true);
   const [fomoCounter, setFomoCounter] = useState(637);
@@ -680,39 +682,39 @@ export default function LandingPage() {
       <NanaChatDemo scrollToWaitingList={scrollToWaitingList} />
 
       {/* ── GAMIFIKASI ── */}
-      <section className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
-        <div className="max-w-5xl mx-auto bg-white rounded-3xl p-8 sm:p-12 text-center overflow-hidden">
+      <section className="pb-16 px-5 sm:px-12 lg:px-20 relative z-10">
+        <div className="max-w-4xl mx-auto card-d rounded-3xl p-6 sm:p-8 overflow-hidden">
           <Reveal>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#0A0A0A] mb-2">Level up bukan cuma di game.</h2>
-            <p className="text-[#8FA4C8] text-sm mb-10 max-w-md mx-auto leading-relaxed">
-              Di Atur Pintar, setiap kebiasaan finansial yang kamu lakuin punya reward nyata.
-            </p>
+            <div className="mb-5">
+              <span className="text-[10px] font-black text-[#FF6A00] uppercase tracking-widest">Gamifikasi</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-white mt-1 mb-1">Level up bukan cuma di game.</h2>
+              <p className="text-white/40 text-xs leading-relaxed">Setiap kebiasaan finansial yang kamu lakuin punya reward nyata.</p>
+            </div>
           </Reveal>
-          <Reveal delay={100}>
-            <div className="flex items-center justify-center flex-wrap gap-2 mb-8">
+          <Reveal delay={80}>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-5">
               {LEVELS.map((lv, i) =>
-              <div key={i} className="flex items-center gap-2">
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-xl shadow-md"
-                  style={{ background: `linear-gradient(135deg, hsl(${120 - i * 20},80%,${50 - i * 2}%) 0%, #FF6A00 100%)`, opacity: 0.85 + i * 0.025 }}>
-                      {lv.icon}
-                    </div>
-                    <p className="text-[9px] font-bold text-[#0A0A0A]">{lv.level}</p>
-                    <p className="text-[8px] text-[#8FA4C8] max-w-[64px] leading-tight">{lv.label}</p>
+              <div key={i} className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl" style={{ background: "rgba(255,106,0,0.07)", border: "1px solid rgba(255,106,0,0.15)" }}>
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-base"
+                style={{ background: `linear-gradient(135deg, rgba(255,106,0,${0.2 + i * 0.13}) 0%, rgba(255,179,71,${0.25 + i * 0.1}) 100%)`, border: "1px solid rgba(255,106,0,0.25)" }}>
+                    {lv.icon}
                   </div>
-                  {i < LEVELS.length - 1 && <ChevronRight className="w-4 h-4 text-[#F97316] flex-shrink-0 mb-6" />}
+                  <p className="text-[9px] font-black text-[#FF6A00]">{lv.level}</p>
+                  <p className="text-[8px] text-white/35 text-center leading-tight">{lv.label}</p>
                 </div>
               )}
             </div>
           </Reveal>
-          <Reveal delay={200}>
-            <p className="text-[#8FA4C8] text-sm max-w-lg mx-auto leading-relaxed mb-6">
-              XP kamu nambah setiap kali catat pengeluaran, jaga streak, selesaikan challenge, atau dengerin saran Nana.
-              <br /><span className="text-[#0A0A0A] font-semibold">Karena konsistensi harusnya ada rewardnya.</span>
-            </p>
-            <button onClick={scrollToWaitingList} className="inline-flex items-center gap-2 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105">
-              Amankan Tempatku →
-            </button>
+          <Reveal delay={140}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-white/8">
+              <p className="text-white/45 text-xs leading-relaxed">
+                XP nambah tiap catat, jaga streak & dengerin Nana.<br />
+                <span className="text-white/65 font-semibold">Karena konsistensi harusnya ada rewardnya.</span>
+              </p>
+              <button onClick={scrollToWaitingList} className="flex-shrink-0 flex items-center gap-1.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all whitespace-nowrap">
+                Amankan Tempatku →
+              </button>
+            </div>
           </Reveal>
         </div>
       </section>
