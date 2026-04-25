@@ -681,7 +681,7 @@ export default function LandingPage() {
 
       {/* ── GAMIFIKASI ── */}
       <section className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
-        <div className="max-w-5xl mx-auto bg-white rounded-3xl p-8 sm:p-12 text-center overflow-hidden">
+        <div className="bg-[hsl(var(--secondary-foreground))] mx-auto p-8 text-center rounded-3xl max-w-5xl sm:p-12 overflow-hidden">
           <Reveal>
             <h2 className="text-3xl sm:text-4xl font-black text-[#0A0A0A] mb-2">Level up bukan cuma di game.</h2>
             <p className="text-[#8FA4C8] text-sm mb-10 max-w-md mx-auto leading-relaxed">
