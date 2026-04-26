@@ -107,7 +107,7 @@ function ScrollProgress() {
       const el = document.documentElement;
       const scrolled = el.scrollTop || document.body.scrollTop;
       const total = el.scrollHeight - el.clientHeight;
-      setPct(total > 0 ? (scrolled / total) * 100 : 0);
+      setPct(total > 0 ? scrolled / total * 100 : 0);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -115,8 +115,8 @@ function ScrollProgress() {
   return (
     <div style={{ position: "fixed", right: 4, top: "50%", transform: "translateY(-50%)", zIndex: 9998, height: 160, width: 3, borderRadius: 4, background: "rgba(255,106,0,0.12)", pointerEvents: "none" }}>
       <div style={{ width: "100%", height: `${pct}%`, background: "#FF6A00", borderRadius: 4, transition: "height 0.1s" }} />
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── NANA Chat Demo ───────────────────────────────────────────────────────────
@@ -141,11 +141,11 @@ function getNanaReply(input) {
 }
 
 const QUICK_QUESTIONS = [
-  { emoji: "💰", label: "Cara nabung yang bener", text: "Cara nabung yang bener itu gimana?" },
-  { emoji: "📉", label: "Kok selalu boros?", text: "Kok aku selalu boros ya?" },
-  { emoji: "📈", label: "Mulai investasi", text: "Gimana cara mulai investasi?" },
-  { emoji: "💸", label: "Atur hutang", text: "Gimana cara atur hutang yang banyak?" },
-];
+{ emoji: "💰", label: "Cara nabung yang bener", text: "Cara nabung yang bener itu gimana?" },
+{ emoji: "📉", label: "Kok selalu boros?", text: "Kok aku selalu boros ya?" },
+{ emoji: "📈", label: "Mulai investasi", text: "Gimana cara mulai investasi?" },
+{ emoji: "💸", label: "Atur hutang", text: "Gimana cara atur hutang yang banyak?" }];
+
 
 function NanaChatDemo({ scrollToWaitingList }) {
   const [messages, setMessages] = useState([
@@ -212,19 +212,19 @@ function NanaChatDemo({ scrollToWaitingList }) {
             </div>
 
             {/* Quick questions */}
-            {showQuick && !done && (
-              <div className="px-4 pt-3 pb-1">
+            {showQuick && !done &&
+            <div className="px-4 pt-3 pb-1">
                 <p className="text-white/30 text-[10px] mb-2">Mau tanya soal apa?</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {QUICK_QUESTIONS.map((q, i) => (
-                    <button key={i} onClick={() => sendMessage(q.text)} disabled={typing}
-                      className="flex items-center gap-1 text-[10px] text-white/70 border border-white/10 hover:border-[#FF6A00]/50 hover:text-white bg-white/4 hover:bg-[#FF6A00]/10 rounded-full px-2.5 py-1 transition-all disabled:opacity-40">
+                  {QUICK_QUESTIONS.map((q, i) =>
+                <button key={i} onClick={() => sendMessage(q.text)} disabled={typing}
+                className="flex items-center gap-1 text-[10px] text-white/70 border border-white/10 hover:border-[#FF6A00]/50 hover:text-white bg-white/4 hover:bg-[#FF6A00]/10 rounded-full px-2.5 py-1 transition-all disabled:opacity-40">
                       <span>{q.emoji}</span> {q.label}
                     </button>
-                  ))}
+                )}
                 </div>
               </div>
-            )}
+            }
 
             {/* Messages */}
             <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
@@ -264,10 +264,10 @@ function NanaChatDemo({ scrollToWaitingList }) {
                 </button> :
               <div className="flex gap-2">
                   <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                  placeholder="Atau ketik sendiri..." disabled={typing || done}
-                  className="bg-white/5 text-white px-3 py-2.5 text-xs rounded-xl flex-1 border border-white/8 placeholder-white/25 outline-none focus:border-[#FF6A00]/40 disabled:opacity-40" />
+                placeholder="Atau ketik sendiri..." disabled={typing || done}
+                className="bg-white/5 text-white px-3 py-2.5 text-xs rounded-xl flex-1 border border-white/8 placeholder-white/25 outline-none focus:border-[#FF6A00]/40 disabled:opacity-40" />
                   <button onClick={handleSend} disabled={typing || !input.trim() || done}
-                  className="w-9 h-9 rounded-xl bg-[#FF6A00] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40">
+                className="w-9 h-9 rounded-xl bg-[#FF6A00] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40">
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -350,7 +350,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
         biggest_money_problem: form.biggest_money_problem || undefined,
         current_finance_tracking_method: form.current_finance_tracking_method,
         early_access_interest: form.early_access_interest
-      });
+      }, { as_admin: true });
       const qNum = fomoCounter + 1;
       setQueueNumber(qNum);
       incrementCounter();
@@ -494,7 +494,7 @@ export default function LandingPage() {
   const howRef = useRef(null);
   const waitingListRef = useRef(null);
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => {window.scrollTo(0, 0);}, []);
 
   const [featureWaitingList, setFeatureWaitingList] = useState(true);
   const [fomoCounter, setFomoCounter] = useState(637);
@@ -767,12 +767,12 @@ export default function LandingPage() {
             <p className="text-white/40 text-sm mb-10">Web app — buka browser, langsung bisa. Tanpa install apapun.</p>
           </Reveal>
           <Reveal delay={120}>
-            <div className="iphone-frame mx-auto" style={{ width: 280 }}>
+            <div className="mx-auto px-2 iphone-frame" style={{ width: 280 }}>
               <div className="iphone-notch" />
               <div className="overflow-hidden rounded-[30px] bg-black" style={{ aspectRatio: "9/16" }}>
                 <iframe
-                  src={VIDEO_URL}
-                  className="w-full h-full"
+                  src={VIDEO_URL} className="px-4 w-full h-full"
+
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title="Demo Atur Pintar" />
@@ -852,12 +852,12 @@ export default function LandingPage() {
             <p className="text-[#FF6A00] text-[10px] font-black uppercase tracking-widest mb-1">⏳ Early Access</p>
             <p className="text-white/60 text-xs mb-3 leading-relaxed">Pendaftaran waiting list akan segera ditutup setelah kuota awal terpenuhi.</p>
             <div className="flex flex-col gap-1.5 text-left max-w-xs mx-auto">
-              {["Early access sebelum publik", 'Badge "Founding Member" permanen di profilmu', "30 hari Premium gratis"].map((b, i) => (
-                <div key={i} className="flex items-center gap-2">
+              {["Early access sebelum publik", 'Badge "Founding Member" permanen di profilmu', "30 hari Premium gratis"].map((b, i) =>
+              <div key={i} className="flex items-center gap-2">
                   <span className="text-green-400 text-xs flex-shrink-0">✅</span>
                   <span className="text-white/55 text-xs">{b}</span>
                 </div>
-              ))}
+              )}
             </div>
             <p className="text-white/25 text-[10px] mt-3">Gratis · Tanpa kartu kredit · Tanpa syarat tersembunyi</p>
           </div>
