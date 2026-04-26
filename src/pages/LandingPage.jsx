@@ -341,21 +341,16 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("https://api.base44.com/api/apps/69a82e8090f60786b869983c/entities/WaitingList/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          whatsapp: form.whatsapp || undefined,
-          job: form.job,
-          city: form.city,
-          biggest_money_problem: form.biggest_money_problem || undefined,
-          current_finance_tracking_method: form.current_finance_tracking_method,
-          early_access_interest: form.early_access_interest
-        })
+      await base44.entities.WaitingList.create({
+        name: form.name,
+        email: form.email,
+        whatsapp: form.whatsapp || undefined,
+        job: form.job,
+        city: form.city,
+        biggest_money_problem: form.biggest_money_problem || undefined,
+        current_finance_tracking_method: form.current_finance_tracking_method,
+        early_access_interest: form.early_access_interest
       });
-      if (!res.ok) throw new Error("Failed");
       const qNum = fomoCounter + 1;
       setQueueNumber(qNum);
       incrementCounter();
