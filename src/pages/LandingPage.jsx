@@ -350,7 +350,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
         biggest_money_problem: form.biggest_money_problem || undefined,
         current_finance_tracking_method: form.current_finance_tracking_method,
         early_access_interest: form.early_access_interest
-      }, { as_admin: true });
+      });
       const qNum = fomoCounter + 1;
       setQueueNumber(qNum);
       incrementCounter();
