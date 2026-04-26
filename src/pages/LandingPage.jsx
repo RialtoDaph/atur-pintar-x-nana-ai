@@ -767,7 +767,7 @@ export default function LandingPage() {
             <p className="text-white/40 text-sm mb-10">Web app — buka browser, langsung bisa. Tanpa install apapun.</p>
           </Reveal>
           <Reveal delay={120}>
-            <div className="mx-auto pr-1 iphone-frame" style={{ width: 280 }}>
+            <div className="mx-auto my-1 iphone-frame" style={{ width: 280 }}>
               <div className="iphone-notch" />
               <div className="overflow-hidden rounded-[30px] bg-black" style={{ aspectRatio: "9/16" }}>
                 <iframe
