@@ -1,247 +1,307 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, TrendingUp, TrendingDown, Pencil, Wallet } from "lucide-react";
+import PremiumGate from "@/components/subscription/PremiumGate";
+import PremiumBlurCard from "@/components/subscription/PremiumBlurCard";
+import { Plus, Trash2, TrendingUp, RefreshCw, TrendingDown } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import AddInvestmentModal from "@/components/investments/AddInvestmentModal.jsx";
+import DiversificationChart from "@/components/investments/DiversificationChart";
+import PortfolioTrendChart from "@/components/investments/PortfolioTrendChart";
+import RiskProfileRecommendation from "@/components/investments/RiskProfileRecommendation";
+import EducationResources from "@/components/investments/EducationResources";
 import { useAppSettings } from "@/components/utils/useAppSettings";
-
-const INVESTMENT_TYPES_EMOJI = {
-  reksa_dana: { emoji: "📈", label: "Reksa Dana" },
-  saham: { emoji: "📊", label: "Saham" },
-  crypto: { emoji: "🪙", label: "Kripto" },
-  emas: { emoji: "🥇", label: "Emas" },
-  deposito: { emoji: "🏦", label: "Deposito" },
-  obligasi: { emoji: "📄", label: "Obligasi" },
-  lainnya: { emoji: "💼", label: "Lainnya" },
-};
+import { INVESTMENT_TYPES_MAP } from "@/components/investments/investmentConstants";
+import { Pencil } from "lucide-react";
+import InvestmentNanaPanel from "@/components/investments/InvestmentNanaPanel";
 
 export default function InvestmentsPage() {
-  const { formatCurrency } = useAppSettings();
+  const { formatCurrency, t, settings } = useAppSettings();
   const [investments, setInvestments] = useState([]);
-  const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editingInv, setEditingInv] = useState(null);
   const [user, setUser] = useState(null);
-  const [groupBy, setGroupBy] = useState("none"); // "none" | "wallet"
+  const [showWatchlist, setShowWatchlist] = useState(false);
+  const [watchlist, setWatchlist] = useState([]);
+  const [refreshingPrices, setRefreshingPrices] = useState(false);
 
   useEffect(() => {
     base44.auth.me().then(u => {
       setUser(u);
-      loadData(u);
-    }).catch(() => setLoading(false));
+    }).catch(() => {});
   }, []);
 
-  async function loadData(u) {
-    setLoading(true);
-    const [inv, accs] = await Promise.all([
-      base44.entities.Investment.filter({ created_by: u.email }, "-created_date"),
-      base44.entities.Account.filter({ created_by: u.email, type: "investment" }).catch(() => []),
-    ]);
-    setInvestments(inv || []);
-    setAccounts(accs || []);
-    setLoading(false);
-  }
+  useEffect(() => { if (user) loadData(); }, [user]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    const unsub = base44.entities.Investment.subscribe(() => loadData());
+    return unsub;
+  }, [user?.email]);
+
+  async function loadData() {
+     setLoading(true);
+     try {
+       const [inv, watch] = await Promise.all([
+         base44.entities.Investment.filter({ created_by: user.email }, "-created_date"),
+         base44.entities.InvestmentWatchlist.filter({ created_by: user.email }, "-created_date").catch(() => []),
+       ]);
+       setInvestments(inv);
+       setWatchlist(watch);
+     } catch (error) {
+       console.error("Failed to load investments:", error);
+     } finally {
+       setLoading(false);
+     }
+   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Hapus investasi ini?")) return;
-    setInvestments(prev => prev.filter(inv => inv.id !== id));
-    await base44.entities.Investment.delete(id);
-  }
+     if (!window.confirm(t('investments_delete_confirm') || "Hapus investasi ini?")) return;
+     try {
+       setInvestments(prev => prev.filter(inv => inv.id !== id));
+       await base44.entities.Investment.delete(id);
+     } catch (error) {
+       console.error("Delete investment failed:", error);
+       loadData();
+     }
+   }
 
   function handleEdit(inv) {
     setEditingInv(inv);
     setShowAdd(true);
   }
 
-  async function handleSave(data) {
-    if (editingInv) {
-      await base44.entities.Investment.update(editingInv.id, data);
-    } else {
-      await base44.entities.Investment.create(data);
+  async function handleRefreshPrices() {
+    setRefreshingPrices(true);
+    try {
+      await base44.functions.invoke("updateInvestmentPrices", {});
+      await loadData();
+    } catch (error) {
+      console.error("Price refresh failed:", error);
+    } finally {
+      setRefreshingPrices(false);
     }
-    setShowAdd(false);
-    setEditingInv(null);
-    loadData(user);
   }
 
-  const totalInvested = investments.reduce((s, i) => s + (i.initial_amount || 0), 0);
-  const totalValue = investments.reduce((s, i) => s + (i.current_value || 0), 0);
-  const totalGain = totalValue - totalInvested;
-  const gainPercent = totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(2) : 0;
-  const isPositiveTotal = totalGain >= 0;
+  async function handleSave(data) {
+     try {
+       if (editingInv) {
+         await base44.entities.Investment.update(editingInv.id, data);
+       } else {
+         await base44.entities.Investment.create(data);
+       }
+       setShowAdd(false);
+       setEditingInv(null);
+       loadData();
+     } catch (error) {
+       console.error("Save investment failed:", error);
+       throw error;
+     }
+   }
 
-  // Group by wallet
-  const grouped = groupBy === "wallet"
-    ? accounts.reduce((acc, wallet) => {
-        acc[wallet.id] = { wallet, items: investments.filter(i => i.account_id === wallet.id) };
-        return acc;
-      }, { __none: { wallet: null, items: investments.filter(i => !i.account_id) } })
-    : null;
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
 
-  function InvestmentCard({ inv }) {
-    const type = INVESTMENT_TYPES_EMOJI[inv.type] || INVESTMENT_TYPES_EMOJI.lainnya;
-    const gain = (inv.current_value || 0) - (inv.initial_amount || 0);
-    const gainPct = inv.initial_amount > 0 ? ((gain / inv.initial_amount) * 100).toFixed(2) : 0;
-    const isPos = gain >= 0;
-    const walletName = accounts.find(a => a.id === inv.account_id)?.name;
-
+  if (!loading && !isPremium) {
     return (
-      <div className="bg-white rounded-2xl p-5 shadow-sm">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#FF6A00]/10 flex items-center justify-center text-xl">
-              {inv.icon || type.emoji}
-            </div>
-            <div>
-              <p className="font-semibold text-[#1A1A1A]">{inv.name}</p>
-              <p className="text-xs text-[#8FA4C8]">
-                {type.label}
-                {walletName && <span className="ml-1">· {walletName}</span>}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => handleEdit(inv)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors">
-              <Pencil className="w-4 h-4" />
-            </button>
-            <button onClick={() => handleDelete(inv.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors">
-              <Trash2 className="w-4 h-4" />
-            </button>
+      <div className="min-h-screen bg-[#F2F4F7] pb-8">
+        <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+          <div className="max-w-2xl mx-auto">
+            <p className="text-[#8FA4C8] text-sm font-medium">Portofolio</p>
+            <h1 className="text-white text-2xl font-bold mt-0.5">Investasi</h1>
           </div>
         </div>
-
-        <div className="mt-4 flex justify-between items-end">
-          <div>
-            <p className="text-xs text-[#8FA4C8]">Nilai Saat Ini</p>
-            <p className="font-bold text-[#1A1A1A] text-lg">{formatCurrency(inv.current_value)}</p>
-            <p className="text-xs text-[#8FA4C8]">Modal: {formatCurrency(inv.initial_amount)}</p>
-          </div>
-          <div className="text-right">
-            <div className={`flex items-center gap-1 justify-end px-3 py-1.5 rounded-xl ${isPos ? "bg-[#00C9A7]/10" : "bg-[#FF6B6B]/10"}`}>
-              {isPos ? <TrendingUp className="w-3.5 h-3.5 text-[#00C9A7]" /> : <TrendingDown className="w-3.5 h-3.5 text-[#FF6B6B]" />}
-              <p className={`font-bold text-sm ${isPos ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                {isPos ? "+" : ""}{gainPct}%
-              </p>
+        <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
+          <PremiumBlurCard>
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <p className="font-bold text-[#1A1A1A] mb-2">Portofolio Investasi</p>
+              <div className="space-y-3">
+                {["Reksa Dana - Pertumbuhan", "Saham BBCA", "Emas Digital"].map((n, i) => (
+                  <div key={i} className="flex items-center justify-between border-b border-[#F2F4F7] pb-2">
+                    <span className="text-sm text-[#1A1A1A]">{n}</span>
+                    <span className="text-sm font-bold text-[#00C9A7]">+{(i+1)*3}.{i+1}%</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p className={`text-xs font-semibold mt-1 ${isPos ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-              {isPos ? "+" : ""}{formatCurrency(gain)}
-            </p>
-          </div>
+          </PremiumBlurCard>
+          <PremiumBlurCard>
+            <div className="bg-white rounded-2xl p-6 shadow-sm h-40" />
+          </PremiumBlurCard>
         </div>
-
-        {inv.purchase_date && (
-          <p className="text-xs text-[#CBD5E0] mt-2">Beli: {inv.purchase_date}</p>
-        )}
-        {inv.notes && <p className="text-xs text-[#8FA4C8] mt-1 italic">{inv.notes}</p>}
       </div>
     );
   }
 
+  const totalInvested = investments.reduce((s, i) => s + i.initial_amount, 0);
+  const totalValue = investments.reduce((s, i) => s + i.current_value, 0);
+  const totalGain = totalValue - totalInvested;
+  const gainPercent = totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(2) : 0;
+
   return (
-    <div className="min-h-screen bg-[#F2F4F7] pb-10">
-      {/* Header */}
+    <div className="min-h-screen bg-[#F2F4F7] pb-8">
       <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-[#8FA4C8] text-sm font-medium">Portofolio</p>
-              <h1 className="text-white text-2xl font-bold mt-0.5">Investasi</h1>
+              <p className="text-[#8FA4C8] text-sm font-medium">{t('investments_portfolio')}</p>
+              <h1 className="text-white text-2xl font-bold mt-0.5">{t('investments_title')}</h1>
             </div>
-            <button
-              onClick={() => { setEditingInv(null); setShowAdd(true); }}
-              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
-            >
-              <Plus className="w-5 h-5 text-white" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleRefreshPrices}
+                disabled={refreshingPrices}
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-50"
+                title="Refresh live prices"
+              >
+                <RefreshCw className={`w-4 h-4 text-white ${refreshingPrices ? "animate-spin" : ""}`} />
+              </button>
+              <button
+                onClick={() => setShowAdd(true)}
+                className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+              >
+                <Plus className="w-5 h-5 text-white" />
+              </button>
+            </div>
           </div>
 
-          {/* Summary Card */}
+          {/* Portfolio trend chart embedded in dark header */}
           {investments.length > 0 && (
-            <div className="bg-white/10 rounded-2xl p-4">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-[#8FA4C8] text-xs mb-1">Modal</p>
-                  <p className="text-white font-bold text-sm">{formatCurrency(totalInvested)}</p>
-                </div>
-                <div>
-                  <p className="text-[#8FA4C8] text-xs mb-1">Nilai Sekarang</p>
-                  <p className="text-white font-bold text-sm">{formatCurrency(totalValue)}</p>
-                </div>
-                <div>
-                  <p className="text-[#8FA4C8] text-xs mb-1">Untung/Rugi</p>
-                  <p className={`font-bold text-sm ${isPositiveTotal ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
-                    {isPositiveTotal ? "+" : ""}{gainPercent}%
-                  </p>
-                </div>
-              </div>
-            </div>
+            <PortfolioTrendChart
+              investments={investments}
+              totalValue={totalValue}
+              totalInvested={totalInvested}
+              darkMode={true}
+              refreshKey={refreshingPrices}
+            />
           )}
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-5 mt-4 space-y-4">
-        {/* Group toggle — only show if there are investment accounts */}
-        {accounts.length > 0 && investments.length > 0 && (
-          <div className="flex gap-2">
-            <button
-              onClick={() => setGroupBy("none")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${groupBy === "none" ? "bg-[#FF6A00] text-white" : "bg-white text-[#8FA4C8]"}`}
-            >
-              Semua
-            </button>
-            <button
-              onClick={() => setGroupBy("wallet")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${groupBy === "wallet" ? "bg-[#FF6A00] text-white" : "bg-white text-[#8FA4C8]"}`}
-            >
-              <Wallet className="w-3 h-3" /> Per Dompet
-            </button>
+        {/* Diversification and assets below */}
+
+        {/* Diversification pie */}
+        <DiversificationChart investments={investments} totalValue={totalValue} formatCurrency={formatCurrency} />
+
+        {loading ? (
+          [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
+        ) : investments.length === 0 ? (
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
+            <TrendingUp className="w-10 h-10 text-[#8FA4C8] mx-auto mb-3" />
+            <p className="text-[#4A5568] font-semibold">{t('investments_empty_title')}</p>
+            <p className="text-[#8FA4C8] text-sm mt-1">{t('investments_empty_desc')}</p>
+          </div>
+        ) : (
+          investments.map(inv => {
+            const type = INVESTMENT_TYPES_MAP[inv.type] || INVESTMENT_TYPES_MAP.lainnya;
+            const typeLabel = settings.language === 'en' ? type.label_en : type.label_id;
+            const gain = inv.current_value - inv.initial_amount;
+            const gainPct = inv.initial_amount > 0 ? ((gain / inv.initial_amount) * 100).toFixed(2) : 0;
+            const isPositive = gain >= 0;
+            const portfolioWeight = totalValue > 0 ? ((inv.current_value / totalValue) * 100).toFixed(1) : 0;
+            const hasDailyChange = inv.daily_change_pct !== undefined && inv.daily_change_pct !== null && ["saham","crypto"].includes(inv.type);
+            const dailyIsPositive = (inv.daily_change_pct || 0) >= 0;
+            return (
+              <Link
+                key={inv.id}
+                to={`${createPageUrl("InvestmentDetail")}?id=${inv.id}`}
+                className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow block"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#4F7CFF]/10 flex items-center justify-center text-xl">
+                      {inv.icon || type.emoji}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#1A1A1A]">{inv.name}</p>
+                      <p className="text-xs text-[#8FA4C8]">
+                        {typeLabel} · {portfolioWeight}{t('investments_portfolio_weight')}
+                        {inv.last_price_update && <span className="ml-1 text-[#CBD5E0]">· {inv.last_price_update}</span>}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2" onClick={(e) => e.preventDefault()}>
+                   {hasDailyChange && (
+                     <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full ${
+                       dailyIsPositive ? "bg-[#00C9A7]/10 text-[#00C9A7]" : "bg-[#FF6B6B]/10 text-[#FF6B6B]"
+                     }`}>
+                       {dailyIsPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                       {dailyIsPositive ? "+" : ""}{inv.daily_change_pct}%
+                     </span>
+                   )}
+                  <button onClick={() => handleEdit(inv)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDelete(inv.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  </div>
+                </div>
+                <div className="mt-3 flex justify-between items-end">
+                  <div>
+                     <p className="text-xs text-[#8FA4C8]">{t('current_value')}</p>
+                     <p className="font-bold text-[#1A1A1A] text-lg">{formatCurrency(inv.current_value)}</p>
+                   </div>
+                   <div className="text-right">
+                     <p className="text-xs text-[#8FA4C8]">{t('profit_loss')}</p>
+                     <p className={`font-bold text-base ${isPositive ? "text-[#00C9A7]" : "text-[#FF6B6B]"}`}>
+                       {isPositive ? "+" : ""}{formatCurrency(gain)} ({isPositive ? "+" : ""}{gainPct}%)
+                     </p>
+                   </div>
+                </div>
+                {inv.notes && <p className="text-xs text-[#8FA4C8] mt-2 italic">{inv.notes}</p>}
+              </Link>
+            );
+          })
+        )}
+
+        {watchlist.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-[#1A1A1A] text-base">{t('investments_watchlist_title')}</h2>
+              <button onClick={() => setShowWatchlist(!showWatchlist)} className="text-xs text-[#FF6A00] font-medium">
+                {showWatchlist ? t('investments_watchlist_hide') : t('investments_watchlist_show')}
+              </button>
+            </div>
+            {showWatchlist && (
+              <div className="space-y-2">
+                {watchlist.map((item) => (
+                  <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-[#1A1A1A]">{item.name}</p>
+                      <p className="text-xs text-[#8FA4C8]">{item.symbol || item.type}</p>
+                    </div>
+                    {item.current_price && (
+                      <div className="text-right">
+                        <p className="font-bold text-[#1A1A1A]">{formatCurrency(item.current_price)}</p>
+                        {item.target_price && (
+                          <p className="text-xs text-[#8FA4C8]">{t('investments_target')}: {formatCurrency(item.target_price)}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {loading ? (
-          [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse shadow-sm" />)
-        ) : investments.length === 0 ? (
-          <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
-            <TrendingUp className="w-12 h-12 text-[#8FA4C8] mx-auto mb-3" />
-            <p className="text-[#4A5568] font-semibold">Belum ada investasi</p>
-            <p className="text-[#8FA4C8] text-sm mt-1">Tambahkan investasi pertama kamu</p>
-            <button
-              onClick={() => setShowAdd(true)}
-              className="mt-4 bg-[#FF6A00] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-[#e05e00] transition-colors"
-            >
-              + Tambah Investasi
-            </button>
-          </div>
-        ) : groupBy === "wallet" ? (
-          // Grouped view
-          Object.entries(grouped).map(([key, { wallet, items }]) => {
-            if (items.length === 0) return null;
-            const walletTotal = items.reduce((s, i) => s + (i.current_value || 0), 0);
-            return (
-              <div key={key}>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{wallet?.icon || "💼"}</span>
-                    <p className="text-sm font-bold text-[#1A1A1A]">{wallet?.name || "Tanpa Dompet"}</p>
-                  </div>
-                  <p className="text-sm font-bold text-[#FF6A00]">{formatCurrency(walletTotal)}</p>
-                </div>
-                <div className="space-y-3">
-                  {items.map(inv => <InvestmentCard key={inv.id} inv={inv} />)}
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          // Flat view
-          investments.map(inv => <InvestmentCard key={inv.id} inv={inv} />)
-        )}
+        <InvestmentNanaPanel investments={investments} />
+
+        <RiskProfileRecommendation investments={investments} />
+
+        {/* Education resources — minimized at the bottom */}
+        <EducationResources />
       </div>
 
       {showAdd && (
         <AddInvestmentModal
           investment={editingInv}
-          onClose={() => { setShowAdd(false); setEditingInv(null); }}
+          onClose={() => {
+            setShowAdd(false);
+            setEditingInv(null);
+          }}
           onSave={handleSave}
         />
       )}

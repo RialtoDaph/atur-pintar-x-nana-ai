@@ -4,7 +4,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "Nama investasi (e.g., Reksa Dana Campuran, Saham BBCA)"
+      "description": "Name of the investment"
     },
     "type": {
       "type": "string",
@@ -18,32 +18,45 @@
         "lainnya"
       ],
       "default": "reksa_dana",
-      "description": "Jenis investasi"
-    },
-    "account_id": {
-      "type": "string",
-      "description": "ID dompet investasi (Account dengan tipe investment)"
+      "description": "Type of investment"
     },
     "initial_amount": {
       "type": "number",
-      "description": "Modal awal yang diinvestasikan"
+      "description": "Initial investment amount"
     },
     "current_value": {
       "type": "number",
-      "description": "Nilai saat ini (diisi manual)"
+      "description": "Current market value"
     },
     "purchase_date": {
       "type": "string",
       "format": "date",
-      "description": "Tanggal pembelian"
+      "description": "Date of purchase"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Number of units/shares"
+    },
+    "price_per_unit": {
+      "type": "number",
+      "description": "Current price per unit"
     },
     "notes": {
       "type": "string",
-      "description": "Catatan tambahan"
+      "description": "Additional notes"
     },
     "icon": {
       "type": "string",
       "description": "Emoji icon"
+    },
+    "last_price_update": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when price was last auto-updated"
+    },
+    "daily_change_pct": {
+      "type": "number",
+      "description": "Daily price change percentage from previous close"
     }
   },
   "required": [
