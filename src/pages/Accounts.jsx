@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
-import AccountAvatar from "@/components/ui/AccountAvatar";
+import AccountLogo from "@/components/ui/AccountLogo";
 
 
 function formatRupiah(n) {
@@ -105,7 +105,13 @@ function AccountModal({ account, onClose, onSave }) {
               {/* Selected preview or prompt */}
               {form.name ? (
                 <div className="flex items-center gap-3 p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                  <AccountAvatar logoUrl={form.logo_url} name={form.name} color={form.color || "#F97316"} size="w-10 h-10" />
+                  {form.logo_url ? (
+                    <AccountLogo logoUrl={form.logo_url} size="w-10 h-10" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (form.color || "#F97316") + "20" }}>
+                      <span className="text-sm">{form.icon || "🏦"}</span>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-[#1A1A1A]">{form.name}</p>
                     <p className="text-[10px] text-[#8FA4C8]">{form.type === "bank" ? "Bank" : form.type === "ewallet" ? "E-Wallet" : form.type === "cash" ? "Cash" : "Lainnya"}</p>
@@ -133,7 +139,13 @@ function AccountModal({ account, onClose, onSave }) {
                     {filteredDefaults.map(da => (
                       <button key={da.id} onClick={() => applyTemplate(da)}
                         className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-colors text-left">
-                        <AccountAvatar logoUrl={da.logo_url} name={da.name} color={da.color || "#F97316"} size="w-8 h-8" />
+                        {da.logo_url ? (
+                           <AccountLogo logoUrl={da.logo_url} size="w-8 h-8" />
+                         ) : (
+                           <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (da.color || "#F97316") + "20" }}>
+                             <span className="text-sm">{da.icon || "🏦"}</span>
+                           </div>
+                         )}
                         <div className="min-w-0">
                           <p className="text-xs font-semibold text-[#1A1A1A] truncate">{da.name}</p>
                           <p className="text-[10px] text-[#8FA4C8]">{da.type === "bank" ? "Bank" : da.type === "ewallet" ? "E-Wallet" : da.type === "cash" ? "Cash" : "Lainnya"}</p>
@@ -152,7 +164,13 @@ function AccountModal({ account, onClose, onSave }) {
           {/* EDIT: show account preview */}
           {account?.id && (
             <div className="flex items-center gap-3 p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-              <AccountAvatar logoUrl={account.logo_url} name={account.name} color={account.color || "#F97316"} size="w-10 h-10" />
+              {account.logo_url ? (
+                <AccountLogo logoUrl={account.logo_url} size="w-10 h-10" />
+              ) : (
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (account.color || "#F97316") + "20" }}>
+                  <span className="text-sm">{account.icon || "🏦"}</span>
+                </div>
+              )}
               <div>
                 <p className="text-sm font-bold text-[#1A1A1A]">{account.name}</p>
                 <p className="text-[10px] text-[#8FA4C8]">{account.type === "bank" ? "Bank" : account.type === "ewallet" ? "E-Wallet" : account.type === "cash" ? "Cash" : "Lainnya"}</p>
@@ -317,7 +335,13 @@ export default function Accounts() {
           accounts.map(acc => (
             <div key={acc.id} className={`bg-white rounded-2xl p-4 border transition-all duration-200 hover:shadow-lg ${acc.is_default ? "border-[#F97316]/40 shadow-md" : "border-[#F0F2F5] shadow-md"}`}>
               <div className="flex items-center gap-4">
-                <AccountAvatar logoUrl={acc.logo_url} name={acc.name} color={acc.color || "#FF6A00"} size="w-12 h-12" />
+                {acc.logo_url ? (
+                   <AccountLogo logoUrl={acc.logo_url} size="w-12 h-12" />
+                 ) : (
+                   <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
+                     <span className="text-lg">{acc.icon || "🏦"}</span>
+                   </div>
+                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-bold text-[#1A1A1A] text-sm">{acc.name}</p>

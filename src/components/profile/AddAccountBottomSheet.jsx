@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Check, ChevronRight } from "lucide-react";
-import AccountAvatar from "@/components/ui/AccountAvatar";
+import AccountLogo from "@/components/ui/AccountLogo";
 
 function formatRupiah(n) {
   if (!n) return "";
@@ -105,7 +105,13 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                       backgroundColor: isSelected ? "#FFF7ED" : "#FAFAFA",
                     }}
                   >
-                    <AccountAvatar logoUrl={acc.logo_url} name={acc.name} color={acc.color || "#F97316"} size="w-11 h-11" />
+                    {acc.logo_url ? (
+                       <AccountLogo logoUrl={acc.logo_url} size="w-11 h-11" />
+                     ) : (
+                       <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#F97316") + "20" }}>
+                         <span className="text-xl">{acc.icon || "🏦"}</span>
+                       </div>
+                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[#1A1A1A]">{acc.name}</p>
                       {acc.institution && acc.institution !== acc.name && (
@@ -128,7 +134,13 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
            <div className="px-5 pb-4 pt-2">
              <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E2E8F0]">
                <div className="flex items-center gap-3 mb-4">
-                 <AccountAvatar logoUrl={selected.logo_url} name={selected.name} color={selected.color || "#F97316"} size="w-10 h-10" />
+                 {selected.logo_url ? (
+                   <AccountLogo logoUrl={selected.logo_url} size="w-10 h-10" />
+                 ) : (
+                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (selected.color || "#F97316") + "20" }}>
+                     <span className="text-xl">{selected.icon || "🏦"}</span>
+                   </div>
+                 )}
                   <div>
                     <p className="text-sm font-bold text-[#1A1A1A]">{selected.name}</p>
                     <p className="text-xs text-[#8FA4C8]">Dipilih ✓</p>
