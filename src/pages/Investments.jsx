@@ -180,14 +180,12 @@ export default function InvestmentsPage() {
           </div>
 
           {/* Portfolio trend chart embedded in dark header */}
-          {investments.length > 0 && (
-            <PortfolioTrendChart
-              investments={investments}
-              totalValue={totalValue}
-              totalInvested={totalInvested}
-              darkMode={true}
-            />
-          )}
+          <PortfolioTrendChart
+            investments={investments}
+            totalValue={totalValue}
+            totalInvested={totalInvested}
+            darkMode={true}
+          />
         </div>
       </div>
 
