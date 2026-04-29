@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import { Target, CreditCard, Lightbulb, ChevronRight, Bell, Settings, User, Users, PiggyBank, Trophy, Gamepad2 } from "lucide-react";
+import { Target, CreditCard, Lightbulb, ChevronRight, Bell, Settings, User, Users, PiggyBank, Trophy, Gamepad2, TrendingUp } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function Menu() {
@@ -12,6 +12,7 @@ export default function Menu() {
         { label: t('nav_goals'), desc: "Pantau dan capai target keuanganmu", icon: Target, emoji: "🎯", page: "Goals", color: "#FF6A00" },
         { label: t('nav_debts'), desc: "Lacak cicilan dan sisa hutang", icon: CreditCard, emoji: "💳", page: "Debts", color: "#FF6B6B" },
         { label: t('nav_budget'), desc: "Atur dan pantau anggaran bulananmu", icon: PiggyBank, emoji: "📊", page: "Budget", color: "#00C9A7" },
+        { label: "Investasi", desc: "Pantau portofolio saham, reksa dana, dan aset", icon: TrendingUp, emoji: "📈", page: "Investments", color: "#00C9A7" },
         { label: "Keuangan Bersama", desc: "Kelola keuangan bersama pasangan atau keluarga", icon: Users, emoji: "👨‍👩‍👧", page: "SharedFinance", color: "#9C27B0" },
       ],
     },
