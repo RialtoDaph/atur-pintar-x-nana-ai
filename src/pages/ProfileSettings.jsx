@@ -393,7 +393,16 @@ export default function ProfileSettings() {
                         </button>
                       ))}
                       <button
-                        onClick={() => { setBottomSheetType(group.key); setShowAddBottomSheet(true); }}
+                        onClick={() => {
+                          if (group.key === "investment") {
+                            setEditAccount(null);
+                            setDefaultAccountType("investment");
+                            setShowAccountModal(true);
+                          } else {
+                            setBottomSheetType(group.key);
+                            setShowAddBottomSheet(true);
+                          }
+                        }}
                         className="flex-shrink-0 border border-dashed border-[#E2E8F0] rounded-xl px-3 py-2 flex items-center gap-1.5 hover:border-[#F97316] hover:bg-[#FFF7ED] transition-all">
                         <Plus className="w-3.5 h-3.5 text-[#8FA4C8]" />
                         <p className="text-[10px] font-medium text-[#8FA4C8] whitespace-nowrap">Tambah</p>
