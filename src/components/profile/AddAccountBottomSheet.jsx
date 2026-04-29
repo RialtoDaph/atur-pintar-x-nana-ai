@@ -18,6 +18,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
   const [selected, setSelected] = useState(null);
   const [balanceDisplay, setBalanceDisplay] = useState("");
   const [saving, setSaving] = useState(false);
+  const [failedLogos, setFailedLogos] = useState({});
 
   useEffect(() => {
     base44.entities.DefaultAccount.filter({ type: accountType, is_active: true }, "sort_order")
@@ -107,10 +108,10 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                   >
                     <div
                       className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: acc.logo_url ? "transparent" : (acc.color || "#F97316") + "20" }}
+                      style={{ backgroundColor: !acc.logo_url || failedLogos[acc.id] ? (acc.color || "#F97316") + "20" : "transparent" }}
                     >
-                      {acc.logo_url ? (
-                        <img src={acc.logo_url} alt="Logo" className="w-8 h-8 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                      {acc.logo_url && !failedLogos[acc.id] ? (
+                        <img src={acc.logo_url} alt="Logo" className="w-8 h-8 object-contain" onError={() => setFailedLogos(p => ({ ...p, [acc.id]: true }))} />
                       ) : (
                         <span className="text-xl">{acc.icon || "🏦"}</span>
                       )}
@@ -139,10 +140,10 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                <div className="flex items-center gap-3 mb-4">
                  <div
                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                   style={{ backgroundColor: selected.logo_url ? "transparent" : (selected.color || "#F97316") + "20" }}
+                   style={{ backgroundColor: !selected.logo_url || failedLogos[selected.id] ? (selected.color || "#F97316") + "20" : "transparent" }}
                  >
-                   {selected.logo_url ? (
-                      <img src={selected.logo_url} alt="Logo" className="w-6 h-6 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                   {selected.logo_url && !failedLogos[selected.id] ? (
+                      <img src={selected.logo_url} alt="Logo" className="w-6 h-6 object-contain" onError={() => setFailedLogos(p => ({ ...p, [selected.id]: true }))} />
                     ) : (
                       <span className="text-xl">{selected.icon || "🏦"}</span>
                     )}
