@@ -37,69 +37,67 @@ export function getLevelFromXP(xp) {
   return LEVELS[0];
 }
 
-// Shared helper: award XP and handle streak/level-up
+// Shared helper: award XP and handle streak/level-up via backend
 // Returns { updatedProfile, didLevelUp, newLevelData }
 export async function awardXP(userEmail, xpAmount, options = {}) {
-  const existing = await base44.entities.GamificationProfile.filter({ created_by: userEmail });
-  let p;
-  if (!existing || existing.length === 0) {
-    p = await base44.entities.GamificationProfile.create({
-      daily_streak: 0, longest_streak: 0, total_points: 0, level: 1,
-      achievements: [], last_activity_date: null,
-    });
-  } else {
-    const sorted = [...existing].sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
-    p = sorted[0];
-    if (existing.length > 1) {
-      for (const extra of sorted.slice(1)) {
-        base44.entities.GamificationProfile.delete(extra.id).catch(() => {});
-      }
+  // Delegate to processGamification backend for correct streak/achievement logic
+  const trigger = options.trigger || (options.checkTransactions ? "transaction_created" : "daily_check");
+  try {
+    const res = await base44.functions.invoke("processGamification", { trigger, metadata: options });
+    const data = res?.data || {};
+    // Return a shape compatible with callers
+    const existing = await base44.entities.GamificationProfile.filter({ created_by: userEmail });
+    const p = existing?.[0] || {};
+    const newLevel = getLevelFromXP(p.total_points || 0);
+    const oldLevel = getLevelFromXP((p.total_points || 0) - (data.xpAdded || xpAmount));
+    return {
+      updatedProfile: p,
+      didLevelUp: data.leveledUp || false,
+      newLevelData: newLevel,
+      oldLevelData: oldLevel,
+      newStreak: data.streak || p.daily_streak || 0,
+      bonusXP: 0,
+    };
+  } catch (e) {
+    // Fallback: update profile directly if backend fails
+    const existing = await base44.entities.GamificationProfile.filter({ created_by: userEmail });
+    let p;
+    if (!existing || existing.length === 0) {
+      p = await base44.entities.GamificationProfile.create({
+        daily_streak: 0, longest_streak: 0, total_points: 0, level: 1,
+        achievements: [], last_activity_date: null,
+      });
+    } else {
+      const sorted = [...existing].sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
+      p = sorted[0];
     }
+    const today = format(new Date(), "yyyy-MM-dd");
+    const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
+    const last = p.last_activity_date;
+    let newStreak = p.daily_streak || 0;
+    if (last === today) { /* same day */ }
+    else if (last === yesterday) { newStreak += 1; }
+    else { newStreak = 1; }
+    const newXP = (p.total_points || 0) + xpAmount;
+    const oldLevel = getLevelFromXP(p.total_points || 0);
+    const newLevel = getLevelFromXP(newXP);
+    const updates = {
+      total_points: newXP,
+      level: newLevel.level,
+      daily_streak: newStreak,
+      longest_streak: Math.max(p.longest_streak || 0, newStreak),
+      last_activity_date: today,
+    };
+    await base44.entities.GamificationProfile.update(p.id, updates);
+    return {
+      updatedProfile: { ...p, ...updates, id: p.id },
+      didLevelUp: newLevel.level > oldLevel.level,
+      newLevelData: newLevel,
+      oldLevelData: oldLevel,
+      newStreak,
+      bonusXP: 0,
+    };
   }
-
-  const today = format(new Date(), "yyyy-MM-dd");
-  const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
-  const last = p.last_activity_date;
-
-  let newStreak = p.daily_streak || 0;
-  if (last === today) {
-    // same day — streak unchanged
-  } else if (last === yesterday) {
-    newStreak += 1;
-  } else {
-    newStreak = 1;
-  }
-
-  const currentXP = p.total_points || 0;
-  let bonusXP = 0;
-
-  // Streak milestone bonuses (only on new streak day)
-  if (last !== today) {
-    if (newStreak === 7)  bonusXP += 100;
-    if (newStreak === 30) bonusXP += 500;
-  }
-
-  const newXP = currentXP + xpAmount + bonusXP;
-  const oldLevel = getLevelFromXP(currentXP);
-  const newLevel = getLevelFromXP(newXP);
-
-  const updates = {
-    total_points: newXP,
-    level: newLevel.level,
-    daily_streak: newStreak,
-    longest_streak: Math.max(p.longest_streak || 0, newStreak),
-    last_activity_date: today,
-  };
-
-  const updated = await base44.entities.GamificationProfile.update(p.id, updates);
-  return {
-    updatedProfile: { ...p, ...updates, id: p.id },
-    didLevelUp: newLevel.level > oldLevel.level,
-    newLevelData: newLevel,
-    oldLevelData: oldLevel,
-    newStreak,
-    bonusXP,
-  };
 }
 
 export function useGamification(user) {
@@ -170,75 +168,58 @@ export function useGamification(user) {
   const addXP = useCallback(async (xpAmount, opts = {}) => {
     if (!user?.email) return;
     try {
-      const result = await awardXP(user.email, xpAmount, opts);
-      setProfile(result.updatedProfile);
+      // Determine trigger from opts
+      const trigger = opts.trigger || (opts.checkTransactions ? "transaction_created" : opts.checkGoals ? "goal_updated" : "daily_check");
+
+      // Call backend for all gamification logic (streak, achievements, challenges, health score)
+      const res = await base44.functions.invoke("processGamification", { trigger, metadata: opts });
+      const data = res?.data || {};
+
+      // Refresh profile from DB
+      const profiles = await base44.entities.GamificationProfile.filter({ created_by: user.email });
+      const p = profiles?.[0] || {};
+      setProfile(p);
 
       // Show XP float
-      const total = xpAmount + (result.bonusXP || 0);
-      setXpFloatMsg(`+${total} XP`);
-      setTimeout(() => setXpFloatMsg(null), 2000);
-
-      // Show streak popup on new day
-      const today = format(new Date(), "yyyy-MM-dd");
-      if (result.updatedProfile.last_activity_date === today && result.newStreak > 1) {
-        setStreakPopup({ message: `🔥 Streak ${result.newStreak} hari!`, streak: result.newStreak });
+      if ((data.xpAdded || xpAmount) > 0) {
+        setXpFloatMsg(`+${data.xpAdded || xpAmount} XP`);
+        setTimeout(() => setXpFloatMsg(null), 2000);
       }
 
-      // Level up
-      if (result.didLevelUp) {
-        setLevelUpPopup({ level: result.newLevelData });
-        // Save shareable card
+      // Streak popup
+      const newStreak = data.streak || 0;
+      if (newStreak > 1) {
+        setStreakPopup({ message: `🔥 Streak ${newStreak} hari!`, streak: newStreak });
+      }
+
+      // Level up popup
+      if (data.leveledUp) {
+        const newLevelData = LEVELS.find(l => l.level === data.level) || LEVELS[0];
+        setLevelUpPopup({ level: newLevelData });
         base44.entities.ShareableCard.create({
           card_type: "level_up",
-          card_data: { level: result.newLevelData.level, level_name: result.newLevelData.name },
+          card_data: { level: data.level, level_name: newLevelData?.name },
           generated_at: new Date().toISOString(),
         }).catch(() => {});
       }
 
-      // Check achievements
-      const p = result.updatedProfile;
-      const freshAchievements = [...(p.achievements || [])];
-      const checkUnlock = async (key, condition) => {
-        if (condition && !freshAchievements.includes(key)) {
-          const unlocked = await unlockAchievement(p, key);
-          if (unlocked) {
-            freshAchievements.push(key);
-            // Award achievement XP (silently)
-            const def = ACHIEVEMENTS_DEF.find(a => a.key === key);
-            if (def?.xp) {
-              base44.entities.GamificationProfile.update(p.id, {
-                total_points: (p.total_points || 0) + def.xp,
-              }).catch(() => {});
-            }
-          }
-        }
+      // Achievement popup (show first unlocked)
+      if (data.unlockedAchievements?.length > 0) {
+        const key = data.unlockedAchievements[0];
+        const def = ACHIEVEMENTS_DEF.find(a => a.key === key);
+        if (def) setAchievementPopup(def);
+      }
+
+      return {
+        updatedProfile: p,
+        didLevelUp: data.leveledUp || false,
+        newStreak,
+        bonusXP: 0,
+        newLevelData: LEVELS.find(l => l.level === data.level) || LEVELS[0],
       };
-
-      const streak = result.newStreak;
-      const level = result.updatedProfile.level || 1;
-
-      await checkUnlock("streak_3", streak >= 3);
-      await checkUnlock("streak_7", streak >= 7);
-      await checkUnlock("streak_30", streak >= 30);
-      await checkUnlock("level_3", level >= 3);
-      await checkUnlock("level_5", level >= 5);
-      await checkUnlock("level_7", level >= 7);
-
-      if (opts.checkTransactions) {
-        const allTx = await base44.entities.Transaction.filter({ created_by: user.email }, "-date", 60).catch(() => []);
-        const count = (allTx || []).length;
-        await checkUnlock("first_transaction", count >= 1);
-        await checkUnlock("transaction_10", count >= 10);
-        await checkUnlock("transaction_50", count >= 50);
-      }
-      if (opts.checkGoals) {
-        const goals = await base44.entities.SavingsGoal.filter({ created_by: user.email }).catch(() => []);
-        await checkUnlock("first_goal", (goals || []).length >= 1);
-        await checkUnlock("goal_completed", (goals || []).some(g => g.status === "completed"));
-      }
-
-      return result;
-    } catch (e) {}
+    } catch (e) {
+      console.error("addXP error:", e);
+    }
   }, [user?.email]);
 
   // Legacy compat: onNewTransaction still works

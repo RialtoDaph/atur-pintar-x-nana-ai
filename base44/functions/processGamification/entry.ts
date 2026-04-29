@@ -1,0 +1,416 @@
+/**
+ * processGamification — central backend function to handle all gamification logic:
+ * 1. Streak update (Bug 1)
+ * 2. Achievement unlock (Bug 2)
+ * 3. Challenge progress (Bug 3)
+ * 4. FinancialHealthScore init/recalc (Bug 4)
+ *
+ * Call with: { trigger, userEmail, metadata }
+ * triggers: "transaction_created", "goal_created", "goal_updated", "budget_created",
+ *           "nana_message_sent", "persona_created", "mood_checkin", "onboarding_completed",
+ *           "daily_check"
+ */
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+
+const LEVEL_THRESHOLDS = [
+  { level: 1, min: 0 },
+  { level: 2, min: 500 },
+  { level: 3, min: 1500 },
+  { level: 4, min: 3000 },
+  { level: 5, min: 6000 },
+  { level: 6, min: 10000 },
+  { level: 7, min: 20000 },
+];
+
+const ACHIEVEMENTS_DEF = [
+  { key: "first_transaction",  xp: 20,  category: "transaction", title: "📝 Pencatat Pertama",   icon: "📝", hint: "Catat transaksi pertama" },
+  { key: "transaction_10",     xp: 50,  category: "transaction", title: "📊 10 Transaksi!",      icon: "📊", hint: "Total 10 transaksi" },
+  { key: "transaction_50",     xp: 150, category: "transaction", title: "🗂️ 50 Transaksi!",     icon: "🗂️", hint: "Total 50 transaksi" },
+  { key: "transaction_100",    xp: 300, category: "transaction", title: "💯 100 Transaksi!",     icon: "💯", hint: "Total 100 transaksi" },
+  { key: "streak_3",           xp: 30,  category: "streak",      title: "🔥 3 Hari Berturut!",  icon: "🔥", hint: "Streak 3 hari" },
+  { key: "streak_7",           xp: 70,  category: "streak",      title: "🔥 Seminggu Penuh!",   icon: "🔥", hint: "Streak 7 hari" },
+  { key: "streak_14",          xp: 140, category: "streak",      title: "🔥 2 Minggu Konsisten!", icon: "🔥", hint: "Streak 14 hari" },
+  { key: "streak_30",          xp: 300, category: "streak",      title: "💎 30 Hari Konsisten!", icon: "💎", hint: "Streak 30 hari" },
+  { key: "first_goal",         xp: 30,  category: "goal",        title: "🎯 Punya Tujuan!",     icon: "🎯", hint: "Buat 1 savings goal" },
+  { key: "goal_50pct",         xp: 80,  category: "goal",        title: "📈 Setengah Jalan!",   icon: "📈", hint: "Goal 50% tercapai" },
+  { key: "goal_completed",     xp: 200, category: "goal",        title: "🏆 Goal Tercapai!",    icon: "🏆", hint: "Selesaikan 1 savings goal" },
+  { key: "level_2",            xp: 20,  category: "level",       title: "🌱 Si Pencatat",       icon: "🌱", hint: "Capai Level 2" },
+  { key: "level_3",            xp: 50,  category: "level",       title: "🎮 Budgeter Muda",     icon: "🎮", hint: "Capai Level 3" },
+  { key: "level_4",            xp: 60,  category: "level",       title: "🤝 Social Saver",      icon: "🤝", hint: "Capai Level 4" },
+  { key: "level_5",            xp: 100, category: "level",       title: "🧠 Financial Aware",   icon: "🧠", hint: "Capai Level 5" },
+  { key: "level_6",            xp: 200, category: "level",       title: "💡 Investor Pemula",   icon: "💡", hint: "Capai Level 6" },
+  { key: "level_7",            xp: 500, category: "level",       title: "🏆 Atur Pintar Pro!",  icon: "🏆", hint: "Capai Level 7" },
+  { key: "first_budget",       xp: 25,  category: "special",     title: "💰 Budgeter Pertama!", icon: "💰", hint: "Buat budget pertama" },
+  { key: "first_nana_chat",    xp: 15,  category: "special",     title: "🤖 Sapa Nana!",        icon: "🤖", hint: "Chat pertama dengan Nana" },
+  { key: "persona_revealed",   xp: 30,  category: "special",     title: "🔮 Persona Terungkap!",icon: "🔮", hint: "Persona keuangan terungkap" },
+  { key: "mood_7_days",        xp: 70,  category: "special",     title: "😊 7 Hari Mood Check!", icon: "😊", hint: "7 hari mood check-in berturut" },
+];
+
+function getLevelFromXP(xp) {
+  let level = LEVEL_THRESHOLDS[0];
+  for (const l of LEVEL_THRESHOLDS) {
+    if (xp >= l.min) level = l;
+  }
+  return level.level;
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function yesterdayStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function currentMonth() {
+  return new Date().toISOString().slice(0, 7);
+}
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const { trigger, metadata = {} } = await req.json();
+    const userEmail = user.email;
+    const results = [];
+
+    // ── 1. Get or create GamificationProfile ─────────────────────────────────
+    const profiles = await base44.entities.GamificationProfile.filter({ created_by: userEmail });
+    let profile;
+    if (!profiles || profiles.length === 0) {
+      profile = await base44.entities.GamificationProfile.create({
+        daily_streak: 0, longest_streak: 0, total_points: 0, level: 1,
+        achievements: [], last_activity_date: null,
+      });
+    } else {
+      const sorted = [...profiles].sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
+      profile = sorted[0];
+      // Cleanup duplicates
+      for (const extra of sorted.slice(1)) {
+        base44.entities.GamificationProfile.delete(extra.id).catch(() => {});
+      }
+    }
+
+    // ── 2. Streak update (Bug 1) ──────────────────────────────────────────────
+    const today = todayStr();
+    const yesterday = yesterdayStr();
+    const last = profile.last_activity_date;
+
+    let newStreak = profile.daily_streak || 0;
+    let streakChanged = false;
+
+    if (last === today) {
+      // Same day — no change
+    } else if (last === yesterday) {
+      newStreak = (profile.daily_streak || 0) + 1;
+      streakChanged = true;
+    } else {
+      // More than 1 day ago or null — reset to 1
+      newStreak = 1;
+      streakChanged = true;
+    }
+
+    const newLongest = Math.max(profile.longest_streak || 0, newStreak);
+
+    // ── 3. XP award ───────────────────────────────────────────────────────────
+    let xpToAdd = 0;
+    if (trigger === "transaction_created") xpToAdd = 10;
+    else if (trigger === "goal_created") xpToAdd = 5;
+    else if (trigger === "goal_updated") xpToAdd = 3;
+    else if (trigger === "budget_created") xpToAdd = 5;
+    else if (trigger === "nana_message_sent") xpToAdd = 2;
+    else if (trigger === "persona_created") xpToAdd = 10;
+    else if (trigger === "mood_checkin") xpToAdd = 5;
+    else if (trigger === "onboarding_completed") xpToAdd = 50;
+
+    // Streak milestone bonus
+    if (streakChanged && newStreak === 7) xpToAdd += 100;
+    if (streakChanged && newStreak === 30) xpToAdd += 500;
+
+    const oldXP = profile.total_points || 0;
+    let newXP = oldXP + xpToAdd;
+
+    // We'll add achievement XP below; track them
+    const unlockedAchievements = [];
+
+    // ── 4. Get Achievement records for this user ──────────────────────────────
+    const achievementRecords = await base44.entities.Achievement.filter({ created_by: userEmail }).catch(() => []);
+    const unlockedKeys = new Set((achievementRecords || []).filter(a => a.is_unlocked).map(a => a.achievement_key));
+
+    async function tryUnlock(key, condition) {
+      if (!condition) return;
+      if (unlockedKeys.has(key)) return;
+      const def = ACHIEVEMENTS_DEF.find(a => a.key === key);
+      if (!def) return;
+
+      unlockedKeys.add(key);
+      unlockedAchievements.push(def);
+      newXP += def.xp;
+
+      // Find existing locked record or create new
+      const existing = (achievementRecords || []).find(a => a.achievement_key === key);
+      if (existing) {
+        await base44.entities.Achievement.update(existing.id, {
+          is_unlocked: true,
+          unlocked_at: new Date().toISOString(),
+        }).catch(() => {});
+      } else {
+        await base44.entities.Achievement.create({
+          achievement_key: key,
+          title: def.title,
+          description: def.hint,
+          icon: def.icon,
+          category: def.category,
+          xp_reward: def.xp,
+          is_unlocked: true,
+          unlocked_at: new Date().toISOString(),
+        }).catch(() => {});
+      }
+    }
+
+    // ── 5. Check achievements by trigger ─────────────────────────────────────
+
+    // Streak achievements
+    await tryUnlock("streak_3", newStreak >= 3);
+    await tryUnlock("streak_7", newStreak >= 7);
+    await tryUnlock("streak_14", newStreak >= 14);
+    await tryUnlock("streak_30", newStreak >= 30);
+
+    // Transaction achievements
+    if (trigger === "transaction_created" || trigger === "daily_check") {
+      const txCount = await base44.entities.Transaction.filter({ created_by: userEmail }, "-date", 200)
+        .then(r => (r || []).length).catch(() => 0);
+      await tryUnlock("first_transaction", txCount >= 1);
+      await tryUnlock("transaction_10", txCount >= 10);
+      await tryUnlock("transaction_50", txCount >= 50);
+      await tryUnlock("transaction_100", txCount >= 100);
+    }
+
+    // Goal achievements
+    if (trigger === "goal_created" || trigger === "goal_updated" || trigger === "daily_check") {
+      const goals = await base44.entities.SavingsGoal.filter({ created_by: userEmail }).catch(() => []);
+      await tryUnlock("first_goal", (goals || []).length >= 1);
+      await tryUnlock("goal_50pct", (goals || []).some(g => g.target_amount > 0 && (g.current_amount || 0) / g.target_amount >= 0.5));
+      await tryUnlock("goal_completed", (goals || []).some(g => g.status === "completed"));
+    }
+
+    // Budget achievement
+    if (trigger === "budget_created" || trigger === "daily_check") {
+      const budgets = await base44.entities.Budget.filter({ created_by: userEmail }).catch(() => []);
+      await tryUnlock("first_budget", (budgets || []).length >= 1);
+    }
+
+    // Nana achievement
+    if (trigger === "nana_message_sent" || trigger === "daily_check") {
+      const convos = await base44.entities.NanaConversation.filter({ created_by: userEmail }).catch(() => []);
+      await tryUnlock("first_nana_chat", (convos || []).length >= 1);
+    }
+
+    // Persona achievement
+    if (trigger === "persona_created") {
+      await tryUnlock("persona_revealed", true);
+    }
+
+    // Mood achievement
+    if (trigger === "mood_checkin" || trigger === "daily_check") {
+      const moods = await base44.entities.MoodCheckIn.filter({ created_by: userEmail }, "-created_date", 7).catch(() => []);
+      let consecutiveDays = 0;
+      if ((moods || []).length >= 7) {
+        // Check 7 consecutive days
+        const sorted = [...moods].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+        let prev = null;
+        consecutiveDays = 0;
+        for (const m of sorted.slice(0, 7)) {
+          const d = new Date(m.created_date).toISOString().slice(0, 10);
+          if (!prev) { consecutiveDays = 1; prev = d; continue; }
+          const prevD = new Date(prev);
+          prevD.setDate(prevD.getDate() - 1);
+          if (d === prevD.toISOString().slice(0, 10)) { consecutiveDays++; prev = d; }
+          else break;
+        }
+      }
+      await tryUnlock("mood_7_days", consecutiveDays >= 7);
+    }
+
+    // Compute new level
+    const oldLevel = getLevelFromXP(oldXP);
+    const newLevel = getLevelFromXP(newXP);
+
+    // Level achievements
+    await tryUnlock("level_2", newLevel >= 2);
+    await tryUnlock("level_3", newLevel >= 3);
+    await tryUnlock("level_4", newLevel >= 4);
+    await tryUnlock("level_5", newLevel >= 5);
+    await tryUnlock("level_6", newLevel >= 6);
+    await tryUnlock("level_7", newLevel >= 7);
+
+    // Recalc level after achievement XP
+    const finalLevel = getLevelFromXP(newXP);
+
+    // ── 6. Save updated profile ───────────────────────────────────────────────
+    const profileUpdates = {
+      total_points: newXP,
+      level: finalLevel,
+      daily_streak: newStreak,
+      longest_streak: newLongest,
+      last_activity_date: today,
+    };
+    await base44.entities.GamificationProfile.update(profile.id, profileUpdates);
+    results.push("profile_updated");
+
+    // ── 7. Challenge progress (Bug 3) ─────────────────────────────────────────
+    if (trigger === "transaction_created" || trigger === "daily_check") {
+      const challenges = await base44.entities.Challenge.filter({ created_by: userEmail, status: "active" }).catch(() => []);
+
+      for (const ch of (challenges || [])) {
+        const lastProg = ch.last_progress_date;
+        if (lastProg === today) continue; // Already counted today
+
+        const endDate = ch.end_date;
+        const now = today;
+        const isExpired = endDate && now > endDate;
+
+        if (isExpired && ch.progress < 100) {
+          await base44.entities.Challenge.update(ch.id, { status: "failed" }).catch(() => {});
+          continue;
+        }
+
+        let progressed = false;
+
+        if (ch.challenge_key === "nabung_30_hari") {
+          // Check if user has a savings transaction >= 10000 today
+          const txToday = await base44.entities.Transaction.filter({ created_by: userEmail }, "-date", 50).catch(() => []);
+          const hasSavings = (txToday || []).some(tx => {
+            const txDate = (tx.date || tx.created_date || "").slice(0, 10);
+            return txDate === today && tx.type === "savings" && (tx.amount || 0) >= 10000;
+          });
+          if (hasSavings) progressed = true;
+        }
+
+        if (ch.challenge_key === "no_impulsif_7") {
+          // Check if user has NO impulse/shopping expense today
+          const txToday = await base44.entities.Transaction.filter({ created_by: userEmail }, "-date", 50).catch(() => []);
+          const hasImpulse = (txToday || []).some(tx => {
+            const txDate = (tx.date || tx.created_date || "").slice(0, 10);
+            const cat = (tx.category || "").toLowerCase();
+            return txDate === today && tx.type === "expense" && (cat.includes("shopping") || cat.includes("belanja") || cat.includes("hiburan") || cat === "entertainment");
+          });
+          if (!hasImpulse) progressed = true;
+        }
+
+        if (progressed) {
+          const newDays = (ch.progress_days || 0) + 1;
+          const duration = ch.duration_days || 1;
+          const newProgress = Math.min(100, Math.round((newDays / duration) * 100));
+          const newStatus = newProgress >= 100 ? "completed" : "active";
+
+          await base44.entities.Challenge.update(ch.id, {
+            progress_days: newDays,
+            progress: newProgress,
+            status: newStatus,
+            last_progress_date: today,
+          }).catch(() => {});
+
+          // Award XP on completion
+          if (newStatus === "completed" && ch.xp_reward) {
+            await base44.entities.GamificationProfile.update(profile.id, {
+              total_points: newXP + ch.xp_reward,
+            }).catch(() => {});
+          }
+          results.push(`challenge_${ch.challenge_key}_progressed`);
+        }
+      }
+    }
+
+    // ── 8. FinancialHealthScore init/recalc (Bug 4) ───────────────────────────
+    const month = currentMonth();
+    const existingScores = await base44.entities.FinancialHealthScore.filter({ created_by: userEmail }).catch(() => []);
+    const thisMonthScore = (existingScores || []).find(s => s.month === month);
+
+    if (!thisMonthScore || trigger === "daily_check") {
+      // Fetch data for scoring
+      const [allTx, budgets, gamProfiles, goals, nanaConvos] = await Promise.all([
+        base44.entities.Transaction.filter({ created_by: userEmail }, "-date", 200).catch(() => []),
+        base44.entities.Budget.filter({ created_by: userEmail }).catch(() => []),
+        base44.entities.GamificationProfile.filter({ created_by: userEmail }).catch(() => []),
+        base44.entities.SavingsGoal.filter({ created_by: userEmail }).catch(() => []),
+        base44.entities.NanaConversation.filter({ created_by: userEmail }, "-created_date", 50).catch(() => []),
+      ]);
+
+      const gp = (gamProfiles || [])[0] || {};
+      const monthTx = (allTx || []).filter(tx => (tx.date || tx.created_date || "").startsWith(month));
+
+      // consistency_score: up to 250 — based on how many days this month had a transaction
+      const uniqueDays = new Set(monthTx.map(tx => (tx.date || tx.created_date || "").slice(0, 10))).size;
+      const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+      const daysSoFar = Math.min(new Date().getDate(), daysInMonth);
+      const consistency_score = Math.min(250, Math.round((uniqueDays / Math.max(daysSoFar, 1)) * 250));
+
+      // budget_adherence_score: up to 250 — % budgets not exceeded
+      const monthBudgets = (budgets || []).filter(b => b.month === month);
+      let budget_adherence_score = 125; // neutral if no budgets
+      if (monthBudgets.length > 0) {
+        let adherent = 0;
+        for (const b of monthBudgets) {
+          const spent = monthTx.filter(tx => tx.category === b.category && tx.type === "expense")
+            .reduce((s, tx) => s + (tx.amount || 0), 0);
+          if (spent <= (b.amount || 0)) adherent++;
+        }
+        budget_adherence_score = Math.round((adherent / monthBudgets.length) * 250);
+      }
+
+      // streak_score: up to 200
+      const streak = gp.daily_streak || 0;
+      const streak_score = Math.min(200, Math.round((streak / 30) * 200));
+
+      // goal_progress_score: up to 200
+      const activeGoals = (goals || []).filter(g => g.status !== "failed");
+      let goal_progress_score = 0;
+      if (activeGoals.length > 0) {
+        const avgProgress = activeGoals.reduce((s, g) => s + Math.min(1, (g.current_amount || 0) / Math.max(g.target_amount || 1, 1)), 0) / activeGoals.length;
+        goal_progress_score = Math.min(200, Math.round(avgProgress * 200));
+      }
+
+      // nana_interaction_score: up to 100
+      const nanaThisMonth = (nanaConvos || []).filter(c => (c.created_date || "").startsWith(month));
+      const nana_interaction_score = Math.min(100, nanaThisMonth.length * 10);
+
+      const total_score = consistency_score + budget_adherence_score + streak_score + goal_progress_score + nana_interaction_score;
+
+      const scoreData = {
+        month,
+        total_score,
+        consistency_score,
+        budget_adherence_score,
+        streak_score,
+        goal_progress_score,
+        nana_interaction_score,
+        last_calculated_at: new Date().toISOString(),
+      };
+
+      if (thisMonthScore) {
+        await base44.entities.FinancialHealthScore.update(thisMonthScore.id, scoreData).catch(() => {});
+      } else {
+        await base44.entities.FinancialHealthScore.create(scoreData).catch(() => {});
+      }
+      results.push("health_score_updated");
+    }
+
+    return Response.json({
+      success: true,
+      results,
+      streak: newStreak,
+      xpAdded: xpToAdd,
+      totalXP: newXP,
+      level: finalLevel,
+      leveledUp: finalLevel > oldLevel,
+      unlockedAchievements: unlockedAchievements.map(a => a.key),
+    });
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+});

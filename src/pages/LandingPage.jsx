@@ -341,7 +341,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await base44.entities.WaitingList.create({
+      const res = await base44.functions.invoke("submitWaitingList", {
         name: form.name,
         email: form.email,
         whatsapp: form.whatsapp || undefined,
@@ -349,8 +349,9 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
         city: form.city,
         biggest_money_problem: form.biggest_money_problem || undefined,
         current_finance_tracking_method: form.current_finance_tracking_method,
-        early_access_interest: form.early_access_interest
+        early_access_interest: form.early_access_interest,
       });
+      if (res.data?.error) throw new Error(res.data.error);
       const qNum = fomoCounter + 1;
       setQueueNumber(qNum);
       incrementCounter();
@@ -360,7 +361,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
       // Mini confetti
       if (window.confetti) window.confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#FF6A00", "#FFB347", "#ffffff"] });
     } catch (err) {
-      alert("Gagal mendaftar, coba lagi ya.");
+      alert("Gagal mendaftar, coba lagi. " + (err.message || ""));
     } finally {
       setLoading(false);
     }
