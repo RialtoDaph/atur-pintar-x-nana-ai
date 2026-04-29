@@ -1,8 +1,9 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { Resend } from 'npm:resend@4.0.0';
+
+const resend = new Resend(Deno.env.get('Resend_api_'));
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
     const { name, email, queueNumber } = await req.json();
 
     if (!name || !email) {
@@ -74,11 +75,11 @@ Deno.serve(async (req) => {
 </html>
     `;
 
-    await base44.asServiceRole.integrations.Core.SendEmail({
+    await resend.emails.send({
+      from: 'Atur Pintar <admin@aturpintar.id>',
       to: email,
-      from_name: "Tim Atur Pintar",
       subject: `Kamu masuk antrian, ${name}! 🎉`,
-      body: htmlBody,
+      html: htmlBody,
     });
 
     return Response.json({ success: true });
