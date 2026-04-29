@@ -18,7 +18,6 @@ import { useGamification } from "@/hooks/useGamification";
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
 import NanaInsightCard from "@/components/dashboard/NanaInsightCard";
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
-import ReminderAlertWidget from "@/components/dashboard/ReminderAlertWidget";
 import BossBattleCard from "@/components/gamification/BossBattleCard";
 
 const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
@@ -276,8 +275,6 @@ export default function Dashboard() {
           {user?.onboarding_completed && (
             <TodayTransactionsCard transactions={transactions} allCategories={allCategories} />
           )}
-
-          {user?.onboarding_completed && <ReminderAlertWidget user={user} />}
 
 
           <div className="h-2" />
