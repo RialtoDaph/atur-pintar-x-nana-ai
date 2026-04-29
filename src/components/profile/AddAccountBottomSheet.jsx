@@ -132,10 +132,27 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
             </div>
           )}
 
-          {/* Balance input — shown after selection */}
+          {/* Preview + Balance input — shown after selection */}
           {selected && (
            <div className="px-5 pb-4 pt-2">
              <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E2E8F0]">
+               <div className="flex items-center gap-3 mb-4">
+                 <div
+                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                   style={{ backgroundColor: selected.logo_url ? "transparent" : (selected.color || "#F97316") + "20" }}
+                 >
+                   {selected.logo_url ? (
+                      <img src={selected.logo_url} alt="Logo" className="w-6 h-6 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    ) : (
+                      <span className="text-xl">{selected.icon || "🏦"}</span>
+                    )}
+                 </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#1A1A1A]">{selected.name}</p>
+                    <p className="text-xs text-[#8FA4C8]">Dipilih ✓</p>
+                  </div>
+                </div>
+
                <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-3">Saldo Awal (Opsional)</p>
                <div className="relative mb-2">
                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#8FA4C8]">Rp</span>
