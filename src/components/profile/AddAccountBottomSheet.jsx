@@ -107,13 +107,12 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                   >
                     <div
                       className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: acc.logo_url ? "transparent" : (acc.color || "#F97316") + "20" }}
+                      style={{ backgroundColor: (acc.color || "#F97316") + "20" }}
                     >
                       {acc.logo_url ? (
-                        <img src={acc.logo_url} alt="Logo" className="w-8 h-8 object-contain" onError={(e) => e.target.style.display = 'none'} />
-                      ) : (
-                        <span className="text-xl">{acc.icon || "🏦"}</span>
-                      )}
+                        <img src={acc.logo_url} alt="Logo" className="w-8 h-8 object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling?.style.removeProperty('display'); }} />
+                      ) : null}
+                      <span className="text-xl" style={{ display: acc.logo_url ? 'none' : 'block' }}>{acc.icon || "🏦"}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[#1A1A1A]">{acc.name}</p>
@@ -137,6 +136,22 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
            <div className="px-5 pb-4 pt-2">
              <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E2E8F0]">
                <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-3">Saldo Awal (Opsional)</p>
+               <div className="flex items-center gap-3 mb-3">
+                 <div
+                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                   style={{ backgroundColor: (selected.color || "#F97316") + "20" }}
+                 >
+                   {selected.logo_url ? (
+                     <img src={selected.logo_url} alt="Logo" className="w-6 h-6 object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling?.style.removeProperty('display'); }} />
+                   ) : null}
+                   <span className="text-lg" style={{ display: selected.logo_url ? 'none' : 'block' }}>{selected.icon || "🏦"}</span>
+                 </div>
+                 <div>
+                   <p className="text-sm font-bold text-[#1A1A1A]">{selected.name}</p>
+                   <p className="text-xs text-[#8FA4C8]">Sudah dipilih ✓</p>
+                 </div>
+               </div>
+
                <div className="relative mb-2">
                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#8FA4C8]">Rp</span>
                  <input
