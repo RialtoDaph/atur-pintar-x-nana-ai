@@ -25,6 +25,7 @@ function AccountModal({ account, onClose, onSave }) {
   const [defaultAccounts, setDefaultAccounts] = useState([]);
   const [search, setSearch] = useState("");
   const [showTemplates, setShowTemplates] = useState(!account?.id);
+  const [failedLogos, setFailedLogos] = useState({});
 
   useEffect(() => {
     if (!account?.id) {
@@ -133,7 +134,16 @@ function AccountModal({ account, onClose, onSave }) {
                     {filteredDefaults.map(da => (
                       <button key={da.id} onClick={() => applyTemplate(da)}
                         className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-colors text-left">
-                        <AccountAvatar logoUrl={da.logo_url} name={da.name} color={da.color || "#F97316"} size="w-8 h-8" />
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: !da.logo_url || failedLogos[da.id] ? (da.color || "#F97316") + "20" : "transparent" }}
+                        >
+                          {da.logo_url && !failedLogos[da.id] ? (
+                            <img src={da.logo_url} alt="Logo" className="w-6 h-6 object-contain" onError={() => setFailedLogos(p => ({ ...p, [da.id]: true }))} />
+                          ) : (
+                            <span className="text-sm">{da.icon || "🏦"}</span>
+                          )}
+                        </div>
                         <div className="min-w-0">
                           <p className="text-xs font-semibold text-[#1A1A1A] truncate">{da.name}</p>
                           <p className="text-[10px] text-[#8FA4C8]">{da.type === "bank" ? "Bank" : da.type === "ewallet" ? "E-Wallet" : da.type === "cash" ? "Cash" : "Lainnya"}</p>
