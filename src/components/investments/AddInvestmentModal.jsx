@@ -24,7 +24,7 @@ export default function AddInvestmentModal({ onClose, onSave, investment = null 
 
   useEffect(() => {
     base44.auth.me().then(u => {
-      base44.entities.Account.filter({ created_by: u.email, type: "investment" })
+      base44.entities.Account.filter({ created_by: u.email, type: "investasi" })
         .then(accs => setAccounts(accs || []))
         .catch(() => {});
     }).catch(() => {});
