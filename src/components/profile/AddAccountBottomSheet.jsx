@@ -18,7 +18,6 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
   const [selected, setSelected] = useState(null);
   const [balanceDisplay, setBalanceDisplay] = useState("");
   const [saving, setSaving] = useState(false);
-  const [failedLogos, setFailedLogos] = useState(new Set());
 
   useEffect(() => {
     base44.entities.DefaultAccount.filter({ type: accountType, is_active: true }, "sort_order")
@@ -108,10 +107,10 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                   >
                     <div
                       className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: (acc.color || "#F97316") + "20" }}
+                      style={{ backgroundColor: acc.logo_url ? "transparent" : (acc.color || "#F97316") + "20" }}
                     >
-                      {acc.logo_url && !failedLogos.has(acc.id) ? (
-                        <img src={acc.logo_url} alt="Logo" className="w-8 h-8 object-contain" onError={() => setFailedLogos(prev => new Set([...prev, acc.id]))} />
+                      {acc.logo_url ? (
+                        <img src={acc.logo_url} alt="Logo" className="w-8 h-8 object-contain" onError={(e) => e.target.style.display = 'none'} />
                       ) : (
                         <span className="text-xl">{acc.icon || "🏦"}</span>
                       )}
@@ -138,23 +137,6 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
            <div className="px-5 pb-4 pt-2">
              <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E2E8F0]">
                <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-3">Saldo Awal (Opsional)</p>
-               <div className="flex items-center gap-3 mb-3">
-                 <div
-                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                   style={{ backgroundColor: (selected.color || "#F97316") + "20" }}
-                 >
-                   {selected.logo_url && !failedLogos.has(selected.id) ? (
-                     <img src={selected.logo_url} alt="Logo" className="w-6 h-6 object-contain" onError={() => setFailedLogos(prev => new Set([...prev, selected.id]))} />
-                   ) : (
-                     <span className="text-lg">{selected.icon || "🏦"}</span>
-                   )}
-                 </div>
-                 <div>
-                   <p className="text-sm font-bold text-[#1A1A1A]">{selected.name}</p>
-                   <p className="text-xs text-[#8FA4C8]">Sudah dipilih ✓</p>
-                 </div>
-               </div>
-
                <div className="relative mb-2">
                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#8FA4C8]">Rp</span>
                  <input
