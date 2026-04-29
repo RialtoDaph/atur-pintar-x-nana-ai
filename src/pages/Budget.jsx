@@ -9,6 +9,7 @@ import BudgetNanaPanel from "@/components/budget/BudgetNanaPanel";
 import BudgetAlertChecker from "@/components/budget/BudgetAlertChecker";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { awardXP } from "@/hooks/useGamification";
+import { useToast } from "@/components/ui/use-toast";
 
 const DEFAULT_CATEGORIES = [
   { key: "housing",       label_id: "Rumah/Sewa",         label_en: "Housing/Rent",    emoji: "🏠", color: "#4F7CFF" },
@@ -32,6 +33,7 @@ const FREE_BUDGET_LIMIT = 2;
 
 export default function BudgetPage() {
   const { t, formatCurrency, settings } = useAppSettings();
+  const { toast } = useToast();
   const lang = settings.language || "id";
 
   const [monthOffset, setMonthOffset] = useState(0);
@@ -47,6 +49,7 @@ export default function BudgetPage() {
   const [editingBudget, setEditingBudget] = useState(null);
   const [user, setUser] = useState(null);
   const [goals, setGoals] = useState([]);
+  const carryOverCheckedRef = useRef(false);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -110,9 +113,44 @@ export default function BudgetPage() {
       setCustomCategories(cats);
       setGoals(g);
       setGlobalCategories(globalCats || []);
+
+      // Budget carry-over: only check for current month (offset 0), only once per session
+      if (monthOffset === 0 && !carryOverCheckedRef.current && b.length === 0) {
+        carryOverCheckedRef.current = true;
+        await tryCarryOverBudgets(currentMonth);
+      }
     } finally {
       setLoading(false);
     }
+  }
+
+  async function tryCarryOverBudgets(thisMonth) {
+    // Get previous month key
+    const [y, m] = thisMonth.split("-").map(Number);
+    const prevDate = new Date(y, m - 2, 1);
+    const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
+
+    const prevBudgets = await base44.entities.Budget.filter({
+      month: prevMonth,
+      created_by: user.email,
+    }).catch(() => []);
+
+    if (!prevBudgets || prevBudgets.length === 0) return;
+
+    await Promise.all(
+      prevBudgets.map(b =>
+        base44.entities.Budget.create({ category: b.category, amount: b.amount, month: thisMonth, color: b.color })
+      )
+    );
+
+    // Reload budgets after carry-over
+    const freshBudgets = await base44.entities.Budget.filter({ month: thisMonth, created_by: user.email }, "created_date").catch(() => []);
+    setBudgets(freshBudgets);
+
+    toast({
+      title: "Budget berhasil disalin! 🎉",
+      description: `${prevBudgets.length} budget dari bulan lalu otomatis disalin ke bulan ini.`,
+    });
   }
 
   // Build category metadata map — keyed by GlobalCategory.id
@@ -280,6 +318,7 @@ export default function BudgetPage() {
             user={user}
             budgets={budgets}
             spendingByCategory={spendingByCategory}
+            categoryMap={Object.fromEntries(Object.entries(categoryMap).map(([k, v]) => [k, v.label]))}
           />
         )}
 

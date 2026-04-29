@@ -170,6 +170,13 @@ Deno.serve(async (req) => {
           unlocked_at: new Date().toISOString(),
         }).catch(() => {});
       }
+
+      // Also sync achievement_key into GamificationProfile.achievements array
+      // (profile variable is in outer scope and will be updated in step 6)
+      if (!profile.achievements) profile.achievements = [];
+      if (!profile.achievements.includes(key)) {
+        profile.achievements = [...profile.achievements, key];
+      }
     }
 
     // ── 5. Check achievements by trigger ─────────────────────────────────────
@@ -251,13 +258,14 @@ Deno.serve(async (req) => {
     // Recalc level after achievement XP
     const finalLevel = getLevelFromXP(newXP);
 
-    // ── 6. Save updated profile ───────────────────────────────────────────────
+    // ── 6. Save updated profile (including synced achievements array) ─────────
     const profileUpdates = {
       total_points: newXP,
       level: finalLevel,
       daily_streak: newStreak,
       longest_streak: newLongest,
       last_activity_date: today,
+      achievements: profile.achievements || [],
     };
     await base44.entities.GamificationProfile.update(profile.id, profileUpdates);
     results.push("profile_updated");

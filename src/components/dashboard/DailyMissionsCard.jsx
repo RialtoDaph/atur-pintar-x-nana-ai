@@ -38,6 +38,14 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
 
   async function loadMissions() {
     setLoading(true);
+
+    // Clean up stale uncompleted missions from past dates
+    base44.entities.DailyMission.filter({ created_by: user.email, is_completed: false })
+      .then(stale => {
+        const past = (stale || []).filter(m => m.date && m.date < today);
+        past.forEach(m => base44.entities.DailyMission.delete(m.id).catch(() => {}));
+      }).catch(() => {});
+
     const existing = await base44.entities.DailyMission.filter({
       created_by: user.email,
       date: today,
