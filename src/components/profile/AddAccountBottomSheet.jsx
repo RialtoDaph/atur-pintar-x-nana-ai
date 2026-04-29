@@ -106,7 +106,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                       style={{ backgroundColor: acc.logo_url ? "transparent" : (acc.color || "#F97316") + "20" }}
                     >
                       {acc.logo_url ? (
-                        <img src={acc.logo_url} alt="Logo" className="w-full h-full object-contain rounded-xl" />
+                        <img src={acc.logo_url} alt="Logo" className="w-8 h-8 object-contain" onError={(e) => e.target.style.display = 'none'} />
                       ) : (
                         <span className="text-xl">{acc.icon || "🏦"}</span>
                       )}
@@ -138,10 +138,10 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                    style={{ backgroundColor: selected.logo_url ? "transparent" : (selected.color || "#F97316") + "20" }}
                  >
                    {selected.logo_url ? (
-                     <img src={selected.logo_url} alt="Logo" className="w-full h-full object-contain rounded-xl" />
-                   ) : (
-                     <span className="text-xl">{selected.icon || "🏦"}</span>
-                   )}
+                      <img src={selected.logo_url} alt="Logo" className="w-6 h-6 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    ) : (
+                      <span className="text-xl">{selected.icon || "🏦"}</span>
+                    )}
                  </div>
                   <div>
                     <p className="text-sm font-bold text-[#1A1A1A]">{selected.name}</p>
