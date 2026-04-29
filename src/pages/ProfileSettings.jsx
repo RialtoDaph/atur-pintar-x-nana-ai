@@ -20,6 +20,7 @@ import { toast } from "sonner";
 const ACCOUNT_PRESETS = [
   { group: "Bank", icon: "🏦", color: "#1976D2", items: ["BCA", "Mandiri", "BNI", "BRI", "BSI", "Jenius", "SeaBank"] },
   { group: "E-Wallet", icon: "📱", color: "#7B1FA2", items: ["GoPay", "OVO", "DANA", "ShopeePay", "LinkAja"] },
+  { group: "Investment", icon: "📈", color: "#16A34A", items: ["Bibit", "Pluang", "Bareksa", "Manulife", "BNI Investasi", "Ipotfund", "CommonWealth"] },
   { group: "Cash", icon: "💵", color: "#388E3C", items: ["Dompet", "Celengan", "Kas"] },
 ];
 
