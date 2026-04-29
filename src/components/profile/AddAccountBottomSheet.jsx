@@ -35,6 +35,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
       icon: selected.icon || "🏦",
       color: selected.color || "#F97316",
       institution: selected.institution || selected.name,
+      logo_url: selected.logo_url || undefined,
       balance,
       is_default: false,
     });
