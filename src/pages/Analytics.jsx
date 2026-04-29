@@ -17,7 +17,6 @@ import SpendingChart from "@/components/dashboard/SpendingChart";
 import HeroSummaryCard from "@/components/analytics/HeroSummaryCard";
 import CategoryBreakdownChart from "@/components/analytics/CategoryBreakdownChart";
 import BudgetActualWidget from "@/components/analytics/BudgetActualWidget";
-import NanaDailyNarrative from "@/components/analytics/NanaDailyNarrative";
 import { Flame } from "lucide-react";
 
 const DEFAULT_ANALYTICS_CARDS = [
@@ -363,18 +362,6 @@ export default function Analytics() {
         <div className="relative">
           <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
         </div>
-
-        {/* Nana Daily Narrative */}
-        <NanaDailyNarrative
-          user={user}
-          savingRate={thisSavingRate}
-          budgets={budgets}
-          transactions={transactions}
-          streak={streak}
-          netWorth={netWorthValue}
-          debts={debts}
-          allCategoriesConfig={allCategoriesConfig}
-        />
 
         {/* Hero Summary Card — selalu tampil di paling atas */}
         <HeroSummaryCard

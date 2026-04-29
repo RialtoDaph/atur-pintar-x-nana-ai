@@ -104,8 +104,12 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
     },
   ];
 
+  const scoreColor = healthScore?.total_score >= 700 ? "text-[#00C9A7]"
+    : healthScore?.total_score >= 400 ? "text-[#F5A623]"
+    : "text-[#FF6B6B]";
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 pr-14">
+    <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5">
       <div className="grid grid-cols-2 gap-3 mb-3">
         {metrics.map((m, i) => {
           const Icon = m.icon;
@@ -122,21 +126,20 @@ export default function HeroSummaryCard({ goals, investments, debts, transaction
         })}
       </div>
 
-      {/* Financial Health Score footer */}
-      <div className="flex items-center justify-between pt-3 border-t border-[#F2F4F7]">
+      {/* Financial Health Score — small inline card */}
+      <Link to={createPageUrl("Gamifikasi")} className="flex items-center justify-between bg-[#F2F4F7] rounded-xl px-3 py-2.5 mt-1 hover:bg-[#eceef2] transition-colors">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#4A5568]">Skor Finansial:</span>
-          <span className="text-xs font-bold text-[#FF6A00]">
-            {healthScore?.total_score != null ? `${healthScore.total_score}/1000` : "Belum dihitung"}
-          </span>
+          <span className="text-base">❤️</span>
+          <span className="text-xs text-[#4A5568] font-medium">Skor Finansial</span>
         </div>
-        <Link
-          to={createPageUrl("Gamifikasi")}
-          className="text-[10px] text-[#FF6A00] font-semibold hover:opacity-75 transition-opacity"
-        >
-          Lihat detail →
-        </Link>
-      </div>
+        <div className="flex items-center gap-1.5">
+          <span className={`text-sm font-bold ${healthScore?.total_score != null ? scoreColor : "text-[#8FA4C8]"}`}>
+            {healthScore?.total_score != null ? `${healthScore.total_score}` : "—"}
+          </span>
+          <span className="text-[10px] text-[#8FA4C8]">/1000</span>
+          <span className="text-[10px] text-[#FF6A00] font-semibold ml-1">Lihat →</span>
+        </div>
+      </Link>
     </div>
   );
 }
