@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import PremiumGate from "@/components/subscription/PremiumGate";
 import PremiumBlurCard from "@/components/subscription/PremiumBlurCard";
-import { Plus, Trash2, TrendingUp, RefreshCw, TrendingDown } from "lucide-react";
+import { Plus, Trash2, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import AddInvestmentModal from "@/components/investments/AddInvestmentModal.jsx";
@@ -24,7 +23,7 @@ export default function InvestmentsPage() {
   const [user, setUser] = useState(null);
   const [showWatchlist, setShowWatchlist] = useState(false);
   const [watchlist, setWatchlist] = useState([]);
-  const [refreshingPrices, setRefreshingPrices] = useState(false);
+  const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -43,12 +42,14 @@ export default function InvestmentsPage() {
   async function loadData() {
      setLoading(true);
      try {
-       const [inv, watch] = await Promise.all([
+       const [inv, watch, accs] = await Promise.all([
          base44.entities.Investment.filter({ created_by: user.email }, "-created_date"),
          base44.entities.InvestmentWatchlist.filter({ created_by: user.email }, "-created_date").catch(() => []),
+         base44.entities.Account.filter({ created_by: user.email }).catch(() => []),
        ]);
        setInvestments(inv);
        setWatchlist(watch);
+       setAccounts(accs || []);
      } catch (error) {
        console.error("Failed to load investments:", error);
      } finally {
@@ -70,18 +71,6 @@ export default function InvestmentsPage() {
   function handleEdit(inv) {
     setEditingInv(inv);
     setShowAdd(true);
-  }
-
-  async function handleRefreshPrices() {
-    setRefreshingPrices(true);
-    try {
-      await base44.functions.invoke("updateInvestmentPrices", {});
-      await loadData();
-    } catch (error) {
-      console.error("Price refresh failed:", error);
-    } finally {
-      setRefreshingPrices(false);
-    }
   }
 
   async function handleSave(data) {
@@ -147,22 +136,12 @@ export default function InvestmentsPage() {
               <p className="text-[#8FA4C8] text-sm font-medium">{t('investments_portfolio')}</p>
               <h1 className="text-white text-2xl font-bold mt-0.5">{t('investments_title')}</h1>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleRefreshPrices}
-                disabled={refreshingPrices}
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-50"
-                title="Refresh live prices"
-              >
-                <RefreshCw className={`w-4 h-4 text-white ${refreshingPrices ? "animate-spin" : ""}`} />
-              </button>
-              <button
-                onClick={() => setShowAdd(true)}
-                className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
-              >
-                <Plus className="w-5 h-5 text-white" />
-              </button>
-            </div>
+            <button
+              onClick={() => setShowAdd(true)}
+              className="w-10 h-10 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+            >
+              <Plus className="w-5 h-5 text-white" />
+            </button>
           </div>
 
           {/* Portfolio trend chart embedded in dark header */}
@@ -172,7 +151,6 @@ export default function InvestmentsPage() {
               totalValue={totalValue}
               totalInvested={totalInvested}
               darkMode={true}
-              refreshKey={refreshingPrices}
             />
           )}
         </div>
@@ -200,8 +178,7 @@ export default function InvestmentsPage() {
             const gainPct = inv.initial_amount > 0 ? ((gain / inv.initial_amount) * 100).toFixed(2) : 0;
             const isPositive = gain >= 0;
             const portfolioWeight = totalValue > 0 ? ((inv.current_value / totalValue) * 100).toFixed(1) : 0;
-            const hasDailyChange = inv.daily_change_pct !== undefined && inv.daily_change_pct !== null && ["saham","crypto"].includes(inv.type);
-            const dailyIsPositive = (inv.daily_change_pct || 0) >= 0;
+            const walletAccount = accounts.find(a => a.id === inv.account_id);
             return (
               <Link
                 key={inv.id}
@@ -216,20 +193,12 @@ export default function InvestmentsPage() {
                     <div>
                       <p className="font-semibold text-[#1A1A1A]">{inv.name}</p>
                       <p className="text-xs text-[#8FA4C8]">
-                        {typeLabel} · {portfolioWeight}{t('investments_portfolio_weight')}
-                        {inv.last_price_update && <span className="ml-1 text-[#CBD5E0]">· {inv.last_price_update}</span>}
+                        {typeLabel} · {portfolioWeight}%
+                        {walletAccount && <span className="ml-1">· {walletAccount.icon || "💼"} {walletAccount.name}</span>}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2" onClick={(e) => e.preventDefault()}>
-                   {hasDailyChange && (
-                     <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full ${
-                       dailyIsPositive ? "bg-[#00C9A7]/10 text-[#00C9A7]" : "bg-[#FF6B6B]/10 text-[#FF6B6B]"
-                     }`}>
-                       {dailyIsPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                       {dailyIsPositive ? "+" : ""}{inv.daily_change_pct}%
-                     </span>
-                   )}
                   <button onClick={() => handleEdit(inv)} className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors">
                     <Pencil className="w-4 h-4" />
                   </button>

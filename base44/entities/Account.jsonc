@@ -12,6 +12,7 @@
         "bank",
         "cash",
         "ewallet",
+        "investment",
         "other"
       ],
       "default": "bank"
