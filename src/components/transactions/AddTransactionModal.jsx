@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X, Camera, Loader2, Scissors, Upload, Sparkles, History, ChevronDown } from "lucide-react";
+import { updateStreak, completeMission } from "@/hooks/useGamificationActions";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
@@ -171,9 +172,16 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
         }
       }
       await onSave(txData);
+
+      // Gamification: streak + mission
+      const user = await base44.auth.me();
+      if (user?.email) {
+        updateStreak(user.email).catch(() => {});
+        completeMission(user.email, "catat_transaksi").catch(() => {});
+      }
+
       // CategoryLearning
       if (note && category) {
-        const user = await base44.auth.me();
         const words = note.split(/\s+/).filter(w => w.length >= 3);
         for (const word of words) {
           const frag = word.toLowerCase();

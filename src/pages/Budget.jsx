@@ -9,6 +9,7 @@ import BudgetNanaPanel from "@/components/budget/BudgetNanaPanel";
 import BudgetAlertChecker from "@/components/budget/BudgetAlertChecker";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { awardXP } from "@/hooks/useGamification";
+import { updateStreak, completeMission } from "@/hooks/useGamificationActions";
 import { useToast } from "@/components/ui/use-toast";
 
 const DEFAULT_CATEGORIES = [
@@ -113,6 +114,12 @@ export default function BudgetPage() {
       setCustomCategories(cats);
       setGoals(g);
       setGlobalCategories(globalCats || []);
+
+      // Gamification: streak + cek_budget mission (only current month view)
+      if (monthOffset === 0 && user?.email) {
+        updateStreak(user.email).catch(() => {});
+        completeMission(user.email, "cek_budget").catch(() => {});
+      }
 
       // Budget carry-over: only check for current month (offset 0), only once per session
       if (monthOffset === 0 && !carryOverCheckedRef.current && b.length === 0) {

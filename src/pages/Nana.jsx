@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
 import { awardXP } from "@/hooks/useGamification";
+import { updateStreak, completeMission } from "@/hooks/useGamificationActions";
 import MoodPicker from "@/components/nana/MoodPicker";
 import NanaQuickActions from "@/components/nana/NanaQuickActions";
 import { format } from "date-fns";
@@ -227,6 +228,12 @@ export default function Nana() {
     saveToNanaConversation("user", text, msgType);
 
     await base44.agents.addMessage(conv, { role: "user", content: text });
+
+    // Gamification: streak + tanya_nana mission
+    if (user?.email) {
+      updateStreak(user.email).catch(() => {});
+      completeMission(user.email, "tanya_nana").catch(() => {});
+    }
 
     if (!isPremium) {
       const newCount = msgCount + 1;
