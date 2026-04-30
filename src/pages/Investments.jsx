@@ -173,11 +173,10 @@ export default function InvestmentsPage() {
                       <p className="font-bold text-[#1A1A1A] leading-tight">
                         {walletAccount ? walletAccount.name : inv.name}
                       </p>
-                      {walletAccount && (
-                        <p className="text-xs text-[#4A5568] font-medium">{inv.name}</p>
-                      )}
-                      {/* Sub: tipe investasi as plain text */}
-                      <p className="text-xs text-[#8FA4C8] mt-0.5">{typeLabel}</p>
+                      {/* Sub: nama aset · tipe — satu baris */}
+                      <p className="text-xs text-[#8FA4C8] mt-0.5">
+                        {walletAccount ? `${inv.name} · ${typeLabel}` : typeLabel}
+                      </p>
                     </div>
                   </div>
                   <button onClick={() => handleDelete(inv.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors p-1">

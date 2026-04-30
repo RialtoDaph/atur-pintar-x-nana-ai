@@ -41,59 +41,64 @@ export default function PortfolioSummaryChart({ totalBeli, totalJual, saldoAktif
 
   return (
     <div>
-      {/* Numbers */}
-      <div className="mb-4">
-        <p className="text-white/40 text-xs mb-0.5">Saldo Aktif</p>
-        <p className="text-white text-3xl font-bold">{formatCurrency(saldoAktif)}</p>
-        <div className="flex gap-4 mt-2">
+      {/* Numbers + Chart menyatu */}
+      <div className="relative">
+        {/* Overlay info di atas chart */}
+        <div className="flex items-end justify-between mb-2">
           <div>
-            <p className="text-white/40 text-xs">Total Beli</p>
-            <p className="text-white/80 text-sm font-semibold">{formatCurrency(totalBeli)}</p>
+            <p className="text-white/40 text-xs mb-0.5">Saldo Aktif</p>
+            <p className="text-white text-3xl font-bold leading-none">{formatCurrency(saldoAktif)}</p>
           </div>
-          <div>
-            <p className="text-white/40 text-xs">Total Jual</p>
-            <p className="text-white/80 text-sm font-semibold">{formatCurrency(totalJual)}</p>
+          <div className="flex gap-4 text-right pb-1">
+            <div>
+              <p className="text-white/40 text-[10px]">Total Beli</p>
+              <p className="text-white/80 text-xs font-semibold">{formatCurrency(totalBeli)}</p>
+            </div>
+            <div>
+              <p className="text-white/40 text-[10px]">Total Jual</p>
+              <p className="text-white/80 text-xs font-semibold">{formatCurrency(totalJual)}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Chart */}
-      {chartData.length >= 2 ? (
-        <div className="-mx-2">
-          <ResponsiveContainer width="100%" height={130}>
-            <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="saldoGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={color} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis
-                dataKey="label"
-                tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }}
-                axisLine={false}
-                tickLine={false}
-                interval="preserveStartEnd"
-              />
-              <YAxis hide domain={["auto", "auto"]} />
-              <Tooltip content={<CustomTooltip formatCurrency={formatCurrency} />} />
-              <Area
-                type="monotone"
-                dataKey="value"
-                stroke={color}
-                strokeWidth={2}
-                fill="url(#saldoGrad)"
-                dot={false}
-                activeDot={{ r: 4, fill: color, strokeWidth: 0 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="h-[80px] flex items-center justify-center">
-          <p className="text-white/25 text-xs">Tambah transaksi untuk melihat tren</p>
-        </div>
-      )}
+        {/* Chart langsung di bawah tanpa jarak */}
+        {chartData.length >= 2 ? (
+          <div className="-mx-2">
+            <ResponsiveContainer width="100%" height={110}>
+              <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="saldoGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={color} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval="preserveStartEnd"
+                />
+                <YAxis hide domain={["auto", "auto"]} />
+                <Tooltip content={<CustomTooltip formatCurrency={formatCurrency} />} />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke={color}
+                  strokeWidth={2}
+                  fill="url(#saldoGrad)"
+                  dot={false}
+                  activeDot={{ r: 4, fill: color, strokeWidth: 0 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="h-[60px] flex items-center justify-center">
+            <p className="text-white/25 text-xs">Tambah transaksi untuk melihat tren</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
