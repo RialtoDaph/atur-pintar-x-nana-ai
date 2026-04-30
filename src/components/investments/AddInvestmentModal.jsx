@@ -107,18 +107,42 @@ export default function AddInvestmentModal({ onClose, onSave }) {
                 </button>
               </div>
             ) : (
-              <select
-                className={inputCls}
-                value={form.account_id}
-                onChange={e => setForm(f => ({ ...f, account_id: e.target.value }))}
-              >
-                <option value="">{lang === "en" ? "-- Select wallet (optional) --" : "-- Pilih dompet (opsional) --"}</option>
+              <div className="flex flex-col gap-2">
+                {/* None option */}
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, account_id: "" }))}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm text-left transition-colors ${
+                    form.account_id === ""
+                      ? "border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00] font-semibold"
+                      : "border-[#E2E8F0] bg-[#F8FAFC] text-[#8FA4C8]"
+                  }`}
+                >
+                  {lang === "en" ? "-- None (optional) --" : "-- Tanpa dompet (opsional) --"}
+                </button>
                 {accounts.map(acc => (
-                  <option key={acc.id} value={acc.id}>
-                    {acc.icon || "💼"} {acc.name}
-                  </option>
+                  <button
+                    key={acc.id}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, account_id: acc.id }))}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm text-left transition-colors ${
+                      form.account_id === acc.id
+                        ? "border-[#FF6A00] bg-[#FF6A00]/5"
+                        : "border-[#E2E8F0] bg-[#F8FAFC]"
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-[#F2F4F7] flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {acc.logo_url
+                        ? <img src={acc.logo_url} alt={acc.name} className="w-full h-full object-contain" />
+                        : <span className="text-lg">{acc.icon || "💼"}</span>
+                      }
+                    </div>
+                    <span className={`font-medium text-[#1A1A1A] ${form.account_id === acc.id ? "text-[#FF6A00]" : ""}`}>
+                      {acc.name}
+                    </span>
+                  </button>
                 ))}
-              </select>
+              </div>
             )}
           </div>
 
