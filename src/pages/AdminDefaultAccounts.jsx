@@ -14,7 +14,7 @@ const TYPES = [
 const ICONS = ["🏦","💵","📱","💳","🏧","🐷","💰","🎯","📈","💹","🏛️","🌟","⚡","🎪","🛡️","💎"];
 const COLORS = ["#1976D2","#7B1FA2","#388E3C","#F57C00","#E91E63","#00BCD4","#F97316","#EF4444","#8BC34A","#FF9800","#607D8B","#795548"];
 
-const EMPTY = { name: "", institution: "", type: "bank", icon: "🏦", color: "#1976D2", sort_order: 0, is_active: true };
+const EMPTY = { name: "", institution: "", type: "bank", icon: "🏦", color: "#1976D2", logo_url: "", sort_order: 0, is_active: true };
 
 export default function AdminDefaultAccounts() {
   const [items, setItems] = useState([]);
@@ -48,6 +48,7 @@ export default function AdminDefaultAccounts() {
       type: item.type || "bank",
       icon: item.icon || "🏦",
       color: item.color || "#1976D2",
+      logo_url: item.logo_url || "",
       sort_order: item.sort_order || 0,
       is_active: item.is_active !== false,
     });
@@ -176,6 +177,20 @@ export default function AdminDefaultAccounts() {
                     placeholder="PT Bank BCA..."
                     className="w-full px-3 py-2.5 rounded-xl border border-[#E2E8F0] text-sm bg-[#F8FAFC] outline-none focus:ring-2 focus:ring-[#FF6A00]" />
                 </div>
+              </div>
+
+              {/* Logo URL */}
+              <div>
+                <p className="text-xs font-semibold text-[#8FA4C8] mb-1">Logo URL (opsional)</p>
+                <input value={form.logo_url} onChange={e => setForm(f => ({ ...f, logo_url: e.target.value }))}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2.5 rounded-xl border border-[#E2E8F0] text-sm bg-[#F8FAFC] outline-none focus:ring-2 focus:ring-[#FF6A00]" />
+                {form.logo_url && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <p className="text-xs text-[#8FA4C8]">Preview:</p>
+                    <img src={form.logo_url} alt="logo" className="h-6 max-w-24 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                  </div>
+                )}
               </div>
 
               {/* Sort order */}
