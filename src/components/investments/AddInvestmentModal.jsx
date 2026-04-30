@@ -91,7 +91,49 @@ export default function AddInvestmentModal({ onClose, onSave }) {
             </select>
           </div>
 
-
+          {/* Platform / Dompet */}
+          <div>
+            <label className={labelCls}>{lang === "en" ? "Wallet / Platform" : "Dompet / Platform"}</label>
+            {accounts.length === 0 ? (
+              <div className="border border-[#E2E8F0] rounded-xl px-4 py-3 bg-[#FFF5F5] space-y-2">
+                <p className="text-sm text-[#C84545]">
+                  {lang === "en" ? "No investment wallets yet." : "Belum ada dompet investasi."}
+                </p>
+                <button
+                  onClick={() => navigate("/Accounts")}
+                  className="text-xs font-semibold text-[#FF6A00] hover:text-[#e05e00] underline"
+                >
+                  {lang === "en" ? "Go to Accounts" : "Buka Rekening"}
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, account_id: "" }))}
+                  className={`flex items-center gap-2 py-1.5 text-sm text-left transition-colors ${form.account_id === "" ? "text-[#FF6A00] font-semibold" : "text-[#8FA4C8]"}`}
+                >
+                  {lang === "en" ? "None (optional)" : "Tanpa dompet (opsional)"}
+                </button>
+                {accounts.map(acc => (
+                  <button
+                    key={acc.id}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, account_id: acc.id }))}
+                    className={`flex items-center gap-2 py-1.5 text-sm text-left transition-colors ${form.account_id === acc.id ? "text-[#FF6A00] font-semibold" : "text-[#1A1A1A]"}`}
+                  >
+                    <div className="w-6 h-6 rounded-lg bg-[#F2F4F7] flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {acc.logo_url
+                        ? <img src={acc.logo_url} alt={acc.name} className="w-full h-full object-contain" />
+                        : <span className="text-sm">{acc.icon || "💼"}</span>
+                      }
+                    </div>
+                    {acc.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Tanggal */}
           <div>
