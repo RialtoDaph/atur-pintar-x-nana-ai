@@ -107,39 +107,28 @@ export default function AddInvestmentModal({ onClose, onSave }) {
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
-                {/* None option */}
+              <div className="flex flex-col gap-1">
                 <button
                   type="button"
                   onClick={() => setForm(f => ({ ...f, account_id: "" }))}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm text-left transition-colors ${
-                    form.account_id === ""
-                      ? "border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00] font-semibold"
-                      : "border-[#E2E8F0] bg-[#F8FAFC] text-[#8FA4C8]"
-                  }`}
+                  className={`flex items-center gap-2 py-1.5 text-sm text-left transition-colors ${form.account_id === "" ? "text-[#FF6A00] font-semibold" : "text-[#8FA4C8]"}`}
                 >
-                  {lang === "en" ? "-- None (optional) --" : "-- Tanpa dompet (opsional) --"}
+                  {lang === "en" ? "None (optional)" : "Tanpa dompet (opsional)"}
                 </button>
                 {accounts.map(acc => (
                   <button
                     key={acc.id}
                     type="button"
                     onClick={() => setForm(f => ({ ...f, account_id: acc.id }))}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm text-left transition-colors ${
-                      form.account_id === acc.id
-                        ? "border-[#FF6A00] bg-[#FF6A00]/5"
-                        : "border-[#E2E8F0] bg-[#F8FAFC]"
-                    }`}
+                    className={`flex items-center gap-2 py-1.5 text-sm text-left transition-colors ${form.account_id === acc.id ? "text-[#FF6A00] font-semibold" : "text-[#1A1A1A]"}`}
                   >
-                    <div className="w-8 h-8 rounded-xl bg-[#F2F4F7] flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div className="w-6 h-6 rounded-lg bg-[#F2F4F7] flex items-center justify-center overflow-hidden flex-shrink-0">
                       {acc.logo_url
                         ? <img src={acc.logo_url} alt={acc.name} className="w-full h-full object-contain" />
-                        : <span className="text-lg">{acc.icon || "💼"}</span>
+                        : <span className="text-sm">{acc.icon || "💼"}</span>
                       }
                     </div>
-                    <span className={`font-medium text-[#1A1A1A] ${form.account_id === acc.id ? "text-[#FF6A00]" : ""}`}>
-                      {acc.name}
-                    </span>
+                    {acc.name}
                   </button>
                 ))}
               </div>
