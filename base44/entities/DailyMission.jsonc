@@ -28,6 +28,11 @@
       "type": "boolean",
       "default": false,
       "description": "Apakah misi sudah diselesaikan"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi misi (opsional)"
     }
   },
   "required": [

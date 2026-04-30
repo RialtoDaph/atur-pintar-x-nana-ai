@@ -91,6 +91,11 @@
       },
       "default": [],
       "description": "ID kategori favorit user untuk quick-pick (maks 6)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi pengaturan pengguna (opsional)"
     }
   },
   "required": [],

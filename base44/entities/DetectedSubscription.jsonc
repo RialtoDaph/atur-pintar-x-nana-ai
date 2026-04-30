@@ -53,6 +53,11 @@
         "type": "string"
       },
       "description": "Sample transaction notes that matched this pattern"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi subscription terdeteksi (opsional)"
     }
   },
   "required": [

@@ -46,6 +46,11 @@
       "type": "string",
       "default": "",
       "description": "Name of the parent category (only for subcategories)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi kategori global (opsional)"
     }
   },
   "required": [

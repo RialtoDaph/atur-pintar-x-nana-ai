@@ -17,6 +17,11 @@
     "color": {
       "type": "string",
       "description": "Color for the budget card"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi budget (opsional)"
     }
   },
   "required": [

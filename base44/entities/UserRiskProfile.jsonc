@@ -59,6 +59,11 @@
       "type": "string",
       "format": "date",
       "description": "Tanggal terakhir profil dinilai"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi profil risiko pengguna (opsional)"
     }
   },
   "required": [

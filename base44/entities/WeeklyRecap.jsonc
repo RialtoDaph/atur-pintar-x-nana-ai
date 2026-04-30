@@ -1,0 +1,82 @@
+{
+  "name": "WeeklyRecap",
+  "type": "object",
+  "properties": {
+    "week_start": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal mulai minggu (Senin, YYYY-MM-DD)"
+    },
+    "week_end": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal akhir minggu (Minggu, YYYY-MM-DD)"
+    },
+    "total_income": {
+      "type": "number",
+      "default": 0,
+      "description": "Total pemasukan minggu ini"
+    },
+    "total_expense": {
+      "type": "number",
+      "default": 0,
+      "description": "Total pengeluaran minggu ini"
+    },
+    "net": {
+      "type": "number",
+      "default": 0,
+      "description": "Selisih income - expense"
+    },
+    "top_categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "count": {
+            "type": "number"
+          }
+        }
+      },
+      "default": [],
+      "description": "Top 3 kategori pengeluaran minggu ini"
+    },
+    "transaction_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Jumlah transaksi minggu ini"
+    },
+    "vs_last_week_pct": {
+      "type": "number",
+      "description": "Perubahan pengeluaran vs minggu lalu (%)"
+    },
+    "summary_text": {
+      "type": "string",
+      "description": "Ringkasan narasi dari Nana AI"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Apakah user sudah membaca rekap ini"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi weekly recap (opsional)"
+    }
+  },
+  "required": [
+    "week_start",
+    "week_end"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

@@ -71,6 +71,11 @@
         "completed"
       ],
       "default": "draft"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi split bill (opsional)"
     }
   },
   "required": [

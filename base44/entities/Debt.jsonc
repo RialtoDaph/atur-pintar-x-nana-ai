@@ -50,6 +50,11 @@
     "icon": {
       "type": "string",
       "description": "Emoji icon"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi utang (opsional)"
     }
   },
   "required": [

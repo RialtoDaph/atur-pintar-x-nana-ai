@@ -27,6 +27,11 @@
     "parent_category_key": {
       "type": "string",
       "description": "Parent category key (default or custom_<id>)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi kategori (opsional)"
     }
   },
   "required": [

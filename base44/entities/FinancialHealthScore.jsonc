@@ -43,6 +43,11 @@
     "breakdown": {
       "type": "object",
       "description": "Breakdown skor per komponen (legacy)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi skor kesehatan (opsional)"
     }
   },
   "required": [

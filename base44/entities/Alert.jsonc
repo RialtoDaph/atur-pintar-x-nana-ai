@@ -58,6 +58,11 @@
     "action_url": {
       "type": "string",
       "description": "URL to take action on alert"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi alert tambahan (opsional)"
     }
   },
   "required": [

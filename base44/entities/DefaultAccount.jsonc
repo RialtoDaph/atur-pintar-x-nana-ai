@@ -42,6 +42,11 @@
       "type": "boolean",
       "default": true,
       "description": "Tampil di pilihan user"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi akun default (opsional)"
     }
   },
   "required": [

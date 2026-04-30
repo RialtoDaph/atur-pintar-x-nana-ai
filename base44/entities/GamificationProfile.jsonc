@@ -34,6 +34,11 @@
       },
       "default": [],
       "description": "Daftar achievement yang diraih"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi profil gamifikasi (opsional)"
     }
   },
   "required": [],

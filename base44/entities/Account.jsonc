@@ -1,47 +1,52 @@
 {
   "name": "Account",
-  "type": "object",
   "properties": {
+    "balance": {
+      "default": 0,
+      "description": "Saldo rekening",
+      "type": "number"
+    },
+    "color": {
+      "description": "Warna kartu",
+      "type": "string"
+    },
+    "icon": {
+      "description": "Emoji icon",
+      "type": "string"
+    },
+    "institution": {
+      "description": "Nama bank/institusi",
+      "type": "string"
+    },
+    "is_default": {
+      "default": false,
+      "description": "Rekening utama",
+      "type": "boolean"
+    },
+    "logo_url": {
+      "description": "URL logo dari institusi",
+      "type": "string"
+    },
     "name": {
-      "type": "string",
-      "description": "Nama rekening (e.g., Rekening BCA, Dompet Cash, OVO)"
+      "description": "Nama rekening (e.g., Rekening BCA, Dompet Cash, OVO)",
+      "type": "string"
     },
     "type": {
-      "type": "string",
+      "default": "bank",
+      "description": "Tipe rekening",
       "enum": [
         "bank",
         "cash",
         "ewallet",
-        "investment",
+        "investasi",
         "other"
       ],
-      "default": "bank"
+      "type": "string"
     },
-    "balance": {
-      "type": "number",
-      "default": 0,
-      "description": "Saldo rekening"
-    },
-    "icon": {
+    "description": {
       "type": "string",
-      "description": "Emoji icon"
-    },
-    "color": {
-      "type": "string",
-      "description": "Warna kartu"
-    },
-    "logo_url": {
-      "type": "string",
-      "description": "URL logo dari institusi"
-    },
-    "is_default": {
-      "type": "boolean",
-      "default": false,
-      "description": "Rekening utama"
-    },
-    "institution": {
-      "type": "string",
-      "description": "Nama bank/institusi"
+      "maxLength": 1000,
+      "description": "Deskripsi rekening (opsional)"
     }
   },
   "required": [
@@ -52,5 +57,6 @@
     "enabled": true,
     "filter_field": "created_by",
     "filter_value": "{{user.email}}"
-  }
+  },
+  "type": "object"
 }

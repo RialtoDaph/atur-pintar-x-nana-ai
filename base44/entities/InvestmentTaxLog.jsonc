@@ -39,6 +39,11 @@
     "year": {
       "type": "number",
       "description": "Tahun pajak"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi log pajak investasi (opsional)"
     }
   },
   "required": [

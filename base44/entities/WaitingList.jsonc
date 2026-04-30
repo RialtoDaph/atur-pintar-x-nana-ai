@@ -48,6 +48,20 @@
         "Belum yakin"
       ],
       "description": "Kesediaan mencoba versi awal"
+    },
+    "invited": {
+      "type": "boolean",
+      "default": false,
+      "description": "Apakah sudah diinvite"
+    },
+    "invited_at": {
+      "type": "string",
+      "description": "Tanggal dan waktu invite dikirim"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi waiting list entry (opsional)"
     }
   },
   "required": [
@@ -59,8 +73,35 @@
     "early_access_interest"
   ],
   "rls": {
-    "enabled": true,
-    "filter_field": "created_by",
-    "filter_value": "{{user.email}}"
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
   }
 }

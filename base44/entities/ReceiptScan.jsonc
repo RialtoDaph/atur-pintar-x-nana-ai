@@ -40,6 +40,11 @@
     "transaction_id": {
       "type": "string",
       "description": "ID transaksi terkait jika sudah dikonfirmasi"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi scan struk (opsional)"
     }
   },
   "required": [

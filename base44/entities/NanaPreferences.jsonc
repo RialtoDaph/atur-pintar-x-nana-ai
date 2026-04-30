@@ -40,6 +40,11 @@
       ],
       "default": "weekly",
       "description": "Frekuensi saran yang diinginkan"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi preferensi Nana (opsional)"
     }
   },
   "required": [],

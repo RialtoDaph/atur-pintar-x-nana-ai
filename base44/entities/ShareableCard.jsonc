@@ -1,0 +1,44 @@
+{
+  "name": "ShareableCard",
+  "type": "object",
+  "properties": {
+    "card_type": {
+      "type": "string",
+      "enum": [
+        "achievement",
+        "level_up",
+        "streak_milestone",
+        "persona",
+        "fhs_score"
+      ],
+      "description": "Tipe shareable card"
+    },
+    "card_data": {
+      "type": "object",
+      "description": "Data untuk generate card (nama, level, score, persona, dll)"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Waktu card di-generate"
+    },
+    "is_shared": {
+      "type": "boolean",
+      "default": false,
+      "description": "Apakah card sudah di-share"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi shareable card (opsional)"
+    }
+  },
+  "required": [
+    "card_type"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}

@@ -1,57 +1,67 @@
 {
   "name": "AppConfig",
-  "type": "object",
   "properties": {
+    "app_name": {
+      "default": "Atur Pintar",
+      "description": "Application name",
+      "type": "string"
+    },
     "company_name": {
-      "type": "string",
       "default": "PT Rideff Vreka Tech",
-      "description": "Nama resmi perusahaan pengelola"
-    },
-    "feature_split_bill": {
-      "type": "boolean",
-      "default": true,
-      "description": "Enable Split Bill feature"
-    },
-    "feature_shared_wallet": {
-      "type": "boolean",
-      "default": true,
-      "description": "Enable Shared Wallet feature"
-    },
-    "feature_investment": {
-      "type": "boolean",
-      "default": true,
-      "description": "Enable Investment feature"
-    },
-    "feature_nana_ai": {
-      "type": "boolean",
-      "default": true,
-      "description": "Enable Nana AI chat"
+      "description": "Nama resmi perusahaan pengelola",
+      "type": "string"
     },
     "feature_gamification": {
-      "type": "boolean",
       "default": true,
-      "description": "Enable streaks and achievements"
+      "description": "Enable streaks and achievements",
+      "type": "boolean"
+    },
+    "feature_investment": {
+      "default": true,
+      "description": "Enable Investment feature",
+      "type": "boolean"
+    },
+    "feature_nana_ai": {
+      "default": true,
+      "description": "Enable Nana AI chat",
+      "type": "boolean"
+    },
+    "feature_shared_wallet": {
+      "default": true,
+      "description": "Enable Shared Wallet feature",
+      "type": "boolean"
+    },
+    "feature_split_bill": {
+      "default": true,
+      "description": "Enable Split Bill feature",
+      "type": "boolean"
+    },
+    "feature_waiting_list": {
+      "default": false,
+      "description": "Enable Waiting List feature",
+      "type": "boolean"
     },
     "maintenance_mode": {
-      "type": "boolean",
       "default": false,
-      "description": "Show maintenance page to non-admin users"
+      "description": "Show maintenance page to non-admin users",
+      "type": "boolean"
     },
     "premium_price_monthly": {
-      "type": "number",
-      "default": 39000,
-      "description": "Monthly premium price in IDR"
+      "default": 49000,
+      "description": "Monthly premium price in IDR",
+      "type": "number"
     },
     "premium_price_yearly": {
-      "type": "number",
-      "default": 299000,
-      "description": "Yearly premium price in IDR"
+      "default": 399900,
+      "description": "Yearly premium price in IDR",
+      "type": "number"
     },
-    "app_name": {
+    "description": {
       "type": "string",
-      "default": "Atur Pintar",
-      "description": "Application name"
+      "maxLength": 1000,
+      "description": "Deskripsi konfigurasi aplikasi (opsional)"
     }
   },
-  "required": []
+  "required": [],
+  "type": "object"
 }

@@ -34,6 +34,11 @@
       },
       "default": [],
       "description": "List of emails that have read this notification"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi notifikasi tambahan (opsional)"
     }
   },
   "required": [

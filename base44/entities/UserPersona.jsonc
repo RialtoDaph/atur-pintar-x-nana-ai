@@ -1,0 +1,67 @@
+{
+  "name": "UserPersona",
+  "type": "object",
+  "properties": {
+    "persona_type": {
+      "type": "string",
+      "enum": [
+        "explorer",
+        "pelit",
+        "mager",
+        "ambisius",
+        "impulsif",
+        "balanced"
+      ],
+      "description": "Tipe persona hasil Financial Personality Quiz"
+    },
+    "persona_label": {
+      "type": "string",
+      "description": "Label display persona (misal: Si Explorer Duit)"
+    },
+    "quiz_answers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Jawaban user dari 5 pertanyaan quiz"
+    },
+    "primary_goal": {
+      "type": "string",
+      "description": "Tujuan finansial pertama yang dipilih user saat onboarding"
+    },
+    "primary_goal_label": {
+      "type": "string",
+      "description": "Label display tujuan finansial"
+    },
+    "income_range": {
+      "type": "string",
+      "enum": [
+        "under_3jt",
+        "3_5jt",
+        "5_8jt",
+        "8_15jt",
+        "above_15jt",
+        "prefer_not_to_say"
+      ],
+      "description": "Range income bulanan dari onboarding"
+    },
+    "onboarding_completed_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal onboarding selesai"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Deskripsi persona pengguna (opsional)"
+    }
+  },
+  "required": [
+    "persona_type"
+  ],
+  "rls": {
+    "enabled": true,
+    "filter_field": "created_by",
+    "filter_value": "{{user.email}}"
+  }
+}
