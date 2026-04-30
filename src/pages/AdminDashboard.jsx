@@ -303,17 +303,17 @@ export default function AdminDashboard() {
                       <p className="text-xs text-[#8FA4C8]">Daftar: {u.created_date ? new Date(u.created_date).toLocaleDateString('id-ID') : '-'}</p>
                     </div>
                     <button
-                      disabled={sendingReminder[u.id]}
-                      onClick={async () => {
-                        setSendingReminder(prev => ({ ...prev, [u.id]: true }));
-                        await base44.asServiceRole.entities.AdminNotification.create({
-                          title: '👋 Selesaikan setup akunmu!',
-                          message: 'Hei! Kamu belum selesai proses onboarding Atur Pintar. Yuk buka app dan selesaikan setup untuk mulai kelola keuanganmu.',
-                          target_type: 'specific',
-                          target_email: u.email
-                        });
-                        setSendingReminder(prev => ({ ...prev, [u.id]: false }));
-                      }}
+                       disabled={sendingReminder[u.id]}
+                       onClick={async () => {
+                         setSendingReminder(prev => ({ ...prev, [u.id]: true }));
+                         await base44.entities.AdminNotification.create({
+                           title: '👋 Selesaikan setup akunmu!',
+                           message: 'Hei! Kamu belum selesai proses onboarding Atur Pintar. Yuk buka app dan selesaikan setup untuk mulai kelola keuanganmu.',
+                           target_type: 'specific',
+                           target_email: u.email
+                         });
+                         setSendingReminder(prev => ({ ...prev, [u.id]: false }));
+                       }}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6A00] text-white text-xs font-bold rounded-lg hover:bg-[#e05e00] disabled:opacity-50 transition-colors flex-shrink-0">
                       {sendingReminder[u.id] ? <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send className="w-3 h-3" />}
                       Kirim Reminder
