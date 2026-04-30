@@ -9,6 +9,7 @@ import { base44 } from "@/api/base44Client";
 
 import ReminderNotificationPopup from "@/components/reminders/ReminderNotificationPopup";
 import { syncAccountBalance } from "@/components/utils/accountSync";
+import { updateChallengesAfterTransaction } from "@/lib/updateChallengesAfterTransaction";
 import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSettingsContext";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { AnimatePresence, motion } from "framer-motion";
@@ -414,6 +415,8 @@ function LayoutInner({ children, currentPageName }) {
         onSave={async (data) => {
           await base44.entities.Transaction.create(data);
           if (data.account_id) await syncAccountBalance(data.account_id, data.amount, data.type, 1);
+          // Update challenge progress after transaction
+          if (user?.email) await updateChallengesAfterTransaction(user.email);
           setShowAddTransaction(false);
           // Small delay to let account balance update propagate, then refresh dashboard
           setTimeout(() => window.dispatchEvent(new Event("refresh-dashboard")), 400);

@@ -11,6 +11,7 @@ import GoalCard from "@/components/goals/GoalCard";
 import GoalsNanaPanel from "@/components/goals/GoalsNanaPanel";
 import { toast } from "sonner";
 import PullToRefresh from "@/components/utils/PullToRefresh";
+import { updateChallengesAfterTransaction } from "@/lib/updateChallengesAfterTransaction";
 
 const FREE_GOALS_LIMIT = 2;
 
@@ -99,14 +100,16 @@ export default function Goals() {
     setTransactions(prev => [optimisticTx, ...prev]);
     setShowTxModal(null);
     try {
-      await Promise.all([
-        base44.entities.Transaction.create(tx),
-        base44.entities.SavingsGoal.update(goalId, {
-          current_amount: newAmount,
-          status: newAmount >= goal.target_amount ? "completed" : "active",
-        }),
-      ]);
-    } catch (error) {
+       await Promise.all([
+         base44.entities.Transaction.create(tx),
+         base44.entities.SavingsGoal.update(goalId, {
+           current_amount: newAmount,
+           status: newAmount >= goal.target_amount ? "completed" : "active",
+         }),
+       ]);
+       // Update challenge progress
+       if (user?.email) await updateChallengesAfterTransaction(user.email);
+     } catch (error) {
       setGoals(previousGoals);
       setTransactions(prev => prev.filter(t => t.id !== optimisticTx.id));
       loadData();
@@ -117,10 +120,15 @@ export default function Goals() {
     const newAmount = (goal.current_amount || 0) + amount;
     const newStatus = newAmount >= goal.target_amount ? "completed" : goal.status;
     await Promise.all([
-      base44.entities.Transaction.create({
-        type: "savings", amount, account_id: accountId,
-        goal_id: goal.id, date, note: note || `Tabungan ${goal.name}`,
-      }),
+      (async () => {
+        const tx = await base44.entities.Transaction.create({
+          type: "savings", amount, account_id: accountId,
+          goal_id: goal.id, date, note: note || `Tabungan ${goal.name}`,
+        });
+        // Update challenge progress
+        if (user?.email) await updateChallengesAfterTransaction(user.email);
+        return tx;
+      })(),
       base44.entities.SavingsGoal.update(goal.id, { current_amount: newAmount, status: newStatus }),
       base44.entities.Account.filter({ id: accountId }).then(([acc]) => {
         if (acc) return base44.entities.Account.update(accountId, { balance: Math.max((acc.balance || 0) - amount, 0) });
