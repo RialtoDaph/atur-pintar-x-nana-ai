@@ -118,13 +118,10 @@ export default function InvestmentsPage() {
   async function handleAddTransaction(txData) {
      try {
        await base44.entities.InvestmentTransaction.create(txData);
-       // Update current_value directly: buy adds, sell subtracts
-       const inv = investments.find(i => i.id === txData.investment_id);
-       if (inv) {
-         const delta = txData.type === "buy" ? txData.total_amount : -txData.total_amount;
-         const newValue = Math.max(0, (inv.current_value || 0) + delta);
-         await base44.entities.Investment.update(txData.investment_id, { current_value: newValue });
-       }
+       // Recalculate investment value
+       await base44.functions.invoke('recalculateInvestmentValue', {
+         investment_id: txData.investment_id,
+       });
        setShowAddTx(null);
        loadData();
      } catch (error) {
