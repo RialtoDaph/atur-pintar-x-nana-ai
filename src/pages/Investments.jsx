@@ -9,6 +9,7 @@ import InvestmentTransactionModal from "@/components/investments/InvestmentTrans
 import EducationResources from "@/components/investments/EducationResources";
 import InvestmentNanaPanel from "@/components/investments/InvestmentNanaPanel";
 import RiskProfileRecommendation from "@/components/investments/RiskProfileRecommendation";
+import PortfolioSummaryChart from "@/components/investments/PortfolioSummaryChart";
 
 export default function InvestmentsPage() {
   const { formatCurrency, t, settings } = useAppSettings();
@@ -126,21 +127,14 @@ export default function InvestmentsPage() {
             </button>
           </div>
 
-          {/* Portfolio Summary */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/10 rounded-2xl p-3">
-              <p className="text-white/50 text-xs mb-1">Total Beli</p>
-              <p className="text-white font-bold text-sm">{formatCurrency(portfolioTotalBeli)}</p>
-            </div>
-            <div className="bg-white/10 rounded-2xl p-3">
-              <p className="text-white/50 text-xs mb-1">Total Jual</p>
-              <p className="text-white font-bold text-sm">{formatCurrency(portfolioTotalJual)}</p>
-            </div>
-            <div className="bg-white/10 rounded-2xl p-3">
-              <p className="text-white/50 text-xs mb-1">Saldo Aktif</p>
-              <p className="text-[#00C9A7] font-bold text-sm">{formatCurrency(portfolioSaldoAktif)}</p>
-            </div>
-          </div>
+          {/* Portfolio Chart */}
+          <PortfolioSummaryChart
+            totalBeli={portfolioTotalBeli}
+            totalJual={portfolioTotalJual}
+            saldoAktif={portfolioSaldoAktif}
+            transactions={transactions}
+            formatCurrency={formatCurrency}
+          />
         </div>
       </div>
 
