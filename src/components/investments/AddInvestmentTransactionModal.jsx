@@ -10,7 +10,6 @@ export default function AddInvestmentTransactionModal({ investment, onClose, onS
     type: "buy",
     total_amount: "",
     transaction_date: new Date().toISOString().split("T")[0],
-    notes: "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -25,7 +24,6 @@ export default function AddInvestmentTransactionModal({ investment, onClose, onS
         type: form.type,
         total_amount: amount,
         transaction_date: form.transaction_date,
-        notes: form.notes || undefined,
       });
     } finally {
       setSaving(false);
@@ -39,8 +37,6 @@ export default function AddInvestmentTransactionModal({ investment, onClose, onS
   const typeLabels = {
     buy: lang === "en" ? "Buy" : "Beli",
     sell: lang === "en" ? "Sell" : "Jual",
-    dividend: lang === "en" ? "Dividend" : "Dividen",
-    adjustment: lang === "en" ? "Adjustment" : "Penyesuaian",
   };
 
   return (
@@ -65,16 +61,24 @@ export default function AddInvestmentTransactionModal({ investment, onClose, onS
           {/* Type */}
           <div>
             <label className={labelCls}>{lang === "en" ? "Transaction Type" : "Jenis Transaksi"}</label>
-            <select
-              value={form.type}
-              onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
-              className={inputCls}
-            >
-              <option value="buy">{typeLabels.buy}</option>
-              <option value="sell">{typeLabels.sell}</option>
-              <option value="dividend">{typeLabels.dividend}</option>
-              <option value="adjustment">{typeLabels.adjustment}</option>
-            </select>
+            <div className="flex gap-2">
+              {["buy", "sell"].map(t => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, type: t }))}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${
+                    form.type === t
+                      ? t === "buy"
+                        ? "bg-[#00C9A7] text-white border-[#00C9A7]"
+                        : "bg-[#FF6B6B] text-white border-[#FF6B6B]"
+                      : "bg-[#F8FAFC] text-[#8FA4C8] border-[#E2E8F0]"
+                  }`}
+                >
+                  {typeLabels[t]}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Amount */}
@@ -101,17 +105,7 @@ export default function AddInvestmentTransactionModal({ investment, onClose, onS
             />
           </div>
 
-          {/* Notes */}
-          <div>
-            <label className={labelCls}>{lang === "en" ? "Notes (optional)" : "Catatan (opsional)"}</label>
-            <input
-              type="text"
-              placeholder={lang === "en" ? "e.g. Monthly DCA" : "mis. DCA bulanan"}
-              className={inputCls}
-              value={form.notes}
-              onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-            />
-          </div>
+
         </div>
 
         <button
