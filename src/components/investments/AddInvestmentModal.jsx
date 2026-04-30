@@ -107,35 +107,23 @@ export default function AddInvestmentModal({ onClose, onSave }) {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
-                {accounts.map(acc => {
-                  const selected = form.account_id === acc.id;
-                  const selectedType = INVESTMENT_TYPES_LIST.find(t => t.key === form.type);
-                  const typeLabel = selectedType ? (lang === "en" ? selectedType.label_en : selectedType.label_id) : "";
-                  return (
-                    <button
-                      key={acc.id}
-                      type="button"
-                      onClick={() => setForm(f => ({ ...f, account_id: acc.id }))}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-xl border text-left transition-all ${
-                        selected
-                          ? "border-[#FF6A00] bg-[#FF6A00]/5"
-                          : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#FF6A00]/40"
-                      }`}
-                    >
-                      <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
-                        {acc.logo_url
-                          ? <img src={acc.logo_url} alt={acc.name} className="w-full h-full object-contain" />
-                          : <span className="text-xl">{acc.icon || "💼"}</span>
-                        }
-                      </div>
-                      <div className="min-w-0">
-                        <p className={`text-sm font-bold truncate ${selected ? "text-[#FF6A00]" : "text-[#1A1A1A]"}`}>{acc.name}</p>
-                        <p className="text-[10px] text-[#8FA4C8] truncate">{form.name || (lang === "en" ? "Asset name" : "Nama aset")} · {typeLabel}</p>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="flex flex-col gap-1">
+                {accounts.map(acc => (
+                  <button
+                    key={acc.id}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, account_id: acc.id }))}
+                    className={`flex items-center gap-2 py-1.5 text-sm text-left transition-colors ${form.account_id === acc.id ? "text-[#FF6A00] font-semibold" : "text-[#1A1A1A]"}`}
+                  >
+                    <div className="w-6 h-6 rounded-lg bg-[#F2F4F7] flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {acc.logo_url
+                        ? <img src={acc.logo_url} alt={acc.name} className="w-full h-full object-contain" />
+                        : <span className="text-sm">{acc.icon || "💼"}</span>
+                      }
+                    </div>
+                    {acc.name}
+                  </button>
+                ))}
               </div>
             )}
           </div>
