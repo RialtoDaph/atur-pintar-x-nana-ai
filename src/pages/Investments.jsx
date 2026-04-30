@@ -149,8 +149,8 @@ export default function InvestmentsPage() {
           </div>
         ) : (
           investments.map(inv => {
-            const type = INVESTMENT_TYPES_MAP[inv.type] || INVESTMENT_TYPES_MAP.lainnya;
-            const typeLabel = settings.language === 'en' ? type.label_en : type.label_id;
+            const invType = INVESTMENT_TYPES_MAP[inv.type] || INVESTMENT_TYPES_MAP.lainnya;
+            const typeLabel = settings.language === 'en' ? invType.label_en : invType.label_id;
             const { totalBeli, totalJual, saldoAktif, untungRugi } = getMetrics(inv.id);
             const walletAccount = accounts.find(a => a.id === inv.account_id);
             const isProfit = untungRugi >= 0;
@@ -165,7 +165,7 @@ export default function InvestmentsPage() {
                       {walletAccount?.logo_url ? (
                         <img src={walletAccount.logo_url} alt={walletAccount.name} className="w-full h-full object-contain" />
                       ) : (
-                        <span className="text-2xl">{walletAccount?.icon || type.emoji}</span>
+                        <span className="text-2xl">{walletAccount?.icon || invType.emoji}</span>
                       )}
                     </div>
                     <div>
