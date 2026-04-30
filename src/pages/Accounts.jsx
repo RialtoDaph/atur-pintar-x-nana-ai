@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
 import AccountLogo from "@/components/ui/AccountLogo";
+import AddAccountBottomSheet from "@/components/profile/AddAccountBottomSheet";
 
 
 function formatRupiah(n) {
@@ -197,7 +198,7 @@ function AccountModal({ account, onClose, onSave }) {
           {/* Balance input — always shown */}
           <div>
             <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5">
-              {account?.id ? "Saldo Saat Ini" : "Saldo Awal"}
+              {account?.id ? "Ubah Saldo" : "Saldo Awal"}
             </p>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm">Rp</span>
@@ -213,6 +214,9 @@ function AccountModal({ account, onClose, onSave }) {
                 className="w-full pl-10 pr-4 py-3 bg-[#F2F4F7] rounded-xl text-sm text-[#1A1A1A] outline-none focus:ring-2 focus:ring-[#F97316]/30 font-bold"
               />
             </div>
+            {account?.id && (
+              <p className="text-[10px] text-[#8FA4C8] mt-2">Saldo saat ini: <span className="font-bold text-[#1A1A1A]">{formatRupiah(account.balance)}</span></p>
+            )}
           </div>
 
           {/* Default toggle */}
@@ -228,10 +232,10 @@ function AccountModal({ account, onClose, onSave }) {
           </div>
         </div>
         <div className="px-5 pb-6 pt-2">
-          <button onClick={handleSave} disabled={saving || (!account?.id && !form.name.trim())}
+          <button onClick={handleSave} disabled={saving || (!account?.id && !form.name.trim()) || (!account?.id && form.balance === 0 && !form._balanceDisplay)}
             className="w-full py-3.5 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
             {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check className="w-4 h-4" />}
-            {account?.id ? "Simpan Perubahan" : "Buat Rekening"}
+            {account?.id ? "Simpan Perubahan" : "Simpan"}
           </button>
         </div>
       </div>
@@ -249,6 +253,8 @@ export default function Accounts() {
   const [deleteInfo, setDeleteInfo] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [showAddBottomSheet, setShowAddBottomSheet] = useState(false);
+  const [bottomSheetType, setBottomSheetType] = useState("bank");
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -329,73 +335,93 @@ export default function Accounts() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 mt-5 space-y-3">
-        <button
-          onClick={() => { setEditAccount(null); setShowModal(true); }}
-          className="w-full bg-[#F97316] text-white py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all duration-150"
-          style={{boxShadow: '0 4px 16px rgba(249,115,22,0.4)'}}
-        >
-          <Plus className="w-4 h-4" /> Tambah Rekening Baru
-        </button>
-
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-8 h-8 border-4 border-[#F2F4F7] border-t-[#F97316] rounded-full animate-spin" />
           </div>
         ) : accounts.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm p-10 text-center">
-            <Wallet className="w-12 h-12 text-[#E2E8F0] mx-auto mb-3" />
-            <p className="text-[#1A1A1A] font-semibold">Belum ada rekening</p>
-            <p className="text-[#8FA4C8] text-sm mt-1">Tambahkan rekening bank, e-wallet, atau cash kamu</p>
-          </div>
-        ) : (
-          accounts.map(acc => (
-            <div key={acc.id} className={`bg-white rounded-2xl p-4 border transition-all duration-200 hover:shadow-lg ${acc.is_default ? "border-[#F97316]/40 shadow-md" : "border-[#F0F2F5] shadow-md"}`}>
-              <div className="flex items-center gap-4">
-                {acc.logo_url ? (
-                    <AccountLogo 
-                      logoUrl={acc.logo_url} 
-                      size="w-12 h-12"
-                      fallback={
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
-                          <span className="text-lg">{acc.icon || "🏦"}</span>
-                        </div>
-                      }
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
-                      <span className="text-lg">{acc.icon || "🏦"}</span>
-                    </div>
-                  )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-[#1A1A1A] text-sm">{acc.name}</p>
-                    {acc.is_default && <span className="text-[10px] bg-[#F97316]/10 text-[#F97316] font-bold px-2 py-0.5 rounded-full">Utama</span>}
-                  </div>
-                  <p className="text-xs text-[#8FA4C8] mt-0.5">{typeLabel[acc.type] || acc.type}</p>
-                  <p className="text-base font-bold mt-1" style={{ color: (acc.balance || 0) < 0 ? "#EF4444" : (acc.color || "#1A1A1A") }}>
-                    {formatRupiah(acc.balance)}
-                    {(acc.balance || 0) < 0 && <span className="ml-1 text-[10px] bg-red-100 text-red-500 font-bold px-1.5 py-0.5 rounded-full">Negatif</span>}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => syncBalance(acc)} disabled={syncing === acc.id} className="p-2 rounded-xl hover:bg-blue-50 text-[#8FA4C8] hover:text-blue-500 transition-colors" title="Sinkronkan Saldo dari Transaksi">
-                    <RefreshCw className={`w-4 h-4 ${syncing === acc.id ? 'animate-spin' : ''}`} />
-                  </button>
-                  {!acc.is_default && (
-                    <button onClick={() => setDefault(acc)} className="p-2 rounded-xl hover:bg-amber-50 text-[#8FA4C8] hover:text-amber-500 transition-colors" title="Jadikan Utama">
-                      <Star className="w-4 h-4" />
-                    </button>
-                  )}
-                  <button onClick={() => { setEditAccount(acc); setShowModal(true); }} className="p-2 rounded-xl hover:bg-[#F2F4F7] text-[#8FA4C8] transition-colors">
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => confirmDelete(acc)} className="p-2 rounded-xl hover:bg-red-50 text-[#8FA4C8] hover:text-red-500 transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+          <>
+            <button
+              onClick={() => { setBottomSheetType("bank"); setShowAddBottomSheet(true); }}
+              className="w-full bg-[#F97316] text-white py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all duration-150"
+              style={{boxShadow: '0 4px 16px rgba(249,115,22,0.4)'}}
+            >
+              <Plus className="w-4 h-4" /> Tambah Rekening Baru
+            </button>
+            <div className="bg-white rounded-2xl shadow-sm p-10 text-center">
+              <Wallet className="w-12 h-12 text-[#E2E8F0] mx-auto mb-3" />
+              <p className="text-[#1A1A1A] font-semibold">Belum ada rekening</p>
+              <p className="text-[#8FA4C8] text-sm mt-1">Tambahkan rekening bank, e-wallet, atau cash kamu</p>
             </div>
-          ))
+          </>
+        ) : (
+          <>
+            {/* Group view with add buttons per type */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden p-4 space-y-4">
+              {[
+                { key: "bank", label: "BANK", icon: "🏦" },
+                { key: "ewallet", label: "E-WALLET", icon: "📱" },
+                { key: "investasi", label: "INVESTASI", icon: "📈" },
+                { key: "cash", label: "CASH", icon: "💵" },
+              ].map(group => {
+                const groupAccounts = accounts.filter(a => a.type === group.key);
+                return (
+                  <div key={group.key}>
+                    <p className="text-[9px] font-bold text-[#8FA4C8] uppercase tracking-widest mb-2">{group.label}</p>
+                    <div className="space-y-2">
+                      {groupAccounts.map(acc => (
+                        <div key={acc.id} className="bg-[#F8FAFC] rounded-xl p-3 border border-[#E2E8F0] flex items-center gap-3 hover:border-[#F97316]/50 transition-all">
+                          {acc.logo_url ? (
+                              <AccountLogo 
+                                logoUrl={acc.logo_url} 
+                                size="w-10 h-10"
+                                fallback={
+                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
+                                    <span className="text-sm">{acc.icon || "🏦"}</span>
+                                  </div>
+                                }
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
+                                <span className="text-sm">{acc.icon || "🏦"}</span>
+                              </div>
+                            )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-semibold text-[#1A1A1A]">{acc.name}</p>
+                              {acc.is_default && <span className="text-[9px] bg-[#F97316]/10 text-[#F97316] font-bold px-1.5 py-0.5 rounded-full">Utama</span>}
+                            </div>
+                            <p className="text-[11px] font-bold mt-1" style={{ color: (acc.balance || 0) < 0 ? "#EF4444" : "#27AE60" }}>
+                              {formatRupiah(acc.balance)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-0.5">
+                            <button onClick={() => syncBalance(acc)} disabled={syncing === acc.id} className="p-1.5 rounded-lg hover:bg-white text-[#8FA4C8] hover:text-blue-500 transition-colors" title="Sinkronkan">
+                              <RefreshCw className={`w-3.5 h-3.5 ${syncing === acc.id ? 'animate-spin' : ''}`} />
+                            </button>
+                            <button onClick={() => { setEditAccount(acc); setShowModal(true); }} className="p-1.5 rounded-lg hover:bg-white text-[#8FA4C8] transition-colors">
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => confirmDelete(acc)} className="p-1.5 rounded-lg hover:bg-white text-[#8FA4C8] hover:text-red-500 transition-colors">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {groupAccounts.length > 0 && (
+                        <button
+                          onClick={() => { setBottomSheetType(group.key); setShowAddBottomSheet(true); }}
+                          className="w-full border border-dashed border-[#E2E8F0] rounded-xl px-3 py-2.5 flex items-center justify-center gap-1.5 hover:border-[#F97316] hover:bg-[#FFF7ED] transition-all">
+                          <Plus className="w-3.5 h-3.5 text-[#8FA4C8]" />
+                          <p className="text-[11px] font-medium text-[#8FA4C8]">Tambah {group.label}</p>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
 
         {/* Info Card */}
@@ -405,16 +431,24 @@ export default function Accounts() {
         </div>
       </div>
 
-      {showModal && (
+      {showAddBottomSheet && (
+        <AddAccountBottomSheet
+          accountType={bottomSheetType}
+          onClose={() => setShowAddBottomSheet(false)}
+          onSave={(acc) => {
+            setAccounts(prev => [...prev, acc]);
+            setShowAddBottomSheet(false);
+            toast.success(`${acc.name} berhasil ditambahkan ✓`);
+          }}
+        />
+      )}
+
+      {showModal && editAccount && (
         <AccountModal
           account={editAccount}
           onClose={() => { setShowModal(false); setEditAccount(null); }}
           onSave={(acc) => {
-            if (editAccount?.id) {
-              setAccounts(prev => prev.map(a => a.id === acc.id ? acc : a));
-            } else {
-              setAccounts(prev => [...prev, acc]);
-            }
+            setAccounts(prev => prev.map(a => a.id === acc.id ? acc : a));
             setShowModal(false);
             setEditAccount(null);
           }}

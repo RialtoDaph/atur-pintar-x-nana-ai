@@ -503,17 +503,12 @@ export default function ProfileSettings() {
         />
       )}
 
-      {showAccountModal && (
+      {showAccountModal && editAccount && (
         <AccountModal
           account={editAccount}
-          defaultType={!editAccount ? defaultAccountType : undefined}
           onClose={() => { setShowAccountModal(false); setEditAccount(null); }}
           onSave={(acc) => {
-            if (editAccount?.id) {
-              setAccounts(prev => prev.map(a => a.id === acc.id ? acc : a));
-            } else {
-              setAccounts(prev => [...prev, acc]);
-            }
+            setAccounts(prev => prev.map(a => a.id === acc.id ? acc : a));
             setShowAccountModal(false);
             setEditAccount(null);
           }}

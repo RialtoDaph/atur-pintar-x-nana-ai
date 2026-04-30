@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Check, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import AccountLogo from "@/components/ui/AccountLogo";
 
 function formatRupiah(n) {
@@ -28,10 +29,17 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
   }, [accountType]);
 
   async function handleSave() {
-    if (!selected) return;
+    if (!selected) {
+      toast.error("Pilih rekening terlebih dahulu");
+      return;
+    }
+    const balance = parseNum(balanceDisplay);
+    if (balance === 0 && balanceDisplay.trim() === "") {
+      toast.error("Saldo Awal tidak boleh kosong");
+      return;
+    }
     setSaving(true);
     try {
-      const balance = parseNum(balanceDisplay);
       const created = await base44.entities.Account.create({
         name: selected.name,
         type: selected.type,
@@ -42,8 +50,21 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
         balance,
         is_default: false,
       });
+      // Catat saldo awal sebagai transaksi income jika > 0
+      if (balance > 0) {
+        await base44.entities.Transaction.create({
+          account_id: created.id,
+          amount: balance,
+          type: "income",
+          category: "other",
+          note: `Saldo awal ${created.name}`,
+          date: new Date().toISOString().split("T")[0],
+        });
+      }
       onSave(created);
       onClose();
+    } catch (err) {
+      toast.error("Gagal menambah rekening");
     } finally {
       setSaving(false);
     }
@@ -165,7 +186,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                   </div>
                 </div>
 
-               <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-3">Saldo Awal (Opsional)</p>
+               <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-3">Saldo Awal <span className="text-red-500">*Wajib</span></p>
                <div className="relative mb-2">
                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#8FA4C8]">Rp</span>
                  <input
@@ -176,11 +197,11 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                      const raw = e.target.value.replace(/[^0-9]/g, "");
                      setBalanceDisplay(raw === "" ? "" : Number(raw).toLocaleString("id-ID"));
                    }}
-                   placeholder="0"
+                   placeholder="Masukkan jumlah (tidak boleh kosong)"
                    className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#1A1A1A] outline-none focus:ring-2 focus:ring-[#F97316]/30"
                  />
                </div>
-               <p className="text-[10px] text-[#8FA4C8]">Tidak ada saldo awal berarti mulai dari Rp 0</p>
+               <p className="text-[10px] text-[#8FA4C8]">Minimal Rp 0 untuk memulai</p>
              </div>
            </div>
           )}
@@ -198,7 +219,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
             ) : (
               <Check className="w-4 h-4" />
             )}
-            {saving ? "Menyimpan..." : selected ? `Tambah ${selected.name}` : "Pilih rekening dulu"}
+            {saving ? "Menyimpan..." : "Simpan Rekening"}
           </button>
         </div>
       </div>
