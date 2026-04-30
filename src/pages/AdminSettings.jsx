@@ -46,13 +46,13 @@ export default function AdminSettings() {
   }, []);
 
   async function loadData() {
-    setLoading(true);
-    try {
-      const [adminRes, configRes] = await Promise.all([
-        base44.entities.User.filter({ role: "admin" }),
-        base44.asServiceRole.entities.AppConfig.list()
-      ]);
-      setAdmins(adminRes);
+   setLoading(true);
+   try {
+     const [adminRes, configRes] = await Promise.all([
+       base44.entities.User.filter({ role: "admin" }),
+       base44.entities.AppConfig.list()
+     ]);
+     setAdmins(adminRes);
 
       if (configRes && configRes.length) {
         const config = configRes[0];
@@ -96,9 +96,9 @@ export default function AdminSettings() {
       };
 
       if (appConfig) {
-        await base44.asServiceRole.entities.AppConfig.update(appConfig.id, payload);
+        await base44.entities.AppConfig.update(appConfig.id, payload);
       } else {
-        const created = await base44.asServiceRole.entities.AppConfig.create(payload);
+        const created = await base44.entities.AppConfig.create(payload);
         setAppConfig(created);
       }
 
