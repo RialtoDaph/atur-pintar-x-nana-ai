@@ -18,7 +18,9 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [balanceDisplay, setBalanceDisplay] = useState("");
+  const [isDefault, setIsDefault] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [balanceError, setBalanceError] = useState(false);
 
   useEffect(() => {
     // Map accountType "investment" to "investasi" for database query
@@ -33,6 +35,13 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
       toast.error("Pilih rekening terlebih dahulu");
       return;
     }
+    // Step 5: validasi saldo wajib diisi
+    if (balanceDisplay.trim() === "") {
+      setBalanceError(true);
+      toast.error("Saldo Awal wajib diisi");
+      return;
+    }
+    setBalanceError(false);
     const balance = parseNum(balanceDisplay);
     setSaving(true);
     try {
@@ -44,7 +53,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
         institution: selected.institution || selected.name,
         logo_url: selected.logo_url || undefined,
         balance,
-        is_default: false,
+        is_default: isDefault,
       });
       // Catat saldo awal sebagai transaksi income jika > 0
       if (balance > 0) {
@@ -192,12 +201,28 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
                    onChange={e => {
                      const raw = e.target.value.replace(/[^0-9]/g, "");
                      setBalanceDisplay(raw === "" ? "" : Number(raw).toLocaleString("id-ID"));
+                     setBalanceError(false);
                    }}
-                   placeholder="Masukkan jumlah (tidak boleh kosong)"
-                   className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#1A1A1A] outline-none focus:ring-2 focus:ring-[#F97316]/30"
+                   placeholder="Masukkan jumlah saldo saat ini"
+                   className={`w-full pl-10 pr-4 py-3 bg-white rounded-xl border text-sm font-semibold text-[#1A1A1A] outline-none focus:ring-2 focus:ring-[#F97316]/30 ${balanceError ? "border-red-400 ring-2 ring-red-200" : "border-[#E2E8F0]"}`}
                  />
                </div>
-               <p className="text-[10px] text-[#8FA4C8]">Minimal Rp 0 untuk memulai</p>
+               {balanceError && <p className="text-[10px] text-red-500 mb-2">Saldo awal wajib diisi (boleh 0)</p>}
+
+               {/* Step 4: Toggle Rekening Utama */}
+               <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#F0F2F5]">
+                 <div>
+                   <p className="text-xs font-semibold text-[#1A1A1A]">Rekening Utama</p>
+                   <p className="text-[10px] text-[#8FA4C8]">Default saat catat transaksi baru</p>
+                 </div>
+                 <button
+                   onClick={() => setIsDefault(v => !v)}
+                   className={`w-10 h-5.5 rounded-full transition-colors relative flex-shrink-0 ${isDefault ? "bg-[#F97316]" : "bg-[#E2E8F0]"}`}
+                   style={{ width: 40, height: 22 }}
+                 >
+                   <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${isDefault ? "left-5" : "left-1"}`} />
+                 </button>
+               </div>
              </div>
            </div>
           )}
@@ -208,7 +233,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
           <button
             onClick={handleSave}
             disabled={!selected || saving}
-            className="w-full py-4 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-40 flex items-center justify-center gap-2 transition-all"
+            className="w-full py-4 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-40 flex items-center justify-center gap-2 transition-all active:scale-95"
           >
             {saving ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
