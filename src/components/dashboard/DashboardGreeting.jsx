@@ -1,10 +1,24 @@
+// Sanitize display name: handle "sakit, amnahfy" style entries
+export function sanitizeDisplayName(fullName) {
+  if (!fullName) return null;
+  let name = fullName.trim();
+  // If name contains a comma, take the part AFTER the last comma (e.g. "sakit, Amnahfy" → "Amnahfy")
+  if (name.includes(",")) {
+    const parts = name.split(",");
+    name = parts[parts.length - 1].trim();
+  }
+  // Take first word only
+  name = name.split(/\s+/)[0];
+  // Remove leading/trailing non-letter chars
+  name = name.replace(/^[^a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]+|[^a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]+$/g, "");
+  return name || null;
+}
+
 export default function DashboardGreeting({ user, gamificationProfile }) {
   const hour = new Date().getHours();
 
-  // Use display name from full_name, fallback to email prefix, then "Kamu"
-  const rawName = user?.full_name?.trim();
   const emailPrefix = user?.email?.split("@")[0];
-  const name = (rawName && rawName.length > 0 ? rawName.split(" ")[0] : null)
+  const name = sanitizeDisplayName(user?.full_name)
     || (emailPrefix ? emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) : null)
     || "Kamu";
 

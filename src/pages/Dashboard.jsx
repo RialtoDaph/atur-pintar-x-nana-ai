@@ -201,7 +201,7 @@ export default function Dashboard() {
 
         {/* Top Header */}
         <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-6 pb-14">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl md:max-w-4xl mx-auto">
             {/* 1. Greeting */}
             <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
 
@@ -217,7 +217,7 @@ export default function Dashboard() {
         </div>
 
         {/* Budget Widget — overlaps header/body boundary */}
-        <div className="max-w-2xl mx-auto px-4 -mt-8 relative z-10">
+        <div className="max-w-2xl md:max-w-4xl mx-auto px-4 -mt-8 relative z-10">
           <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
             <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
           </Suspense>
@@ -242,42 +242,48 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="max-w-2xl mx-auto px-4 space-y-3 mt-3">
+        <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-3">
+          {/* Mobile: single column, Tablet: 2-column grid */}
+          <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0 md:items-start">
 
-          {/* 4. Misi Hari Ini */}
-          {user?.onboarding_completed && (
-            <NanaInsightCard
-              todayExpense={transactions
-                .filter(t => t.date === todayStr && t.type === "expense" && !t.is_deleted)
-                .reduce((s, t) => s + (t.amount || 0), 0)}
-            />
-          )}
+            {/* Nana Insight */}
+            {user?.onboarding_completed && (
+              <div className="md:col-span-2">
+                <NanaInsightCard
+                  todayExpense={transactions
+                    .filter(t => t.date === todayStr && t.type === "expense" && !t.is_deleted)
+                    .reduce((s, t) => s + (t.amount || 0), 0)}
+                />
+              </div>
+            )}
 
-          {/* 5. Banner Belum Catat */}
-          {user?.onboarding_completed && (
-            <DailyMissionsCard
-              user={user}
-              gamificationProfile={activeGamProfile}
-              onProfileUpdate={setGamProfile}
-            />
-          )}
+            {/* Daily Missions */}
+            {user?.onboarding_completed && (
+              <DailyMissionsCard
+                user={user}
+                gamificationProfile={activeGamProfile}
+                onProfileUpdate={setGamProfile}
+              />
+            )}
 
-          {/* 6. Daily Mission Card */}
-          {user?.onboarding_completed && (
-            <BossBattleCard
-              user={user}
-              gamificationProfile={activeGamProfile}
-              onProfileUpdate={setGamProfile}
-            />
-          )}
+            {/* Boss Battle */}
+            {user?.onboarding_completed && (
+              <BossBattleCard
+                user={user}
+                gamificationProfile={activeGamProfile}
+                onProfileUpdate={setGamProfile}
+              />
+            )}
 
-          {/* 7. Transaksi Overview Hari Ini */}
-          {user?.onboarding_completed && (
-            <TodayTransactionsCard transactions={transactions} allCategories={allCategories} />
-          )}
+            {/* Today Transactions - full width */}
+            {user?.onboarding_completed && (
+              <div className="md:col-span-2">
+                <TodayTransactionsCard transactions={transactions} allCategories={allCategories} />
+              </div>
+            )}
 
-
-          <div className="h-2" />
+          </div>
+          <div className="h-4" />
         </div>
 
         {showAddTransaction && (

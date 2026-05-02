@@ -14,23 +14,26 @@ export default class ErrorBoundary extends Component {
     console.error("ErrorBoundary caught:", error, info);
   }
 
+  handleRetry = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#F2F4F7] flex items-center justify-center p-6">
-          <div className="bg-white rounded-3xl shadow-lg p-8 max-w-sm w-full text-center">
-            <div className="text-5xl mb-4">🔌</div>
-            <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">Terjadi Kesalahan</h2>
-            <p className="text-sm text-[#8FA4C8] mb-6">
-              Koneksi bermasalah atau ada error tak terduga. Periksa internet kamu dan coba lagi.
+        <div className="min-h-[200px] bg-[#F2F4F7] flex items-center justify-center p-6 rounded-2xl">
+          <div className="bg-white rounded-3xl shadow-sm p-8 max-w-sm w-full text-center">
+            <div className="text-4xl mb-3">😕</div>
+            <h2 className="text-base font-bold text-[#1A1A1A] mb-2">Terjadi kesalahan, coba lagi</h2>
+            <p className="text-xs text-[#8FA4C8] mb-5">
+              Ada yang tidak beres di bagian ini. Coba tap tombol di bawah untuk memuat ulang.
             </p>
             <button
-              onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
-              className="w-full py-3 bg-[#FF6A00] text-white rounded-xl font-bold text-sm hover:bg-[#E55A00] transition-colors"
+              onClick={this.handleRetry}
+              className="w-full py-3 bg-[#FF6A00] text-white rounded-xl font-bold text-sm active:scale-95 transition-transform"
             >
               Coba Lagi
             </button>
-
           </div>
         </div>
       );

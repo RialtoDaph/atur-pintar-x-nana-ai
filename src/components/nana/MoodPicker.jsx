@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { sanitizeDisplayName } from "@/components/dashboard/DashboardGreeting";
 
 const MOODS = [
   { mood: "stress", emoji: "😤", label: "Lagi Stress" },
@@ -9,7 +10,7 @@ const MOODS = [
 ];
 
 export default function MoodPicker({ userName, onSelect, loading }) {
-  const firstName = userName ? userName.split(" ")[0] : "Kamu";
+  const firstName = sanitizeDisplayName(userName) || "Kamu";
 
   return (
     <motion.div

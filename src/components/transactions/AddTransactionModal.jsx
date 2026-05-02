@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { X, Camera, Loader2, Scissors, Upload, Sparkles, History, ChevronDown } from "lucide-react";
 import { updateStreak, completeMission } from "@/hooks/useGamificationActions";
 import { Link } from "react-router-dom";
@@ -30,6 +30,7 @@ const INTERVALS = [
 export default function AddTransactionModal({ goals = [], onClose, onSave, initialValues = {} }) {
   const [tab, setTab] = useState("expense");
   const [amountRaw, setAmountRaw] = useState(initialValues.amount ? String(initialValues.amount) : "");
+  const [amountFocused, setAmountFocused] = useState(false);
   const [category, setCategory] = useState(initialValues.category || "");
   const [note, setNote] = useState(initialValues.note || "");
   const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
@@ -342,10 +343,13 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                   ref={amountInputRef}
                   type="text"
                   inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="0"
                   className="text-3xl font-bold bg-transparent border-none outline-none text-center w-full max-w-[220px]"
                   style={{ color: amountRaw ? typeColor : "#CBD5E0" }}
-                  value={formatDisplay(amountRaw)}
+                  value={amountFocused ? amountRaw : formatDisplay(amountRaw)}
+                  onFocus={() => setAmountFocused(true)}
+                  onBlur={() => setAmountFocused(false)}
                   onChange={e => setAmountRaw(e.target.value.replace(/\D/g, ""))}
                   autoComplete="off"
                 />

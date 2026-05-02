@@ -131,19 +131,20 @@ export default function NanaPreferencesSettings() {
               <div key={type.id} className="flex items-start gap-3 p-3 rounded-lg border border-[#2D2D2D] hover:border-[#FF6A00]/30 transition-colors">
                 <Checkbox
                   id={type.id}
-                  checked={preferences.preferred_advice_types.includes(type.id)}
+                  checked={(preferences.preferred_advice_types || []).includes(type.id)}
                   onCheckedChange={(checked) => {
-                    if (checked) {
-                      setPreferences({
-                        ...preferences,
-                        preferred_advice_types: [...preferences.preferred_advice_types, type.id],
-                      });
-                    } else {
-                      setPreferences({
-                        ...preferences,
-                        preferred_advice_types: preferences.preferred_advice_types.filter((id) => id !== type.id),
-                      });
-                    }
+                  const current = preferences.preferred_advice_types || [];
+                  if (checked) {
+                    setPreferences({
+                      ...preferences,
+                      preferred_advice_types: [...current, type.id],
+                    });
+                  } else {
+                    setPreferences({
+                      ...preferences,
+                      preferred_advice_types: current.filter((id) => id !== type.id),
+                    });
+                  }
                   }}
                   className="mt-1"
                 />

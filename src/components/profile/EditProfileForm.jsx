@@ -2,6 +2,21 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Camera, Save, X } from "lucide-react";
 
+// Strip leading/trailing commas, extra spaces, and normalize order if "word, word" pattern
+function sanitizeName(name) {
+  if (!name) return name;
+  let n = name.trim();
+  // Remove leading/trailing commas and spaces
+  n = n.replace(/^[,\s]+|[,\s]+$/g, "");
+  // If contains comma, swap order: "sakit, Amnahfy" → "Amnahfy"
+  if (n.includes(",")) {
+    const parts = n.split(",").map(p => p.trim()).filter(Boolean);
+    // Take everything after the first comma as the real name
+    n = parts.slice(1).join(" ").trim() || parts[0];
+  }
+  return n;
+}
+
 function formatIDR(val) {
   const num = String(val).replace(/\D/g, '');
   if (!num) return '';
@@ -39,7 +54,7 @@ export default function EditProfileForm({ user, onSaved, onCancel }) {
     setSaving(true);
     const salaryNum = form.monthly_salary ? Number(String(form.monthly_salary).replace(/\D/g, '')) : undefined;
     await base44.auth.updateMe({
-      full_name: form.full_name,
+      full_name: sanitizeName(form.full_name),
       date_of_birth: form.date_of_birth,
       city: form.city,
       whatsapp: form.whatsapp,
