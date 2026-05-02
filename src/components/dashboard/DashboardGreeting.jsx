@@ -1,6 +1,12 @@
 export default function DashboardGreeting({ user, gamificationProfile }) {
   const hour = new Date().getHours();
-  const name = user?.full_name?.split(" ")[0] || "Kamu";
+
+  // Use display name from full_name, fallback to email prefix, then "Kamu"
+  const rawName = user?.full_name?.trim();
+  const emailPrefix = user?.email?.split("@")[0];
+  const name = (rawName && rawName.length > 0 ? rawName.split(" ")[0] : null)
+    || (emailPrefix ? emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) : null)
+    || "Kamu";
 
   let greeting;
   if (hour >= 6 && hour < 11) greeting = `Pagi, ${name}! ☀️`;

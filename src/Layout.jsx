@@ -203,7 +203,7 @@ function LayoutInner({ children, currentPageName }) {
   }, [currentPageName]);
 
   return (
-    <div className="min-h-screen font-sans bg-[#F2F4F7] sm:pb-0" style={{ paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : 'calc(env(safe-area-inset-bottom, 0px) + 64px)' }}>
+    <div className="min-h-screen font-sans bg-[#F2F4F7]" style={{ paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : undefined }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -212,7 +212,7 @@ function LayoutInner({ children, currentPageName }) {
         html.dark { color-scheme: dark; }
       `}</style>
 
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — shows on sm+ (tablet and desktop) */}
       <div className="hidden sm:flex fixed left-0 top-0 h-full w-60 bg-[#0A0A0A] flex-col px-5 py-8 z-40" style={{ boxShadow: '4px 0 24px rgba(0,0,0,0.5)' }}>
         {/* Logo */}
         <div className="mb-8 px-2 flex items-center gap-2">
@@ -325,8 +325,9 @@ function LayoutInner({ children, currentPageName }) {
         </div>
       </div>
 
-      {/* Main content — add top padding on mobile for header */}
-      <div ref={mainContentRef} className="sm:ml-60 pt-14 sm:pt-0 overflow-y-auto" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
+      {/* Main content */}
+      <div ref={mainContentRef} className="sm:ml-60 pt-14 sm:pt-6 overflow-y-auto"
+        style={{ paddingBottom: window.innerWidth >= 640 ? '24px' : 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
         <AnimatePresence mode="sync">
           <motion.div
             key={currentPageName}
@@ -340,7 +341,7 @@ function LayoutInner({ children, currentPageName }) {
         </AnimatePresence>
       </div>
 
-      {/* Mobile bottom nav — hidden when any modal is open */}
+      {/* Mobile bottom nav — hidden on sm+ (tablet/desktop uses sidebar) */}
       {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
         {mobileMainNav.map((item) => {
           const active = currentPageName === item.page;

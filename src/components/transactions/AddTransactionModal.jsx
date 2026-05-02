@@ -269,8 +269,8 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl overflow-y-auto" style={{ maxHeight: "92dvh" }}>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center md:items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="bg-white rounded-t-3xl sm:rounded-3xl md:rounded-3xl w-full sm:max-w-md md:max-w-lg shadow-2xl overflow-y-auto" style={{ maxHeight: "92dvh" }}>
 
           {/* Type tabs */}
           <div className="grid grid-cols-2 sticky top-0 z-10 bg-white">
@@ -334,20 +334,22 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
             )}
 
             {/* Amount */}
-            <div className="text-center py-4 border-b border-[#F2F4F7] mb-4 cursor-pointer" onClick={() => amountInputRef.current?.focus()}>
-              <p className="text-[11px] text-[#8FA4C8] mb-1">nominal</p>
-              <p className="text-3xl font-bold" style={{ color: typeColor }}>
-                Rp {formatDisplay(amountRaw) || <span className="text-[#CBD5E0]">0</span>}
-              </p>
-              {!amountRaw && <p className="text-[10px] text-[#8FA4C8] mt-1">ketuk untuk mengetik</p>}
-              <input
-                ref={amountInputRef}
-                type="tel"
-                inputMode="numeric"
-                className="opacity-0 w-0 h-0 absolute"
-                value={amountRaw}
-                onChange={e => setAmountRaw(e.target.value.replace(/\D/g, ""))}
-              />
+            <div className="py-4 border-b border-[#F2F4F7] mb-4">
+              <p className="text-[11px] text-[#8FA4C8] mb-2 text-center">nominal</p>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xl font-bold" style={{ color: typeColor }}>Rp</span>
+                <input
+                  ref={amountInputRef}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  className="text-3xl font-bold bg-transparent border-none outline-none text-center w-full max-w-[220px]"
+                  style={{ color: amountRaw ? typeColor : "#CBD5E0" }}
+                  value={formatDisplay(amountRaw)}
+                  onChange={e => setAmountRaw(e.target.value.replace(/\D/g, ""))}
+                  autoComplete="off"
+                />
+              </div>
             </div>
 
             {/* Account pills */}
