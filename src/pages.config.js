@@ -52,9 +52,7 @@ import AdminCategories from './pages/AdminCategories';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogs from './pages/AdminLogs';
 import AdminNotifications from './pages/AdminNotifications';
-import AdminPanel from './pages/AdminPanel';
 import AdminSubscriptions from './pages/AdminSubscriptions';
-import AdminUserSupport from './pages/AdminUserSupport';
 import AdminUsers from './pages/AdminUsers';
 import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
@@ -69,7 +67,6 @@ import Menu from './pages/Menu';
 import Nana from './pages/Nana.jsx';
 import Reminders from './pages/Reminders';
 import Settings from './pages/Settings';
-import SpendingDetail from './pages/SpendingDetail';
 import Tips from './pages/Tips';
 import Transactions from './pages/Transactions.jsx';
 
@@ -81,9 +78,7 @@ export const PAGES = {
     "AdminDashboard": AdminDashboard,
     "AdminLogs": AdminLogs,
     "AdminNotifications": AdminNotifications,
-    "AdminPanel": AdminPanel,
     "AdminSubscriptions": AdminSubscriptions,
-    "AdminUserSupport": AdminUserSupport,
     "AdminUsers": AdminUsers,
     "Alerts": Alerts,
     "Analytics": Analytics,
@@ -98,7 +93,6 @@ export const PAGES = {
     "Nana": Nana,
     "Reminders": Reminders,
     "Settings": Settings,
-    "SpendingDetail": SpendingDetail,
     "Tips": Tips,
     "Transactions": Transactions,
 }

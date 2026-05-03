@@ -7,7 +7,7 @@ import {
 import ChangePasswordModal from "@/components/profile/ChangePasswordModal";
 import EditProfileForm from "@/components/profile/EditProfileForm";
 import AddAccountBottomSheet from "@/components/profile/AddAccountBottomSheet";
-import AccountLogo from "@/components/transactions/AccountLogo";
+import AccountAvatar from "@/components/ui/AccountAvatar";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
@@ -383,7 +383,7 @@ export default function ProfileSettings() {
                           onClick={() => { setEditAccount(acc); setShowAccountModal(true); }}
                           className="flex-shrink-0 bg-white border border-[#E2E8F0] rounded-xl px-2.5 py-2 text-left hover:border-[#F97316]/50 transition-all flex items-center gap-2 min-w-0"
                           style={{ maxWidth: 140 }}>
-                          <AccountLogo logoUrl={acc.logo_url} icon={acc.icon || group.icon} bgColor={acc.color || "#FF6A00"} />
+                          <AccountAvatar logoUrl={acc.logo_url} name={acc.name} color={acc.color || "#FF6A00"} />
                           <div className="min-w-0">
                             <p className="text-[11px] font-semibold text-[#1A1A1A] truncate leading-tight">{acc.name}</p>
                             <p className="text-[10px] font-bold truncate" style={{ color: (acc.balance || 0) < 0 ? "#EF4444" : "#27AE60" }}>
