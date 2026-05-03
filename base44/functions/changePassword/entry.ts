@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       ip_address: ip,
       severity: 'warning',
       details: `User ${user.email} changed their password`,
-    }).catch(() => {});
+    }).catch((e) => console.error('changePassword: audit log failed:', e));
 
     return Response.json({ success: true });
   } catch (error) {

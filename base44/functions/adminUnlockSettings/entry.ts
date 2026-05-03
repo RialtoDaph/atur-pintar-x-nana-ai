@@ -20,7 +20,9 @@ Deno.serve(async (req) => {
     try {
       const existing = await base44.asServiceRole.entities.AppSettings.filter({ id: settings_id });
       if (existing?.[0]?.created_by) targetEmail = existing[0].created_by;
-    } catch (_) {}
+    } catch (e) {
+      console.error('adminUnlockSettings: failed to fetch existing settings:', e);
+    }
 
     await base44.asServiceRole.entities.AppSettings.update(settings_id, {
       settings_unlocked: unlock === true,
@@ -39,7 +41,7 @@ Deno.serve(async (req) => {
       ip_address: ip,
       severity: 'warning',
       details: `Admin ${user.email} ${unlock === true ? 'unlocked' : 'locked'} settings for ${targetEmail || 'unknown user'}`,
-    }).catch(() => {});
+    }).catch((e) => console.error('adminUnlockSettings: audit log failed:', e));
 
     return Response.json({ success: true, unlocked: unlock === true });
   } catch (error) {

@@ -31,7 +31,9 @@ Deno.serve(async (req) => {
             is_read: false,
             read_by: []
           });
-        } catch (e) {}
+        } catch (e) {
+          console.error('adminSubscriptionManager: failed to notify expired payment:', e);
+        }
       }
     }
 
@@ -63,7 +65,9 @@ Deno.serve(async (req) => {
               is_read: false,
               read_by: []
             });
-          } catch (e) {}
+          } catch (e) {
+            console.error('adminSubscriptionManager: failed to send 3-day reminder:', e);
+          }
         }
       }
     }
@@ -76,7 +80,9 @@ Deno.serve(async (req) => {
         severity: 'info',
         details: 'Daily subscription auto-expire & reminder check'
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error('adminSubscriptionManager: failed to write activity log:', e);
+    }
 
     return Response.json({ success: true, message: 'Subscription check completed' });
   } catch (error) {

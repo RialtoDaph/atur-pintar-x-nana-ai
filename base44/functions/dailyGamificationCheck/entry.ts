@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
       if (last && last !== today && last !== yesterday && (profile.daily_streak || 0) > 0) {
         await base44.asServiceRole.entities.GamificationProfile.update(profile.id, {
           daily_streak: 0,
-        }).catch(() => {});
+        }).catch((e) => console.error('dailyGamificationCheck: streak reset failed:', e));
         results.streak_resets++;
       }
 
@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
       const challenges = await base44.asServiceRole.entities.Challenge.filter({ created_by: userEmail, status: "active" }).catch(() => []);
       for (const ch of (challenges || [])) {
         if (ch.end_date && today > ch.end_date && (ch.progress || 0) < 100) {
-          await base44.asServiceRole.entities.Challenge.update(ch.id, { status: "failed" }).catch(() => {});
+          await base44.asServiceRole.entities.Challenge.update(ch.id, { status: "failed" }).catch((e) => console.error('dailyGamificationCheck: challenge update failed:', e));
           results.challenges_failed++;
         }
       }
@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
           goal_progress_score,
           nana_interaction_score,
           last_calculated_at: new Date().toISOString(),
-        }).catch(() => {});
+        }).catch((e) => console.error('dailyGamificationCheck: health score create failed:', e));
         results.health_scores++;
       }
     }

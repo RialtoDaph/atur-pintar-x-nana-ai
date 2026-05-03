@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
         ip_address: ipAddress,
         severity,
         details,
-      }).catch(() => {});
+      }).catch((e) => console.error('adminManageStreaks: audit log failed:', e));
 
     if (action === 'resetUser') {
       const profiles = await base44.asServiceRole.entities.GamificationProfile.filter({ created_by: email });
