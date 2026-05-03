@@ -30,8 +30,21 @@ Deno.serve(async (req) => {
       settings: settingsByEmail[u.email] || null,
     }));
 
+    // Audit log: admin listed all users (with settings)
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
+    await base44.asServiceRole.entities.SystemLog.create({
+      log_type: 'sensitive_access',
+      user_email: user.email,
+      user_id: user.id,
+      action: 'admin_list_users',
+      ip_address: ip,
+      severity: 'info',
+      details: `Admin ${user.email} listed ${users.length} users with their AppSettings.`
+    }).catch(() => {});
+
     return Response.json({ users: result });
   } catch (error) {
+    console.error('adminGetUsers error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

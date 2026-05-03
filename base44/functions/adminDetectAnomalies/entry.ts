@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
@@ -7,6 +7,18 @@ Deno.serve(async (req) => {
     if (user?.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
 
     const transactions = await base44.asServiceRole.entities.Transaction.list('-date', 3000);
+
+    // Audit log: admin scanned all-user transactions
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
+    await base44.asServiceRole.entities.SystemLog.create({
+      log_type: 'sensitive_access',
+      user_email: user.email,
+      user_id: user.id,
+      action: 'admin_detect_anomalies',
+      ip_address: ip,
+      severity: 'info',
+      details: `Admin ${user.email} scanned ${transactions.length} transactions for anomalies.`
+    }).catch(() => {});
 
     // Group by user
     const byUser = {};
@@ -110,6 +122,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ anomalies, total: anomalies.length });
   } catch (error) {
+    console.error('adminDetectAnomalies error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

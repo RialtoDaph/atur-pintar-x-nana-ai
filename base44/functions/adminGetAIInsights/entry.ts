@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
@@ -11,6 +11,18 @@ Deno.serve(async (req) => {
       base44.asServiceRole.entities.User.list(),
       base44.asServiceRole.entities.Transaction.list('-date', 3000),
     ]);
+
+    // Audit log: admin accessed all-user financial insights
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
+    await base44.asServiceRole.entities.SystemLog.create({
+      log_type: 'sensitive_access',
+      user_email: user.email,
+      user_id: user.id,
+      action: 'admin_get_ai_insights',
+      ip_address: ip,
+      severity: 'info',
+      details: `Admin ${user.email} accessed AI insights for ${users.length} users / ${transactions.length} transactions.`
+    }).catch(() => {});
 
     // Simulate AI insights data based on transaction patterns
     const byUser = {};
@@ -58,6 +70,7 @@ Deno.serve(async (req) => {
     const totalAICallsEstimate = insights.length * 3; // estimate
     return Response.json({ insights, totalAICallsEstimate });
   } catch (error) {
+    console.error('adminGetAIInsights error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
