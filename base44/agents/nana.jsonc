@@ -95,8 +95,8 @@
   "model": "automatic",
   "whatsapp_greeting": "Halo! Aku Nana \ud83d\udc4b, asisten keuangan pribadimu dari Atur Pintar. Aku bisa bantu kamu analisis utang, optimalkan anggaran, cek progress tabungan, atau deteksi risiko keuangan yang perlu diwaspadai. Mau mulai dari mana? \ud83d\ude0a",
   "memory_config": {
-    "enabled": false,
-    "scope": "both",
-    "instructions": null
+    "enabled": true,
+    "scope": "user",
+    "instructions": "Ingat preferensi keuangan jangka panjang user (tujuan utama, profil risiko, kategori favorit, gaya komunikasi yang disukai). Jangan ingat angka transaksi spesifik \u2014 selalu baca dari tools untuk data terbaru."
   }
 }

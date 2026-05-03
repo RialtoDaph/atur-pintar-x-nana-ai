@@ -14,12 +14,20 @@ export default function NanaDashboardChat() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(false);
   const [preferences, setPreferences] = useState(null);
+  const [user, setUser] = useState(null);
   const bottomRef = useRef(null);
   const { context, formatContextForMessage } = useFinancialContext(true);
 
+  const FREE_NANA_LIMIT = 30;
+  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const chatCount = user?.nana_message_month === currentMonth ? (user?.nana_message_count || 0) : 0;
+  const nanaLimitReached = !isPremium && chatCount >= FREE_NANA_LIMIT;
+
   useEffect(() => {
-    base44.auth.me().then((user) => {
-      base44.entities.NanaPreferences.filter({ created_by: user.email }).then((prefs) => {
+    base44.auth.me().then((u) => {
+      setUser(u);
+      base44.entities.NanaPreferences.filter({ created_by: u.email }).then((prefs) => {
         if (prefs?.length > 0) setPreferences(prefs[0]);
       }).catch(() => {});
     }).catch(() => {});
@@ -58,7 +66,7 @@ export default function NanaDashboardChat() {
   }
 
   async function sendMessage() {
-    if (!input.trim() || sending) return;
+    if (!input.trim() || sending || nanaLimitReached) return;
     let conv = activeConv;
     if (!conv) {
       conv = await base44.agents.createConversation({
@@ -72,6 +80,11 @@ export default function NanaDashboardChat() {
     setInput("");
     const contextBlock = formatContextForMessage(context);
     await base44.agents.addMessage(conv, { role: "user", content: text + contextBlock });
+    if (!isPremium) {
+      const newCount = chatCount + 1;
+      await base44.auth.updateMe({ nana_message_count: newCount, nana_message_month: currentMonth });
+      setUser((u) => ({ ...u, nana_message_count: newCount, nana_message_month: currentMonth }));
+    }
     setSending(false);
   }
 
@@ -256,23 +269,29 @@ export default function NanaDashboardChat() {
 
       {/* Input */}
       <div className="px-3 py-2.5 border-t border-[#E2E8F0]">
-        <div className="flex gap-2 bg-[#F2F4F7] rounded-xl border border-[#E2E8F0] px-3 py-1.5">
-          <textarea
-            className="flex-1 text-xs text-[#1A1A1A] resize-none outline-none bg-transparent placeholder:text-[#8FA4C8] max-h-16"
-            rows={1}
-            placeholder="Tanya atau catat transaksi..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKey}
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim() || sending}
-            className="w-7 h-7 rounded-full bg-[#FF6A00] flex items-center justify-center flex-shrink-0 disabled:opacity-40 hover:bg-[#e05e00] transition-colors self-end tap-highlight-fix"
-          >
-            <Send className="w-3 h-3 text-white" />
-          </button>
-        </div>
+        {nanaLimitReached ? (
+          <p className="text-xs text-[#8FA4C8] text-center py-1">
+            Batas {FREE_NANA_LIMIT} chat/bulan tercapai. <Link to="/Subscription" className="text-[#FF6A00] font-semibold underline">Upgrade</Link>
+          </p>
+        ) : (
+          <div className="flex gap-2 bg-[#F2F4F7] rounded-xl border border-[#E2E8F0] px-3 py-1.5">
+            <textarea
+              className="flex-1 text-xs text-[#1A1A1A] resize-none outline-none bg-transparent placeholder:text-[#8FA4C8] max-h-16"
+              rows={1}
+              placeholder="Tanya atau catat transaksi..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKey}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || sending}
+              className="w-7 h-7 rounded-full bg-[#FF6A00] flex items-center justify-center flex-shrink-0 disabled:opacity-40 hover:bg-[#e05e00] transition-colors self-end tap-highlight-fix"
+            >
+              <Send className="w-3 h-3 text-white" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

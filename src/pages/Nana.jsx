@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Send, Sparkles, Plus, Crown } from "lucide-react";
+import { Send, Plus, Crown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
@@ -53,6 +53,7 @@ export default function Nana() {
   }, [messages]);
 
   const savedNanaMsgIds = useRef(new Set());
+  const lastContentByMsgId = useRef({});
   const pendingSaveTimers = useRef({});
 
   useEffect(() => {
@@ -60,36 +61,43 @@ export default function Nana() {
     const unsub = base44.agents.subscribeToConversation(activeConv.id, (data) => {
       const msgs = data.messages || [];
       setMessages(msgs);
-      // Save completed Nana (assistant) messages — debounce to avoid saving partial streaming chunks
+      // Save completed Nana (assistant) messages — only save when content is stable (unchanged for 2.5s)
       msgs.forEach(msg => {
         if (msg.role === "assistant" && msg.id && msg.content && !savedNanaMsgIds.current.has(msg.id)) {
-          // Cancel any pending save for this message (content may still be streaming)
+          // Skip if content hasn't changed since last tick (still streaming same buffer)
+          if (lastContentByMsgId.current[msg.id] === msg.content && pendingSaveTimers.current[msg.id]) {
+            return;
+          }
+          lastContentByMsgId.current[msg.id] = msg.content;
+          // Cancel previous pending save — content changed, reset timer
           if (pendingSaveTimers.current[msg.id]) {
             clearTimeout(pendingSaveTimers.current[msg.id]);
           }
-          // Debounce: save 1.5s after last update for this message id
+          // Wait 2.5s of no content changes before saving (safer than 1.5s for slow streams)
           pendingSaveTimers.current[msg.id] = setTimeout(() => {
-            // Re-check it's not already saved
             if (savedNanaMsgIds.current.has(msg.id)) return;
             savedNanaMsgIds.current.add(msg.id);
             delete pendingSaveTimers.current[msg.id];
-            if (user?.email) {
+            const finalContent = lastContentByMsgId.current[msg.id];
+            delete lastContentByMsgId.current[msg.id];
+            if (user?.email && finalContent) {
               base44.entities.NanaConversation.create({
                 role: "nana",
-                message: msg.content,
+                message: finalContent,
                 session_date: today,
                 mood: todayMood?.mood || undefined,
                 message_type: "chat",
               }).catch(() => {});
             }
-          }, 1500);
+          }, 2500);
         }
       });
     });
     return () => {
       unsub();
-      // Clear all pending timers on cleanup
       Object.values(pendingSaveTimers.current).forEach(t => clearTimeout(t));
+      pendingSaveTimers.current = {};
+      lastContentByMsgId.current = {};
     };
   }, [activeConv?.id, user?.email]);
 

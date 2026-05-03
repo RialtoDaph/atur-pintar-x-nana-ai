@@ -144,10 +144,22 @@ export function useFinancialContext(enabled = true) {
         return { ...g, pct, remaining, daysLeft, monthsLeft, neededPerMonth };
       });
 
-      // Upcoming reminders (due within 10 days)
+      // Upcoming reminders (due within 10 days, includes wrap-around to next month)
       const upcomingReminders = reminders
-        .filter((r) => r.is_active && r.due_day >= dayOfMonth && r.due_day - dayOfMonth <= 10)
-        .sort((a, b) => a.due_day - b.due_day);
+        .filter((r) => r.is_active)
+        .map((r) => {
+          // Calculate days until due, accounting for month wrap-around
+          let daysUntilDue;
+          if (r.due_day >= dayOfMonth) {
+            daysUntilDue = r.due_day - dayOfMonth;
+          } else {
+            // Due day passed this month — calculate to same day next month
+            daysUntilDue = (daysInMonth - dayOfMonth) + r.due_day;
+          }
+          return { ...r, _daysUntilDue: daysUntilDue };
+        })
+        .filter((r) => r._daysUntilDue <= 10)
+        .sort((a, b) => a._daysUntilDue - b._daysUntilDue);
 
       // Investment summary
       const totalInvested = investments.reduce((s, i) => s + (i.initial_amount || 0), 0);
@@ -219,7 +231,7 @@ export function useFinancialContext(enabled = true) {
           title: r.title,
           amount: r.amount,
           dueDay: r.due_day,
-          daysUntilDue: r.due_day - dayOfMonth,
+          daysUntilDue: r._daysUntilDue,
         })),
         recurringExpenses: recurringExpenses.map(t => ({
           note: t.note,
@@ -262,31 +274,39 @@ export function useFinancialContext(enabled = true) {
     ];
 
     if (snapshot.thisMonth.spendingSpikes?.length > 0) {
-      lines.push(`\nLONJAKAN PENGELUARAN vs rata-rata 3 bulan lalu:`);
-      snapshot.thisMonth.spendingSpikes.forEach((s) => {
+      lines.push(`\nLONJAKAN PENGELUARAN vs rata-rata 3 bulan lalu (top 5):`);
+      snapshot.thisMonth.spendingSpikes.slice(0, 5).forEach((s) => {
         lines.push(`- ${s.category}: ${fmt(s.thisMonth)} bulan ini vs rata-rata ${fmt(s.avg3M)} (+${s.spikePct}%, lebih boros ${fmt(s.spikeRp)})`);
       });
     }
 
     if (snapshot.budgetStatus.length > 0) {
-      lines.push(`\nSTATUS ANGGARAN:`);
-      snapshot.budgetStatus.forEach((b) => {
+      // Prioritize budgets that are at risk (>= 80%) or over budget
+      const sortedBudgets = [...snapshot.budgetStatus].sort((a, b) => b.pct - a.pct).slice(0, 8);
+      lines.push(`\nSTATUS ANGGARAN (top 8 by % terpakai):`);
+      sortedBudgets.forEach((b) => {
         const flag = b.pct >= 100 ? " ⚠️OVER" : b.pct >= 80 ? " ⚠️HAMPIR HABIS" : "";
         lines.push(`- ${b.category}: ${fmt(b.spent)}/${fmt(b.limit)} (${b.pct}%)${flag}`);
       });
     }
 
     if (snapshot.debts.length > 0) {
-      lines.push(`\nUTANG AKTIF (urutan bunga tertinggi):`);
-      snapshot.debts.forEach((d, i) => {
+      lines.push(`\nUTANG AKTIF (top 5, urutan bunga tertinggi):`);
+      snapshot.debts.slice(0, 5).forEach((d, i) => {
         lines.push(`${i + 1}. ${d.name} (${d.type}): sisa ${fmt(d.remaining)}, bunga ${d.interestRate || 0}%/tahun, cicilan ${fmt(d.monthlyPayment)}/bulan${d.dueDate ? `, jatuh tempo ${d.dueDate}` : ""}`);
       });
       lines.push(`Total utang: ${fmt(snapshot.debtSummary.totalRemaining)}, total cicilan: ${fmt(snapshot.debtSummary.totalMonthlyPayment)}/bulan`);
     }
 
     if (snapshot.goals.length > 0) {
-      lines.push(`\nTUJUAN TABUNGAN AKTIF:`);
-      snapshot.goals.forEach((g) => {
+      // Prioritize urgent goals (daysLeft < 30 or pct < 100)
+      const sortedGoals = [...snapshot.goals].sort((a, b) => {
+        const aUrgent = a.daysLeft !== null && a.daysLeft < 30 ? 0 : 1;
+        const bUrgent = b.daysLeft !== null && b.daysLeft < 30 ? 0 : 1;
+        return aUrgent - bUrgent;
+      }).slice(0, 5);
+      lines.push(`\nTUJUAN TABUNGAN AKTIF (top 5):`);
+      sortedGoals.forEach((g) => {
         const urgency = g.daysLeft !== null && g.daysLeft < 30 ? " ⚠️MENDESAK" : "";
         lines.push(`- ${g.name}: ${fmt(g.current)}/${fmt(g.target)} (${g.pct}%), sisa ${fmt(g.remaining)}${g.deadline ? `, deadline ${g.deadline} (${g.daysLeft} hari lagi)` : ""}${g.neededPerMonth ? `, perlu ${fmt(g.neededPerMonth)}/bulan` : ""}${urgency}`);
       });
@@ -304,16 +324,20 @@ export function useFinancialContext(enabled = true) {
     }
 
     if (snapshot.recurringExpenses?.length > 0) {
-      lines.push(`\nPENGELUARAN BERULANG (kontrak/tagihan/langganan):`);
-      snapshot.recurringExpenses.forEach((t) => {
+      lines.push(`\nPENGELUARAN BERULANG (top 8 by amount):`);
+      const topRec = [...snapshot.recurringExpenses].sort((a, b) => (b.amount || 0) - (a.amount || 0)).slice(0, 8);
+      topRec.forEach((t) => {
         lines.push(`- ${t.note} [${t.category}]: ${fmt(t.amount)}/${t.interval}`);
       });
+      const moreCount = snapshot.recurringExpenses.length - topRec.length;
+      if (moreCount > 0) lines.push(`...dan ${moreCount} pengeluaran berulang lainnya`);
       lines.push(`Total setara bulanan: ${fmt(snapshot.recurringMonthly.totalExpense)}`);
     }
 
     if (snapshot.recurringIncome?.length > 0) {
-      lines.push(`\nPENDAPATAN BERULANG:`);
-      snapshot.recurringIncome.forEach((t) => {
+      lines.push(`\nPENDAPATAN BERULANG (top 5):`);
+      const topInc = [...snapshot.recurringIncome].sort((a, b) => (b.amount || 0) - (a.amount || 0)).slice(0, 5);
+      topInc.forEach((t) => {
         lines.push(`- ${t.note}: ${fmt(t.amount)}/${t.interval}`);
       });
       lines.push(`Total setara bulanan: ${fmt(snapshot.recurringMonthly.totalIncome)}`);

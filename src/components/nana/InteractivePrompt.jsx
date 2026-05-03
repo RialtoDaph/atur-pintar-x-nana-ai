@@ -59,7 +59,7 @@ export default function InteractivePrompt({ prompt, onResponse }) {
               key={option.value}
               onClick={() => handleSelectOne(option.value)}
               disabled={submitting}
-              className="w-full text-left text-xs bg-[#2D2D2D] border border-[#3D3D3D] rounded-lg px-3 py-2 text-white hover:border-[#FF6A00] hover:bg-[#FF6A00]/10 transition-colors disabled:opacity-50 flex items-center justify-between group"
+              className="w-full text-left text-xs bg-[#F2F4F7] dark:bg-[#2D2D2D] border border-[#E2E8F0] dark:border-[#3D3D3D] rounded-lg px-3 py-2 text-[#1A1A1A] dark:text-white hover:border-[#FF6A00] hover:bg-[#FF6A00]/10 transition-colors disabled:opacity-50 flex items-center justify-between group"
             >
               <span>{option.label}</span>
               <ChevronRight className="w-3 h-3 text-[#8FA4C8] group-hover:text-[#FF6A00] transition-colors" />
@@ -73,16 +73,16 @@ export default function InteractivePrompt({ prompt, onResponse }) {
           {prompt.options?.map((option) => (
             <label
               key={option.value}
-              className="flex items-center gap-2 text-xs bg-[#2D2D2D] border border-[#3D3D3D] rounded-lg px-3 py-2 cursor-pointer hover:border-[#FF6A00] transition-colors"
+              className="flex items-center gap-2 text-xs bg-[#F2F4F7] dark:bg-[#2D2D2D] border border-[#E2E8F0] dark:border-[#3D3D3D] rounded-lg px-3 py-2 cursor-pointer hover:border-[#FF6A00] transition-colors"
             >
               <input
                 type="checkbox"
                 checked={selectedValues.includes(option.value)}
                 onChange={() => handleSelectMultiple(option.value)}
                 disabled={submitting}
-                className="w-3 h-3 rounded border-[#3D3D3D] accent-[#FF6A00] cursor-pointer"
+                className="w-3 h-3 rounded border-[#E2E8F0] dark:border-[#3D3D3D] accent-[#FF6A00] cursor-pointer"
               />
-              <span className="text-white flex-1">{option.label}</span>
+              <span className="text-[#1A1A1A] dark:text-white flex-1">{option.label}</span>
             </label>
           ))}
           <button
@@ -103,7 +103,7 @@ export default function InteractivePrompt({ prompt, onResponse }) {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             disabled={submitting}
-            className="w-full text-xs bg-[#2D2D2D] border border-[#3D3D3D] rounded-lg px-3 py-2 text-white placeholder:text-[#8FA4C8] focus:outline-none focus:border-[#FF6A00] disabled:opacity-50"
+            className="w-full text-xs bg-[#F2F4F7] dark:bg-[#2D2D2D] border border-[#E2E8F0] dark:border-[#3D3D3D] rounded-lg px-3 py-2 text-[#1A1A1A] dark:text-white placeholder:text-[#8FA4C8] focus:outline-none focus:border-[#FF6A00] disabled:opacity-50"
           />
           <button
             onClick={() => handleSubmit()}
@@ -127,7 +127,7 @@ export default function InteractivePrompt({ prompt, onResponse }) {
           <button
             onClick={() => handleSubmit("no")}
             disabled={submitting}
-            className="flex-1 text-xs bg-[#2D2D2D] border border-[#3D3D3D] text-white rounded-lg px-3 py-2 hover:border-[#FF6A00] transition-colors disabled:opacity-50 font-medium"
+            className="flex-1 text-xs bg-[#F2F4F7] dark:bg-[#2D2D2D] border border-[#E2E8F0] dark:border-[#3D3D3D] text-[#1A1A1A] dark:text-white rounded-lg px-3 py-2 hover:border-[#FF6A00] transition-colors disabled:opacity-50 font-medium"
           >
             Tidak
           </button>

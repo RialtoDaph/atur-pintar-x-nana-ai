@@ -16,7 +16,6 @@ export default function NanaFloatingChat() {
   const [loading, setLoading] = useState(false);
   const [preferences, setPreferences] = useState(null);
   const [user, setUser] = useState(null);
-  const [chatCount, setChatCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   const [conversations, setConversations] = useState([]);
@@ -39,10 +38,6 @@ export default function NanaFloatingChat() {
     base44.auth.me().then((u) => {
       if (!isMounted) return;
       setUser(u);
-      // Count monthly Nana messages
-      const monthKey = new Date().toISOString().slice(0, 7);
-      const stored = JSON.parse(localStorage.getItem(`nana_count_${u.id}_${monthKey}`) || '0');
-      setChatCount(parseInt(stored) || 0);
       base44.entities.NanaPreferences.filter({ created_by: u.email }).then((prefs) => {
         if (isMounted && prefs?.length > 0) setPreferences(prefs[0]);
       }).catch(() => {});
@@ -123,6 +118,8 @@ export default function NanaFloatingChat() {
 
   const FREE_NANA_LIMIT = 30;
   const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const chatCount = user?.nana_message_month === currentMonth ? (user?.nana_message_count || 0) : 0;
   const nanaLimitReached = !isPremium && chatCount >= FREE_NANA_LIMIT;
 
   async function sendMessage() {
@@ -147,12 +144,11 @@ export default function NanaFloatingChat() {
       const styleInstruction = responseStyle === "ringkas" ? "\n[MODE JAWABAN: SANGAT RINGKAS, maksimal 80 kata, poin singkat saja]" : "\n[MODE JAWABAN: DETAIL, penjelasan lengkap dengan contoh konkret]";
       const messageContent = text + styleInstruction + contextBlock;
       await base44.agents.addMessage(conv, { role: "user", content: messageContent });
-      // Track count
+      // Track count in DB (so it can't be bypassed across devices)
       if (!isPremium) {
-        const monthKey = new Date().toISOString().slice(0, 7);
         const newCount = chatCount + 1;
-        setChatCount(newCount);
-        if (user) localStorage.setItem(`nana_count_${user.id}_${monthKey}`, JSON.stringify(newCount));
+        await base44.auth.updateMe({ nana_message_count: newCount, nana_message_month: currentMonth });
+        setUser((u) => ({ ...u, nana_message_count: newCount, nana_message_month: currentMonth }));
       }
     } catch (err) {
       setMessages(prev => [...prev, {
