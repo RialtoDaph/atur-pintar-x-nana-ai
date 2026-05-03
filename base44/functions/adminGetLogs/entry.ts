@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
@@ -17,6 +17,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ logs });
   } catch (error) {
+    console.error('adminGetLogs error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

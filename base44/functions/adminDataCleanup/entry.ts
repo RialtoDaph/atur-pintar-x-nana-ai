@@ -105,6 +105,7 @@ Deno.serve(async (req) => {
       message: `Data cleanup completed. Deleted ${deletedCount} records.`
     });
   } catch (error) {
+    console.error('adminDataCleanup error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
