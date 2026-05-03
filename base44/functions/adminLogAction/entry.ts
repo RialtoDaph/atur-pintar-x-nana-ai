@@ -4,19 +4,22 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // This can be called without admin check since it logs all types
-    let callerUser = null;
-    try { callerUser = await base44.auth.me(); } catch (_) { /* anonymous ok for error logs */ }
+    // Require authentication — prevents anonymous log spam / impersonation
+    const callerUser = await base44.auth.me();
+    if (!callerUser) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const body = await req.json();
-    const { log_type, action, entity_type, entity_id, details, severity, user_email, user_id } = body;
+    const { log_type, action, entity_type, entity_id, details, severity } = body;
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
 
+    // Force user identity from auth token — never trust client-supplied user_email/user_id
     await base44.asServiceRole.entities.SystemLog.create({
       log_type: log_type || 'activity',
-      user_email: user_email || callerUser?.email || 'anonymous',
-      user_id: user_id || callerUser?.id || null,
+      user_email: callerUser.email,
+      user_id: callerUser.id,
       action: action || 'unknown',
       entity_type: entity_type || null,
       entity_id: entity_id || null,
