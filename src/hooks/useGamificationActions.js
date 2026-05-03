@@ -89,24 +89,13 @@ export async function completeMission(userEmail, missionKey) {
   // Mark complete
   await base44.entities.DailyMission.update(mission.id, { is_completed: true });
 
-  // Award XP + update streak
+  // Award XP only (streak is handled separately by updateStreak)
   if (xpReward > 0) {
     const profile = await getOrCreateProfile(userEmail);
-    const today2 = format(new Date(), "yyyy-MM-dd");
-    const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
-    const last = profile.last_activity_date;
-
-    let newStreak = profile.daily_streak || 0;
-    if (last === yesterday) newStreak += 1;
-    else if (last !== today2) newStreak = 1;
-
     const newXP = (profile.total_points || 0) + xpReward;
     await base44.entities.GamificationProfile.update(profile.id, {
       total_points: newXP,
       level: getLevelFromXP(newXP),
-      daily_streak: newStreak,
-      longest_streak: Math.max(profile.longest_streak || 0, newStreak),
-      last_activity_date: today2,
     });
   }
 }
