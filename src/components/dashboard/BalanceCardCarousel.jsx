@@ -101,7 +101,7 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
             </div>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
-            {accounts.map((a) =>
+            {[...accounts].sort((a, b) => (b.balance || 0) - (a.balance || 0)).map((a) =>
         <div key={a.id} className="flex items-center gap-1.5 bg-white/8 rounded-lg px-2.5 py-1.5">
                 {a.logo_url ?
           <AccountAvatar logoUrl={a.logo_url} name={a.name} color={a.color || "#FF6A00"} size="h-5 w-5" /> :
