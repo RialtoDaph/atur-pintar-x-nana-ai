@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AdminActivityFeed from "@/components/admin/AdminActivityFeed";
 import { Bell, Send, Users, User, Trash2, RefreshCw, Plus, X } from "lucide-react";
 
 export default function AdminNotifications() {
@@ -184,6 +185,11 @@ export default function AdminNotifications() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Real-time Activity Feed */}
+        <div className="mb-6">
+          <AdminActivityFeed />
         </div>
 
         {/* Stats */}
