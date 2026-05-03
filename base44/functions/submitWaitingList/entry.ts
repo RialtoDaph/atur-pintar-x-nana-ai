@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
     // Check if email already registered
     const existing = await base44.asServiceRole.entities.WaitingList.filter({ email: email.toLowerCase() });
     if (existing && existing.length > 0) {
-      return Response.json({ error: 'Terlalu banyak percobaan, coba lagi nanti' }, { status: 429 });
+      return Response.json({ error: 'Email ini sudah terdaftar di waiting list' }, { status: 409 });
     }
 
     // Use service role to bypass RLS (public form, user not logged in)

@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const SAMPLE_EMAILS = ["larasadelia586@gmail.com", "imeldaiis61@gmail.com"];
 const ENTITIES_TO_CLEAN = [
@@ -30,31 +30,6 @@ Deno.serve(async (req) => {
           }
         }
       }
-    }
-
-    // Fix hd722875@gmail.com's subscription
-    const userList = await base44.asServiceRole.entities.User.filter({ email: "hd722875@gmail.com" });
-    if (userList.length > 0) {
-      const userId = userList[0].id;
-      const today = "2026-04-08";
-      const endDate = "2026-05-08";
-      
-      await base44.asServiceRole.entities.User.update(userId, {
-        subscription_plan: "premium_monthly",
-        subscription_status: "active",
-        subscription_start_date: today,
-        subscription_end_date: endDate
-      });
-
-      // Send notification
-      await base44.asServiceRole.entities.AdminNotification.create({
-        title: "🎉 Akun Premium Aktif!",
-        message: "Pembayaran kamu sudah dikonfirmasi. Selamat menikmati Atur Pintar Premium!",
-        target_type: "specific",
-        target_email: "hd722875@gmail.com",
-        is_read: false,
-        read_by: []
-      });
     }
 
     // Log cleanup

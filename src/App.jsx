@@ -9,6 +9,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import ErrorBoundary from '@/components/utils/ErrorBoundary';
 import Subscription from '@/pages/Subscription';
 import LandingPage from '@/pages/LandingPage';
 import AdminSubscriptions from '@/pages/AdminSubscriptions';
@@ -143,16 +144,18 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <AppConfigProvider>
-          <Router>
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
-        </AppConfigProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <AppConfigProvider>
+            <Router>
+              <AuthenticatedApp />
+            </Router>
+            <Toaster />
+          </AppConfigProvider>
+        </QueryClientProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

@@ -1,61 +1,59 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const NOTION_DATABASE_ID = "328cdc1062bc8054a582d6cd777e3f63";
-
+// NOTE: Notion connector is not authorized for this app. Feedback is forwarded
+// to admin email instead. Rename kept for backward-compatibility with frontend.
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
 
-    const { accessToken } = await base44.asServiceRole.connectors.getConnection("notion");
+    const { rating, message, userName, userEmail } = payload || {};
 
-    const { rating, message, userName, userEmail } = payload;
-
-    // Map rating to priority
-    let priority = "MEDIUM";
-    if (rating >= 4) priority = "LOW";
-    else if (rating <= 2) priority = "HIGH";
-
-    const userLabel = userName ? `${userName}${userEmail ? ` (${userEmail})` : ""}` : (userEmail || "Anonymous");
-    const feedbackContent = `${rating ? `⭐ Rating: ${rating}/5\n\n` : ""}${message}`;
-
-    const body = {
-      parent: { database_id: NOTION_DATABASE_ID },
-      properties: {
-        User: {
-          title: [{ text: { content: userLabel } }]
-        },
-        Feedback: {
-          rich_text: [{ text: { content: feedbackContent } }]
-        },
-        Status: {
-          select: { name: "New" }
-        },
-        Priority: {
-          select: { name: priority }
-        },
-        Type: {
-          select: { name: "Feature request" }
-        }
-      }
-    };
-
-    const response = await fetch("https://api.notion.com/v1/pages", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28"
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-      const err = await response.text();
-      return Response.json({ error: err }, { status: 500 });
+    if (!message || !String(message).trim()) {
+      return Response.json({ error: 'Message required' }, { status: 400 });
     }
 
-    return Response.json({ success: true });
+    // Get admin email from AppConfig (fallback to env)
+    let adminEmail = Deno.env.get("ADMIN_ALERT_EMAIL");
+    try {
+      const configs = await base44.asServiceRole.entities.AppConfig.list();
+      if (configs?.[0]?.admin_alert_email) adminEmail = configs[0].admin_alert_email;
+    } catch (_) {}
+
+    if (!adminEmail) {
+      // Silently accept — feedback already saved on email side from frontend.
+      return Response.json({ success: true, forwarded: false });
+    }
+
+    let priority = "MEDIUM";
+    if (rating >= 4) priority = "LOW";
+    else if (rating && rating <= 2) priority = "HIGH";
+
+    const userLabel = userName ? `${userName}${userEmail ? ` (${userEmail})` : ""}` : (userEmail || "Anonymous");
+    const stars = rating ? "⭐".repeat(rating) : "—";
+
+    const body = `
+📩 Feedback Baru — Atur Pintar
+
+User: ${userLabel}
+Rating: ${stars} ${rating ? `(${rating}/5)` : ""}
+Priority: ${priority}
+
+Pesan:
+${message}
+
+---
+Dikirim otomatis dari form Feedback in-app.
+    `.trim();
+
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      to: adminEmail,
+      subject: `[Atur Pintar] Feedback Baru — ${priority} — ${userLabel}`,
+      body,
+      from_name: 'Atur Pintar Feedback',
+    });
+
+    return Response.json({ success: true, forwarded: true });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { TrendingUp, TrendingDown, Wallet, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AccountAvatar from "@/components/ui/AccountAvatar";
+import { base44 } from "@/api/base44Client";
 
 function compactRupiah(value) {
   return Math.abs(value).toLocaleString('id-ID');
@@ -12,15 +13,26 @@ const HIDDEN = "••••••";
 export default function BalanceCardCarousel({ income, expense, savings, accounts, loading }) {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [hidden, setHidden] = useState(() => localStorage.getItem("balance_hidden") === "1");
+  const [storageKey, setStorageKey] = useState(null);
+  const [hidden, setHidden] = useState(false);
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
+
+  // Scope hidden state per user to avoid leaking across accounts on shared devices
+  useEffect(() => {
+    base44.auth.me().then((u) => {
+      if (!u?.email) return;
+      const key = `balance_hidden::${u.email}`;
+      setStorageKey(key);
+      setHidden(localStorage.getItem(key) === "1");
+    }).catch(() => {});
+  }, []);
 
   function toggleHidden(e) {
     e.stopPropagation();
     const next = !hidden;
     setHidden(next);
-    localStorage.setItem("balance_hidden", next ? "1" : "0");
+    if (storageKey) localStorage.setItem(storageKey, next ? "1" : "0");
   }
 
   function handleTouchStart(e) {

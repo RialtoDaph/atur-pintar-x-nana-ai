@@ -46,13 +46,14 @@ function LayoutInner({ children, currentPageName }) {
       // Log login
       base44.functions.invoke('logUserLogin', {}).catch(() => {});
 
-      // Fetch unread alerts only (badge count)
+      // Fetch unread alerts only (badge count) — dedupe by title+category to avoid hiding distinct alerts
       base44.entities.Alert.filter({ created_by: u.email, status: "unread" }).then((alerts) => {
-        const seenTitles = new Set();
+        const seen = new Set();
         let count = 0;
         for (const a of alerts || []) {
-          if (!seenTitles.has(a.title)) {
-            seenTitles.add(a.title);
+          const key = `${a.title}::${a.category || ""}`;
+          if (!seen.has(key)) {
+            seen.add(key);
             count++;
           }
         }

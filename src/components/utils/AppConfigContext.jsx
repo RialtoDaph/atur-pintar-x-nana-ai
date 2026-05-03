@@ -43,7 +43,7 @@ function getDefaults() {
     feature_investment: true,
     feature_nana_ai: true,
     feature_gamification: true,
-    feature_waiting_list: true,
+    feature_waiting_list: false,
     maintenance_mode: false,
     premium_price_monthly: 49000,
     premium_price_yearly: 490000,
