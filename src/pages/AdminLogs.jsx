@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { ScrollText, RefreshCw, Search, LogIn, Activity, AlertCircle, Filter } from "lucide-react";
+import { ScrollText, RefreshCw, Search, LogIn, Activity, AlertCircle, Filter, ShieldAlert } from "lucide-react";
 
 const LOG_TYPE_CONFIG = {
   login: { label: "Login", icon: LogIn, color: "blue" },
   activity: { label: "Activity", icon: Activity, color: "green" },
   error: { label: "Error", icon: AlertCircle, color: "red" },
+  sensitive_access: { label: "Akses Sensitif", icon: ShieldAlert, color: "orange" },
 };
 
 const SEVERITY_COLORS = {
@@ -88,6 +89,7 @@ export default function AdminLogs() {
   const loginCount = logs.filter(l => l.log_type === "login").length;
   const activityCount = logs.filter(l => l.log_type === "activity").length;
   const errorCount = logs.filter(l => l.log_type === "error").length;
+  const sensitiveCount = logs.filter(l => l.log_type === "sensitive_access").length;
 
   const formatDate = (d) => d ? new Date(d).toLocaleString("id-ID", {
     day: "2-digit", month: "short", year: "numeric",
@@ -139,6 +141,10 @@ export default function AdminLogs() {
             <div className="flex items-center gap-2 mb-1"><AlertCircle className="w-4 h-4 text-red-400" /><p className="text-xs text-[#8FA4C8]">Errors</p></div>
             <p className="text-2xl font-bold text-red-500">{errorCount}</p>
           </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-orange-100">
+            <div className="flex items-center gap-2 mb-1"><ShieldAlert className="w-4 h-4 text-orange-500" /><p className="text-xs text-[#8FA4C8]">Akses Sensitif</p></div>
+            <p className="text-2xl font-bold text-orange-500">{sensitiveCount}</p>
+          </div>
         </div>
 
         {logs.length === 0 && (
@@ -166,6 +172,7 @@ export default function AdminLogs() {
               <option value="login">Login</option>
               <option value="activity">Activity</option>
               <option value="error">Error</option>
+              <option value="sensitive_access">Akses Sensitif</option>
             </select>
             <select value={filterSeverity} onChange={e => { setFilterSeverity(e.target.value); setPage(1); }}
               className="px-3 py-2.5 rounded-xl border border-[#E2E8F0] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6A00]">
@@ -188,6 +195,7 @@ export default function AdminLogs() {
                   <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">User</th>
                   <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Action</th>
                   <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Entity</th>
+                  <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Target User</th>
                   <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">IP</th>
                   <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Severity</th>
                   <th className="text-left px-5 py-3 text-xs font-bold text-[#8FA4C8] uppercase tracking-wider">Details</th>
@@ -204,6 +212,7 @@ export default function AdminLogs() {
                         <span className={`flex items-center gap-1.5 text-xs font-semibold w-fit px-2.5 py-1 rounded-full ${
                           typeConf.color === "blue" ? "bg-blue-50 text-blue-600" :
                           typeConf.color === "green" ? "bg-green-50 text-green-600" :
+                          typeConf.color === "orange" ? "bg-orange-50 text-orange-600" :
                           "bg-red-50 text-red-500"
                         }`}>
                           <Icon className="w-3 h-3" />
@@ -213,6 +222,11 @@ export default function AdminLogs() {
                       <td className="px-5 py-3 text-xs text-[#8FA4C8] max-w-[150px] truncate">{l.user_email || "—"}</td>
                       <td className="px-5 py-3 text-sm text-[#1A1A1A] font-medium">{l.action}</td>
                       <td className="px-5 py-3 text-xs text-[#8FA4C8]">{l.entity_type || "—"}</td>
+                      <td className="px-5 py-3 text-xs text-[#8FA4C8] max-w-[150px] truncate">
+                        {l.target_email ? (
+                          <span className={`font-medium ${l.target_email === 'ALL_USERS' ? 'text-red-500' : 'text-orange-500'}`}>{l.target_email}</span>
+                        ) : "—"}
+                      </td>
                       <td className="px-5 py-3 text-xs font-mono text-[#8FA4C8]">{l.ip_address || "—"}</td>
                       <td className="px-5 py-3">
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${SEVERITY_COLORS[l.severity] || "bg-gray-50 text-gray-500"}`}>

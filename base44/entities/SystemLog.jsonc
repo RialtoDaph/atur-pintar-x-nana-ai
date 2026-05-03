@@ -7,7 +7,8 @@
       "enum": [
         "login",
         "activity",
-        "error"
+        "error",
+        "sensitive_access"
       ],
       "description": "Type of log entry"
     },
@@ -31,6 +32,10 @@
       "type": "string",
       "description": "Entity ID involved"
     },
+    "target_email": {
+      "type": "string",
+      "description": "Email of user whose data was accessed (for sensitive_access logs)"
+    },
     "ip_address": {
       "type": "string",
       "description": "IP address"
@@ -52,5 +57,23 @@
   "required": [
     "log_type",
     "action"
-  ]
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }
