@@ -315,9 +315,7 @@ function LayoutInner({ children, currentPageName }) {
                 </span>
               }
             </button>
-            <button onClick={() => setShowSearch(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
-              <Search className="w-4 h-4" />
-            </button>
+
             <Link to={createPageUrl("ProfileSettings")} className="w-8 h-8 rounded-full bg-[#F97316] flex items-center justify-center text-white text-xs font-bold tap-highlight-fix overflow-hidden">
               {user?.photo_url ? <img src={user.photo_url} alt="avatar" className="w-full h-full object-cover" /> : initials}
             </Link>

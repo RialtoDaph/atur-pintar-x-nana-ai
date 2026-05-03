@@ -14,8 +14,11 @@ export function sanitizeDisplayName(fullName) {
   return name || null;
 }
 
+import { useState, useEffect } from "react";
+
 export default function DashboardGreeting({ user, gamificationProfile }) {
   const hour = new Date().getHours();
+  const [isDark, setIsDark] = useState(() => localStorage.getItem("darkMode") === "true");
 
   const emailPrefix = user?.email?.split("@")[0];
   const name = sanitizeDisplayName(user?.full_name)
@@ -30,15 +33,32 @@ export default function DashboardGreeting({ user, gamificationProfile }) {
 
   const streak = gamificationProfile?.daily_streak ?? 0;
 
+  function toggleDark() {
+    const next = !isDark;
+    setIsDark(next);
+    localStorage.setItem("darkMode", next ? "true" : "false");
+    if (next) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }
+
   return (
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-white text-xl font-bold">{greeting}</h2>
-      {streak > 0 && (
-        <div className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full">
-          <span className="text-sm">🔥</span>
-          <span className="text-white text-[11px] font-bold">{streak}hari</span>
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+        {streak > 0 && (
+          <div className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full">
+            <span className="text-sm">🔥</span>
+            <span className="text-white text-[11px] font-bold">{streak}hari</span>
+          </div>
+        )}
+        <button
+          onClick={toggleDark}
+          className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-base hover:bg-white/20 transition-all tap-highlight-fix"
+          title={isDark ? "Mode Terang" : "Mode Gelap"}
+        >
+          {isDark ? "☀️" : "🌙"}
+        </button>
+      </div>
     </div>
   );
 }
