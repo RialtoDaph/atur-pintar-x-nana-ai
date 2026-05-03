@@ -101,7 +101,7 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
             </div>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
-            {accounts.slice(0, 3).map((a) =>
+            {accounts.map((a) =>
         <div key={a.id} className="flex items-center gap-1.5 bg-white/8 rounded-lg px-2.5 py-1.5">
                 {a.logo_url ?
           <AccountAvatar logoUrl={a.logo_url} name={a.name} color={a.color || "#FF6A00"} size="h-5 w-5" /> :
@@ -114,14 +114,7 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
                 </div>
               </div>
         )}
-            {accounts.length > 3 &&
-        <button
-          onClick={() => navigate("/Accounts")}
-          className="flex items-center gap-1 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-2.5 py-1.5 text-[#FF9A50] text-[10px] font-semibold">
-          
-                +{accounts.length - 3} lagi
-              </button>
-        }
+
             {accounts.length === 0 &&
         <button
           onClick={() => navigate("/Accounts")}
