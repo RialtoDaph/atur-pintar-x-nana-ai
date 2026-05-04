@@ -384,7 +384,7 @@ function LayoutInner({ children, currentPageName }) {
         className="fixed left-1/2 -translate-x-1/2 z-[70] bg-[#FF6B35] flex items-center justify-center rounded-full active:scale-95 transition-all duration-150 tap-highlight-fix sm:hidden"
         style={{
           width: 56, height: 56,
-          bottom: 'calc(56px + env(safe-area-inset-bottom, 0px))',
+          bottom: 'calc(36px + env(safe-area-inset-bottom, 0px))',
           boxShadow: '0 4px 16px rgba(255,107,53,0.5)'
         }}>
           <Plus className="w-6 h-6 text-white" />
