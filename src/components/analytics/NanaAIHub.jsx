@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Sparkles, Loader2, RefreshCw, BookOpen, TrendingUp, Calendar, ArrowUp, ArrowDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -79,8 +79,12 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
 
     try {
       const res = await base44.integrations.Core.InvokeLLM({ prompt });
-      setNarrative(typeof res === "string" ? res : res?.response || "");
+      const text = typeof res === "string"
+        ? res
+        : (res?.response || res?.text || res?.content || res?.output || "");
+      setNarrative(text || "Hmm, Nana belum bisa kasih analisis kali ini. Coba lagi ya!");
     } catch (e) {
+      console.error("[NanaAIHub] InvokeLLM failed:", e);
       setNarrative("Gagal memuat analisis. Coba lagi.");
     }
     setLoading(false);
@@ -272,26 +276,33 @@ function TrendTab({ trendData, formatCurrency, formatShortNumber }) {
 
 // ===== Sub-tab: Daily =====
 function DailyTab({ transactions, filterPeriod, customDateRange, formatCurrency, formatShortNumber }) {
-  const now = new Date();
-  const monthRange = customDateRange || {
-    start: new Date(now.getFullYear(), now.getMonth() - (parseInt(filterPeriod) - 1), 1),
-    end: now,
-  };
-  const monthDiff = (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
-    (monthRange.end.getMonth() - monthRange.start.getMonth());
+  const { data, total, totalDays, avg } = useMemo(() => {
+    const now = new Date();
+    const monthRange = customDateRange || {
+      start: new Date(now.getFullYear(), now.getMonth() - ((parseInt(filterPeriod) || 6) - 1), 1),
+      end: now,
+    };
+    const monthDiff = Math.max(
+      0,
+      (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
+        (monthRange.end.getMonth() - monthRange.start.getMonth())
+    );
 
-  const data = Array.from({ length: monthDiff + 1 }, (_, i) => {
-    const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
-    const monthTx = transactions.filter(t => {
-      const td = new Date(t.date);
-      return td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear() && t.type === "expense";
+    const arr = Array.from({ length: monthDiff + 1 }, (_, i) => {
+      const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
+      let sum = 0;
+      for (const t of transactions) {
+        if (t.type !== "expense") continue;
+        const td = new Date(t.date);
+        if (td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear()) sum += t.amount || 0;
+      }
+      return { name: MONTHS_ID[d.getMonth()], value: sum };
     });
-    return { name: MONTHS_ID[d.getMonth()], value: monthTx.reduce((s, t) => s + t.amount, 0) };
-  });
 
-  const total = data.reduce((s, m) => s + m.value, 0);
-  const totalDays = Math.max(Math.ceil((monthRange.end - monthRange.start) / (1000 * 60 * 60 * 24)) + 1, 1);
-  const avg = total / totalDays;
+    const t = arr.reduce((s, m) => s + m.value, 0);
+    const days = Math.max(Math.ceil((monthRange.end - monthRange.start) / (1000 * 60 * 60 * 24)) + 1, 1);
+    return { data: arr, total: t, totalDays: days, avg: t / days };
+  }, [transactions, filterPeriod, customDateRange]);
 
   if (total === 0) {
     return (
