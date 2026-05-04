@@ -15,6 +15,7 @@ export function sanitizeDisplayName(fullName) {
 }
 
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function DashboardGreeting({ user, gamificationProfile }) {
   const hour = new Date().getHours();
@@ -46,10 +47,14 @@ export default function DashboardGreeting({ user, gamificationProfile }) {
       <h2 className="text-white text-xl font-bold">{greeting}</h2>
       <div className="flex items-center gap-2">
         {streak > 0 && (
-          <div className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full">
+          <Link
+            to="/Gamifikasi"
+            className="flex items-center gap-1 bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors px-2.5 py-1 rounded-full tap-highlight-fix"
+            title="Lihat progres gamifikasi"
+          >
             <span className="text-sm">🔥</span>
             <span className="text-white text-[11px] font-bold">{streak}hari</span>
-          </div>
+          </Link>
         )}
         <button
           onClick={toggleDark}

@@ -129,7 +129,7 @@ const AuthenticatedApp = () => {
       <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />
       <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />
       <Route path="/About" element={<About />} />
-      <Route path="/Achievements" element={<LayoutWrapper currentPageName="Achievements"><Achievements /></LayoutWrapper>} />
+      <Route path="/Achievements" element={<Navigate to="/Gamifikasi" replace />} />
       <Route path="/ReceiptScanHistory" element={<LayoutWrapper currentPageName="ReceiptScanHistory"><ReceiptScanHistory /></LayoutWrapper>} />
       <Route path="/Gamifikasi" element={<LayoutWrapper currentPageName="Gamifikasi"><Gamifikasi /></LayoutWrapper>} />
       <Route path="/Investments" element={<LayoutWrapper currentPageName="Investments"><Investments /></LayoutWrapper>} />
