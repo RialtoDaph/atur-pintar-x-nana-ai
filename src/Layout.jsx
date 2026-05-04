@@ -362,17 +362,6 @@ function LayoutInner({ children, currentPageName }) {
             </button>);
 
         })}
-        {/* More button → goes to Menu page */}
-        <button
-          key="menu"
-          data-tour="mobile-more-tab"
-          onClick={() => handleTabClick("Menu")}
-          className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
-          mobileMorePages.includes(currentPageName) ? "text-[#F97316]" : "text-[#888]"}`}>
-          
-          <Grid3x3 className="w-5 h-5" />
-          {t('nav_more')}
-        </button>
       </div>
 
       {/* Mobile FAB - center-bottom, toggles Plus↔X (X when modal open) */}
