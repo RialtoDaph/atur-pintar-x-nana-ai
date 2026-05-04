@@ -60,6 +60,14 @@ export default function DebtsPage() {
     setLoading(false);
   }
 
+  async function resolveDebtCategoryId() {
+    try {
+      const cats = await base44.entities.GlobalCategory.filter({ name: "Finansial & Keuangan", is_active: true });
+      if (cats && cats.length) return cats[0].id;
+    } catch {}
+    return undefined;
+  }
+
   async function handlePayment({ amount, note, date, accountId }) {
     const debt = debts.find(d => d.id === paymentModal);
     if (!debt) return;
@@ -69,18 +77,18 @@ export default function DebtsPage() {
 
     setDebts(prev => prev.map(d => d.id === debt.id ? { ...d, remaining_amount: newRemaining, status: newStatus } : d));
     try {
+      const categoryId = await resolveDebtCategoryId();
       const txData = {
         amount,
         type: "expense",
-        category: "cicilan",
+        category: categoryId || undefined,
         note: note || `Cicilan ${debt.name}`,
         date: date || new Date().toISOString().split("T")[0],
         debt_id: debt.id,
         ...(accountId ? { account_id: accountId } : {}),
       };
       await Promise.all([
-        base44.entities.Transaction.create(txData).then(async (tx) => {
-          // Sync account balance if account selected
+        base44.entities.Transaction.create(txData).then(async () => {
           if (accountId) {
             await base44.functions.invoke("syncTransactionChanges", {
               action: "create",
@@ -99,6 +107,7 @@ export default function DebtsPage() {
         toast.success(`🎉 ${debt.name} telah lunas!`);
       }
     } catch (error) {
+      toast.error("Gagal mencatat pembayaran. Coba lagi.");
       loadData();
     }
   }
@@ -107,9 +116,10 @@ export default function DebtsPage() {
     const debt = await base44.entities.Debt.create(data);
     // Auto-create recurring transaction if monthly_payment set
     if (data.monthly_payment > 0) {
+      const categoryId = await resolveDebtCategoryId();
       await base44.entities.Transaction.create({
         type: "expense",
-        category: "cicilan",
+        category: categoryId || undefined,
         amount: data.monthly_payment,
         note: `Cicilan ${data.name}`,
         date: data.due_date || new Date().toISOString().split("T")[0],
@@ -124,15 +134,32 @@ export default function DebtsPage() {
   }
 
   async function markPaid(debt) {
+    // Mark debt as paid AND stop the recurring transaction template (avoid ghost expenses post-payoff)
     await base44.entities.Debt.update(debt.id, { status: "paid", remaining_amount: 0 });
+    try {
+      const recurringTemplates = await base44.entities.Transaction.filter({
+        debt_id: debt.id,
+        is_recurring: true,
+      });
+      await Promise.all(
+        (recurringTemplates || [])
+          .filter(t => !t.is_recurring_child)
+          .map(t => base44.entities.Transaction.delete(t.id))
+      );
+    } catch {}
     setMarkPaidConfirm(null);
     loadData();
   }
 
   async function handleDelete(id) {
-    // Unlink any linked transactions before deleting (avoid orphan debt_id refs)
+    // Unlink past-payment transactions, but DELETE recurring templates (prevent orphan auto-generation)
     const linked = await base44.entities.Transaction.filter({ debt_id: id });
-    await Promise.all((linked || []).map(tx => base44.entities.Transaction.update(tx.id, { debt_id: null })));
+    await Promise.all((linked || []).map(tx => {
+      if (tx.is_recurring && !tx.is_recurring_child) {
+        return base44.entities.Transaction.delete(tx.id);
+      }
+      return base44.entities.Transaction.update(tx.id, { debt_id: null });
+    }));
     await base44.entities.Debt.delete(id);
     setDeleteConfirm(null);
     loadData();
