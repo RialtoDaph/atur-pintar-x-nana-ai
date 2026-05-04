@@ -1,86 +1,66 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { AlertTriangle, ChevronDown, ChevronUp, TrendingUp, CheckCircle, HelpCircle } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import AnomalySecurityModal from "./AnomalySecurityModal";
 
 export default function AnomalyDetector({ transactions, allCategoriesConfig = {} }) {
   const { formatCurrency } = useAppSettings();
-  const [anomalies, setAnomalies] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [feedback, setFeedback] = useState({});
   const [securityModal, setSecurityModal] = useState(null);
 
-  useEffect(() => {
-    if (!transactions || transactions.length === 0) return;
+  const anomalies = useMemo(() => {
+    if (!transactions || transactions.length === 0) return [];
 
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    const last3Months = [];
+    const last3Set = new Set();
     for (let i = 1; i <= 3; i++) {
       let m = currentMonth - i;
       let y = currentYear;
       if (m < 0) { m += 12; y -= 1; }
-      last3Months.push({ month: m, year: y });
+      last3Set.add(`${y}-${m}`);
     }
 
-    const expenses = transactions.filter(t => t.type === "expense");
-
+    // Single pass through transactions
     const currentSpend = {};
-    expenses.forEach(t => {
-      const d = new Date(t.date);
-      if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-        const cat = t.category || "other";
-        currentSpend[cat] = (currentSpend[cat] || 0) + t.amount;
-      }
-    });
-
     const avgSpend = {};
-    last3Months.forEach(({ month, year }) => {
-      expenses.forEach(t => {
-        const d = new Date(t.date);
-        if (d.getMonth() === month && d.getFullYear() === year) {
-          const cat = t.category || "other";
-          avgSpend[cat] = (avgSpend[cat] || 0) + t.amount / 3;
-        }
-      });
-    });
+    for (const t of transactions) {
+      if (t.type !== "expense") continue;
+      const d = new Date(t.date);
+      const cat = t.category || "other";
+      const m = d.getMonth();
+      const y = d.getFullYear();
+      if (m === currentMonth && y === currentYear) {
+        currentSpend[cat] = (currentSpend[cat] || 0) + (t.amount || 0);
+      } else if (last3Set.has(`${y}-${m}`)) {
+        avgSpend[cat] = (avgSpend[cat] || 0) + (t.amount || 0) / 3;
+      }
+    }
 
     const detected = [];
     Object.entries(currentSpend).forEach(([cat, amount]) => {
       const avg = avgSpend[cat] || 0;
+      const catInfo = allCategoriesConfig[cat] || {};
+      const base = {
+        category: cat,
+        label: catInfo.label || cat,
+        emoji: catInfo.emoji || "📦",
+        color: catInfo.color || "#8FA4C8",
+        current: amount,
+      };
       if (avg > 0 && amount > avg * 1.5 && (amount - avg) > 100000) {
-        const pctIncrease = ((amount - avg) / avg * 100).toFixed(0);
-        const catInfo = allCategoriesConfig[cat] || {};
-        detected.push({
-          category: cat,
-          label: catInfo.label || cat,
-          emoji: catInfo.emoji || "📦",
-          color: catInfo.color || "#8FA4C8",
-          current: amount,
-          average: avg,
-          pctIncrease: parseInt(pctIncrease),
-        });
+        detected.push({ ...base, average: avg, pctIncrease: parseInt(((amount - avg) / avg * 100).toFixed(0)) });
       } else if (avg === 0 && amount > 500000) {
-        const catInfo = allCategoriesConfig[cat] || {};
-        detected.push({
-          category: cat,
-          label: catInfo.label || cat,
-          emoji: catInfo.emoji || "📦",
-          color: catInfo.color || "#8FA4C8",
-          current: amount,
-          average: 0,
-          pctIncrease: 999,
-          isNew: true,
-        });
+        detected.push({ ...base, average: 0, pctIncrease: 999, isNew: true });
       }
     });
 
     detected.sort((a, b) => b.pctIncrease - a.pctIncrease);
-    setAnomalies(detected.slice(0, 5));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transactions]);
+    return detected.slice(0, 5);
+  }, [transactions, allCategoriesConfig]);
 
   if (anomalies.length === 0) return null;
 

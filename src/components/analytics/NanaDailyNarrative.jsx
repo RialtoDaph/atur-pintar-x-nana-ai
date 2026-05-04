@@ -1,6 +1,5 @@
-import { useMemo, useState, useRef } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 
 const NANA_AVATAR = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png";
 
@@ -66,7 +65,7 @@ export default function NanaDailyNarrative({ user, savingRate, budgets, transact
   const narrative = useMemo(() => {
     if (!user) return null;
     return generateNarrative({ firstName, savingRate, budgets, transactions, streak, netWorth, debts, allCategoriesConfig });
-  }, [user?.email, savingRate, budgets.length, streak, netWorth]);
+  }, [user?.email, firstName, savingRate, budgets, transactions, streak, netWorth, debts, allCategoriesConfig]);
 
   if (!narrative) return null;
 

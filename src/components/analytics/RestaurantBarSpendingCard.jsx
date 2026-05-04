@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ComposedChart } from "recharts";
 import { ChevronRight, TrendingUp, TrendingDown } from "lucide-react";
 import { createPageUrl } from "@/utils";
@@ -15,132 +15,99 @@ export default function RestaurantBarSpendingCard({
 }) {
   const navigate = useNavigate();
   const { formatShortNumber } = useAppSettings();
-  const now = new Date();
 
-  // Find restaurant and bar category IDs (including sub-categories of food)
-  const restaurantCats = customCategories.filter(
-    c => c.name?.toLowerCase().includes("restoran") || c.name?.toLowerCase().includes("restaurant") ||
-         c.name?.toLowerCase().includes("makan")
-  );
-  const barCats = customCategories.filter(
-    c => c.name?.toLowerCase().includes("bar") || c.name?.toLowerCase().includes("minuman") ||
-         c.name?.toLowerCase().includes("kafe") || c.name?.toLowerCase().includes("cafe") ||
-         c.name?.toLowerCase().includes("coffee")
-  );
+  const { currentMonthlyData, currentDailyAvg, trendDiff, isTrendPositive } = useMemo(() => {
+    const now = new Date();
 
-  // Also include sub-categories whose parent is "food"
-  const foodSubCats = customCategories.filter(
-    c => c.parent_category_key === "food"
-  );
+    // Build category key sets
+    const restaurantCats = customCategories.filter(
+      c => c.name?.toLowerCase().includes("restoran") || c.name?.toLowerCase().includes("restaurant") ||
+           c.name?.toLowerCase().includes("makan")
+    );
+    const barCats = customCategories.filter(
+      c => c.name?.toLowerCase().includes("bar") || c.name?.toLowerCase().includes("minuman") ||
+           c.name?.toLowerCase().includes("kafe") || c.name?.toLowerCase().includes("cafe") ||
+           c.name?.toLowerCase().includes("coffee")
+    );
+    const foodSubCats = customCategories.filter(c => c.parent_category_key === "food");
 
-  const restaurantCatId = restaurantCats[0]?.id;
-  const barCatId = barCats[0]?.id;
+    const restaurantKeys = new Set([
+      ...restaurantCats.map(c => `custom_${c.id}`),
+      ...foodSubCats.filter(c => c.name?.toLowerCase().match(/makan|restoran|restaurant/)).map(c => `custom_${c.id}`),
+    ]);
+    const barKeys = new Set([
+      ...barCats.map(c => `custom_${c.id}`),
+      ...foodSubCats.filter(c => c.name?.toLowerCase().match(/bar|minum|kafe|cafe|coffee/)).map(c => `custom_${c.id}`),
+    ]);
 
-  const getMonthRange = () => {
-    if (customDateRange) {
-      return customDateRange;
-    }
-    const months = parseInt(filterPeriod);
-    return {
-      start: new Date(now.getFullYear(), now.getMonth() - (months - 1), 1),
+    // Resolve range with NaN guard
+    const monthRange = customDateRange || {
+      start: new Date(now.getFullYear(), now.getMonth() - ((parseInt(filterPeriod) || 6) - 1), 1),
       end: now,
     };
-  };
+    const monthDiff = Math.max(0,
+      (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
+      (monthRange.end.getMonth() - monthRange.start.getMonth())
+    );
 
-  const monthRange = getMonthRange();
+    // Build month buckets for current period (single pass)
+    const currBuckets = {};
+    for (let i = 0; i <= monthDiff; i++) {
+      const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
+      const k = `${d.getFullYear()}-${d.getMonth()}`;
+      currBuckets[k] = {
+        name: d.toLocaleDateString("id-ID", { month: "short" }),
+        restaurant: 0, bar: 0, total: 0,
+        label: d.toLocaleDateString("id-ID", { month: "2-digit", year: "2-digit" }),
+      };
+    }
 
-  const monthDiff =
-    (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
-    (monthRange.end.getMonth() - monthRange.start.getMonth());
-
-  // All relevant category keys
-  const restaurantKeys = new Set([
-    ...restaurantCats.map(c => `custom_${c.id}`),
-    ...foodSubCats.filter(c => c.name?.toLowerCase().match(/makan|restoran|restaurant/)).map(c => `custom_${c.id}`),
-  ]);
-  const barKeys = new Set([
-    ...barCats.map(c => `custom_${c.id}`),
-    ...foodSubCats.filter(c => c.name?.toLowerCase().match(/bar|minum|kafe|cafe|coffee/)).map(c => `custom_${c.id}`),
-  ]);
-
-  const isRestaurant = (tx) => restaurantKeys.has(tx.category);
-  const isBar = (tx) => barKeys.has(tx.category);
-  const isRestaurantBar = (tx) => isRestaurant(tx) || isBar(tx);
-
-  // Calculate monthly expenses for current period (with sub-category breakdown)
-  const currentMonthlyData = Array.from({ length: monthDiff + 1 }, (_, i) => {
-    const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    const monthTx = transactions.filter(t => {
-      const td = new Date(t.date);
-      return (
-        td.getMonth() === month &&
-        td.getFullYear() === year &&
-        t.type === "expense" &&
-        isRestaurantBar(t)
-      );
-    });
-    
-    const restaurant = monthTx.filter(t => isRestaurant(t)).reduce((s, t) => s + t.amount, 0);
-    const bar = monthTx.filter(t => isBar(t)).reduce((s, t) => s + t.amount, 0);
-    const total = monthTx.reduce((s, t) => s + t.amount, 0);
-    
-    return {
-      name: d.toLocaleDateString("id-ID", { month: "short" }),
-      restaurant,
-      bar,
-      total,
-      label: d.toLocaleDateString("id-ID", { month: "2-digit", year: "2-digit" })
+    // Previous period range
+    const prevRange = {
+      start: new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() - (monthDiff + 1), 1),
+      end: new Date(monthRange.start.getFullYear(), monthRange.start.getMonth(), 0),
     };
-  });
+    const prevSet = new Set();
+    for (let d = new Date(prevRange.start); d <= prevRange.end; d.setMonth(d.getMonth() + 1)) {
+      prevSet.add(`${d.getFullYear()}-${d.getMonth()}`);
+    }
 
-  // Calculate daily average for current period
-  // Use full period days: from start to last day of end month
-  const fullPeriodEnd = new Date(monthRange.end.getFullYear(), monthRange.end.getMonth() + 1, 0);
-  const periodStart = monthRange.start;
-  const totalDays = Math.max(
-    Math.ceil((fullPeriodEnd - periodStart) / (1000 * 60 * 60 * 24)) + 1,
-    1
-  );
-  const currentTotal = currentMonthlyData.reduce((s, m) => s + m.total, 0);
-  const currentDailyAvg = currentTotal / totalDays;
-
-  // Calculate previous period for trend
-  const prevMonthRange = {
-    start: new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() - (monthDiff + 1), 1),
-    end: new Date(monthRange.start.getFullYear(), monthRange.start.getMonth(), 0),
-  };
-
-  const prevMonthDiff =
-    (prevMonthRange.end.getFullYear() - prevMonthRange.start.getFullYear()) * 12 +
-    (prevMonthRange.end.getMonth() - prevMonthRange.start.getMonth());
-
-  const prevMonthlyData = Array.from({ length: prevMonthDiff + 1 }, (_, i) => {
-    const d = new Date(prevMonthRange.start.getFullYear(), prevMonthRange.start.getMonth() + i, 1);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    const monthTx = transactions.filter(t => {
+    // Single pass through transactions
+    let prevTotal = 0;
+    for (const t of transactions) {
+      if (t.type !== "expense") continue;
+      const isResto = restaurantKeys.has(t.category);
+      const isBarTx = barKeys.has(t.category);
+      if (!isResto && !isBarTx) continue;
       const td = new Date(t.date);
-      return (
-        td.getMonth() === month &&
-        td.getFullYear() === year &&
-        t.type === "expense" &&
-        isRestaurantBar(t)
-      );
-    });
-    return monthTx.reduce((s, t) => s + t.amount, 0);
-  });
+      const k = `${td.getFullYear()}-${td.getMonth()}`;
+      const amt = t.amount || 0;
+      if (currBuckets[k]) {
+        if (isResto) currBuckets[k].restaurant += amt;
+        if (isBarTx) currBuckets[k].bar += amt;
+        currBuckets[k].total += amt;
+      } else if (prevSet.has(k)) {
+        prevTotal += amt;
+      }
+    }
 
-  const prevTotalDays = Math.max(
-    Math.ceil((prevMonthRange.end - prevMonthRange.start) / (1000 * 60 * 60 * 24)) + 1,
-    1
-  );
-  const prevTotal = prevMonthlyData.reduce((s, m) => s + m, 0);
-  const prevDailyAvg = prevTotal / prevTotalDays;
+    const currentMonthlyArr = Object.values(currBuckets);
+    const fullPeriodEnd = new Date(monthRange.end.getFullYear(), monthRange.end.getMonth() + 1, 0);
+    const totalDays = Math.max(Math.ceil((fullPeriodEnd - monthRange.start) / (1000 * 60 * 60 * 24)) + 1, 1);
+    const currTotal = currentMonthlyArr.reduce((s, m) => s + m.total, 0);
+    const currAvg = currTotal / totalDays;
 
-  const trendDiff = currentDailyAvg - prevDailyAvg;
-  const isTrendPositive = trendDiff >= 0;
+    const prevDays = Math.max(Math.ceil((prevRange.end - prevRange.start) / (1000 * 60 * 60 * 24)) + 1, 1);
+    const prevAvg = prevTotal / prevDays;
+    const diff = currAvg - prevAvg;
+
+    return {
+      currentMonthlyData: currentMonthlyArr,
+      currentDailyAvg: currAvg,
+      trendDiff: diff,
+      isTrendPositive: diff >= 0,
+    };
+  }, [transactions, customCategories, filterPeriod, customDateRange]);
 
   const handleNavigate = () => {
     navigate(`${createPageUrl("SpendingDetail")}?type=restaurant_bar&period=${filterPeriod}`);
