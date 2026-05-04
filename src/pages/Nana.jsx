@@ -53,46 +53,22 @@ function NanaInner() {
     loadConversations();
   }, []);
 
-  // Restore scroll position when messages first render; auto-scroll to bottom
-  // only for new messages added afterwards (and only if user is already near bottom).
+  // Always auto-scroll to the latest message when the chat opens, when messages
+  // change (new message arrives / sent), or when switching conversations.
+  // Initial mount uses an instant jump; subsequent updates use smooth scroll.
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container || messages.length === 0) return;
 
     if (!didInitialScroll.current) {
-      // First render of messages — restore saved scroll position for this conv,
-      // or default to bottom (latest message) if no saved position exists.
-      const key = activeConv?.id ? `nana_scroll_${activeConv.id}` : null;
-      const saved = key ? sessionStorage.getItem(key) : null;
-      if (saved !== null) {
-        container.scrollTop = parseInt(saved, 10) || 0;
-      } else {
-        container.scrollTop = container.scrollHeight;
-      }
+      container.scrollTop = container.scrollHeight;
       didInitialScroll.current = true;
       return;
     }
-
-    // Subsequent updates: only auto-scroll if user is already near bottom
-    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distanceFromBottom < 120) {
-      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-    }
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
   }, [messages, activeConv?.id]);
 
-  // Persist scroll position per conversation so user comes back where they left off
-  useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (!container || !activeConv?.id) return;
-    const key = `nana_scroll_${activeConv.id}`;
-    const handler = () => {
-      sessionStorage.setItem(key, String(container.scrollTop));
-    };
-    container.addEventListener("scroll", handler, { passive: true });
-    return () => container.removeEventListener("scroll", handler);
-  }, [activeConv?.id]);
-
-  // Reset initial-scroll flag when switching conversations so each conv restores its own position
+  // Reset initial-scroll flag when switching conversations so each conv jumps to bottom on open
   useEffect(() => {
     didInitialScroll.current = false;
   }, [activeConv?.id]);
