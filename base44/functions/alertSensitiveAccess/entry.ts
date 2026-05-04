@@ -6,7 +6,11 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const body = await req.json();
 
-    // Support both direct call and entity automation payload
+    // Support both direct call and entity automation payload.
+    // Only fire on CREATE events to prevent duplicate emails when a log is later updated.
+    if (body.event && body.event.type !== "create") {
+      return Response.json({ skipped: true, reason: "not a create event" });
+    }
     const logData = body.data || body;
 
     if (!logData || logData.log_type !== "sensitive_access") {

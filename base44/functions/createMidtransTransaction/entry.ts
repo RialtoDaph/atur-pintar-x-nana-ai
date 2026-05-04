@@ -45,7 +45,9 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.SubscriptionPayment.update(existing.id, { status: 'expired' });
     }
 
-    const orderId = `AP-${user.id.slice(0, 8)}-${Date.now()}`;
+    // Guard: user.id may be undefined in edge cases — fall back to email hash slice.
+    const userIdSafe = (user.id || user.email || 'anon').toString().slice(0, 8);
+    const orderId = `AP-${userIdSafe}-${Date.now()}`;
     const serverKey = Deno.env.get("MIDTRANS_SERVER_KEY");
     const auth = btoa(`${serverKey}:`);
 

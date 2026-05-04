@@ -19,11 +19,14 @@ export async function updateChallengesAfterTransaction(userEmail) {
 
     if (!activeChallenges || activeChallenges.length === 0) return;
 
-    // Fetch today's transactions
-    const todaysTxs = await base44.entities.Transaction.filter({
+    // Fetch today's transactions — exclude soft-deleted and recurring templates
+    const todaysTxsRaw = await base44.entities.Transaction.filter({
       created_by: userEmail,
       date: today,
     }).catch(() => []);
+    const todaysTxs = (todaysTxsRaw || []).filter(tx =>
+      tx.is_deleted !== true && !(tx.is_recurring === true && !tx.is_recurring_child)
+    );
 
     // Fetch GamificationProfile for XP reward
     const profiles = await base44.entities.GamificationProfile.filter({
@@ -45,8 +48,8 @@ export async function updateChallengesAfterTransaction(userEmail) {
       } else if (challenge.challenge_key === "nabung_30_hari") {
         // Check if already counted today
         if (challenge.last_progress_date !== today) {
-          // Check if there's a transaction today with amount >= 10000
-          const hasQualifyingTx = todaysTxs.some((tx) => (tx.amount || 0) >= 10000);
+          // Must be a SAVINGS transaction >= 10000 (matches backend processGamification logic)
+          const hasQualifyingTx = todaysTxs.some((tx) => tx.type === "savings" && (tx.amount || 0) >= 10000);
 
           if (hasQualifyingTx) {
             updatedData.progress_days = (challenge.progress_days || 0) + 1;
@@ -69,9 +72,9 @@ export async function updateChallengesAfterTransaction(userEmail) {
           }
         }
       } else if (challenge.challenge_key.startsWith("nabung_mingguan_")) {
-        // Weekly savings challenge
+        // Weekly savings challenge — also requires type=savings
         if (challenge.last_progress_date !== today) {
-          const hasQualifyingTx = todaysTxs.some((tx) => (tx.amount || 0) >= 50000);
+          const hasQualifyingTx = todaysTxs.some((tx) => tx.type === "savings" && (tx.amount || 0) >= 50000);
 
           if (hasQualifyingTx) {
             updatedData.progress_days = (challenge.progress_days || 0) + 1;

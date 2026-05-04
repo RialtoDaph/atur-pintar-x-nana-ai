@@ -109,9 +109,12 @@ export default function Transactions() {
 
   useEffect(() => { fetchData(); }, []);
 
-  // Filtered transactions for Riwayat tab
+  // Filtered transactions for Riwayat tab.
+  // Exclude soft-deleted records and recurring TEMPLATES (templates show only in Rutin tab).
   const filtered = transactions.filter(tx => {
     if (!tx.date) return false;
+    if (tx.is_deleted === true) return false;
+    if (tx.is_recurring === true && !tx.is_recurring_child) return false;
     const d = new Date(tx.date);
     if (d.getMonth() !== filters.month || d.getFullYear() !== filters.year) return false;
     if (filters.type !== "all" && tx.type !== filters.type) return false;
@@ -132,9 +135,12 @@ export default function Transactions() {
   // Recurring transactions for Rutin tab
   const recurringTxs = transactions.filter(tx => tx.is_recurring && !tx.is_recurring_child);
 
-  // Spending data for SpendingBar (current month expenses)
+  // Spending data for SpendingBar (current month expenses).
+  // Exclude soft-deleted and recurring templates so the bar reflects real spending.
   const monthExpenses = transactions.filter(tx => {
     if (!tx.date || tx.type !== "expense") return false;
+    if (tx.is_deleted === true) return false;
+    if (tx.is_recurring === true && !tx.is_recurring_child) return false;
     const d = new Date(tx.date);
     return d.getMonth() === filters.month && d.getFullYear() === filters.year;
   });
