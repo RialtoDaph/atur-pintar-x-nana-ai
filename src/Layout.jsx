@@ -358,15 +358,15 @@ function LayoutInner({ children, currentPageName }) {
             </button>);
         })}
 
-        {/* Center FAB - Add Transaction (elevated) */}
-        <div className="flex-1 flex justify-center">
+        {/* Center FAB - Add Transaction (off-side, sticks out above nav box) */}
+        <div className="flex-1 flex justify-center relative">
           <button
             onClick={() => setShowAddTransaction(true)}
             data-tour="add-transaction-btn"
-            className="bg-[#FF6B35] rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all duration-150 tap-highlight-fix ring-4 ring-[#0A0A0A]"
+            className="bg-[#FF6B35] rounded-full flex items-center justify-center active:scale-95 transition-all duration-150 tap-highlight-fix absolute left-1/2 -translate-x-1/2"
             style={{
               width: 48, height: 48,
-              marginTop: -32,
+              top: -28,
               boxShadow: '0 4px 16px rgba(255,107,53,0.5)'
             }}>
             <Plus className="w-5 h-5 text-white" />
