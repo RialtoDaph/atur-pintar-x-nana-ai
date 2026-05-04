@@ -218,13 +218,16 @@ function NanaInner() {
   async function sendMessage(textOverride) {
     const text = typeof textOverride === "string" ? textOverride : input;
     if (!text.trim() || sending || isLimitReached) return;
+    // Block sending until user is loaded — without this, quota update could overwrite a higher existing count with 1
+    if (!user) return;
     // Rate limit: min 3 detik antar pesan (anti-spam, hemat AI credits)
     const nowMs = Date.now();
     if (nowMs - lastSendAt.current < 3000) return;
-    lastSendAt.current = nowMs;
 
     let conv = activeConv;
     setSending(true);
+    const previousInput = input;
+    setInput("");
     try {
       if (!conv) {
         conv = await base44.agents.createConversation({
@@ -235,42 +238,51 @@ function NanaInner() {
         setConversations(prev => [conv, ...prev]);
       }
 
-      setInput("");
-
       const msgType = detectMessageType(text);
-      // Save user message to NanaConversation
-      saveToNanaConversation("user", text, msgType);
 
+      // Send to agent FIRST — only count quota / save / award XP if it actually succeeds
       await base44.agents.addMessage(conv, { role: "user", content: text });
 
-      // Only count quota AFTER addMessage succeeded — failures shouldn't burn user's quota
-      // Gamification: tanya_nana mission (streak handled by processGamification trigger below)
+      // From here on, the message is committed. Set rate-limit timestamp now (not before failure).
+      lastSendAt.current = nowMs;
+
+      // Save user message to NanaConversation (fire-and-forget)
+      saveToNanaConversation("user", text, msgType);
+
+      // Gamification: tanya_nana mission
       if (user?.email) {
         completeMission(user.email, "tanya_nana").catch(() => {});
       }
 
+      // Quota update — read latest user state to avoid race when user sends multiple messages quickly
       if (!isPremium) {
-        const newCount = msgCount + 1;
-        await base44.auth.updateMe({ nana_message_count: newCount, nana_message_month: currentMonth });
-        setUser(u => ({ ...u, nana_message_count: newCount, nana_message_month: currentMonth }));
+        setUser(u => {
+          if (!u) return u;
+          const sameMonth = u.nana_message_month === currentMonth;
+          const newCount = (sameMonth ? (u.nana_message_count || 0) : 0) + 1;
+          base44.auth.updateMe({ nana_message_count: newCount, nana_message_month: currentMonth }).catch(() => {});
+          return { ...u, nana_message_count: newCount, nana_message_month: currentMonth };
+        });
       }
 
-    // XP for sending message via backend (max 3x per day; backend awards 2 XP per nana_message_sent)
-    if (user?.email) {
-      const key = `nana_msg_xp_${today}`;
-      const count = parseInt(localStorage.getItem(key) || "0", 10);
-      if (count < 3) {
-        localStorage.setItem(key, String(count + 1));
-        base44.functions.invoke("processGamification", { trigger: "nana_message_sent" }).catch(() => {});
-        addTodayXP(2);
+      // XP for sending message via backend (max 3x per day; backend awards 2 XP per nana_message_sent)
+      if (user?.email) {
+        const key = `nana_msg_xp_${today}`;
+        const count = parseInt(localStorage.getItem(key) || "0", 10);
+        if (count < 3) {
+          localStorage.setItem(key, String(count + 1));
+          base44.functions.invoke("processGamification", { trigger: "nana_message_sent" }).catch(() => {});
+          addTodayXP(2);
+        }
       }
-    }
     } catch (error) {
-    console.error("Error sending message:", error);
+      console.error("Error sending message:", error);
+      // Restore input so user doesn't lose their message on failure
+      setInput(previousInput);
     } finally {
-    setSending(false);
+      setSending(false);
     }
-    }
+  }
 
   function handleKey(e) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -358,7 +370,7 @@ function NanaInner() {
                 const showSeparator = i === 0 || (prevDate && msgDate !== prevDate);
 
                 return (
-                  <div key={i}>
+                  <div key={msg.id || `msg-${i}`}>
                     {showSeparator && (
                       <div className="flex items-center gap-2 my-3">
                         <div className="flex-1 h-px bg-[#E2E8F0] dark:bg-[#2D2D2D]" />
