@@ -137,10 +137,14 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
                 {hidden ? <span className="tracking-[0.2em]">{HIDDEN}</span> : `Rp ${compactRupiah(totalBalance)}`}
               </p>
             </div>
-            <div className="text-right">
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate("/Accounts"); }}
+              className="text-right tap-highlight-fix"
+              title="Buka Rekening"
+            >
               <p className="text-white/50 text-[10px] mb-0.5">{accounts.length} rekening</p>
-              <Wallet className="w-5 h-5 text-white/40 ml-auto" />
-            </div>
+              <Wallet className="w-5 h-5 text-white/40 ml-auto hover:text-white/70 transition-colors" />
+            </button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
             {[...accounts].sort((a, b) => (b.balance || 0) - (a.balance || 0)).map((a) =>
@@ -182,10 +186,14 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
                 {hidden ? <span className="tracking-[0.2em]">{HIDDEN}</span> : `Rp ${compactRupiah(invSaldoAktif)}`}
               </p>
             </div>
-            <div className="text-right">
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate("/Investments"); }}
+              className="text-right tap-highlight-fix"
+              title="Buka Investasi"
+            >
               <p className="text-white/50 text-[10px] mb-0.5">{investments.length} aset</p>
-              <LineChart className="w-5 h-5 text-white/40 ml-auto" />
-            </div>
+              <LineChart className="w-5 h-5 text-white/40 ml-auto hover:text-white/70 transition-colors" />
+            </button>
           </div>
           {investments.length === 0 ? (
             <button
@@ -232,10 +240,14 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
                 {hidden ? <span className="tracking-[0.2em]">{HIDDEN}</span> : `Rp ${compactRupiah(totalShared)}`}
               </p>
             </div>
-            <div className="text-right">
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate("/SharedFinance"); }}
+              className="text-right tap-highlight-fix"
+              title="Buka Keuangan Bersama"
+            >
               <p className="text-white/50 text-[10px] mb-0.5">{sharedWallets.length} dompet</p>
-              <Users className="w-5 h-5 text-white/40 ml-auto" />
-            </div>
+              <Users className="w-5 h-5 text-white/40 ml-auto hover:text-white/70 transition-colors" />
+            </button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
             {[...sharedWallets].sort((a, b) => (b.balance || 0) - (a.balance || 0)).map((w) =>
