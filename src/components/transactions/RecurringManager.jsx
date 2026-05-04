@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { syncAccountBalance } from "@/components/utils/accountSync";
+import { recalculateAccountBalance } from "@/components/utils/accountSync";
 
 const INTERVAL_DAYS = { daily: 1, weekly: 7, monthly: 30, yearly: 365 };
 
@@ -48,17 +48,17 @@ export async function processRecurringTransactions(userEmail) {
         current = addInterval(current, tx.recurring_interval);
       }
 
-      await Promise.all([
-        base44.entities.Transaction.bulkCreate(toCreate),
-        base44.entities.Transaction.update(tx.id, {
-          recurring_last_generated: latestGenerated,
-        }),
-      ]);
-      // Sync account balance for each generated child
+      // Serial: create children first, then mark parent as processed.
+      // If create succeeds but update fails, next run will detect duplicates via recurring_last_generated
+      // being stale — but at least we won't lose the children. The reverse (update first) would orphan them.
+      await base44.entities.Transaction.bulkCreate(toCreate);
+      await base44.entities.Transaction.update(tx.id, {
+        recurring_last_generated: latestGenerated,
+      });
+      // Recalculate account balance ONCE from source of truth (idempotent, accurate).
+      // Avoids drift from sequential incremental syncAccountBalance calls.
       if (tx.account_id) {
-        for (const child of toCreate) {
-          await syncAccountBalance(tx.account_id, child.amount, child.type, 1);
-        }
+        await recalculateAccountBalance(tx.account_id);
       }
     }
   }
