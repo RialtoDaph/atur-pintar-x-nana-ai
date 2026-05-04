@@ -376,12 +376,11 @@ function LayoutInner({ children, currentPageName }) {
         })}
       </div>}
 
-      {/* Mobile FAB - floats ABOVE bottom nav (off-side up) */}
-      {!anyModalOpen &&
+      {/* Mobile FAB - floats ABOVE bottom nav. Becomes close (X) when modal is open */}
       <button
-        onClick={() => setShowAddTransaction(true)}
+        onClick={() => setShowAddTransaction(v => !v)}
         data-tour="add-transaction-btn"
-        className="fixed left-1/2 -translate-x-1/2 z-[70] flex items-center justify-center rounded-full active:scale-95 transition-all duration-150 tap-highlight-fix sm:hidden"
+        className="fixed left-1/2 -translate-x-1/2 z-[80] flex items-center justify-center rounded-full active:scale-95 transition-all duration-200 tap-highlight-fix sm:hidden"
         style={{
           width: 64, height: 64,
           bottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
@@ -389,14 +388,14 @@ function LayoutInner({ children, currentPageName }) {
           padding: 4,
           boxShadow: '0 6px 18px rgba(0,0,0,0.35)'
         }}>
-          <span className="w-full h-full rounded-full flex items-center justify-center" style={{
-            background: 'linear-gradient(145deg, #FF8A50 0%, #F97316 100%)',
-            boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3)'
-          }}>
-            <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-          </span>
-        </button>
-      }
+        <span className="w-full h-full rounded-full flex items-center justify-center transition-transform duration-300" style={{
+          background: showAddTransaction ? 'linear-gradient(145deg, #4A4A4A 0%, #1A1A1A 100%)' : 'linear-gradient(145deg, #FF8A50 0%, #F97316 100%)',
+          boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3)',
+          transform: showAddTransaction ? 'rotate(135deg)' : 'rotate(0deg)'
+        }}>
+          <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+        </span>
+      </button>
 
       {/* FAB for desktop */}
       {!anyModalOpen &&

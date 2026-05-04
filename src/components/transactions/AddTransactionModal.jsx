@@ -270,8 +270,17 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center md:items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div className="bg-white rounded-t-3xl sm:rounded-3xl md:rounded-3xl w-full sm:max-w-md md:max-w-lg shadow-2xl overflow-y-auto" style={{ maxHeight: "92dvh" }}>
+      {/* Backdrop — translucent so FAB at z-80 stays visible above */}
+      <div className="fixed inset-0 z-40 bg-black/40 sm:backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-x-0 bottom-0 z-40 flex items-end sm:items-center md:items-center justify-center sm:inset-0 sm:bottom-auto sm:top-0 pointer-events-none">
+        <div
+          className="bg-white rounded-t-3xl sm:rounded-3xl md:rounded-3xl w-full sm:max-w-md md:max-w-lg shadow-2xl overflow-y-auto pointer-events-auto animate-slide-up-sheet"
+          style={{ maxHeight: "75dvh" }}
+          onClick={e => e.stopPropagation()}>
+          {/* Drag handle */}
+          <div className="sm:hidden flex justify-center pt-2.5 pb-1">
+            <div className="w-10 h-1 rounded-full bg-[#E2E8F0]" />
+          </div>
 
           {/* Type tabs */}
           <div className="grid grid-cols-2 sticky top-0 z-10 bg-white">
@@ -305,7 +314,6 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                   <History className="w-3 h-3" /> Riwayat scan
                 </Link>
               </div>
-              <button onClick={onClose} className="p-1.5 hover:bg-[#F2F4F7] rounded-lg"><X className="w-4 h-4 text-[#8FA4C8]" /></button>
             </div>
             <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleScanReceipt} />
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleScanReceipt} />
