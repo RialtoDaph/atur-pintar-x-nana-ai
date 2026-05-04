@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { base44 } from "@/api/base44Client";
 import { useAppSettings } from "@/components/utils/useAppSettings";
@@ -29,50 +29,50 @@ export default function CategoryBreakdownChart({ transactions, loading, periodSu
   const [activeTab, setActiveTab] = useState("expense");
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([
       base44.entities.CustomCategory.list(),
       base44.entities.GlobalCategory.list(),
     ]).then(([custom, global]) => {
-      setCustomCats([...custom, ...global]);
-    });
+      if (!cancelled) setCustomCats([...custom, ...global]);
+    }).catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
-  const categoryConfig = { ...DEFAULT_CONFIG };
-  customCats.forEach(c => {
-    const entry = { label: c.name, color: c.color || "#95A5A6", emoji: c.emoji || "📦" };
-    categoryConfig[`custom_${c.id}`] = entry;
-    categoryConfig[c.id] = entry;
-  });
+  const categoryConfig = useMemo(() => {
+    const cfg = { ...DEFAULT_CONFIG };
+    customCats.forEach(c => {
+      const entry = { label: c.name, color: c.color || "#95A5A6", emoji: c.emoji || "📦" };
+      cfg[`custom_${c.id}`] = entry;
+      cfg[c.id] = entry;
+    });
+    return cfg;
+  }, [customCats]);
 
-  // Expense data
-  const expenses = transactions.filter(t => t.type === "expense");
-  const byExpenseCategory = {};
-  expenses.forEach(t => {
-    const cat = t.category || "other";
-    byExpenseCategory[cat] = (byExpenseCategory[cat] || 0) + t.amount;
-  });
-  const expenseData = Object.entries(byExpenseCategory)
-    .map(([key, value]) => {
-      const config = categoryConfig[key] || { label: key, color: "#95A5A6", emoji: "📦" };
-      return { key, value, ...config };
-    })
-    .sort((a, b) => b.value - a.value);
-  const expenseTotal = expenseData.reduce((s, d) => s + d.value, 0);
+  const { expenseData, expenseTotal, incomeData, incomeTotal } = useMemo(() => {
+    const byExp = {};
+    const byInc = {};
+    for (const t of transactions) {
+      const cat = t.category || "other";
+      if (t.type === "expense") byExp[cat] = (byExp[cat] || 0) + t.amount;
+      else if (t.type === "income") byInc[cat] = (byInc[cat] || 0) + t.amount;
+    }
+    const buildList = (map) => Object.entries(map)
+      .map(([key, value]) => {
+        const config = categoryConfig[key] || { label: key, color: "#95A5A6", emoji: "📦" };
+        return { key, value, ...config };
+      })
+      .sort((a, b) => b.value - a.value);
 
-  // Income data
-  const incomes = transactions.filter(t => t.type === "income");
-  const byIncomeCategory = {};
-  incomes.forEach(t => {
-    const cat = t.category || "other";
-    byIncomeCategory[cat] = (byIncomeCategory[cat] || 0) + t.amount;
-  });
-  const incomeData = Object.entries(byIncomeCategory)
-    .map(([key, value]) => {
-      const config = categoryConfig[key] || { label: key, color: "#95A5A6", emoji: "📦" };
-      return { key, value, ...config };
-    })
-    .sort((a, b) => b.value - a.value);
-  const incomeTotal = incomeData.reduce((s, d) => s + d.value, 0);
+    const eData = buildList(byExp);
+    const iData = buildList(byInc);
+    return {
+      expenseData: eData,
+      expenseTotal: eData.reduce((s, d) => s + d.value, 0),
+      incomeData: iData,
+      incomeTotal: iData.reduce((s, d) => s + d.value, 0),
+    };
+  }, [transactions, categoryConfig]);
 
   const activeData = activeTab === "expense" ? expenseData : incomeData;
   const activeTotal = activeTab === "expense" ? expenseTotal : incomeTotal;

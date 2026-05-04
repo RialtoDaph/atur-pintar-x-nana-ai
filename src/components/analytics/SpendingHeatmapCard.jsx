@@ -22,10 +22,11 @@ export default function SpendingHeatmapCard({ transactions = [], embedded = fals
       totals[day] = (totals[day] || 0) + (t.amount || 0);
     });
 
-    const max = Math.max(...Object.values(totals), 0);
+    const values = Object.values(totals);
+    const max = values.length > 0 ? Math.max(...values) : 0;
     const dim = new Date(year, month + 1, 0).getDate();
     const offset = new Date(year, month, 1).getDay();
-    const total = Object.values(totals).reduce((s, v) => s + v, 0);
+    const total = values.reduce((s, v) => s + v, 0);
 
     let busy = null;
     let busyAmt = 0;
@@ -42,7 +43,7 @@ export default function SpendingHeatmapCard({ transactions = [], embedded = fals
       daysInMonth: dim,
       firstDayOffset: offset,
       totalMonth: total,
-      busiestDay: busy ? { day: busy, amount: busyAmt } : null,
+      busiestDay: busy != null ? { day: busy, amount: busyAmt } : null,
     };
   }, [transactions, viewMonth]);
 

@@ -1,25 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DateRangeFilter({ onFilterChange, defaultPeriod = "6" }) {
-  const [period, setPeriod] = useState(defaultPeriod);
-  const [customStart, setCustomStart] = useState("");
-  const [customEnd, setCustomEnd] = useState("");
+  // Init dari sessionStorage agar UI badge sync sama Analytics state
+  const initial = (() => {
+    try {
+      const saved = sessionStorage.getItem("analytics_custom_range");
+      if (saved) return "custom";
+      return sessionStorage.getItem("analytics_filter_period") || defaultPeriod;
+    } catch { return defaultPeriod; }
+  })();
+
+  const [period, setPeriod] = useState(initial);
+  const [customStart, setCustomStart] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem("analytics_custom_range");
+      if (!saved) return "";
+      const p = JSON.parse(saved);
+      return new Date(p.start).toISOString().split("T")[0];
+    } catch { return ""; }
+  });
+  const [customEnd, setCustomEnd] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem("analytics_custom_range");
+      if (!saved) return "";
+      const p = JSON.parse(saved);
+      return new Date(p.end).toISOString().split("T")[0];
+    } catch { return ""; }
+  });
   const [showCustom, setShowCustom] = useState(false);
+  const [error, setError] = useState("");
 
   const handlePeriodChange = (value) => {
     setPeriod(value);
     setShowCustom(false);
+    setError("");
     onFilterChange({ type: "period", value });
   };
 
   const handleCustomRange = () => {
-    if (customStart && customEnd) {
-      onFilterChange({
-        type: "custom",
-        startDate: customStart,
-        endDate: customEnd,
-      });
+    setError("");
+    if (!customStart || !customEnd) {
+      setError("Pilih tanggal mulai & akhir");
+      return;
     }
+    if (new Date(customStart) > new Date(customEnd)) {
+      setError("Tanggal mulai harus sebelum tanggal akhir");
+      return;
+    }
+    onFilterChange({
+      type: "custom",
+      startDate: customStart,
+      endDate: customEnd,
+    });
+    setShowCustom(false);
   };
 
   const periodOptions = [
@@ -54,32 +87,37 @@ export default function DateRangeFilter({ onFilterChange, defaultPeriod = "6" })
 
       {/* Custom Date Range Popover */}
       {showCustom && (
-        <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-lg p-3 shadow-lg border border-[#E2E8F0] z-10 flex gap-2 flex-col sm:flex-row">
-          <input
-            type="date"
-            value={customStart}
-            onChange={(e) => setCustomStart(e.target.value)}
-            className="px-2 py-1 rounded-lg bg-[#F2F4F7] text-[#0A0A0A] text-xs border border-[#E2E8F0] focus:outline-none focus:border-[#FF6A00]"
-          />
-          <input
-            type="date"
-            value={customEnd}
-            onChange={(e) => setCustomEnd(e.target.value)}
-            className="px-2 py-1 rounded-lg bg-[#F2F4F7] text-[#0A0A0A] text-xs border border-[#E2E8F0] focus:outline-none focus:border-[#FF6A00]"
-          />
-          <button
-            onClick={handleCustomRange}
-            disabled={!customStart || !customEnd}
-            className="px-2.5 py-1 rounded-lg bg-[#FF6A00] text-white text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-          >
-            Terapkan
-          </button>
-          <button
-            onClick={() => setShowCustom(false)}
-            className="px-2.5 py-1 rounded-lg bg-[#F2F4F7] text-[#0A0A0A] text-xs font-medium"
-          >
-            Batal
-          </button>
+        <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-lg p-3 shadow-lg border border-[#E2E8F0] z-10 flex flex-col gap-2">
+          <div className="flex gap-2 flex-col sm:flex-row">
+            <input
+              type="date"
+              value={customStart}
+              max={customEnd || undefined}
+              onChange={(e) => { setCustomStart(e.target.value); setError(""); }}
+              className="px-2 py-1 rounded-lg bg-[#F2F4F7] text-[#0A0A0A] text-xs border border-[#E2E8F0] focus:outline-none focus:border-[#FF6A00]"
+            />
+            <input
+              type="date"
+              value={customEnd}
+              min={customStart || undefined}
+              onChange={(e) => { setCustomEnd(e.target.value); setError(""); }}
+              className="px-2 py-1 rounded-lg bg-[#F2F4F7] text-[#0A0A0A] text-xs border border-[#E2E8F0] focus:outline-none focus:border-[#FF6A00]"
+            />
+            <button
+              onClick={handleCustomRange}
+              disabled={!customStart || !customEnd}
+              className="px-2.5 py-1 rounded-lg bg-[#FF6A00] text-white text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+              Terapkan
+            </button>
+            <button
+              onClick={() => { setShowCustom(false); setError(""); }}
+              className="px-2.5 py-1 rounded-lg bg-[#F2F4F7] text-[#0A0A0A] text-xs font-medium"
+            >
+              Batal
+            </button>
+          </div>
+          {error && <p className="text-[11px] text-[#FF6B6B] font-medium">{error}</p>}
         </div>
       )}
     </div>

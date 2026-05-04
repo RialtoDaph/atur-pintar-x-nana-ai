@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, ComposedChart } from "recharts";
 import { TrendingUp, TrendingDown, ChevronDown, ChevronUp } from "lucide-react";
 import { createPageUrl } from "@/utils";
@@ -13,79 +13,76 @@ export default function DailySpendingCard({
 }) {
   const { formatShortNumber, formatCurrency } = useAppSettings();
   const [expanded, setExpanded] = useState(true);
-  const now = new Date();
 
-  const getMonthRange = () => {
-    if (customDateRange) return customDateRange;
-    const months = parseInt(filterPeriod);
-    return {
-      start: new Date(now.getFullYear(), now.getMonth() - (months - 1), 1),
+  const {
+    currentMonthlyData,
+    currentTotal,
+    totalDays,
+    currentDailyAvg,
+    prevDailyAvg,
+    trendDiff,
+    isTrendPositive,
+    isEmpty,
+  } = useMemo(() => {
+    const now = new Date();
+    const monthRange = customDateRange || {
+      start: new Date(now.getFullYear(), now.getMonth() - ((parseInt(filterPeriod) || 6) - 1), 1),
       end: now,
     };
-  };
 
-  const monthRange = getMonthRange();
+    // Clamp negative diffs (defensive — kalau range terbalik)
+    const monthDiff = Math.max(
+      0,
+      (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
+        (monthRange.end.getMonth() - monthRange.start.getMonth())
+    );
 
-  const monthDiff =
-    (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
-    (monthRange.end.getMonth() - monthRange.start.getMonth());
-
-  const currentMonthlyData = Array.from({ length: monthDiff + 1 }, (_, i) => {
-    const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    const monthTx = transactions.filter(t => {
-      const td = new Date(t.date);
-      return td.getMonth() === month && td.getFullYear() === year && t.type === "expense";
+    const data = Array.from({ length: monthDiff + 1 }, (_, i) => {
+      const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
+      const month = d.getMonth();
+      const year = d.getFullYear();
+      let total = 0;
+      for (const t of transactions) {
+        if (t.type !== "expense") continue;
+        const td = new Date(t.date);
+        if (td.getMonth() === month && td.getFullYear() === year) total += t.amount || 0;
+      }
+      return { name: d.toLocaleDateString("id-ID", { month: "short" }), value: total };
     });
-    const total = monthTx.reduce((s, t) => s + t.amount, 0);
+
+    const cTotal = data.reduce((s, m) => s + m.value, 0);
+    const tDays = Math.max(
+      Math.ceil((monthRange.end - monthRange.start) / (1000 * 60 * 60 * 24)) + 1,
+      1
+    );
+    const cAvg = cTotal / tDays;
+
+    // Previous period: shift mundur sesuai durasi periode yang sama
+    const periodMs = monthRange.end - monthRange.start;
+    const prevEnd = new Date(monthRange.start.getTime() - 1);
+    const prevStart = new Date(prevEnd.getTime() - periodMs);
+    let pTotal = 0;
+    for (const t of transactions) {
+      if (t.type !== "expense") continue;
+      const td = new Date(t.date);
+      if (td >= prevStart && td <= prevEnd) pTotal += t.amount || 0;
+    }
+    const pDays = Math.max(Math.ceil((prevEnd - prevStart) / (1000 * 60 * 60 * 24)) + 1, 1);
+    const pAvg = pTotal / pDays;
+
+    const tDiff = cAvg - pAvg;
+
     return {
-      name: d.toLocaleDateString("id-ID", { month: "short" }),
-      value: total,
+      currentMonthlyData: data,
+      currentTotal: cTotal,
+      totalDays: tDays,
+      currentDailyAvg: cAvg,
+      prevDailyAvg: pAvg,
+      trendDiff: tDiff,
+      isTrendPositive: tDiff >= 0,
+      isEmpty: cTotal === 0,
     };
-  });
-
-  const currentTotal = currentMonthlyData.reduce((s, m) => s + m.value, 0);
-
-  // Hitung hari aktual dalam periode yang dipilih (start → end)
-  const totalDays = Math.max(
-    Math.ceil((monthRange.end - monthRange.start) / (1000 * 60 * 60 * 24)) + 1,
-    1
-  );
-  const currentDailyAvg = currentTotal / totalDays;
-
-  // Previous period untuk trend
-  const prevMonthRange = {
-    start: new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() - (monthDiff + 1), 1),
-    end: new Date(monthRange.start.getFullYear(), monthRange.start.getMonth(), 0),
-  };
-
-  const prevMonthDiff =
-    (prevMonthRange.end.getFullYear() - prevMonthRange.start.getFullYear()) * 12 +
-    (prevMonthRange.end.getMonth() - prevMonthRange.start.getMonth());
-
-  const prevMonthlyData = Array.from({ length: prevMonthDiff + 1 }, (_, i) => {
-    const d = new Date(prevMonthRange.start.getFullYear(), prevMonthRange.start.getMonth() + i, 1);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    const monthTx = transactions.filter(t => {
-      const td = new Date(t.date);
-      return td.getMonth() === month && td.getFullYear() === year && t.type === "expense";
-    });
-    return monthTx.reduce((s, t) => s + t.amount, 0);
-  });
-
-  const prevTotalDays = Math.max(
-    Math.ceil((prevMonthRange.end - prevMonthRange.start) / (1000 * 60 * 60 * 24)) + 1,
-    1
-  );
-  const prevTotal = prevMonthlyData.reduce((s, m) => s + m, 0);
-  const prevDailyAvg = prevTotal / prevTotalDays;
-
-  const trendDiff = currentDailyAvg - prevDailyAvg;
-  const isTrendPositive = trendDiff >= 0;
-
-  const isEmpty = currentTotal === 0;
+  }, [transactions, filterPeriod, customDateRange]);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">

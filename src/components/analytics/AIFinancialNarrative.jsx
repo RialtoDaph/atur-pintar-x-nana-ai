@@ -71,8 +71,13 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
 
     try {
       const res = await base44.integrations.Core.InvokeLLM({ prompt });
-      setNarrative(typeof res === "string" ? res : res?.response || "");
+      // InvokeLLM bisa return string langsung, atau object dengan field text/response/content
+      const text = typeof res === "string"
+        ? res
+        : (res?.response || res?.text || res?.content || res?.output || "");
+      setNarrative(text || "Hmm, Nana belum bisa kasih analisis kali ini. Coba lagi ya!");
     } catch (e) {
+      console.error("[AIFinancialNarrative] InvokeLLM failed:", e);
       setNarrative("Gagal memuat analisis. Coba lagi.");
     }
     setLoading(false);
