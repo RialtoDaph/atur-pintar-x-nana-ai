@@ -135,7 +135,12 @@ function NanaInner() {
   const pendingSaveTimers = useRef({});
 
   useEffect(() => {
-    if (!activeConv) return;
+    if (!activeConv || !user?.email) return;
+    // 🔒 SECURITY: re-verify ownership at subscribe time
+    // (guards against stale activeConv after logout/login on same tab)
+    if (activeConv.created_by && activeConv.created_by !== user.email) return;
+
+    const subscriberEmail = user.email; // capture at subscribe time
     const unsub = base44.agents.subscribeToConversation(activeConv.id, (data) => {
       const msgs = data.messages || [];
       setMessages(msgs);
@@ -151,14 +156,15 @@ function NanaInner() {
           if (pendingSaveTimers.current[msg.id]) {
             clearTimeout(pendingSaveTimers.current[msg.id]);
           }
-          // Wait 2.5s of no content changes before saving (safer than 1.5s for slow streams)
+          // Wait 2.5s of no content changes before saving
           pendingSaveTimers.current[msg.id] = setTimeout(() => {
             if (savedNanaMsgIds.current.has(msg.id)) return;
             savedNanaMsgIds.current.add(msg.id);
             delete pendingSaveTimers.current[msg.id];
             const finalContent = lastContentByMsgId.current[msg.id];
             delete lastContentByMsgId.current[msg.id];
-            if (user?.email && finalContent) {
+            // Only save if the user that started this subscription is still logged in
+            if (subscriberEmail && finalContent) {
               base44.entities.NanaConversation.create({
                 role: "nana",
                 message: finalContent,
@@ -172,12 +178,13 @@ function NanaInner() {
       });
     });
     return () => {
-      unsub();
+      try { unsub(); } catch {}
+      // Clear all pending timers + buffers on unmount/conv change to avoid late writes
       Object.values(pendingSaveTimers.current).forEach(t => clearTimeout(t));
       pendingSaveTimers.current = {};
       lastContentByMsgId.current = {};
     };
-  }, [activeConv?.id, user?.email]);
+  }, [activeConv?.id, activeConv?.created_by, user?.email]);
 
   async function checkTodayMood(email) {
     try {
@@ -308,6 +315,12 @@ function NanaInner() {
     if (nowMs - lastSendAt.current < 3000) return;
 
     let conv = activeConv;
+    // 🔒 SECURITY: refuse to send into a conversation not owned by current user
+    if (conv && conv.created_by && conv.created_by !== user.email) {
+      conv = null;
+      setActiveConv(null);
+      setMessages([]);
+    }
     setSending(true);
     const previousInput = input;
     setInput("");
