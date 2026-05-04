@@ -121,17 +121,18 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
               <Wallet className="w-5 h-5 text-white/40 ml-auto" />
             </div>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
             {[...accounts].sort((a, b) => (b.balance || 0) - (a.balance || 0)).map((a) =>
-        <div key={a.id} className="flex items-center gap-1.5 bg-white/8 rounded-lg px-2.5 py-1.5">
-                {a.logo_url ?
-          <AccountAvatar logoUrl={a.logo_url} name={a.name} color={a.color || "#FF6A00"} size="h-5 w-5" /> :
-
-          <span className="text-xs">{a.icon || "💳"}</span>
-          }
-                <div>
-                  <p className="text-white/60 text-[9px]">{a.name}</p>
-                  <p className="text-white text-[10px] font-bold">{hidden ? HIDDEN : `Rp ${compactRupiah(a.balance || 0)}`}</p>
+        <div key={a.id} className="flex-shrink-0 flex items-center gap-1.5 bg-white/8 rounded-lg px-2.5 h-10 w-[128px]">
+                <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                  {a.logo_url ?
+            <AccountAvatar logoUrl={a.logo_url} name={a.name} color={a.color || "#FF6A00"} size="h-5 w-5" /> :
+            <span className="text-xs leading-none">{a.icon || "💳"}</span>
+            }
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-white/60 text-[9px] truncate leading-tight">{a.name}</p>
+                  <p className="text-white text-[10px] font-bold truncate leading-tight">{hidden ? HIDDEN : `Rp ${compactRupiah(a.balance || 0)}`}</p>
                 </div>
               </div>
         )}
@@ -139,7 +140,7 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
             {accounts.length === 0 &&
         <button
           onClick={() => navigate("/Accounts")}
-          className="flex items-center gap-1.5 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-3 py-1.5 text-[#FF9A50] text-xs font-semibold">
+          className="flex-shrink-0 flex items-center gap-1.5 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-3 h-10 text-[#FF9A50] text-xs font-semibold">
           
                 + Tambah Rekening
               </button>
