@@ -40,6 +40,7 @@ export default function Goals() {
   const [savingsGoal, setSavingsGoal] = useState(null); // goal to add savings to
   const [raiseTargetGoal, setRaiseTargetGoal] = useState(null);
   const [deleteConfirmGoal, setDeleteConfirmGoal] = useState(null);
+  const [showDetailDeleteConfirm, setShowDetailDeleteConfirm] = useState(false);
 
   const goal = goals.find((g) => g.id === goalId) || null;
 
@@ -298,7 +299,7 @@ export default function Goals() {
         {/* Transactions */}
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-semibold text-[#1A1A1A]">{t('goals_activity')}</h2>
-          <button onClick={handleDelete} className="text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1 tap-highlight-fix">
+          <button onClick={() => setShowDetailDeleteConfirm(true)} className="text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1 tap-highlight-fix">
             <Trash2 className="w-3.5 h-3.5" /> {t('goals_delete_goal')}
           </button>
         </div>
@@ -367,6 +368,19 @@ export default function Goals() {
             onClose={() => setEditingGoal(null)}
             onSave={handleAddGoal}
           />
+        )}
+
+        {showDetailDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full">
+              <p className="font-bold text-[#1A1A1A] mb-2">Hapus Goal ini?</p>
+              <p className="text-sm text-[#4A5568] mb-5">Transaksi tabungan terkait akan menjadi transaksi tanpa goal (tidak ikut dihapus).</p>
+              <div className="flex gap-2">
+                <button onClick={() => setShowDetailDeleteConfirm(false)} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#8FA4C8] hover:bg-[#F2F4F7]">Batal</button>
+                <button onClick={() => { setShowDetailDeleteConfirm(false); handleDelete(); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600">Hapus</button>
+              </div>
+            </div>
+          </div>
         )}
         </div>
         </PullToRefresh>
