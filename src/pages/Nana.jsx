@@ -167,7 +167,7 @@ function NanaInner() {
       }
 
       setSending(true);
-      const moodMsg = `[mood:${moodObj.mood}] Hari ini gue lagi ${moodObj.label}`;
+      const moodMsg = `[mood:${moodObj.mood}] Hari ini aku lagi ${moodObj.label}`;
       saveToNanaConversation("user", moodMsg, "chat");
       await base44.agents.addMessage(conv, {
         role: "user",
