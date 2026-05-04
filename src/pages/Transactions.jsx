@@ -78,9 +78,13 @@ export default function Transactions() {
         sessionStorage.setItem("tx_categories", JSON.stringify(cats));
       }
 
-      // Load transactions first
-      const txs = await base44.entities.Transaction.filter({ created_by: user.email, is_deleted: false }, "-date");
-      setTransactions(txs || []);
+      // Load transactions first.
+      // NOTE: We filter by created_by only and exclude soft-deleted client-side.
+      // Filtering `is_deleted: false` server-side hides legacy transactions where
+      // the field is undefined/null (pre-soft-delete records) → user sees history loss.
+      const txsRaw = await base44.entities.Transaction.filter({ created_by: user.email }, "-date");
+      const txs = (txsRaw || []).filter(t => t.is_deleted !== true);
+      setTransactions(txs);
       setCategories((cats || []).filter(c => c.is_active !== false));
 
       // Then accounts

@@ -69,15 +69,22 @@ Deno.serve(async (req) => {
     const oldGoalId = oldTransaction?.goal_id;
     const newGoalId = transaction?.goal_id;
 
-    // Handle goal_id change on edit
-    if (action === "update" && oldGoalId && newGoalId && oldGoalId !== newGoalId) {
+    // Handle goal_id change on edit (including unlink: oldGoalId set, newGoalId empty).
+    // Without the unlink branch, the else-block below would re-apply to oldGoalId after reverting → double count.
+    const goalChanged = action === "update" && oldGoalId !== newGoalId && (oldGoalId || newGoalId);
+    if (goalChanged) {
       // Revert from old goal
-      if (oldTransaction?.type === "savings") {
+      if (oldGoalId && oldTransaction?.type === "savings") {
         const oldGoals = await base44.entities.SavingsGoal.filter({ id: oldGoalId });
         const oldGoal = oldGoals?.[0];
         if (oldGoal) {
           const newAmount = Math.max(0, (oldGoal.current_amount || 0) - oldTransaction.amount);
-          await base44.entities.SavingsGoal.update(oldGoalId, { current_amount: newAmount });
+          const updates = { current_amount: newAmount };
+          // Revert "completed" status if amount drops below target after revert
+          if (oldGoal.status === "completed" && oldGoal.target_amount > 0 && newAmount < oldGoal.target_amount) {
+            updates.status = "active";
+          }
+          await base44.entities.SavingsGoal.update(oldGoalId, updates);
           results.push("old_goal_reverted");
         }
       }
@@ -88,7 +95,8 @@ Deno.serve(async (req) => {
         if (newGoal) {
           const newAmount = (newGoal.current_amount || 0) + transaction.amount;
           const updates = { current_amount: newAmount };
-          if (newAmount >= newGoal.target_amount && newGoal.status !== "completed") {
+          // Guard: only mark completed if target_amount > 0 (avoid completing goals with target 0).
+          if (newGoal.target_amount > 0 && newAmount >= newGoal.target_amount && newGoal.status !== "completed") {
             updates.status = "completed";
           }
           await base44.entities.SavingsGoal.update(newGoalId, updates);
@@ -113,8 +121,8 @@ Deno.serve(async (req) => {
           newAmount = Math.max(0, newAmount);
           const updates = { current_amount: newAmount };
 
-          // Auto-complete goal if target reached
-          if (newAmount >= goal.target_amount && goal.status !== "completed") {
+          // Auto-complete goal if target reached (guard: target must be > 0)
+          if (goal.target_amount > 0 && newAmount >= goal.target_amount && goal.status !== "completed") {
             updates.status = "completed";
             await createAlertIfNotExists(base44, user.email, {
               type: "goal_near",
@@ -126,7 +134,7 @@ Deno.serve(async (req) => {
             results.push("goal_completed");
           }
           // Revert completed status if amount drops below target
-          if (newAmount < goal.target_amount && goal.status === "completed") {
+          if (goal.target_amount > 0 && newAmount < goal.target_amount && goal.status === "completed") {
             updates.status = "active";
           }
           await base44.entities.SavingsGoal.update(goalId, updates);
