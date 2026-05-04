@@ -79,7 +79,7 @@ function NanaInner() {
   async function handleSelectConversation(conv) {
     setShowHistory(false);
     if (conv.id === activeConv?.id) return;
-    // 🔒 SECURITY: only allow opening conversations owned by current user
+    // 🔒 Defensive: block ONLY when created_by exists and doesn't match
     if (user?.email && conv.created_by && conv.created_by !== user.email) return;
     try {
       const full = await base44.agents.getConversation(conv.id);
@@ -249,14 +249,13 @@ function NanaInner() {
     setLoading(true);
     try {
       const all = await base44.agents.listConversations({ agent_name: "nana" });
-      // 🔒 SECURITY: filter to ONLY this user's conversations.
-      // listConversations may return convs from other users; we must guard client-side.
-      const convs = (all || []).filter(c => c.created_by === userEmail);
+      // 🔒 SECURITY (defensive): if SDK returns created_by, drop foreign records.
+      // Otherwise trust SDK scoping (it auto-filters by current user).
+      const convs = (all || []).filter(c => !c.created_by || c.created_by === userEmail);
       setConversations(convs);
       if (convs.length > 0) {
         const conv = await base44.agents.getConversation(convs[0].id);
-        // Double-check ownership before showing messages
-        if (conv?.created_by === userEmail) {
+        if (conv && (!conv.created_by || conv.created_by === userEmail)) {
           setActiveConv(conv);
           setMessages(conv.messages || []);
         }

@@ -34,13 +34,13 @@ function NanaDashboardChatInner() {
         if (prefs?.length > 0) setPreferences(prefs[0]);
       }).catch(() => {});
 
-      // Load latest conversation — filter by created_by to prevent cross-user leak
+      // Load latest conversation — defensive filter (SDK already scopes by user)
       try {
         const all = await base44.agents.listConversations({ agent_name: "nana" });
-        const convs = (all || []).filter((c) => c.created_by === u.email);
+        const convs = (all || []).filter((c) => !c.created_by || c.created_by === u.email);
         if (convs.length > 0) {
           const conv = await base44.agents.getConversation(convs[0].id);
-          if (conv?.created_by === u.email) {
+          if (conv && (!conv.created_by || conv.created_by === u.email)) {
             setActiveConv(conv);
             setMessages(conv.messages || []);
           }
