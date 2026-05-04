@@ -426,21 +426,6 @@ export default function Accounts() {
           </>
         )}
 
-        {/* Shared Finance Link */}
-        <Link
-          to={createPageUrl("SharedFinance")}
-          className="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-3 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-all duration-150 border border-[#F0F2F5]"
-        >
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-sm" style={{ backgroundColor: "#9C27B020", boxShadow: "0 2px 8px #9C27B025" }}>
-            👨‍👩‍👧
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-[#1A1A1A]">Keuangan Bersama</p>
-            <p className="text-xs text-[#8FA4C8] mt-0.5">Kelola dompet bersama pasangan atau keluarga</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-[#CBD5E0] flex-shrink-0" />
-        </Link>
-
         {/* Info Card */}
         <div className="bg-white rounded-2xl shadow-sm p-4 border border-[#F97316]/20">
          <p className="text-xs font-bold text-[#F97316] uppercase tracking-widest mb-2">💡 Tips</p>
