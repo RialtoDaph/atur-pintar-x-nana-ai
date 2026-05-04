@@ -366,7 +366,7 @@ function LayoutInner({ children, currentPageName }) {
             className="bg-[#FF6B35] rounded-full flex items-center justify-center active:scale-95 transition-all duration-150 tap-highlight-fix absolute left-1/2 -translate-x-1/2"
             style={{
               width: 48, height: 48,
-              top: -28,
+              top: -36,
               boxShadow: '0 4px 16px rgba(255,107,53,0.5)'
             }}>
             <Plus className="w-5 h-5 text-white" />
