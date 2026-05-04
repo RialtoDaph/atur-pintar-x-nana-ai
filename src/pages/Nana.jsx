@@ -8,6 +8,8 @@ import { completeMission } from "@/hooks/useGamificationActions";
 import MoodPicker from "@/components/nana/MoodPicker";
 import NanaQuickActions from "@/components/nana/NanaQuickActions";
 import NanaErrorBoundary from "@/components/nana/NanaErrorBoundary";
+import InteractivePrompt from "@/components/nana/InteractivePrompt";
+import { parseNanaMessage } from "@/components/nana/parseNanaMessage";
 import { format } from "date-fns";
 
 const FREE_MSG_LIMIT = 30;
@@ -391,11 +393,25 @@ function NanaInner() {
                           ? "bg-[#FF6A00] text-white"
                           : "bg-white dark:bg-[#1A1E25] border border-[#E2E8F0] dark:border-[#2D2D2D] text-[#1A1A1A] dark:text-white"
                       }`}>
-                        {msg.role === "assistant" ? (
-                          <ReactMarkdown className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 text-[#1A1A1A] dark:text-white">
-                            {msg.content}
-                          </ReactMarkdown>
-                        ) : (
+                        {msg.role === "assistant" ? (() => {
+                          const { text, interactivePrompt } = parseNanaMessage(msg.content);
+                          const isLastAssistant = i === visibleMessages.length - 1;
+                          return (
+                            <>
+                              {text && (
+                                <ReactMarkdown className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 text-[#1A1A1A] dark:text-white">
+                                  {text}
+                                </ReactMarkdown>
+                              )}
+                              {interactivePrompt && isLastAssistant && (
+                                <InteractivePrompt
+                                  prompt={interactivePrompt}
+                                  onResponse={(displayText, value) => sendMessage(displayText || value)}
+                                />
+                              )}
+                            </>
+                          );
+                        })() : (
                           <p>{msg.content}</p>
                         )}
                       </div>
