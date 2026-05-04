@@ -12,10 +12,11 @@ function generateCode() {
 function Avatar({ email, size = 7 }) {
   const colors = ["#FF6A00","#4F7CFF","#22C55E","#A855F7","#EC4899","#14B8A6"];
   const colorIdx = email ? email.charCodeAt(0) % colors.length : 0;
+  const px = size * 4; // tailwind unit (4px) → literal pixels
   return (
     <div
-      className={`w-${size} h-${size} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0`}
-      style={{ backgroundColor: colors[colorIdx], fontSize: size <= 6 ? 10 : 12 }}
+      className="rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+      style={{ width: px, height: px, backgroundColor: colors[colorIdx], fontSize: size <= 6 ? 10 : 12 }}
     >
       {email ? email[0].toUpperCase() : "?"}
     </div>
@@ -535,21 +536,22 @@ export default function SharedFinance() {
   }
 
   async function handleDelete(wallet) {
+    // Cascade: delete all SharedWalletTransaction first to prevent orphans
+    const txs = await base44.entities.SharedWalletTransaction.filter({ wallet_id: wallet.id }).catch(() => []);
+    await Promise.all((txs || []).map(t => base44.entities.SharedWalletTransaction.delete(t.id).catch(() => {})));
     await base44.entities.SharedWallet.delete(wallet.id);
     setWallets(prev => prev.filter(w => w.id !== wallet.id));
+    setWalletTxsMap(prev => { const next = { ...prev }; delete next[wallet.id]; return next; });
     toast.success("Wallet berhasil dihapus");
   }
 
   async function handleAddTransaction(txData) {
     const tx = await base44.entities.SharedWalletTransaction.create(txData);
-    setWalletTxsMap(prev => ({
-      ...prev,
-      [txData.wallet_id]: [tx, ...(prev[txData.wallet_id] || [])],
-    }));
-    // Recalculate balance
-    const allTxs = [tx, ...(walletTxsMap[txData.wallet_id] || [])];
-    const income = allTxs.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-    const expense = allTxs.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+    // Re-fetch authoritative list to avoid race conditions on rapid double-submit
+    const allTxs = await base44.entities.SharedWalletTransaction.filter({ wallet_id: txData.wallet_id }, "-date", 200).catch(() => [tx]);
+    setWalletTxsMap(prev => ({ ...prev, [txData.wallet_id]: allTxs }));
+    const income = allTxs.filter(t => t.type === "income").reduce((s, t) => s + (t.amount || 0), 0);
+    const expense = allTxs.filter(t => t.type === "expense").reduce((s, t) => s + (t.amount || 0), 0);
     await base44.entities.SharedWallet.update(txData.wallet_id, { balance: income - expense });
     toast.success("Transaksi ditambahkan!");
   }
