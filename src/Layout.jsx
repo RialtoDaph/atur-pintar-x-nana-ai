@@ -358,20 +358,8 @@ function LayoutInner({ children, currentPageName }) {
             </button>);
         })}
 
-        {/* Center FAB - Add Transaction (off-side, sticks out above nav box) */}
-        <div className="flex-1 flex justify-center relative">
-          <button
-            onClick={() => setShowAddTransaction(true)}
-            data-tour="add-transaction-btn"
-            className="bg-[#FF6B35] rounded-full flex items-center justify-center active:scale-95 transition-all duration-150 tap-highlight-fix absolute left-1/2 -translate-x-1/2"
-            style={{
-              width: 48, height: 48,
-              top: -36,
-              boxShadow: '0 4px 16px rgba(255,107,53,0.5)'
-            }}>
-            <Plus className="w-5 h-5 text-white" />
-          </button>
-        </div>
+        {/* Spacer for center FAB */}
+        <div className="flex-1" />
 
         {mobileRightNav.map((item) => {
           const active = currentPageName === item.page;
@@ -387,6 +375,21 @@ function LayoutInner({ children, currentPageName }) {
             </button>);
         })}
       </div>}
+
+      {/* Mobile center FAB - floats above nav bar */}
+      {!anyModalOpen &&
+      <button
+        onClick={() => setShowAddTransaction(true)}
+        data-tour="add-transaction-btn"
+        className="fixed z-[70] sm:hidden bg-[#FF6B35] flex items-center justify-center rounded-full active:scale-95 transition-all duration-150 tap-highlight-fix left-1/2 -translate-x-1/2"
+        style={{
+          width: 56, height: 56,
+          bottom: 'calc(48px + env(safe-area-inset-bottom, 0px))',
+          boxShadow: '0 6px 20px rgba(255,107,53,0.55)'
+        }}>
+          <Plus className="w-6 h-6 text-white" />
+        </button>
+      }
 
       {/* FAB for desktop */}
       {!anyModalOpen &&
