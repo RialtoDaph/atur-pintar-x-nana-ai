@@ -9,9 +9,9 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 const NEEDS_KEYS = ["housing", "food", "transport", "health"];
 const WANTS_KEYS = ["entertainment", "shopping", "subscriptions", "other"];
 
-export default function BehaviorInsightsCard({ transactions = [], filterPeriod = "6", customDateRange = null, allCategoriesConfig = {} }) {
+export default function BehaviorInsightsCard({ transactions = [], filterPeriod = "6", customDateRange = null, allCategoriesConfig = {}, initialTab = "merchant" }) {
   const { formatCurrency, formatShortNumber } = useAppSettings();
-  const [tab, setTab] = useState("merchant"); // merchant | lifestyle | nospend
+  const [tab, setTab] = useState(initialTab); // merchant | lifestyle | nospend
 
   const data = useMemo(() => {
     const now = new Date();

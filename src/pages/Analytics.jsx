@@ -1,29 +1,19 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppSettings } from "@/components/utils/useAppSettings";
-import { LayoutList } from "lucide-react";
+import { LayoutList, Flame } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 import AnalyticsCardManager from "@/components/analytics/AnalyticsCardManager";
 import PremiumBlurCard from "@/components/subscription/PremiumBlurCard";
-import NetWorthCard from "@/components/analytics/NetWorthCard";
-import AIFinancialNarrative from "@/components/analytics/AIFinancialNarrative";
 import DateRangeFilter from "@/components/analytics/DateRangeFilter";
-import DailySpendingCard from "@/components/analytics/DailySpendingCard";
-import SpendingChart from "@/components/dashboard/SpendingChart";
 import CategoryBreakdownChart from "@/components/analytics/CategoryBreakdownChart";
-import BudgetActualWidget from "@/components/analytics/BudgetActualWidget";
-import MonthEndForecastCard from "@/components/analytics/MonthEndForecastCard";
-import SpendingHeatmapCard from "@/components/analytics/SpendingHeatmapCard";
-import SpendingPatternCard from "@/components/analytics/SpendingPatternCard";
-import BehaviorInsightsCard from "@/components/analytics/BehaviorInsightsCard";
-import SectionHeader from "@/components/analytics/SectionHeader";
-import { Flame } from "lucide-react";
+import BehaviorHeroCard from "@/components/analytics/BehaviorHeroCard";
+import BehaviorInsightsTabs from "@/components/analytics/BehaviorInsightsTabs";
+import NanaAIHub from "@/components/analytics/NanaAIHub";
 
 const DEFAULT_ANALYTICS_CARDS = [
-  { id: "net_worth", visible: true },
-  { id: "daily_spending", visible: true },
   { id: "spending_chart", visible: true },
 ];
 
@@ -41,7 +31,6 @@ const DEFAULT_CATEGORIES_FLAT = [
   { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#8FA4C8" },
 ];
 
-// Format subtitle periode yang human-readable
 function buildPeriodSubtitle(filterPeriod, customDateRange) {
   const now = new Date();
   const MONTHS_ID = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
@@ -64,7 +53,7 @@ function buildPeriodSubtitle(filterPeriod, customDateRange) {
 }
 
 export default function Analytics() {
-  const { t, formatShortNumber, formatCurrency } = useAppSettings();
+  const { t } = useAppSettings();
   const queryClient = useQueryClient();
   const [filterPeriod, setFilterPeriod] = useState("6");
   const [customDateRange, setCustomDateRange] = useState(null);
@@ -75,9 +64,7 @@ export default function Analytics() {
   const [gamification, setGamification] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then(u => {
-      setUser(u);
-    }).catch(() => {});
+    base44.auth.me().then(u => setUser(u)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -124,20 +111,6 @@ export default function Analytics() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: investments = [] } = useQuery({
-    queryKey: ["investments", user?.email],
-    queryFn: () => base44.entities.Investment.filter({ created_by: user.email }),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const { data: debts = [] } = useQuery({
-    queryKey: ["debts", user?.email],
-    queryFn: () => base44.entities.Debt.filter({ created_by: user.email }),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  });
-
   const { data: customCategories = [] } = useQuery({
     queryKey: ["custom_categories"],
     queryFn: () => base44.entities.CustomCategory.list("-created_date"),
@@ -164,14 +137,12 @@ export default function Analytics() {
     if (userSettings) {
       setAppSettings(userSettings);
       if (userSettings.analytics_cards && userSettings.analytics_cards.length > 0) {
-        // Filter out financial_calendar if still in saved settings
         const filtered = userSettings.analytics_cards.filter(c => c.id !== "financial_calendar");
         setAnalyticsCards(filtered);
       }
     }
   }, [settingsList, user?.settings_id]);
 
-  // Exclude soft-deleted records and recurring TEMPLATES (only generated children represent real activity)
   const transactions = rawTransactions.filter(t => !t.is_deleted && !(t.is_recurring === true && !t.is_recurring_child));
   const loading = txLoading || goalsLoading || budgetsLoading;
 
@@ -191,7 +162,6 @@ export default function Analytics() {
     customCategories.forEach(cat => {
       config[`custom_${cat.id}`] = { label: cat.name, emoji: cat.emoji, color: cat.color };
     });
-    // GlobalCategory entries — looked up by their record id (current source of truth)
     globalCategories.forEach(cat => {
       config[cat.id] = { label: cat.name, emoji: cat.emoji || "📦", color: cat.color || "#8FA4C8" };
     });
@@ -264,11 +234,6 @@ export default function Analytics() {
     };
   });
 
-  const thisMonthTx = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "expense";
-  });
-
   const filteredExpenses = transactions.filter(t => {
     if (t.type !== "expense") return false;
     const d = new Date(t.date);
@@ -290,8 +255,6 @@ export default function Analytics() {
     }))
     .sort((a, b) => b.value - a.value);
 
-  const totalExpenses = filteredExpenses.reduce((s, t) => s + t.amount, 0);
-
   const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
 
   const totalIncome = trendData.reduce((sum, month) => sum + month.Income, 0);
@@ -301,21 +264,7 @@ export default function Analytics() {
 
   const periodSubtitle = buildPeriodSubtitle(filterPeriod, customDateRange);
 
-  // Data untuk NanaDailyNarrative
   const streak = gamification?.daily_streak || 0;
-  const thisMonthIncome = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "income";
-  }).reduce((s, t) => s + t.amount, 0);
-  const thisMonthExpenseAmt = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "expense";
-  }).reduce((s, t) => s + t.amount, 0);
-  const thisSavingRate = thisMonthIncome > 0 ? ((thisMonthIncome - thisMonthExpenseAmt) / thisMonthIncome) * 100 : null;
-  const totalSavings = goals.reduce((s, g) => s + (g.current_amount || 0), 0);
-  const totalInvestmentValue = investments.reduce((s, i) => s + (i.current_value || 0), 0);
-  const totalDebtsAmt = debts.filter(d => d.status === "active").reduce((s, d) => s + (d.remaining_amount || 0), 0);
-  const netWorthValue = totalSavings + totalInvestmentValue - totalDebtsAmt;
 
   const filteredTxForPeriod = transactions.filter(t => {
     const d = new Date(t.date);
@@ -345,13 +294,10 @@ export default function Analytics() {
             <p className="text-[#8FA4C8] text-xs sm:text-sm font-medium">{t('analytics_overview')}</p>
             <div className="flex items-center gap-2 mt-1">
               <h1 className="text-white text-xl sm:text-2xl font-bold">{t('analytics_title')}</h1>
-              {/* Streak mini-banner */}
               <Link
                 to={createPageUrl("Gamifikasi")}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all tap-highlight-fix ${
-                  streak > 0
-                    ? "bg-[#FF6A00] text-white"
-                    : "bg-white/10 text-[#8FA4C8]"
+                  streak > 0 ? "bg-[#FF6A00] text-white" : "bg-white/10 text-[#8FA4C8]"
                 }`}
               >
                 <Flame className="w-3 h-3" />
@@ -376,67 +322,33 @@ export default function Analytics() {
           <DateRangeFilter onFilterChange={handleFilterChange} defaultPeriod="6" />
         </div>
 
-        {/* ━━━━━━━━━━ 🧠 KEBIASAANMU ━━━━━━━━━━ */}
-        <SectionHeader
-          emoji="🧠"
-          title="Kebiasaanmu"
-          subtitle="Pola & perilaku finansialmu"
+        {/* 🎯 Behavior Hero — auto-pick insight terkuat */}
+        <BehaviorHeroCard
+          transactions={transactions}
+          allCategoriesConfig={allCategoriesConfig}
         />
 
-        {/* Behavior Insights — Top Merchant + 50/30/20 + No-Spend Days */}
+        {/* 🧠 Kebiasaanmu — 5 tabs (Merchant, 50/30/20, No-Spend, Pola, Heatmap) */}
         {isPremium ? (
-          <BehaviorInsightsCard
+          <BehaviorInsightsTabs
             transactions={transactions}
             filterPeriod={filterPeriod}
             customDateRange={customDateRange}
             allCategoriesConfig={allCategoriesConfig}
           />
         ) : (
-          <PremiumBlurCard title="🧠 Behavior Insights">
-            <BehaviorInsightsCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} allCategoriesConfig={allCategoriesConfig} />
+          <PremiumBlurCard title="🧠 Kebiasaanmu">
+            <BehaviorInsightsTabs
+              transactions={transactions}
+              filterPeriod={filterPeriod}
+              customDateRange={customDateRange}
+              allCategoriesConfig={allCategoriesConfig}
+            />
           </PremiumBlurCard>
         )}
 
-        {/* Pola Hari & Jam */}
-        {isPremium ? (
-          <SpendingPatternCard
-            transactions={transactions}
-            filterPeriod={filterPeriod}
-            customDateRange={customDateRange}
-          />
-        ) : (
-          <PremiumBlurCard title="📊 Pola Hari & Jam">
-            <SpendingPatternCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
-          </PremiumBlurCard>
-        )}
-
-        {/* Heatmap Pengeluaran Harian */}
-        {isPremium ? (
-          <SpendingHeatmapCard transactions={transactions} />
-        ) : (
-          <PremiumBlurCard title="🔥 Heatmap Pengeluaran">
-            <SpendingHeatmapCard transactions={transactions} />
-          </PremiumBlurCard>
-        )}
-
-        {/* ━━━━━━━━━━ 📈 RINGKASAN UANG ━━━━━━━━━━ */}
-        <SectionHeader
-          emoji="📈"
-          title="Ringkasan Uang"
-          subtitle="Arus masuk, keluar, & proyeksi"
-        />
-
-        {/* Forecast Akhir Bulan */}
-        {isPremium ? (
-          <MonthEndForecastCard transactions={transactions} budgets={budgets} />
-        ) : (
-          <PremiumBlurCard title="🔮 Proyeksi Akhir Bulan">
-            <MonthEndForecastCard transactions={transactions} budgets={budgets} />
-          </PremiumBlurCard>
-        )}
-
-        {/* AI Financial Narrative */}
-        <AIFinancialNarrative
+        {/* ✨ Nana AI Hub — 5 tabs (Narasi, Tren, Forecast, Harian, Budget) */}
+        <NanaAIHub
           trendData={trendData}
           pieData={pieData}
           totalIncome={totalIncome}
@@ -444,56 +356,17 @@ export default function Analytics() {
           savingsRate={savingsRate}
           periodLabel={formatPeriodLabel(isPremium ? filterPeriod : "3")}
           periodSubtitle={periodSubtitle}
-          goals={goals}
           hasPrevData={hasPrevData}
           prevIncome={prevIncome}
           prevExpenses={prevExpenses}
           prevSavingsRate={prevSavingsRate}
           budgets={budgets}
           transactions={transactions}
+          filterPeriod={filterPeriod}
+          customDateRange={customDateRange}
         />
 
-        {/* Daily Spending Card */}
-        {isCardVisible("daily_spending") && (
-          isPremium ? (
-            <DailySpendingCard
-              transactions={transactions}
-              filterPeriod={filterPeriod}
-              customDateRange={customDateRange}
-              periodSubtitle={periodSubtitle}
-            />
-          ) : (
-            <PremiumBlurCard title="📈 Pengeluaran Harian">
-              <DailySpendingCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} periodSubtitle={periodSubtitle} />
-            </PremiumBlurCard>
-          )
-        )}
-
-        {/* ━━━━━━━━━━ 💰 KEKAYAAN ━━━━━━━━━━ */}
-        <SectionHeader
-          emoji="💰"
-          title="Kekayaan"
-          subtitle="Aset, kategori, & posisi finansial"
-        />
-
-        {/* Net Worth Card */}
-        {isCardVisible("net_worth") && (
-          isPremium ? (
-            <NetWorthCard
-              goals={goals}
-              investments={investments}
-              debts={debts}
-              transactions={transactions}
-              periodSubtitle={periodSubtitle}
-            />
-          ) : (
-            <PremiumBlurCard title="📊 Kekayaan Bersih (Net Worth)">
-              <NetWorthCard goals={goals} investments={investments} debts={debts} transactions={transactions} periodSubtitle={periodSubtitle} />
-            </PremiumBlurCard>
-          )
-        )}
-
-        {/* Category Breakdown (Expense + Income tabs) */}
+        {/* 🛍️ Kategori Keuangan */}
         {isCardVisible("spending_chart") && (
           isPremium ? (
             <CategoryBreakdownChart
