@@ -330,7 +330,7 @@ function LayoutInner({ children, currentPageName }) {
 
       {/* Main content */}
       <div ref={mainContentRef} className="sm:ml-60 pt-14 sm:pt-6 overflow-y-auto"
-        style={{ paddingBottom: window.innerWidth >= 640 ? '24px' : 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
+        style={{ paddingBottom: window.innerWidth >= 640 ? '24px' : (currentPageName === "Nana" ? '0px' : 'calc(80px + env(safe-area-inset-bottom, 0px))') }}>
         <AnimatePresence mode="sync">
           <motion.div
             key={currentPageName}
