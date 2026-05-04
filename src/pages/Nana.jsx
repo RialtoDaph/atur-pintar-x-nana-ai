@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { completeMission } from "@/hooks/useGamificationActions";
 import MoodPicker from "@/components/nana/MoodPicker";
 import NanaQuickActions from "@/components/nana/NanaQuickActions";
+import { useFinancialContext } from "@/components/nana/useFinancialContext";
 import NanaErrorBoundary from "@/components/nana/NanaErrorBoundary";
 import NanaHistoryPanel from "@/components/nana/NanaHistoryPanel";
 import NanaPreferencesModal from "@/components/nana/NanaPreferencesModal";
@@ -41,6 +42,7 @@ function NanaInner() {
   const recognitionRef = useRef(null);
   const navigate = useNavigate();
   const today = format(new Date(), "yyyy-MM-dd");
+  const { context: financialContext } = useFinancialContext(true);
 
   // Voice input via Web Speech API
   function toggleVoice() {
@@ -512,7 +514,7 @@ function NanaInner() {
                 {!isPremium && (
                   <p className="text-[10px] text-[#8FA4C8] text-center mb-2">{msgCount}/{FREE_MSG_LIMIT} pesan bulan ini</p>
                 )}
-                <NanaQuickActions onSelect={sendMessage} disabled={sending} />
+                <NanaQuickActions onSelect={sendMessage} disabled={sending} contextSnapshot={financialContext} />
                 <div className="bg-white dark:bg-[#1A1E25] rounded-2xl border border-[#E2E8F0] dark:border-[#2D2D2D] shadow-sm overflow-hidden">
                   <textarea
                     className="w-full text-sm text-[#1A1A1A] dark:text-white resize-none outline-none bg-transparent placeholder:text-[#C0C9D8] dark:placeholder:text-[#8FA4C8] px-4 pt-3 pb-2 leading-relaxed min-h-[52px] max-h-32"
