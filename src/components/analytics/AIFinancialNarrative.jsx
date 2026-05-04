@@ -26,15 +26,14 @@ function DeltaTag({ current, prev, higherIsBetter = true }) {
   );
 }
 
-export default function AIFinancialNarrative({ trendData, budgetTrendData = [], pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [], hasPrevData, prevIncome, prevExpenses, prevSavingsRate }) {
+export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [], hasPrevData, prevIncome, prevExpenses, prevSavingsRate }) {
   const { formatCurrency, formatShortNumber } = useAppSettings();
   const [narrative, setNarrative] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(true);
-  const [chartTab, setChartTab] = useState("cashflow"); // 'cashflow' | 'budget'
+  const [activeChart, setActiveChart] = useState("line");
 
   const hasData = trendData.some(d => d.Income > 0 || d.Expenses > 0);
-  const hasBudgetData = budgetTrendData.some(d => d.Budget > 0);
 
   async function generateNarrative() {
     setLoading(true);
@@ -120,27 +119,30 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
           ) : (
             <>
               {/* Chart Tabs */}
-              <div className="px-4 sm:px-5">
-                <div className="flex gap-1.5 mb-2 bg-[#F2F4F7] p-1 rounded-xl">
+              <div className="px-4 sm:px-5 mb-3">
+                <div className="flex bg-[#F2F4F7] rounded-xl p-1 w-fit">
                   <button
-                    onClick={() => setChartTab("cashflow")}
-                    className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-colors tap-highlight-fix ${
-                      chartTab === "cashflow" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
+                    onClick={() => setActiveChart("line")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeChart === "line" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
                     }`}
                   >
-                    Pemasukan vs Pengeluaran
+                    📈 Tren
                   </button>
                   <button
-                    onClick={() => setChartTab("budget")}
-                    className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-colors tap-highlight-fix ${
-                      chartTab === "budget" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
+                    onClick={() => setActiveChart("goals")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeChart === "goals" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
                     }`}
                   >
-                    Budget vs Aktual
+                    🎯 Goals
                   </button>
                 </div>
+              </div>
 
-                {chartTab === "cashflow" && (
+              {/* Charts */}
+              <div className="px-4 sm:px-5">
+                {activeChart === "line" && (
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={trendData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
@@ -156,33 +158,44 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                   </ResponsiveContainer>
                 )}
 
-                {chartTab === "budget" && (
-                  hasBudgetData ? (
-                    <ResponsiveContainer width="100%" height={200}>
-                      <LineChart data={budgetTrendData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
-                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={v => formatShortNumber(v)} />
-                        <Tooltip
-                          formatter={(v) => [formatCurrency(v), undefined]}
-                          contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
-                        />
-                        <Line type="monotone" dataKey="Budget" stroke="#4F7CFF" strokeWidth={2.5} dot={{ r: 4, fill: "#4F7CFF" }} />
-                        <Line type="monotone" dataKey="Aktual" stroke="#FF6B6B" strokeWidth={2.5} dot={{ r: 4, fill: "#FF6B6B" }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-center" style={{ height: 200 }}>
-                      <span className="text-3xl mb-2">💸</span>
-                      <p className="text-xs text-[#8FA4C8] mb-3">Belum ada budget yang di-set</p>
-                      <Link
-                        to={createPageUrl("Budget")}
-                        className="px-3 py-1.5 bg-[#FF6A00] text-white text-[11px] font-semibold rounded-lg hover:bg-[#e55f00] transition-colors"
-                      >
-                        Buat Budget
-                      </Link>
-                    </div>
-                  )
+                {activeChart === "goals" && (
+                  <div>
+                    {goals.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-40 text-[#8FA4C8] text-sm">
+                        <span className="text-3xl mb-2">🎯</span>
+                        <p>Belum ada savings goal yang dibuat.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 py-2">
+                        {goals.map((goal) => {
+                          const pct = Math.min(100, Math.round(((goal.current_amount || 0) / (goal.target_amount || 1)) * 100));
+                          return (
+                            <div key={goal.id} className="space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-semibold text-[#1A1A1A] flex items-center gap-1">
+                                  {goal.icon || "🎯"} {goal.name}
+                                </span>
+                                <span className="font-bold" style={{ color: pct >= 100 ? "#00C9A7" : "#FF6A00" }}>{pct}%</span>
+                              </div>
+                              <div className="w-full h-3 bg-[#F2F4F7] rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all duration-500"
+                                  style={{
+                                    width: `${pct}%`,
+                                    background: pct >= 100 ? "#00C9A7" : `linear-gradient(90deg, #FF6A00, #FF9A3C)`
+                                  }}
+                                />
+                              </div>
+                              <div className="flex justify-between text-[10px] text-[#8FA4C8]">
+                                <span>{formatCurrency(goal.current_amount || 0)}</span>
+                                <span>{formatCurrency(goal.target_amount)}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 

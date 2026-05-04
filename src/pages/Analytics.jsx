@@ -14,6 +14,7 @@ import DailySpendingCard from "@/components/analytics/DailySpendingCard";
 import SpendingChart from "@/components/dashboard/SpendingChart";
 import FinancialScoreCard from "@/components/analytics/FinancialScoreCard";
 import CategoryBreakdownChart from "@/components/analytics/CategoryBreakdownChart";
+import BudgetActualWidget from "@/components/analytics/BudgetActualWidget";
 import { Flame } from "lucide-react";
 
 const DEFAULT_ANALYTICS_CARDS = [
@@ -259,23 +260,6 @@ export default function Analytics() {
     };
   });
 
-  const budgetTrendData = Array.from({ length: monthDiff + 1 }, (_, i) => {
-    const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    const ym = `${year}-${String(month + 1).padStart(2, "0")}`;
-    const monthBudgets = budgets.filter(b => b.month === ym);
-    const totalBudget = monthBudgets.reduce((s, b) => s + (b.amount || 0), 0);
-    const totalActual = transactions
-      .filter(t => {
-        if (t.type !== "expense") return false;
-        const td = new Date(t.date);
-        return td.getMonth() === month && td.getFullYear() === year;
-      })
-      .reduce((s, t) => s + t.amount, 0);
-    return { name: localizedMonths[month], Budget: totalBudget, Aktual: totalActual };
-  });
-
   const thisMonthTx = transactions.filter(t => {
     const d = new Date(t.date);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "expense";
@@ -394,7 +378,6 @@ export default function Analytics() {
         {/* AI Financial Narrative */}
         <AIFinancialNarrative
           trendData={trendData}
-          budgetTrendData={budgetTrendData}
           pieData={pieData}
           totalIncome={totalIncome}
           totalExpenses={periodExpenses}
@@ -454,6 +437,20 @@ export default function Analytics() {
               <CategoryBreakdownChart transactions={filteredTxForPeriod} loading={loading} periodSubtitle={periodSubtitle} />
             </PremiumBlurCard>
           )
+        )}
+
+        {/* Budget vs Aktual */}
+        {isPremium ? (
+          <BudgetActualWidget
+            budgets={budgets}
+            transactions={transactions}
+            allCategoriesConfig={allCategoriesConfig}
+            periodSubtitle={periodSubtitle}
+          />
+        ) : (
+          <PremiumBlurCard title="💸 Budget vs Aktual">
+            <BudgetActualWidget budgets={budgets} transactions={transactions} allCategoriesConfig={allCategoriesConfig} periodSubtitle={periodSubtitle} />
+          </PremiumBlurCard>
         )}
 
       </div>
