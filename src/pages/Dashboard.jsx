@@ -16,7 +16,6 @@ import RecurringManager from "@/components/transactions/RecurringManager";
 import { useGamification } from "@/hooks/useGamification";
 
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
-import NanaInsightCard from "@/components/dashboard/NanaInsightCard";
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
 import BossBattleCard from "@/components/gamification/BossBattleCard";
 
@@ -262,17 +261,6 @@ export default function Dashboard() {
         <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-3">
           {/* Mobile: single column, Tablet: 2-column grid */}
           <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0 md:items-start">
-
-            {/* Nana Insight */}
-            {user?.onboarding_completed && (
-              <div className="md:col-span-2">
-                <NanaInsightCard
-                  todayExpense={transactions
-                    .filter(t => t.date === todayStr && t.type === "expense" && !t.is_deleted)
-                    .reduce((s, t) => s + (t.amount || 0), 0)}
-                />
-              </div>
-            )}
 
             {/* Boss Battle */}
             {user?.onboarding_completed && (
