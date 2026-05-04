@@ -1,50 +1,46 @@
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { useMemo } from "react";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
 
-const MAX_VISIBLE = 3;
+const MONTHS_ID = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
 
-export default function BudgetActualWidget({ budgets, transactions, allCategoriesConfig, periodSubtitle }) {
-  const { formatCurrency } = useAppSettings();
-  const [globalCategories, setGlobalCategories] = useState([]);
-  const [showAll, setShowAll] = useState(false);
+export default function BudgetActualWidget({ budgets, transactions, periodSubtitle }) {
+  const { formatCurrency, formatShortNumber } = useAppSettings();
   const now = new Date();
 
-  useEffect(() => {
-    base44.entities.GlobalCategory.list("sort_order").catch(() => []).then(data => {
-      setGlobalCategories(data || []);
-    });
-  }, []);
+  // Build last 6 months of data: total budget vs total actual expense
+  const chartData = useMemo(() => {
+    const data = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = MONTHS_ID[d.getMonth()];
 
-  // Resolve category ID ke nama + emoji
-  function resolveCat(categoryKey) {
-    if (!categoryKey) return { emoji: "📦", label: "Kategori Lainnya" };
-    // Sudah ada di allCategoriesConfig (default keys atau custom_<id>)
-    if (allCategoriesConfig[categoryKey]) return allCategoriesConfig[categoryKey];
-    // Coba cari di globalCategories by id (raw mongo id)
-    const globalMatch = globalCategories.find(c => c.id === categoryKey);
-    if (globalMatch) return { emoji: globalMatch.emoji || "📦", label: globalMatch.name };
-    return { emoji: "📦", label: "Kategori Lainnya" };
-  }
+      // Total budget for this month
+      const monthBudgets = budgets.filter(b => b.month === monthKey);
+      const totalBudget = monthBudgets.reduce((s, b) => s + (b.amount || 0), 0);
 
-  // Hitung spending bulan ini per kategori
-  const thisMonthExpenses = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && t.type === "expense";
-  });
+      // Total actual expense for this month
+      const totalActual = transactions
+        .filter(t => {
+          if (t.type !== "expense") return false;
+          const td = new Date(t.date);
+          return td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear();
+        })
+        .reduce((s, t) => s + (t.amount || 0), 0);
 
-  const spentByCategory = {};
-  thisMonthExpenses.forEach(t => {
-    const cat = t.category || "other";
-    spentByCategory[cat] = (spentByCategory[cat] || 0) + t.amount;
-  });
+      data.push({ name: label, Budget: totalBudget, Aktual: totalActual });
+    }
+    return data;
+  }, [budgets, transactions]);
 
-  if (budgets.length === 0) {
+  const hasAnyBudget = chartData.some(d => d.Budget > 0);
+
+  if (budgets.length === 0 || !hasAnyBudget) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-5 pr-14">
+      <div className="bg-white rounded-2xl shadow-sm p-5">
         <div className="mb-3">
           <h2 className="font-bold text-[#1A1A1A] text-base">Budget vs Aktual</h2>
           {periodSubtitle && <p className="text-xs text-[#8FA4C8] mt-0.5">{periodSubtitle}</p>}
@@ -64,104 +60,79 @@ export default function BudgetActualWidget({ budgets, transactions, allCategorie
     );
   }
 
-  const budgetItems = budgets.map(b => {
-    const catConfig = resolveCat(b.category);
-    const spent = spentByCategory[b.category] || 0;
-    const pct = b.amount > 0 ? (spent / b.amount) * 100 : 0;
-    const isOver = pct > 100;
-    const isNear = pct >= 90 && pct <= 100;
-    const isWarning = pct >= 70 && pct < 90;
-    const barColor = pct > 90 ? "#FF6B6B" : pct > 70 ? "#F5A623" : "#00C9A7";
-
-    return { ...b, catConfig, spent, pct, isOver, isNear, isWarning, barColor };
-  }).sort((a, b) => b.pct - a.pct);
-
-  const overCount = budgetItems.filter(b => b.pct > 100).length;
-  const nearCount = budgetItems.filter(b => b.pct >= 90 && b.pct <= 100).length;
-  const warnCount = budgetItems.filter(b => b.pct >= 70 && b.pct < 90).length;
-
+  // Footer logic: compare current month
+  const current = chartData[chartData.length - 1];
+  const diff = current.Aktual - current.Budget;
   let footerText, footerColor;
-  if (overCount > 0) {
-    footerText = `🚨 ${overCount} kategori sudah melebihi budget!`;
+  if (current.Budget === 0) {
+    footerText = "ℹ️ Belum ada budget untuk bulan ini";
+    footerColor = "text-[#8FA4C8]";
+  } else if (diff > 0) {
+    footerText = `🚨 Bulan ini melebihi budget ${formatCurrency(diff)}`;
     footerColor = "text-[#FF6B6B]";
-  } else if (nearCount > 0) {
-    footerText = `⚠️ ${nearCount} kategori hampir melebihi budget bulan ini!`;
-    footerColor = "text-[#FF6B6B]";
-  } else if (warnCount > 0) {
-    footerText = `🟡 Hati-hati, ${warnCount} kategori mendekati batas budget!`;
-    footerColor = "text-[#F5A623]";
   } else {
-    footerText = "✅ Semua budget masih aman!";
+    footerText = `✅ Bulan ini hemat ${formatCurrency(Math.abs(diff))} dari budget`;
     footerColor = "text-[#00C9A7]";
   }
 
-  const visibleItems = showAll ? budgetItems : budgetItems.slice(0, MAX_VISIBLE);
-  const hiddenCount = budgetItems.length - MAX_VISIBLE;
-
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-5 pr-14">
+    <div className="bg-white rounded-2xl shadow-sm p-5">
       <div className="mb-4">
         <h2 className="font-bold text-[#1A1A1A] text-base">Budget vs Aktual</h2>
-        {periodSubtitle && <p className="text-xs text-[#8FA4C8] mt-0.5">{periodSubtitle}</p>}
+        {periodSubtitle && <p className="text-xs text-[#8FA4C8] mt-0.5">Tren 6 bulan terakhir</p>}
       </div>
 
-      <div className="space-y-4">
-        {visibleItems.map((item, i) => (
-          <div key={item.id || i}>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="text-xs text-[#4A5568] truncate">
-                  {item.catConfig.emoji} {item.catConfig.label}
-                </span>
-                {item.isOver && (
-                  <span className="px-1.5 py-0.5 bg-[#FF6B6B]/15 text-[#FF6B6B] text-[9px] font-bold rounded-full flex-shrink-0">
-                    Melebihi!
-                  </span>
-                )}
-                {item.isNear && !item.isOver && (
-                  <span className="px-1.5 py-0.5 bg-[#FF6B6B]/10 text-[#FF6B6B] text-[9px] font-bold rounded-full flex-shrink-0">
-                    Hampir!
-                  </span>
-                )}
-                {item.isWarning && (
-                  <span className="px-1.5 py-0.5 bg-[#F5A623]/15 text-[#F5A623] text-[9px] font-bold rounded-full flex-shrink-0">
-                    Hati-hati
-                  </span>
-                )}
-              </div>
-              <span className={`text-xs font-bold flex-shrink-0 ml-2 ${item.isOver ? "text-[#FF6B6B]" : item.isNear ? "text-[#FF6B6B]" : item.isWarning ? "text-[#F5A623]" : "text-[#4A5568]"}`}>
-                {item.pct.toFixed(0)}%
-              </span>
-            </div>
-
-            <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden mb-1">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${Math.min(item.pct, 100)}%`,
-                  backgroundColor: item.barColor,
-                }}
-              />
-            </div>
-
-            <p className="text-[10px] text-[#8FA4C8]">
-              {formatCurrency(item.spent)} terpakai dari {formatCurrency(item.amount)}
-            </p>
-          </div>
-        ))}
+      <div className="h-56 -ml-2">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" vertical={false} />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 11, fill: "#8FA4C8" }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fontSize: 10, fill: "#8FA4C8" }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(v) => formatShortNumber(v)}
+              width={45}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#0A0A0A",
+                border: "none",
+                borderRadius: 12,
+                fontSize: 12,
+                color: "#fff",
+              }}
+              labelStyle={{ color: "#8FA4C8", fontSize: 11 }}
+              formatter={(value) => formatCurrency(value)}
+            />
+            <Legend
+              iconType="circle"
+              wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="Budget"
+              stroke="#4F7CFF"
+              strokeWidth={2.5}
+              dot={{ r: 3, fill: "#4F7CFF" }}
+              activeDot={{ r: 5 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="Aktual"
+              stroke="#FF6B6B"
+              strokeWidth={2.5}
+              dot={{ r: 3, fill: "#FF6B6B" }}
+              activeDot={{ r: 5 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
-
-      {hiddenCount > 0 && (
-        <button
-          onClick={() => setShowAll(s => !s)}
-          className="mt-4 w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-[#FF6A00] py-2.5 rounded-xl bg-[#FF6A00]/8 hover:bg-[#FF6A00]/15 transition-colors tap-highlight-fix"
-        >
-          {showAll
-            ? <><ChevronUp className="w-3.5 h-3.5" /> Tutup</>
-            : <><ChevronDown className="w-3.5 h-3.5" /> Lihat {hiddenCount} budget lainnya</>
-          }
-        </button>
-      )}
 
       <div className={`mt-4 pt-3 border-t border-[#F2F4F7] text-xs font-medium ${footerColor}`}>
         {footerText}
