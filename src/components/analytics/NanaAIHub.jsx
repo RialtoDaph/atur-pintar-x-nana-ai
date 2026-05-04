@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Sparkles, Loader2, RefreshCw, BookOpen, TrendingUp, Calendar, ArrowUp, ArrowDown } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, BookOpen, TrendingUp, ArrowUp, ArrowDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import {
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Bar, ComposedChart
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid
 } from "recharts";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
@@ -94,7 +94,6 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
     { id: "narasi", label: "Narasi", icon: BookOpen },
     { id: "tren", label: "Tren", icon: TrendingUp },
     { id: "forecast", label: "Forecast", icon: Sparkles },
-    { id: "harian", label: "Harian", icon: Calendar },
     { id: "budget", label: "Budget", icon: TrendingUp },
   ];
 
@@ -159,16 +158,6 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
 
             {tab === "forecast" && (
               <MonthEndForecastCard transactions={transactions} budgets={budgets} embedded />
-            )}
-
-            {tab === "harian" && (
-              <DailyTab
-                transactions={transactions}
-                filterPeriod={filterPeriod}
-                customDateRange={customDateRange}
-                formatCurrency={formatCurrency}
-                formatShortNumber={formatShortNumber}
-              />
             )}
 
             {tab === "budget" && (
@@ -255,68 +244,6 @@ function TrendTab({ trendData, formatCurrency, formatShortNumber }) {
           <Line type="monotone" dataKey="Expenses" stroke="#FF6B6B" strokeWidth={2.5} dot={{ r: 4, fill: "#FF6B6B" }} name="Pengeluaran" />
         </LineChart>
       </ResponsiveContainer>
-    </>
-  );
-}
-
-// ===== Sub-tab: Daily =====
-function DailyTab({ transactions, filterPeriod, customDateRange, formatCurrency, formatShortNumber }) {
-  const { data, total, totalDays, avg } = useMemo(() => {
-    const now = new Date();
-    const monthRange = customDateRange || {
-      start: new Date(now.getFullYear(), now.getMonth() - ((parseInt(filterPeriod) || 6) - 1), 1),
-      end: now,
-    };
-    const monthDiff = Math.max(
-      0,
-      (monthRange.end.getFullYear() - monthRange.start.getFullYear()) * 12 +
-        (monthRange.end.getMonth() - monthRange.start.getMonth())
-    );
-
-    const arr = Array.from({ length: monthDiff + 1 }, (_, i) => {
-      const d = new Date(monthRange.start.getFullYear(), monthRange.start.getMonth() + i, 1);
-      let sum = 0;
-      for (const t of transactions) {
-        if (t.type !== "expense") continue;
-        const td = new Date(t.date);
-        if (td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear()) sum += t.amount || 0;
-      }
-      return { name: MONTHS_ID[d.getMonth()], value: sum };
-    });
-
-    const t = arr.reduce((s, m) => s + m.value, 0);
-    const days = Math.max(Math.ceil((monthRange.end - monthRange.start) / (1000 * 60 * 60 * 24)) + 1, 1);
-    return { data: arr, total: t, totalDays: days, avg: t / days };
-  }, [transactions, filterPeriod, customDateRange]);
-
-  if (total === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-8 text-center">
-        <span className="text-3xl mb-2">📅</span>
-        <p className="text-xs text-[#8FA4C8]">Belum ada pengeluaran di periode ini.</p>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <ResponsiveContainer width="100%" height={180}>
-        <ComposedChart data={data}>
-          <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={v => formatShortNumber(v)} />
-          <Tooltip
-            formatter={(v) => [formatCurrency(v), undefined]}
-            contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
-          />
-          <Bar dataKey="value" fill="#FF6B6B" radius={[6, 6, 0, 0]} />
-        </ComposedChart>
-      </ResponsiveContainer>
-      <div className="mt-3 flex items-baseline gap-2">
-        <p className="text-sm text-[#8FA4C8]">Ø</p>
-        <p className="text-xl sm:text-2xl font-bold text-[#0A0A0A]">{formatShortNumber(avg)}</p>
-        <p className="text-sm text-[#8FA4C8]">/Hari</p>
-      </div>
-      <p className="text-[10px] text-[#8FA4C8] mt-1">Rata-rata dari {totalDays} hari · Total {formatShortNumber(total)}</p>
     </>
   );
 }
