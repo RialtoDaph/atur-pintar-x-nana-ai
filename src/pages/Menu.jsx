@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
-import { Target, CreditCard, Lightbulb, ChevronRight, Bell, Settings, User, Users, PiggyBank, TrendingUp } from "lucide-react";
+import { Target, CreditCard, Lightbulb, ChevronRight, User, Users, PiggyBank, TrendingUp } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function Menu() {
@@ -19,7 +19,6 @@ export default function Menu() {
     {
       title: t('menu_notifications'),
       items: [
-        { label: "Notifikasi", desc: "Pengingat tagihan dan notifikasi cerdas", icon: Bell, emoji: "🔔", page: "Notifications", color: "#F5A623" },
         { label: t('nav_tips'), desc: "Saran dan tips mengelola keuangan", icon: Lightbulb, emoji: "💡", page: "Tips", color: "#F5A623" },
       ],
     },
@@ -27,7 +26,6 @@ export default function Menu() {
       title: t('menu_account'),
       items: [
         { label: "Profil Saya", desc: "Kelola profil dan akun Anda", icon: User, emoji: "👤", page: "ProfileSettings", color: "#FF6A00" },
-        { label: t('nav_settings'), desc: "Preferensi dan pengaturan aplikasi", icon: Settings, emoji: "⚙️", page: "Settings", color: "#888" },
       ],
     },
   ];
