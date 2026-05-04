@@ -23,48 +23,56 @@ export default function SpendingStatsCard({ transactions, allCategoriesConfig })
     }), [transactions, currentMonth, currentYear]
   );
 
-  // Top 5 categories this month
-  const catMap = {};
-  thisMonthExpenses.forEach(t => {
-    const cat = t.category || "other";
-    catMap[cat] = (catMap[cat] || 0) + (t.amount || 0);
-  });
-  const top5 = Object.entries(catMap)
-    .map(([key, val]) => ({
-      name: allCategoriesConfig[key]?.emoji + " " + (allCategoriesConfig[key]?.label || key),
-      amount: val,
-      color: allCategoriesConfig[key]?.color || "#8FA4C8",
-    }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 5);
-
-  // Income vs Expense last 3 months
-  const trend3M = Array.from({ length: 3 }, (_, i) => {
-    const d = new Date(currentYear, currentMonth - 2 + i, 1);
-    const mo = d.getMonth();
-    const yr = d.getFullYear();
-    const mTxs = transactions.filter(t => {
-      const td = new Date(t.date);
-      return td.getMonth() === mo && td.getFullYear() === yr && !t.is_deleted;
+  const { top5, trend3M, totalThisMonth, avgDaily, biggest, pieData } = useMemo(() => {
+    // Top 5 categories this month
+    const catMap = {};
+    thisMonthExpenses.forEach(t => {
+      const cat = t.category || "other";
+      catMap[cat] = (catMap[cat] || 0) + (t.amount || 0);
     });
-    return {
-      name: MONTHS_ID[mo],
-      Pemasukan: mTxs.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0),
-      Pengeluaran: mTxs.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0),
-    };
-  });
+    const top5Arr = Object.entries(catMap)
+      .map(([key, val]) => {
+        const cfg = allCategoriesConfig[key] || {};
+        const emoji = cfg.emoji ? `${cfg.emoji} ` : "";
+        return {
+          name: `${emoji}${cfg.label || key}`,
+          amount: val,
+          color: cfg.color || "#8FA4C8",
+        };
+      })
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 5);
 
-  // Average daily spending this month
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    // Income vs Expense last 3 months — single pass
+    const buckets = {};
+    for (let i = 0; i < 3; i++) {
+      const d = new Date(currentYear, currentMonth - 2 + i, 1);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      buckets[key] = { name: MONTHS_ID[d.getMonth()], Pemasukan: 0, Pengeluaran: 0 };
+    }
+    for (const t of transactions) {
+      if (t.is_deleted) continue;
+      const td = new Date(t.date);
+      const k = `${td.getFullYear()}-${td.getMonth()}`;
+      const bucket = buckets[k];
+      if (!bucket) continue;
+      if (t.type === "income") bucket.Pemasukan += t.amount || 0;
+      else if (t.type === "expense") bucket.Pengeluaran += t.amount || 0;
+    }
+    const trend3MArr = Object.values(buckets);
+
+    // Avg daily + biggest
+    const todayDay = now.getDate();
+    const total = thisMonthExpenses.reduce((s, t) => s + (t.amount || 0), 0);
+    const avg = todayDay > 0 ? Math.round(total / todayDay) : 0;
+    const big = thisMonthExpenses.reduce((max, t) => (!max || t.amount > max.amount) ? t : max, null);
+
+    const pie = top5Arr.map((c, i) => ({ name: c.name, value: c.amount, color: c.color || COLORS[i] }));
+
+    return { top5: top5Arr, trend3M: trend3MArr, totalThisMonth: total, avgDaily: avg, biggest: big, pieData: pie };
+  }, [thisMonthExpenses, transactions, allCategoriesConfig, currentMonth, currentYear, now]);
+
   const todayDay = now.getDate();
-  const totalThisMonth = thisMonthExpenses.reduce((s, t) => s + (t.amount || 0), 0);
-  const avgDaily = todayDay > 0 ? Math.round(totalThisMonth / todayDay) : 0;
-
-  // Biggest single expense
-  const biggest = thisMonthExpenses.reduce((max, t) => (!max || t.amount > max.amount) ? t : max, null);
-
-  // Pie data
-  const pieData = top5.map((c, i) => ({ name: c.name, value: c.amount, color: c.color || COLORS[i] }));
 
   if (thisMonthExpenses.length === 0) return null;
 

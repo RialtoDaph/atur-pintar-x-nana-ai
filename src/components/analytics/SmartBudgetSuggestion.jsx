@@ -49,7 +49,9 @@ export default function SmartBudgetSuggestion({ transactions, budgets, allCatego
   }, [transactions, budgets, allCategoriesConfig, currentMonth, savedIds, dismissedIds]);
 
   const handleApprove = async (cat, amount) => {
-    const finalAmount = editValues[cat] !== undefined ? Number(editValues[cat]) : amount;
+    const raw = editValues[cat];
+    const parsed = raw !== undefined && raw !== "" ? Number(raw) : amount;
+    const finalAmount = Number.isFinite(parsed) && parsed > 0 ? parsed : amount;
     setSaving(s => ({ ...s, [cat]: true }));
     try {
       const existing = budgets.find(b => b.category === cat && b.month === currentMonth);
