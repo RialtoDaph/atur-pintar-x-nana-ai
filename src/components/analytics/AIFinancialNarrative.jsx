@@ -26,13 +26,15 @@ function DeltaTag({ current, prev, higherIsBetter = true }) {
   );
 }
 
-export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [], hasPrevData, prevIncome, prevExpenses, prevSavingsRate }) {
+export default function AIFinancialNarrative({ trendData, budgetTrendData = [], pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [], hasPrevData, prevIncome, prevExpenses, prevSavingsRate }) {
   const { formatCurrency, formatShortNumber } = useAppSettings();
   const [narrative, setNarrative] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(true);
+  const [chartTab, setChartTab] = useState("cashflow"); // 'cashflow' | 'budget'
 
   const hasData = trendData.some(d => d.Income > 0 || d.Expenses > 0);
+  const hasBudgetData = budgetTrendData.some(d => d.Budget > 0);
 
   async function generateNarrative() {
     setLoading(true);
@@ -117,21 +119,71 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
             </div>
           ) : (
             <>
-              {/* Chart */}
+              {/* Chart Tabs */}
               <div className="px-4 sm:px-5">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={trendData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={v => formatShortNumber(v)} />
-                    <Tooltip
-                      formatter={(v) => [formatCurrency(v), undefined]}
-                      contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
-                    />
-                    <Line type="monotone" dataKey="Income" stroke="#00C9A7" strokeWidth={2.5} dot={{ r: 4, fill: "#00C9A7" }} name="Pemasukan" />
-                    <Line type="monotone" dataKey="Expenses" stroke="#FF6B6B" strokeWidth={2.5} dot={{ r: 4, fill: "#FF6B6B" }} name="Pengeluaran" />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="flex gap-1.5 mb-2 bg-[#F2F4F7] p-1 rounded-xl">
+                  <button
+                    onClick={() => setChartTab("cashflow")}
+                    className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-colors tap-highlight-fix ${
+                      chartTab === "cashflow" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
+                    }`}
+                  >
+                    Pemasukan vs Pengeluaran
+                  </button>
+                  <button
+                    onClick={() => setChartTab("budget")}
+                    className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-colors tap-highlight-fix ${
+                      chartTab === "budget" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
+                    }`}
+                  >
+                    Budget vs Aktual
+                  </button>
+                </div>
+
+                {chartTab === "cashflow" && (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <LineChart data={trendData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={v => formatShortNumber(v)} />
+                      <Tooltip
+                        formatter={(v) => [formatCurrency(v), undefined]}
+                        contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
+                      />
+                      <Line type="monotone" dataKey="Income" stroke="#00C9A7" strokeWidth={2.5} dot={{ r: 4, fill: "#00C9A7" }} name="Pemasukan" />
+                      <Line type="monotone" dataKey="Expenses" stroke="#FF6B6B" strokeWidth={2.5} dot={{ r: 4, fill: "#FF6B6B" }} name="Pengeluaran" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+
+                {chartTab === "budget" && (
+                  hasBudgetData ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart data={budgetTrendData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={v => formatShortNumber(v)} />
+                        <Tooltip
+                          formatter={(v) => [formatCurrency(v), undefined]}
+                          contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
+                        />
+                        <Line type="monotone" dataKey="Budget" stroke="#4F7CFF" strokeWidth={2.5} dot={{ r: 4, fill: "#4F7CFF" }} />
+                        <Line type="monotone" dataKey="Aktual" stroke="#FF6B6B" strokeWidth={2.5} dot={{ r: 4, fill: "#FF6B6B" }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8 text-center" style={{ height: 200 }}>
+                      <span className="text-3xl mb-2">💸</span>
+                      <p className="text-xs text-[#8FA4C8] mb-3">Belum ada budget yang di-set</p>
+                      <Link
+                        to={createPageUrl("Budget")}
+                        className="px-3 py-1.5 bg-[#FF6A00] text-white text-[11px] font-semibold rounded-lg hover:bg-[#e55f00] transition-colors"
+                      >
+                        Buat Budget
+                      </Link>
+                    </div>
+                  )
+                )}
               </div>
 
               {/* Metrics strip */}
