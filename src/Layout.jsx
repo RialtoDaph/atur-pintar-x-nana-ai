@@ -123,17 +123,16 @@ function LayoutInner({ children, currentPageName }) {
   { name: "Settings", label: t('nav_settings'), icon: Settings, page: "Settings" }];
 
 
-  // Mobile: 4 main items + "Lainnya" (Budget moved to Menu)
+  // Mobile: Home, Nana AI, [Add FAB center], Analytics, Transactions
   const NANA_AVATAR_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png";
 
-  const mobileMainNav = [
+  const mobileLeftNav = [
   { name: "Dashboard", label: t('nav_home'), icon: LayoutDashboard, page: "Dashboard" },
-  { name: "Nana", label: "Nana AI", icon: null, page: "Nana", avatarUrl: NANA_AVATAR_URL },
+  { name: "Nana", label: "Nana AI", icon: null, page: "Nana", avatarUrl: NANA_AVATAR_URL }];
+
+  const mobileRightNav = [
   { name: "Analytics", label: t('nav_analytics'), icon: BarChart2, page: "Analytics" },
   { name: "Transactions", label: t('nav_transactions'), icon: ArrowLeftRight, page: "Transactions" }];
-
-
-  const mobileMorePages = ["Goals", "Debts", "Notifications", "Accounts", "SharedFinance", "Tips", "Settings", "Menu", "Budget"];
 
   const initials = user?.full_name ? user.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "U";
 
@@ -166,12 +165,9 @@ function LayoutInner({ children, currentPageName }) {
   // Update tab history when navigating to a main page
   useEffect(() => {
     const mobileMainNavNames = ["Dashboard", "Nana", "Analytics", "Transactions"];
-    const mobileMorePagesNames = ["Goals", "Debts", "Reminders", "Alerts", "Tips", "Settings", "Menu", "Investments", "Budget", "Accounts", "SharedFinance", "Notifications"];
 
     if (mobileMainNavNames.includes(currentPageName)) {
       tabHistory.current[currentPageName] = currentPageName;
-    } else if (mobileMorePagesNames.includes(currentPageName)) {
-      tabHistory.current["Menu"] = currentPageName;
     }
   }, [currentPageName]);
 
@@ -341,8 +337,8 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Mobile bottom nav — hidden on sm+ (tablet/desktop uses sidebar) */}
-      {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
-        {mobileMainNav.map((item) => {
+      {!anyModalOpen && <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex items-end z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
+        {mobileLeftNav.map((item) => {
           const active = currentPageName === item.page;
           return (
             <button
@@ -350,7 +346,7 @@ function LayoutInner({ children, currentPageName }) {
               onClick={() => handleTabClick(item.page)}
               className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
               active ? "text-[#F97316]" : "text-[#888]"}`}>
-              
+
               {item.avatarUrl ? (
                 <div className={`w-5 h-5 rounded-full overflow-hidden flex-shrink-0 ${active ? "ring-2 ring-[#F97316]" : ""}`}>
                   <img src={item.avatarUrl} alt={item.label} className="w-full h-full object-cover" />
@@ -360,37 +356,37 @@ function LayoutInner({ children, currentPageName }) {
               )}
               {item.label}
             </button>);
-
         })}
-        {/* More button → goes to Menu page */}
-        <button
-          key="menu"
-          data-tour="mobile-more-tab"
-          onClick={() => handleTabClick("Menu")}
-          className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
-          mobileMorePages.includes(currentPageName) ? "text-[#F97316]" : "text-[#888]"}`}>
-          
-          <Grid3x3 className="w-5 h-5" />
-          {t('nav_more')}
-        </button>
+
+        {/* Center FAB - Add Transaction (elevated) */}
+        <div className="flex-1 flex justify-center">
+          <button
+            onClick={() => setShowAddTransaction(true)}
+            data-tour="add-transaction-btn"
+            className="bg-[#FF6B35] rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all duration-150 tap-highlight-fix"
+            style={{
+              width: 56, height: 56,
+              marginTop: -24,
+              boxShadow: '0 4px 16px rgba(255,107,53,0.5)'
+            }}>
+            <Plus className="w-6 h-6 text-white" />
+          </button>
+        </div>
+
+        {mobileRightNav.map((item) => {
+          const active = currentPageName === item.page;
+          return (
+            <button
+              key={`tab-${item.page}`}
+              onClick={() => handleTabClick(item.page)}
+              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
+              active ? "text-[#F97316]" : "text-[#888]"}`}>
+
+              <item.icon className="w-5 h-5" />
+              {item.label}
+            </button>);
+        })}
       </div>}
-
-      {/* FAB - Add Transaction */}
-      {!anyModalOpen && !isNestedPage &&
-      <button
-        onClick={() => setShowAddTransaction(true)}
-        data-tour="add-transaction-btn" className="bg-[#FF6B35] py-4 rounded-full fixed z-[55] flex items-center justify-center shadow-lg active:scale-95 transition-all duration-150 tap-highlight-fix sm:hidden"
-
-        style={{
-          width: 44, height: 44,
-          bottom: 'calc(76px + env(safe-area-inset-bottom, 0px))',
-          right: 16,
-          boxShadow: '0 2px 12px rgba(255,107,53,0.4)'
-        }}>
-        
-          <Plus className="w-5 h-5 text-white" />
-        </button>
-      }
 
       {/* FAB for desktop */}
       {!anyModalOpen &&
