@@ -135,10 +135,19 @@ Output JSON saja.`;
               onClick={() => !disabled && onSelect(s.question)}
               disabled={disabled || loading}
               title={s.question}
-              className="flex items-center gap-1.5 px-2.5 py-2 bg-white dark:bg-[#1A1E25] border border-[#E2E8F0] dark:border-[#2D2D2D] rounded-xl hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 dark:hover:bg-[#FF6A00]/10 transition-all disabled:opacity-40 tap-highlight-fix text-left min-w-0"
+              className="flex items-start gap-1.5 px-2 py-2 bg-white dark:bg-[#1A1E25] border border-[#E2E8F0] dark:border-[#2D2D2D] rounded-xl hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 dark:hover:bg-[#FF6A00]/10 transition-all disabled:opacity-40 tap-highlight-fix text-left min-w-0"
             >
-              <Icon className="w-3.5 h-3.5 text-[#FF6A00] flex-shrink-0" />
-              <span className="text-[11px] font-medium text-[#1A1A1A] dark:text-white truncate">
+              <Icon className="w-3.5 h-3.5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
+              <span
+                className="text-[11px] font-medium text-[#1A1A1A] dark:text-white leading-tight break-words"
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  wordBreak: 'break-word',
+                }}
+              >
                 {s.label}
               </span>
             </button>
@@ -149,11 +158,11 @@ Output JSON saja.`;
   );
 }
 
-// Keep labels short and clean (max 4 words, no trailing punctuation)
+// Keep labels clean (no trailing punctuation, max 5 words so 2 lines fit nicely)
 function trimLabel(label) {
   const cleaned = String(label).replace(/[?!.]+$/g, "").trim();
   const words = cleaned.split(/\s+/);
-  return words.slice(0, 4).join(" ");
+  return words.slice(0, 5).join(" ");
 }
 
 // Build a short, focused context for suggestion generation only
