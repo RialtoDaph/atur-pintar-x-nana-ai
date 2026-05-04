@@ -15,6 +15,8 @@ export async function recalculateAccountBalance(accountId) {
   let income = 0, expense = 0, savings = 0;
   for (const tx of transactions) {
     if (tx.is_deleted) continue;
+    // Skip recurring TEMPLATES — only generated child transactions affect balance
+    if (tx.is_recurring === true && !tx.is_recurring_child) continue;
     if (tx.type === 'income') income += tx.amount || 0;
     else if (tx.type === 'expense') expense += tx.amount || 0;
     else if (tx.type === 'savings') savings += tx.amount || 0;

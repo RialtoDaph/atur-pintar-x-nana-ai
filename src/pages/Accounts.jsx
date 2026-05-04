@@ -6,6 +6,7 @@ import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle, RefreshCw,
 import { toast } from "sonner";
 import AccountLogo from "@/components/ui/AccountLogo";
 import AddAccountBottomSheet from "@/components/profile/AddAccountBottomSheet";
+import { recalculateAccountBalance } from "@/components/utils/accountSync";
 
 
 function formatRupiah(n) {
@@ -302,12 +303,8 @@ export default function Accounts() {
   async function syncBalance(acc) {
     setSyncing(acc.id);
     try {
-      const txs = await base44.entities.Transaction.filter({ account_id: acc.id });
-      const income = txs.filter(tx => !tx.is_deleted && tx.type === 'income').reduce((s, tx) => s + (tx.amount || 0), 0);
-      const expense = txs.filter(tx => !tx.is_deleted && tx.type === 'expense').reduce((s, tx) => s + (tx.amount || 0), 0);
-      const savings = txs.filter(tx => !tx.is_deleted && tx.type === 'savings').reduce((s, tx) => s + (tx.amount || 0), 0);
-      const newBalance = income - expense - savings;
-      await base44.entities.Account.update(acc.id, { balance: newBalance });
+      // Use shared utility — respects initial_balance and excludes recurring templates.
+      const newBalance = await recalculateAccountBalance(acc.id);
       setAccounts(prev => prev.map(a => a.id === acc.id ? { ...a, balance: newBalance } : a));
       toast.success(`Saldo ${acc.name} disinkronkan: ${formatRupiah(newBalance)}`);
     } catch {
@@ -318,8 +315,13 @@ export default function Accounts() {
   }
 
   async function setDefault(acc) {
-    await Promise.all(accounts.map(a => base44.entities.Account.update(a.id, { is_default: a.id === acc.id })));
-    setAccounts(prev => prev.map(a => ({ ...a, is_default: a.id === acc.id })));
+    try {
+      await Promise.all(accounts.map(a => base44.entities.Account.update(a.id, { is_default: a.id === acc.id })));
+      setAccounts(prev => prev.map(a => ({ ...a, is_default: a.id === acc.id })));
+      toast.success(`"${acc.name}" diset sebagai rekening utama`);
+    } catch {
+      toast.error("Gagal mengubah rekening utama.");
+    }
   }
 
   const totalBalance = accounts.reduce((sum, a) => sum + (a.balance || 0), 0);
