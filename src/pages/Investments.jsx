@@ -62,13 +62,13 @@ export default function InvestmentsPage() {
   async function confirmDelete(id) {
     const inv = investments.find(i => i.id === id);
     if (!inv) { setDeleteConfirm(null); return; }
-    // Reverse account balance for all linked investment transactions
+    // Reverse account balance for all linked investment transactions in parallel
     const invTxs = transactions.filter(tx => tx.investment_id === id);
     if (inv.account_id) {
-      for (const tx of invTxs) {
+      await Promise.all(invTxs.map(tx => {
         const txType = tx.type === "buy" ? "expense" : "income";
-        await syncAccountBalance(inv.account_id, tx.total_amount || 0, txType, -1).catch(() => {});
-      }
+        return syncAccountBalance(inv.account_id, tx.total_amount || 0, txType, -1).catch(() => {});
+      }));
     }
     // Delete all linked investment transactions, then the investment itself
     await Promise.all(invTxs.map(tx => base44.entities.InvestmentTransaction.delete(tx.id).catch(() => {})));

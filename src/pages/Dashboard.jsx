@@ -280,6 +280,8 @@ export default function Dashboard() {
               setShowAddTransaction(false);
               setLastTxAddedAt(Date.now());
               gamification.onNewTransaction();
+              // Notify other listeners (challenges, recurring, etc.) consistently with Layout's modal
+              window.dispatchEvent(new CustomEvent("transaction-added"));
               await loadData();
             }}
           />

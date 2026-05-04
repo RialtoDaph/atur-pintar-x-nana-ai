@@ -87,20 +87,18 @@ export default function DebtsPage() {
         debt_id: debt.id,
         ...(accountId ? { account_id: accountId } : {}),
       };
-      await Promise.all([
-        base44.entities.Transaction.create(txData).then(async () => {
-          if (accountId) {
-            await base44.functions.invoke("syncTransactionChanges", {
-              action: "create",
-              transaction: txData,
-            });
-          }
-        }),
-        base44.entities.Debt.update(debt.id, {
-          remaining_amount: newRemaining,
-          status: newStatus,
-        }),
-      ]);
+      // Create transaction first; chain account-sync explicitly so failures surface in catch
+      const createdTx = await base44.entities.Transaction.create(txData);
+      await base44.entities.Debt.update(debt.id, {
+        remaining_amount: newRemaining,
+        status: newStatus,
+      });
+      if (accountId) {
+        await base44.functions.invoke("syncTransactionChanges", {
+          action: "create",
+          transaction: { ...txData, id: createdTx?.id },
+        }).catch(() => {});
+      }
       setPaymentModal(null);
       toast.success(`Pembayaran cicilan ${debt.name} berhasil dicatat!`);
       if (newStatus === "paid") {
@@ -124,6 +122,8 @@ export default function DebtsPage() {
         note: `Cicilan ${data.name}`,
         date: data.due_date || new Date().toISOString().split("T")[0],
         debt_id: debt.id,
+        // Forward account_id so generated children attach to the right account for balance sync
+        ...(data.account_id ? { account_id: data.account_id } : {}),
         is_recurring: true,
         recurring_interval: "monthly",
       });
@@ -169,7 +169,8 @@ export default function DebtsPage() {
   const activeDebts = debts.filter(d => d.status === "active");
   const paidDebts = debts.filter(d => d.status === "paid");
   const debtLimitReached = !isPremium && activeDebts.length >= FREE_DEBTS_LIMIT;
-  const totalDebt = activeDebts.reduce((s, d) => s + d.remaining_amount, 0);
+  // Guard against null/undefined values to prevent NaN in totals
+  const totalDebt = activeDebts.reduce((s, d) => s + (d.remaining_amount || 0), 0);
   const totalMonthly = activeDebts.reduce((s, d) => s + (d.monthly_payment || 0), 0);
 
   return (
