@@ -498,8 +498,8 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
               </div>
             </div>
             <div className="mb-4">
-              <p className="text-[11px] text-[#8FA4C8] mb-1.5">Tulis nama tempat/merchant</p>
-              <input type="text" placeholder="Gojek, Shopee, McD, Mall, PIK ..." value={note} onChange={e => handleNoteChange(e.target.value)}
+              <p className="text-[11px] text-[#8FA4C8] mb-1.5">catatan</p>
+              <input type="text" placeholder="opsional..." value={note} onChange={e => handleNoteChange(e.target.value)}
                 className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-2 bg-[#F8FAFC]" />
             </div>
 
