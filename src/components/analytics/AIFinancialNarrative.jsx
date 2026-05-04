@@ -26,7 +26,7 @@ function DeltaTag({ current, prev, higherIsBetter = true }) {
   );
 }
 
-export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [], hasPrevData, prevIncome, prevExpenses, prevSavingsRate }) {
+export default function AIFinancialNarrative({ trendData, pieData, totalIncome, totalExpenses, savingsRate, periodLabel, periodSubtitle, goals = [], hasPrevData, prevIncome, prevExpenses, prevSavingsRate, budgets = [], transactions = [] }) {
   const { formatCurrency, formatShortNumber } = useAppSettings();
   const [narrative, setNarrative] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -123,15 +123,23 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                 <div className="flex bg-[#F2F4F7] rounded-xl p-1 w-fit">
                   <button
                     onClick={() => setActiveChart("line")}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       activeChart === "line" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
                     }`}
                   >
                     📈 Tren
                   </button>
                   <button
+                    onClick={() => setActiveChart("budget")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeChart === "budget" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
+                    }`}
+                  >
+                    💸 Budget
+                  </button>
+                  <button
                     onClick={() => setActiveChart("goals")}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       activeChart === "goals" ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#8FA4C8]"
                     }`}
                   >
@@ -157,6 +165,48 @@ Tone: hangat, supportif, tidak menghakimi. Maksimal 200 kata total. Gunakan angk
                     </LineChart>
                   </ResponsiveContainer>
                 )}
+
+                {activeChart === "budget" && (() => {
+                  const MONTHS_ID = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+                  const now = new Date();
+                  const budgetData = [];
+                  for (let i = 5; i >= 0; i--) {
+                    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                    const totalBudget = budgets.filter(b => b.month === monthKey).reduce((s, b) => s + (b.amount || 0), 0);
+                    const totalActual = transactions.filter(t => {
+                      if (t.type !== "expense") return false;
+                      const td = new Date(t.date);
+                      return td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear();
+                    }).reduce((s, t) => s + (t.amount || 0), 0);
+                    budgetData.push({ name: MONTHS_ID[d.getMonth()], Budget: totalBudget, Aktual: totalActual });
+                  }
+                  const hasAnyBudget = budgetData.some(d => d.Budget > 0);
+                  if (!hasAnyBudget) {
+                    return (
+                      <div className="flex flex-col items-center justify-center h-40 text-center">
+                        <span className="text-3xl mb-2">💸</span>
+                        <p className="text-xs text-[#8FA4C8] mb-3">Belum ada budget yang dibuat.</p>
+                        <Link to={createPageUrl("Budget")} className="px-3 py-1.5 bg-[#FF6A00] text-white text-xs font-semibold rounded-lg">Buat Budget</Link>
+                      </div>
+                    );
+                  }
+                  return (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart data={budgetData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#F2F4F7" />
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#8FA4C8" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 10, fill: "#8FA4C8" }} axisLine={false} tickLine={false} tickFormatter={v => formatShortNumber(v)} />
+                        <Tooltip
+                          formatter={(v) => [formatCurrency(v), undefined]}
+                          contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", fontSize: 12 }}
+                        />
+                        <Line type="monotone" dataKey="Budget" stroke="#4F7CFF" strokeWidth={2.5} dot={{ r: 4, fill: "#4F7CFF" }} name="Budget" />
+                        <Line type="monotone" dataKey="Aktual" stroke="#FF6B6B" strokeWidth={2.5} dot={{ r: 4, fill: "#FF6B6B" }} name="Aktual" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  );
+                })()}
 
                 {activeChart === "goals" && (
                   <div>

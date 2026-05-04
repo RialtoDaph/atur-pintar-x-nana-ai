@@ -389,6 +389,8 @@ export default function Analytics() {
           prevIncome={prevIncome}
           prevExpenses={prevExpenses}
           prevSavingsRate={prevSavingsRate}
+          budgets={budgets}
+          transactions={transactions}
         />
 
         {/* Net Worth Card */}
@@ -437,20 +439,6 @@ export default function Analytics() {
               <CategoryBreakdownChart transactions={filteredTxForPeriod} loading={loading} periodSubtitle={periodSubtitle} />
             </PremiumBlurCard>
           )
-        )}
-
-        {/* Budget vs Aktual */}
-        {isPremium ? (
-          <BudgetActualWidget
-            budgets={budgets}
-            transactions={transactions}
-            allCategoriesConfig={allCategoriesConfig}
-            periodSubtitle={periodSubtitle}
-          />
-        ) : (
-          <PremiumBlurCard title="💸 Budget vs Aktual">
-            <BudgetActualWidget budgets={budgets} transactions={transactions} allCategoriesConfig={allCategoriesConfig} periodSubtitle={periodSubtitle} />
-          </PremiumBlurCard>
         )}
 
       </div>
