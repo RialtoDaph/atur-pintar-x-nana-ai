@@ -344,7 +344,8 @@ function LayoutInner({ children, currentPageName }) {
         </AnimatePresence>
       </div>
 
-      {/* Mobile bottom nav — hidden on sm+ (tablet/desktop uses sidebar) */}
+      {/* Mobile bottom nav — hidden on sm+ (tablet/desktop uses sidebar), and hidden on Nana page */}
+      {currentPageName !== "Nana" && (
       <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
         {mobileMainNav.map((item, idx) => {
           const active = currentPageName === item.page;
@@ -370,9 +371,10 @@ function LayoutInner({ children, currentPageName }) {
 
         })}
       </div>
+      )}
 
       {/* Mobile FAB - center-bottom, toggles Plus↔X (X when modal open) */}
-      {!isNestedPage &&
+      {!isNestedPage && currentPageName !== "Nana" &&
       <button
         onClick={() => setShowAddTransaction(v => !v)}
         data-tour="add-transaction-btn"
