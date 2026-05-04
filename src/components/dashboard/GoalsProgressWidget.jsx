@@ -1,8 +1,11 @@
 import { Target, ChevronRight, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function GoalsProgressWidget({ goals = [], loading = false }) {
+  const { formatCurrency } = useAppSettings();
+
   if (loading) {
     return <div className="bg-white rounded-2xl shadow-sm h-24 animate-pulse" />;
   }
@@ -19,7 +22,11 @@ export default function GoalsProgressWidget({ goals = [], loading = false }) {
   const totalSaved = activeGoals.reduce((s, g) => s + (g.current_amount || 0), 0);
   const overallPercent = totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0;
 
-  const topGoals = activeGoals.slice(0, 3);
+  // Each goal row is ~64px (h-16). Show 3 rows + small peek for scroll affordance.
+  const ROW_HEIGHT = 64;
+  const VISIBLE_ROWS = 3;
+  const showScroll = activeGoals.length > VISIBLE_ROWS;
+  const maxHeight = showScroll ? `${ROW_HEIGHT * VISIBLE_ROWS + 8}px` : undefined;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -49,16 +56,19 @@ export default function GoalsProgressWidget({ goals = [], loading = false }) {
           </div>
         </Link>
       ) : (
-        <div className="px-4 pb-4">
+        <div
+          className="px-4 pb-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          style={{ maxHeight }}
+        >
           <div className="space-y-2">
-            {topGoals.map(g => {
+            {activeGoals.map(g => {
               const completed = g.percent >= 100;
               const barColor = completed ? "#00C9A7" : g.percent >= 60 ? "#F5A623" : "#FF6A00";
               return (
                 <Link
                   key={g.id}
                   to={createPageUrl("Goals")}
-                  className="flex items-center gap-3 py-1.5 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] rounded-xl transition-colors -mx-2 px-2"
+                  className="flex items-center gap-3 py-2 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] rounded-xl transition-colors -mx-2 px-2"
                 >
                   <div className="w-9 h-9 rounded-xl bg-[#F2F4F7] flex items-center justify-center text-base flex-shrink-0">
                     {g.icon || "🎯"}
@@ -76,11 +86,21 @@ export default function GoalsProgressWidget({ goals = [], loading = false }) {
                         style={{ width: `${Math.min(g.percent, 100)}%`, backgroundColor: barColor }}
                       />
                     </div>
+                    <p className="text-[10px] text-[#8FA4C8] mt-1 truncate">
+                      {formatCurrency(g.current_amount || 0)} / {formatCurrency(g.target_amount || 0)}
+                    </p>
                   </div>
                 </Link>
               );
             })}
           </div>
+        </div>
+      )}
+
+      {activeGoals.length > 0 && (
+        <div className="px-4 py-3 border-t border-[#F2F4F7] flex items-center justify-between text-[11px]">
+          <span className="text-[#8FA4C8]">Total Terkumpul</span>
+          <span className="font-bold text-[#1A1A1A]">{formatCurrency(totalSaved)} / {formatCurrency(totalTarget)}</span>
         </div>
       )}
     </div>
