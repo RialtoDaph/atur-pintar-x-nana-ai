@@ -514,7 +514,7 @@ function NanaInner() {
                 {!isPremium && (
                   <p className="text-[10px] text-[#8FA4C8] text-center mb-2">{msgCount}/{FREE_MSG_LIMIT} pesan bulan ini</p>
                 )}
-                <NanaQuickActions onSelect={sendMessage} disabled={sending} contextSnapshot={financialContext} />
+                <NanaQuickActions onSelect={(text) => setInput(text)} disabled={sending} contextSnapshot={financialContext} />
                 <div className="bg-white dark:bg-[#1A1E25] rounded-2xl border border-[#E2E8F0] dark:border-[#2D2D2D] shadow-sm overflow-hidden">
                   <textarea
                     className="w-full text-sm text-[#1A1A1A] dark:text-white resize-none outline-none bg-transparent placeholder:text-[#C0C9D8] dark:placeholder:text-[#8FA4C8] px-4 pt-3 pb-2 leading-relaxed min-h-[52px] max-h-32"
