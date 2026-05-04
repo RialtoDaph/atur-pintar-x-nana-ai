@@ -19,6 +19,7 @@ import MonthEndForecastCard from "@/components/analytics/MonthEndForecastCard";
 import SpendingHeatmapCard from "@/components/analytics/SpendingHeatmapCard";
 import SpendingPatternCard from "@/components/analytics/SpendingPatternCard";
 import BehaviorInsightsCard from "@/components/analytics/BehaviorInsightsCard";
+import SectionHeader from "@/components/analytics/SectionHeader";
 import { Flame } from "lucide-react";
 
 const DEFAULT_ANALYTICS_CARDS = [
@@ -379,12 +380,37 @@ export default function Analytics() {
         {/* Financial Score Card — paling atas */}
         <FinancialScoreCard user={user} />
 
-        {/* Forecast Akhir Bulan */}
+        {/* ━━━━━━━━━━ 🧠 KEBIASAANMU ━━━━━━━━━━ */}
+        <SectionHeader
+          emoji="🧠"
+          title="Kebiasaanmu"
+          subtitle="Pola & perilaku finansialmu"
+        />
+
+        {/* Behavior Insights — Top Merchant + 50/30/20 + No-Spend Days */}
         {isPremium ? (
-          <MonthEndForecastCard transactions={transactions} budgets={budgets} />
+          <BehaviorInsightsCard
+            transactions={transactions}
+            filterPeriod={filterPeriod}
+            customDateRange={customDateRange}
+            allCategoriesConfig={allCategoriesConfig}
+          />
         ) : (
-          <PremiumBlurCard title="🔮 Proyeksi Akhir Bulan">
-            <MonthEndForecastCard transactions={transactions} budgets={budgets} />
+          <PremiumBlurCard title="🧠 Behavior Insights">
+            <BehaviorInsightsCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} allCategoriesConfig={allCategoriesConfig} />
+          </PremiumBlurCard>
+        )}
+
+        {/* Pola Hari & Jam */}
+        {isPremium ? (
+          <SpendingPatternCard
+            transactions={transactions}
+            filterPeriod={filterPeriod}
+            customDateRange={customDateRange}
+          />
+        ) : (
+          <PremiumBlurCard title="📊 Pola Hari & Jam">
+            <SpendingPatternCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
           </PremiumBlurCard>
         )}
 
@@ -394,6 +420,22 @@ export default function Analytics() {
         ) : (
           <PremiumBlurCard title="🔥 Heatmap Pengeluaran">
             <SpendingHeatmapCard transactions={transactions} />
+          </PremiumBlurCard>
+        )}
+
+        {/* ━━━━━━━━━━ 📈 RINGKASAN UANG ━━━━━━━━━━ */}
+        <SectionHeader
+          emoji="📈"
+          title="Ringkasan Uang"
+          subtitle="Arus masuk, keluar, & proyeksi"
+        />
+
+        {/* Forecast Akhir Bulan */}
+        {isPremium ? (
+          <MonthEndForecastCard transactions={transactions} budgets={budgets} />
+        ) : (
+          <PremiumBlurCard title="🔮 Proyeksi Akhir Bulan">
+            <MonthEndForecastCard transactions={transactions} budgets={budgets} />
           </PremiumBlurCard>
         )}
 
@@ -415,23 +457,6 @@ export default function Analytics() {
           transactions={transactions}
         />
 
-        {/* Net Worth Card */}
-        {isCardVisible("net_worth") && (
-          isPremium ? (
-            <NetWorthCard
-              goals={goals}
-              investments={investments}
-              debts={debts}
-              transactions={transactions}
-              periodSubtitle={periodSubtitle}
-            />
-          ) : (
-            <PremiumBlurCard title="📊 Kekayaan Bersih (Net Worth)">
-              <NetWorthCard goals={goals} investments={investments} debts={debts} transactions={transactions} periodSubtitle={periodSubtitle} />
-            </PremiumBlurCard>
-          )
-        )}
-
         {/* Daily Spending Card */}
         {isCardVisible("daily_spending") && (
           isPremium ? (
@@ -448,31 +473,28 @@ export default function Analytics() {
           )
         )}
 
-        {/* Pola Hari & Jam */}
-        {isPremium ? (
-          <SpendingPatternCard
-            transactions={transactions}
-            filterPeriod={filterPeriod}
-            customDateRange={customDateRange}
-          />
-        ) : (
-          <PremiumBlurCard title="📊 Pola Hari & Jam">
-            <SpendingPatternCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
-          </PremiumBlurCard>
-        )}
+        {/* ━━━━━━━━━━ 💰 KEKAYAAN ━━━━━━━━━━ */}
+        <SectionHeader
+          emoji="💰"
+          title="Kekayaan"
+          subtitle="Aset, kategori, & posisi finansial"
+        />
 
-        {/* Behavior Insights — Top Merchant + 50/30/20 + No-Spend Days */}
-        {isPremium ? (
-          <BehaviorInsightsCard
-            transactions={transactions}
-            filterPeriod={filterPeriod}
-            customDateRange={customDateRange}
-            allCategoriesConfig={allCategoriesConfig}
-          />
-        ) : (
-          <PremiumBlurCard title="🧠 Behavior Insights">
-            <BehaviorInsightsCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} allCategoriesConfig={allCategoriesConfig} />
-          </PremiumBlurCard>
+        {/* Net Worth Card */}
+        {isCardVisible("net_worth") && (
+          isPremium ? (
+            <NetWorthCard
+              goals={goals}
+              investments={investments}
+              debts={debts}
+              transactions={transactions}
+              periodSubtitle={periodSubtitle}
+            />
+          ) : (
+            <PremiumBlurCard title="📊 Kekayaan Bersih (Net Worth)">
+              <NetWorthCard goals={goals} investments={investments} debts={debts} transactions={transactions} periodSubtitle={periodSubtitle} />
+            </PremiumBlurCard>
+          )
         )}
 
         {/* Category Breakdown (Expense + Income tabs) */}
