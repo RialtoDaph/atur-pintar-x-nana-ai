@@ -1,11 +1,8 @@
 import { Target, ChevronRight, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function GoalsProgressWidget({ goals = [], loading = false }) {
-  const { formatCurrency } = useAppSettings();
-
   if (loading) {
     return <div className="bg-white rounded-2xl shadow-sm h-24 animate-pulse" />;
   }
@@ -21,12 +18,6 @@ export default function GoalsProgressWidget({ goals = [], loading = false }) {
   const totalTarget = activeGoals.reduce((s, g) => s + (g.target_amount || 0), 0);
   const totalSaved = activeGoals.reduce((s, g) => s + (g.current_amount || 0), 0);
   const overallPercent = totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0;
-
-  // Each goal row is ~64px (h-16). Show 3 rows + small peek for scroll affordance.
-  const ROW_HEIGHT = 64;
-  const VISIBLE_ROWS = 3;
-  const showScroll = activeGoals.length > VISIBLE_ROWS;
-  const maxHeight = showScroll ? `${ROW_HEIGHT * VISIBLE_ROWS + 8}px` : undefined;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -56,11 +47,8 @@ export default function GoalsProgressWidget({ goals = [], loading = false }) {
           </div>
         </Link>
       ) : (
-        <div
-          className="px-4 pb-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-          style={{ maxHeight }}
-        >
-          <div className="space-y-2">
+        <div className="px-4 pb-4 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex gap-2 w-max">
             {activeGoals.map(g => {
               const completed = g.percent >= 100;
               const barColor = completed ? "#00C9A7" : g.percent >= 60 ? "#F5A623" : "#FF6A00";
@@ -68,39 +56,27 @@ export default function GoalsProgressWidget({ goals = [], loading = false }) {
                 <Link
                   key={g.id}
                   to={createPageUrl("Goals")}
-                  className="flex items-center gap-3 py-2 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] rounded-xl transition-colors -mx-2 px-2"
+                  title={g.name}
+                  className="flex flex-col gap-1.5 px-3 py-2 bg-[#F8FAFC] hover:bg-[#F2F4F7] active:bg-[#E8ECF1] rounded-xl transition-colors flex-shrink-0"
+                  style={{ width: 140 }}
                 >
-                  <div className="w-9 h-9 rounded-xl bg-[#F2F4F7] flex items-center justify-center text-base flex-shrink-0">
-                    {g.icon || "🎯"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <p className="text-xs font-semibold text-[#1A1A1A] truncate">{g.name}</p>
-                      <p className="text-[10px] font-bold flex-shrink-0" style={{ color: barColor }}>
-                        {Math.round(g.percent)}%
-                      </p>
-                    </div>
-                    <div className="h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{ width: `${Math.min(g.percent, 100)}%`, backgroundColor: barColor }}
-                      />
-                    </div>
-                    <p className="text-[10px] text-[#8FA4C8] mt-1 truncate">
-                      {formatCurrency(g.current_amount || 0)} / {formatCurrency(g.target_amount || 0)}
+                  <div className="flex items-center gap-2">
+                    <span className="text-base flex-shrink-0">{g.icon || "🎯"}</span>
+                    <p className="text-xs font-semibold text-[#1A1A1A] truncate flex-1">{g.name}</p>
+                    <p className="text-[10px] font-bold flex-shrink-0" style={{ color: barColor }}>
+                      {Math.round(g.percent)}%
                     </p>
+                  </div>
+                  <div className="h-1 bg-white rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${Math.min(g.percent, 100)}%`, backgroundColor: barColor }}
+                    />
                   </div>
                 </Link>
               );
             })}
           </div>
-        </div>
-      )}
-
-      {activeGoals.length > 0 && (
-        <div className="px-4 py-3 border-t border-[#F2F4F7] flex items-center justify-between text-[11px]">
-          <span className="text-[#8FA4C8]">Total Terkumpul</span>
-          <span className="font-bold text-[#1A1A1A]">{formatCurrency(totalSaved)} / {formatCurrency(totalTarget)}</span>
         </div>
       )}
     </div>
