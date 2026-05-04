@@ -18,6 +18,7 @@ import BudgetActualWidget from "@/components/analytics/BudgetActualWidget";
 import MonthEndForecastCard from "@/components/analytics/MonthEndForecastCard";
 import SpendingHeatmapCard from "@/components/analytics/SpendingHeatmapCard";
 import SpendingPatternCard from "@/components/analytics/SpendingPatternCard";
+import BehaviorInsightsCard from "@/components/analytics/BehaviorInsightsCard";
 import { Flame } from "lucide-react";
 
 const DEFAULT_ANALYTICS_CARDS = [
@@ -457,6 +458,20 @@ export default function Analytics() {
         ) : (
           <PremiumBlurCard title="📊 Pola Hari & Jam">
             <SpendingPatternCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} />
+          </PremiumBlurCard>
+        )}
+
+        {/* Behavior Insights — Top Merchant + 50/30/20 + No-Spend Days */}
+        {isPremium ? (
+          <BehaviorInsightsCard
+            transactions={transactions}
+            filterPeriod={filterPeriod}
+            customDateRange={customDateRange}
+            allCategoriesConfig={allCategoriesConfig}
+          />
+        ) : (
+          <PremiumBlurCard title="🧠 Behavior Insights">
+            <BehaviorInsightsCard transactions={transactions} filterPeriod={filterPeriod} customDateRange={customDateRange} allCategoriesConfig={allCategoriesConfig} />
           </PremiumBlurCard>
         )}
 
