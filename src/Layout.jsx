@@ -342,24 +342,27 @@ function LayoutInner({ children, currentPageName }) {
 
       {/* Mobile bottom nav — hidden on sm+ (tablet/desktop uses sidebar) */}
       <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
-        {mobileMainNav.map((item) => {
+        {mobileMainNav.map((item, idx) => {
           const active = currentPageName === item.page;
           return (
-            <button
-              key={`tab-${item.page}`}
-              onClick={() => handleTabClick(item.page)}
-              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
-              active ? "text-[#F97316]" : "text-[#888]"}`}>
-              
-              {item.avatarUrl ? (
-                <div className={`w-5 h-5 rounded-full overflow-hidden flex-shrink-0 ${active ? "ring-2 ring-[#F97316]" : ""}`}>
-                  <img src={item.avatarUrl} alt={item.label} className="w-full h-full object-cover" />
-                </div>
-              ) : (
-                <item.icon className="w-5 h-5" />
-              )}
-              {item.label}
-            </button>);
+            <>
+              {idx === 2 && <div key="fab-spacer" className="w-16 flex-shrink-0" aria-hidden="true" />}
+              <button
+                key={`tab-${item.page}`}
+                onClick={() => handleTabClick(item.page)}
+                className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
+                active ? "text-[#F97316]" : "text-[#888]"}`}>
+
+                {item.avatarUrl ? (
+                  <div className={`w-5 h-5 rounded-full overflow-hidden flex-shrink-0 ${active ? "ring-2 ring-[#F97316]" : ""}`}>
+                    <img src={item.avatarUrl} alt={item.label} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <item.icon className="w-5 h-5" />
+                )}
+                {item.label}
+              </button>
+            </>);
 
         })}
       </div>
