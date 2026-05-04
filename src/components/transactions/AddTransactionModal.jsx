@@ -272,15 +272,19 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
     <>
       {/* Backdrop — translucent so FAB at z-80 stays visible above */}
       <div className="fixed inset-0 z-40 bg-black/40 sm:backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed inset-x-0 bottom-0 z-40 flex items-end sm:items-center md:items-center justify-center sm:inset-0 sm:bottom-auto sm:top-0 pointer-events-none">
+      {/* Mobile: floating popup positioned just above the FAB. Desktop: centered modal */}
+      <div
+        className="fixed z-40 pointer-events-none flex justify-center sm:inset-0 sm:items-center"
+        style={{
+          left: 0,
+          right: 0,
+          bottom: 'calc(112px + env(safe-area-inset-bottom, 0px))',
+          top: '64px'
+        }}>
         <div
-          className="bg-white rounded-t-3xl sm:rounded-3xl md:rounded-3xl w-full sm:max-w-md md:max-w-lg shadow-2xl overflow-y-auto pointer-events-auto animate-slide-up-sheet"
-          style={{ maxHeight: "75dvh" }}
+          className="bg-white rounded-3xl shadow-2xl overflow-y-auto pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md md:max-w-lg"
+          style={{ maxHeight: "100%" }}
           onClick={e => e.stopPropagation()}>
-          {/* Drag handle */}
-          <div className="sm:hidden flex justify-center pt-2.5 pb-1">
-            <div className="w-10 h-1 rounded-full bg-[#E2E8F0]" />
-          </div>
 
           {/* Type tabs */}
           <div className="grid grid-cols-2 sticky top-0 z-10 bg-white">
