@@ -8,6 +8,7 @@ import IOUSection from "@/components/splitbill/IOUSection";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import DebtNanaPanel from "@/components/debts/DebtNanaPanel";
 import DebtDetailModal from "@/components/debts/DebtDetailModal";
+import DebtCard from "@/components/debts/DebtCard";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 import { toast } from "sonner";
 
@@ -251,72 +252,18 @@ export default function DebtsPage() {
             <p className="text-[#8FA4C8] text-sm mt-1">{t('debts_empty_desc')}</p>
           </div>
         ) : activeTab === "active" ? (
-          activeDebts.map(debt => {
-            const type = DEBT_TYPES[debt.type] || DEBT_TYPES.lainnya;
-            const progress = debt.total_amount > 0 ? ((debt.total_amount - debt.remaining_amount) / debt.total_amount) * 100 : 0;
-            const monthsLeft = debt.monthly_payment > 0 ? Math.ceil(debt.remaining_amount / debt.monthly_payment) : null;
-            return (
-              <div key={debt.id} className="bg-white rounded-2xl p-5 shadow-md border border-[#F0F2F5] hover:shadow-lg transition-all duration-200">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-10 h-10 rounded-full bg-[#FF6B6B]/10 flex items-center justify-center text-xl flex-shrink-0">
-                      {debt.icon || type.emoji}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-[#1A1A1A]">{debt.name}</p>
-                      <p className="text-xs text-[#8FA4C8]">{type.label}{debt.interest_rate ? ` · ${debt.interest_rate}% p.a.` : ""}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-0.5 flex-shrink-0">
-                    <button onClick={() => setDetailDebt(debt)} className="text-[#CBD5E0] hover:text-[#8FA4C8] transition-colors p-1.5" title="Lihat Detail">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setPaymentModal(debt.id)} className="text-[#CBD5E0] hover:text-[#F97316] transition-colors p-1.5" title="Bayar cicilan">
-                      <Plus className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setEditDebt(debt)} className="text-[#CBD5E0] hover:text-[#4F7CFF] transition-colors p-1.5" title="Edit">
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setMarkPaidConfirm(debt)} className="text-[#CBD5E0] hover:text-[#00C9A7] transition-colors p-1.5" title={t('debts_mark_paid_title')}>
-                      <CheckCircle className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setDeleteConfirm(debt.id)} className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors p-1.5">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 mb-3">
-                  <div className="bg-[#F8FAFC] rounded-xl p-2.5">
-                    <p className="text-[10px] text-[#8FA4C8] mb-0.5">Total Awal</p>
-                    <p className="font-bold text-sm text-[#1A1A1A]">{formatCurrency(debt.total_amount)}</p>
-                  </div>
-                  <div className="bg-[#F8FAFC] rounded-xl p-2.5">
-                    <p className="text-[10px] text-[#8FA4C8] mb-0.5">{t('debts_remaining')}</p>
-                    <p className="font-bold text-[#FF6B6B]">{formatCurrency(debt.remaining_amount)}</p>
-                  </div>
-                  {debt.monthly_payment > 0 && (
-                    <div className="bg-[#F8FAFC] rounded-xl p-2.5">
-                      <p className="text-[10px] text-[#8FA4C8] mb-0.5">{t('debts_installment')}</p>
-                      <p className="font-bold text-[#1A1A1A]">{formatCurrency(debt.monthly_payment)}/bln</p>
-                    </div>
-                  )}
-                  {monthsLeft && (
-                    <div className="bg-[#4F7CFF]/10 rounded-xl p-2.5">
-                      <p className="text-[10px] text-[#4F7CFF] mb-0.5">Est. Lunas</p>
-                      <p className="font-bold text-[#4F7CFF]">{monthsLeft} bln lagi</p>
-                    </div>
-                  )}
-                </div>
-                <div className="w-full bg-[#F2F4F7] rounded-full h-2 mb-1">
-                  <div className="h-2 rounded-full bg-[#00C9A7] transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
-                </div>
-                <div className="flex justify-between text-xs text-[#8FA4C8]">
-                  <span>{Math.round(progress)}% terbayar</span>
-                  {debt.due_date && <span>Jatuh tempo: {new Date(debt.due_date).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}</span>}
-                </div>
-              </div>
-            );
-          })
+          activeDebts.map(debt => (
+            <DebtCard
+              key={debt.id}
+              debt={debt}
+              type={DEBT_TYPES[debt.type] || DEBT_TYPES.lainnya}
+              onPay={(id) => setPaymentModal(id)}
+              onEdit={(d) => setEditDebt(d)}
+              onMarkPaid={(d) => setMarkPaidConfirm(d)}
+              onDelete={(id) => setDeleteConfirm(id)}
+              onOpenDetail={(d) => setDetailDebt(d)}
+            />
+          ))
         ) : (
           paidDebts.length === 0 ? (
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
