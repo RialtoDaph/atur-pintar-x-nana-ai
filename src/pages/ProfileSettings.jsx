@@ -303,18 +303,18 @@ export default function ProfileSettings() {
               </div>
             )}
 
-            <div className="px-5 pb-5">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+            <div className={`px-5 ${completion < 100 ? 'pb-5' : 'py-5'}`}>
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
                   {user.photo_url
                     ? <img src={user.photo_url} alt="Foto" className="w-full h-full object-cover" />
                     : (user.display_name || user.full_name)?.[0]?.toUpperCase() || "U"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[#1A1A1A] text-lg">{user.display_name || user.full_name || t('settings_user_label')}</p>
-                  <p className="text-sm text-[#8FA4C8] mt-0.5">{user.email}</p>
-                  {user.job && <p className="text-xs text-[#8FA4C8] mt-0.5">💼 {user.job}{user.city ? ` · 📍 ${user.city}` : ""}</p>}
-                  {user.role && <p className="text-xs font-semibold text-[#FF6A00] mt-1 uppercase">{user.role}</p>}
+                  <p className="font-bold text-[#1A1A1A] text-base truncate">{user.display_name || user.full_name || t('settings_user_label')}</p>
+                  <p className="text-xs text-[#8FA4C8] mt-0.5 truncate">{user.email}</p>
+                  {user.job && <p className="text-[11px] text-[#8FA4C8] mt-0.5 truncate">💼 {user.job}{user.city ? ` · 📍 ${user.city}` : ""}</p>}
+                  {user.role && <p className="text-[10px] font-semibold text-[#FF6A00] mt-0.5 uppercase tracking-wider">{user.role}</p>}
                 </div>
                 <button onClick={() => setEditingProfile(true)}
                   className="w-9 h-9 rounded-full bg-[#F2F4F7] flex items-center justify-center hover:bg-[#E2E8F0] transition-colors flex-shrink-0">
