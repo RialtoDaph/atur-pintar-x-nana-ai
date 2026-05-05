@@ -35,13 +35,8 @@ export default function IOUSection() {
   const paid = ious.filter((i) => i.status === "paid");
   const totalUnpaid = unpaid.reduce((s, i) => s + i.amount, 0);
 
-  if (loading) {
-    return (
-      <div className="space-y-2 mt-4">
-        {[1, 2].map((i) => <div key={i} className="bg-white rounded-2xl h-20 animate-pulse" />)}
-      </div>);
-
-  }
+  if (loading) return null;
+  if (ious.length === 0) return null;
 
   return (
     <div className="mt-20">
