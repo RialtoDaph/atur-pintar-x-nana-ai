@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { useAppSettings } from "@/components/utils/useAppSettings";
-import { parseRupiah } from "@/components/utils/parseRupiah";
 import useLockBodyScroll from "@/hooks/useLockBodyScroll";
 
 const ICONS = ["💰", "🏠", "✈️", "🚗", "💍", "🎓", "🏖️", "💻", "🛍️", "🎯"];
@@ -22,7 +20,6 @@ function fmtNum(val) {
 
 export default function AddGoalModal({ onClose, onSave, goal = null }) {
   useLockBodyScroll();
-  const { t } = useAppSettings();
   const isEdit = !!goal;
 
   const [form, setForm] = useState(() => {
