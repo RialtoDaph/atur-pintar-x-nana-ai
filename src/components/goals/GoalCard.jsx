@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Pencil, Trash2, PiggyBank, Pause, Play, TrendingUp, MoreHorizontal } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 const COLORS = {
@@ -9,10 +7,8 @@ const COLORS = {
   purple: "#9B59B6", pink: "#E91E8C", teal: "#1ABC9C",
 };
 
-export default function GoalCard({ goal, onEdit, onDelete, onAddSavings, onPause, onResume, onRaiseTarget }) {
+export default function GoalCard({ goal }) {
   const { formatCurrency } = useAppSettings();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
 
   const progress = goal.target_amount > 0
     ? Math.min(((goal.current_amount || 0) / goal.target_amount) * 100, 100)
@@ -25,23 +21,6 @@ export default function GoalCard({ goal, onEdit, onDelete, onAddSavings, onPause
   const isUrgent = daysLeft !== null && daysLeft < 30 && remaining > 0;
   const isCompleted = goal.status === "completed";
   const isPaused = goal.status === "paused";
-
-  // Close menu on outside click
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [menuOpen]);
-
-  const handleAction = (e, fn) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setMenuOpen(false);
-    fn();
-  };
 
   // Border + bar color
   const borderColor = isCompleted ? "border-[#34C87A]/30" : isUrgent ? "border-orange-200" : "border-transparent";
@@ -66,94 +45,41 @@ export default function GoalCard({ goal, onEdit, onDelete, onAddSavings, onPause
   }
 
   return (
-    <div className={`bg-white rounded-2xl p-5 shadow-sm border ${borderColor} relative`}>
-      <Link to={createPageUrl(`Goals?id=${goal.id}`)} className="block">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-              style={{ backgroundColor: `${color}20` }}
-            >
-              {goal.icon || "💰"}
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <p className="font-semibold text-[#1A1A1A] truncate">{goal.name}</p>
-                {isPaused && <span className="text-[10px] bg-[#8FA4C8]/20 text-[#8FA4C8] font-bold px-2 py-0.5 rounded-full flex-shrink-0">Jeda</span>}
-              </div>
-              <p className="text-xs text-[#8FA4C8] truncate">
-                {formatCurrency(goal.current_amount || 0)} / {formatCurrency(goal.target_amount)}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className={`text-sm font-bold ${isCompleted ? "text-[#34C87A]" : isUrgent ? "text-orange-500" : "text-[#1A1A1A]"}`}>
-              {Math.round(progress)}%
-            </span>
-            <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuOpen(v => !v); }}
-              className="text-[#CBD5E0] hover:text-[#1A1A1A] transition-colors tap-highlight-fix"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        <div className="w-full bg-[#F2F4F7] rounded-full h-2.5">
+    <Link
+      to={createPageUrl(`Goals?id=${goal.id}`)}
+      className={`block bg-white rounded-2xl p-5 shadow-sm border ${borderColor} hover:shadow-md transition-shadow tap-highlight-fix`}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3 min-w-0">
           <div
-            className="h-2.5 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%`, backgroundColor: barColor }}
-          />
+            className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+            style={{ backgroundColor: `${color}20` }}
+          >
+            {goal.icon || "💰"}
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <p className="font-semibold text-[#1A1A1A] truncate">{goal.name}</p>
+              {isPaused && <span className="text-[10px] bg-[#8FA4C8]/20 text-[#8FA4C8] font-bold px-2 py-0.5 rounded-full flex-shrink-0">Jeda</span>}
+            </div>
+            <p className="text-xs text-[#8FA4C8] truncate">
+              {formatCurrency(goal.current_amount || 0)} / {formatCurrency(goal.target_amount)}
+            </p>
+          </div>
         </div>
+        <span className={`text-sm font-bold flex-shrink-0 ${isCompleted ? "text-[#34C87A]" : isUrgent ? "text-orange-500" : "text-[#1A1A1A]"}`}>
+          {Math.round(progress)}%
+        </span>
+      </div>
 
-        {statusText}
-      </Link>
-
-      {/* Action menu */}
-      {menuOpen && (
+      <div className="w-full bg-[#F2F4F7] rounded-full h-2.5">
         <div
-          ref={menuRef}
-          className="absolute top-12 right-4 bg-white rounded-xl shadow-lg border border-[#E2E8F0] py-1 z-10 min-w-[160px]"
-        >
-          {isCompleted ? (
-            <>
-              <button onClick={(e) => handleAction(e, () => onRaiseTarget(goal))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#1A1A1A] hover:bg-[#F8FAFC]">
-                <TrendingUp className="w-3.5 h-3.5" /> Naikkan Target
-              </button>
-              <button onClick={(e) => handleAction(e, () => onDelete(goal.id))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50">
-                <Trash2 className="w-3.5 h-3.5" /> Tutup Goal
-              </button>
-            </>
-          ) : isPaused ? (
-            <>
-              <button onClick={(e) => handleAction(e, () => onResume(goal))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#00C9A7] hover:bg-[#F0FDF4]">
-                <Play className="w-3.5 h-3.5" /> Lanjutkan
-              </button>
-              <button onClick={(e) => handleAction(e, () => onEdit(goal))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#1A1A1A] hover:bg-[#F8FAFC]">
-                <Pencil className="w-3.5 h-3.5" /> Edit
-              </button>
-              <button onClick={(e) => handleAction(e, () => onDelete(goal.id))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50">
-                <Trash2 className="w-3.5 h-3.5" /> Hapus
-              </button>
-            </>
-          ) : (
-            <>
-              <button onClick={(e) => handleAction(e, () => onAddSavings(goal))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#00C9A7] hover:bg-[#F0FDF4]">
-                <PiggyBank className="w-3.5 h-3.5" /> Tambah Dana
-              </button>
-              <button onClick={(e) => handleAction(e, () => onPause(goal))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#1A1A1A] hover:bg-[#F8FAFC]">
-                <Pause className="w-3.5 h-3.5" /> Jeda
-              </button>
-              <button onClick={(e) => handleAction(e, () => onEdit(goal))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#1A1A1A] hover:bg-[#F8FAFC]">
-                <Pencil className="w-3.5 h-3.5" /> Edit
-              </button>
-              <button onClick={(e) => handleAction(e, () => onDelete(goal.id))} className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50">
-                <Trash2 className="w-3.5 h-3.5" /> Hapus
-              </button>
-            </>
-          )}
-        </div>
-      )}
-    </div>
+          className="h-2.5 rounded-full transition-all duration-500"
+          style={{ width: `${progress}%`, backgroundColor: barColor }}
+        />
+      </div>
+
+      {statusText}
+    </Link>
   );
 }
