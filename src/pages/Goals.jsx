@@ -5,7 +5,7 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import AddTransactionModal from "@/components/goals/AddTransactionModal";
-import AddGoalModal from "@/components/goals/AddGoalModal";
+import AddGoalModal from "@/components/goals/AddGoalModal.jsx";
 import AddSavingsModal from "@/components/goals/AddSavingsModal";
 import GoalCard from "@/components/goals/GoalCard";
 import GoalsNanaPanel from "@/components/goals/GoalsNanaPanel";
@@ -23,8 +23,6 @@ const COLORS = {
   teal: "#1ABC9C",
 };
 
-
-
 export default function Goals() {
   const navigate = useNavigate();
   const { t, formatCurrency } = useAppSettings();
@@ -37,10 +35,11 @@ export default function Goals() {
   const [showTxModal, setShowTxModal] = useState(null);
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [txFilter, setTxFilter] = useState("all");
-  const [savingsGoal, setSavingsGoal] = useState(null); // goal to add savings to
+  const [savingsGoal, setSavingsGoal] = useState(null);
   const [raiseTargetGoal, setRaiseTargetGoal] = useState(null);
   const [deleteConfirmGoal, setDeleteConfirmGoal] = useState(null);
   const [showDetailDeleteConfirm, setShowDetailDeleteConfirm] = useState(false);
+  const [editingGoal, setEditingGoal] = useState(null);
 
   const goal = goals.find((g) => g.id === goalId) || null;
 
@@ -77,8 +76,6 @@ export default function Goals() {
   }
 
   async function handleTransaction(amount, type, note) {
-    // deposit → "savings" (move money from wallet to goal, decreases wallet balance)
-    // withdrawal → reverse savings (no Transaction record; only update goal current_amount)
     const numAmount = Number(amount);
     if (!numAmount || numAmount <= 0) return;
     const isDeposit = type === "deposit";
@@ -96,7 +93,6 @@ export default function Goals() {
 
     const previousGoals = goals;
     const optimisticTx = tx ? { ...tx, id: `temp_${Date.now()}`, created_date: new Date().toISOString() } : null;
-    // Guard: only mark as completed when target_amount > 0 (avoid 0 >= 0 false positive on uninitialized targets)
     const isCompleted = (goal.target_amount || 0) > 0 && newAmount >= goal.target_amount;
     setGoals(prev => prev.map(g => g.id === goalId ? { ...g, current_amount: newAmount, status: isCompleted ? "completed" : "active" } : g));
     if (optimisticTx) setTransactions(prev => [optimisticTx, ...prev]);
@@ -110,7 +106,6 @@ export default function Goals() {
        ];
        if (tx) ops.push(base44.entities.Transaction.create(tx));
        await Promise.all(ops);
-       // Trigger gamification (streaks/achievements/challenges) via dashboard listener
        if (tx) window.dispatchEvent(new CustomEvent("transaction-added"));
      } catch (error) {
       setGoals(previousGoals);
@@ -121,7 +116,6 @@ export default function Goals() {
 
   async function handleAddSavings(goal, { amount, accountId, date, note }) {
     const newAmount = (goal.current_amount || 0) + amount;
-    // Only auto-complete when target is set (>0); otherwise preserve existing status
     const isCompleted = (goal.target_amount || 0) > 0 && newAmount >= goal.target_amount;
     const newStatus = isCompleted ? "completed" : goal.status;
     await Promise.all([
@@ -130,7 +124,6 @@ export default function Goals() {
           type: "savings", amount, account_id: accountId,
           goal_id: goal.id, date, note: note || `Tabungan ${goal.name}`,
         });
-        // Trigger gamification via dashboard listener (processGamification handles challenges + achievements)
         window.dispatchEvent(new CustomEvent("transaction-added"));
         return tx;
       })(),
@@ -147,7 +140,6 @@ export default function Goals() {
 
   async function handleDelete() {
     if (!goalId) return;
-    // Nullify goal_id on related transactions
     const txs = await base44.entities.Transaction.filter({ goal_id: goalId });
     await Promise.all(txs.map(tx => base44.entities.Transaction.update(tx.id, { goal_id: null })));
     await base44.entities.SavingsGoal.delete(goalId);
@@ -172,8 +164,6 @@ export default function Goals() {
     loadData();
   }
 
-  const [editingGoal, setEditingGoal] = useState(null);
-
   async function handlePause(goal) {
     await base44.entities.SavingsGoal.update(goal.id, { status: "paused" });
     setGoals(prev => prev.map(g => g.id === goal.id ? { ...g, status: "paused" } : g));
@@ -188,22 +178,6 @@ export default function Goals() {
     setRaiseTargetGoal(goal);
     setEditingGoal({ ...goal, _raiseOnly: true });
     setShowAddGoal(true);
-  }
-
-  function calculateSuggestedMonthly(goal) {
-    if (!goal.deadline) return null;
-    const today = new Date();
-    const deadline = new Date(goal.deadline);
-    const remaining = Math.max(goal.target_amount - (goal.current_amount || 0), 0);
-    const months = Math.max((deadline - today) / (1000 * 60 * 60 * 24 * 30), 0.5);
-    return months > 0 ? Math.ceil(remaining / months) : remaining;
-  }
-
-  function calculateDaysRemaining(deadline) {
-    if (!deadline) return null;
-    const today = new Date();
-    const days = Math.ceil((new Date(deadline) - today) / (1000 * 60 * 60 * 24));
-    return Math.max(days, 0);
   }
 
   if (loading) {
@@ -229,7 +203,6 @@ export default function Goals() {
           <ArrowLeft className="w-4 h-4" /> {t('goals_back')}
         </Link>
 
-        {/* Goal hero */}
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#E2E8F0] mb-5">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -244,7 +217,6 @@ export default function Goals() {
             )}
           </div>
 
-          {/* Progress */}
           <div className="mb-4">
             <div className="flex justify-between text-sm mb-2">
               <span className="font-bold text-[#1A1A1A] text-2xl">
@@ -264,14 +236,12 @@ export default function Goals() {
             </div>
           </div>
 
-          {/* Deadline */}
           {goal.deadline && (
             <p className="text-xs text-[#9B9B9B] mb-4">
               🗓 {t('goals_target_label')}: {new Date(goal.deadline).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
             </p>
           )}
 
-          {/* Actions */}
           <div className="space-y-2 mt-4">
             {goal.status !== "completed" && (
               <div className="grid grid-cols-2 gap-2">
@@ -300,7 +270,6 @@ export default function Goals() {
           </div>
         </div>
 
-        {/* Transactions */}
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-semibold text-[#1A1A1A]">{t('goals_activity')}</h2>
           <button onClick={() => setShowDetailDeleteConfirm(true)} className="text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1 tap-highlight-fix">
@@ -308,7 +277,6 @@ export default function Goals() {
           </button>
         </div>
 
-        {/* Filter tabs */}
         {transactions.length > 0 && (
           <div className="flex gap-2 mb-3">
             {["all", "deposit", "withdrawal"].map((f) => (
@@ -386,131 +354,129 @@ export default function Goals() {
             </div>
           </div>
         )}
-        </div>
-        </PullToRefresh>
-        );
-        }
+      </div>
+      </PullToRefresh>
+    );
+  }
 
-        // All goals list view
-        return (
-        <PullToRefresh onRefresh={loadData}>
-    <div className="min-h-screen bg-[#F2F4F7] pb-8">
-      <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-10 pb-20">
-      <div className="max-w-2xl mx-auto">
-        {/* Row 1: Title + primary action */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[#8FA4C8] text-sm font-medium">{t('goals_plan')}</p>
-            <h1 className="text-white text-2xl font-bold mt-0.5">{t('goals_title')}</h1>
+  // All goals list view
+  return (
+    <PullToRefresh onRefresh={loadData}>
+      <div className="min-h-screen bg-[#F2F4F7] pb-8">
+        <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-10 pb-20">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[#8FA4C8] text-sm font-medium">{t('goals_plan')}</p>
+                <h1 className="text-white text-2xl font-bold mt-0.5">{t('goals_title')}</h1>
+              </div>
+              {goalsLimitReached ? (
+                <Link to="/Subscription" className="h-10 px-4 rounded-full bg-[#8FA4C8] flex items-center gap-1.5 shadow-lg hover:bg-[#7a93b5] active:scale-95 transition-all" title="Upgrade untuk goals lebih banyak">
+                  <Crown className="w-4 h-4 text-white" />
+                  <span className="text-white text-sm font-semibold">Upgrade</span>
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setShowAddGoal(true)}
+                  aria-label="Tambah tujuan baru"
+                  className="h-10 px-4 rounded-full bg-[#F97316] flex items-center shadow-lg hover:bg-[#EA580C] active:scale-95 transition-all tap-highlight-fix"
+                >
+                  <span className="text-white text-sm font-semibold">Tambah</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between bg-white/5 rounded-full px-4 py-2 border border-white/10">
+              <span className="text-[#8FA4C8] text-xs font-medium">{t('goals_total_target')}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-white text-sm font-bold">{formatCurrency(goals.reduce((s, g) => s + g.target_amount, 0))}</span>
+                <span className="text-[#8FA4C8] text-xs">· {goals.filter(g => g.status === "active").length} {t('goals_active')}</span>
+              </div>
+            </div>
           </div>
-          {goalsLimitReached ? (
-            <Link to="/Subscription" className="h-10 px-4 rounded-full bg-[#8FA4C8] flex items-center gap-1.5 shadow-lg hover:bg-[#7a93b5] active:scale-95 transition-all" title="Upgrade untuk goals lebih banyak">
-              <Crown className="w-4 h-4 text-white" />
-              <span className="text-white text-sm font-semibold">Upgrade</span>
-            </Link>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-5 -mt-14 space-y-3">
+          <GoalsNanaPanel goals={goals} />
+
+          {goalsLimitReached && (
+            <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 border border-[#FF6A00]/20">
+              <Crown className="w-5 h-5 text-[#F97316] flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-[#1A1A1A]">Batas {FREE_GOALS_LIMIT} tujuan tercapai</p>
+                <p className="text-xs text-[#8FA4C8]">Upgrade Premium untuk goals unlimited.</p>
+              </div>
+              <Link to="/Subscription" className="px-3 py-1.5 bg-[#F97316] text-white rounded-xl text-xs font-semibold hover:bg-[#EA580C] transition-colors flex-shrink-0">Upgrade</Link>
+            </div>
+          )}
+          {loading ? (
+            [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
+          ) : goals.length === 0 ? (
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm" role="status" aria-live="polite">
+              <TrendingUp className="w-12 h-12 text-[#8FA4C8] mx-auto mb-3" aria-hidden="true" />
+              <p className="text-[#4A5568] font-semibold">{t('goals_empty_title')}</p>
+              <p className="text-[#8FA4C8] text-sm mt-1 mb-4">{t('goals_empty_desc')}</p>
+              <button
+                onClick={() => setShowAddGoal(true)}
+                className="px-5 py-2.5 rounded-xl bg-[#F97316] text-white text-sm font-semibold hover:bg-[#EA580C] transition-colors focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:ring-offset-2 tap-highlight-fix"
+              >
+                + Buat Tujuan Pertama
+              </button>
+            </div>
           ) : (
-            <button
-              onClick={() => setShowAddGoal(true)}
-              aria-label="Tambah tujuan baru"
-              className="h-10 px-4 rounded-full bg-[#F97316] flex items-center shadow-lg hover:bg-[#EA580C] active:scale-95 transition-all tap-highlight-fix"
-            >
-              <span className="text-white text-sm font-semibold">Tambah</span>
-            </button>
+            goals.map((g) => (
+              <GoalCard
+                key={g.id}
+                goal={g}
+                onEdit={(goal) => { setEditingGoal(goal); setShowAddGoal(true); }}
+                onDelete={(id) => setDeleteConfirmGoal(id)}
+                onAddSavings={(goal) => setSavingsGoal(goal)}
+                onPause={handlePause}
+                onResume={handleResume}
+                onRaiseTarget={handleRaiseTarget}
+              />
+            ))
           )}
         </div>
 
-        {/* Row 2: Total target summary pill */}
-        <div className="flex items-center justify-between bg-white/5 rounded-full px-4 py-2 border border-white/10">
-          <span className="text-[#8FA4C8] text-xs font-medium">{t('goals_total_target')}</span>
-          <div className="flex items-center gap-2">
-            <span className="text-white text-sm font-bold">{formatCurrency(goals.reduce((s, g) => s + g.target_amount, 0))}</span>
-            <span className="text-[#8FA4C8] text-xs">· {goals.filter(g => g.status === "active").length} {t('goals_active')}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+        {showAddGoal && (
+         <AddGoalModal
+           goal={editingGoal || null}
+           onClose={() => { setShowAddGoal(false); setEditingGoal(null); setRaiseTargetGoal(null); }}
+           onSave={async (data) => {
+             if (raiseTargetGoal) {
+               await base44.entities.SavingsGoal.update(raiseTargetGoal.id, { target_amount: data.target_amount, status: data.current_amount < data.target_amount ? 'active' : 'completed' });
+               setRaiseTargetGoal(null);
+             } else {
+               await handleAddGoal(data);
+             }
+             setShowAddGoal(false); setEditingGoal(null);
+             loadData();
+           }}
+         />
+        )}
 
-    <div className="max-w-2xl mx-auto px-5 -mt-14 space-y-3">
-      <GoalsNanaPanel goals={goals} />
-
-      {goalsLimitReached && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 border border-[#FF6A00]/20">
-          <Crown className="w-5 h-5 text-[#F97316] flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-[#1A1A1A]">Batas {FREE_GOALS_LIMIT} tujuan tercapai</p>
-            <p className="text-xs text-[#8FA4C8]">Upgrade Premium untuk goals unlimited.</p>
-          </div>
-          <Link to="/Subscription" className="px-3 py-1.5 bg-[#F97316] text-white rounded-xl text-xs font-semibold hover:bg-[#EA580C] transition-colors flex-shrink-0">Upgrade</Link>
-        </div>
-      )}
-      {loading ? (
-        [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-24 animate-pulse" />)
-      ) : goals.length === 0 ? (
-        <div className="bg-white rounded-2xl p-8 text-center shadow-sm" role="status" aria-live="polite">
-          <TrendingUp className="w-12 h-12 text-[#8FA4C8] mx-auto mb-3" aria-hidden="true" />
-          <p className="text-[#4A5568] font-semibold">{t('goals_empty_title')}</p>
-          <p className="text-[#8FA4C8] text-sm mt-1 mb-4">{t('goals_empty_desc')}</p>
-          <button
-            onClick={() => setShowAddGoal(true)}
-            className="px-5 py-2.5 rounded-xl bg-[#F97316] text-white text-sm font-semibold hover:bg-[#EA580C] transition-colors focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:ring-offset-2 tap-highlight-fix"
-          >
-            + Buat Tujuan Pertama
-          </button>
-        </div>
-      ) : (
-        goals.map((g) => (
-          <GoalCard
-            key={g.id}
-            goal={g}
-            onEdit={(goal) => { setEditingGoal(goal); setShowAddGoal(true); }}
-            onDelete={(id) => setDeleteConfirmGoal(id)}
-            onAddSavings={(goal) => setSavingsGoal(goal)}
-            onPause={handlePause}
-            onResume={handleResume}
-            onRaiseTarget={handleRaiseTarget}
+        {savingsGoal && (
+          <AddSavingsModal
+            goal={savingsGoal}
+            onClose={() => setSavingsGoal(null)}
+            onSave={(data) => handleAddSavings(savingsGoal, data)}
           />
-        ))
-      )}
-    </div>
+        )}
 
-    {showAddGoal && (
-     <AddGoalModal
-       goal={editingGoal || null}
-       onClose={() => { setShowAddGoal(false); setEditingGoal(null); setRaiseTargetGoal(null); }}
-       onSave={async (data) => {
-         if (raiseTargetGoal) {
-           await base44.entities.SavingsGoal.update(raiseTargetGoal.id, { target_amount: data.target_amount, status: data.current_amount < data.target_amount ? 'active' : 'completed' });
-           setRaiseTargetGoal(null);
-         } else {
-           await handleAddGoal(data);
-         }
-         setShowAddGoal(false); setEditingGoal(null);
-         loadData();
-       }}
-     />
-    )}
-
-    {savingsGoal && (
-      <AddSavingsModal
-        goal={savingsGoal}
-        onClose={() => setSavingsGoal(null)}
-        onSave={(data) => handleAddSavings(savingsGoal, data)}
-      />
-    )}
-
-    {deleteConfirmGoal && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full">
-          <p className="font-bold text-[#1A1A1A] mb-2">Hapus Goal ini?</p>
-          <p className="text-sm text-[#4A5568] mb-5">Menghapus goal tidak akan menghapus transaksi tabungan yang sudah ada. Transaksi terkait akan menjadi transaksi savings tanpa goal.</p>
-          <div className="flex gap-2">
-            <button onClick={() => setDeleteConfirmGoal(null)} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#8FA4C8] hover:bg-[#F2F4F7]">Batal</button>
-            <button onClick={() => handleDeleteFromList(deleteConfirmGoal)} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600">Hapus</button>
+        {deleteConfirmGoal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full">
+              <p className="font-bold text-[#1A1A1A] mb-2">Hapus Goal ini?</p>
+              <p className="text-sm text-[#4A5568] mb-5">Menghapus goal tidak akan menghapus transaksi tabungan yang sudah ada. Transaksi terkait akan menjadi transaksi savings tanpa goal.</p>
+              <div className="flex gap-2">
+                <button onClick={() => setDeleteConfirmGoal(null)} className="flex-1 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#8FA4C8] hover:bg-[#F2F4F7]">Batal</button>
+                <button onClick={() => handleDeleteFromList(deleteConfirmGoal)} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600">Hapus</button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    )}
-    </div>
     </PullToRefresh>
-    );
-    }
+  );
+}
