@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Pencil, Trash2 } from "lucide-react";
 
 function fmt(n) {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}jt`;
@@ -14,7 +15,7 @@ function getBarColor(pct) {
   return "#22C55E";
 }
 
-export default function BudgetChartSection({ budgets, spendingByCategory, getCategoryMeta, formatCurrency }) {
+export default function BudgetChartSection({ budgets, spendingByCategory, getCategoryMeta, formatCurrency, onEdit, onDelete }) {
   const items = useMemo(() => {
     return budgets.map(b => {
       const meta = getCategoryMeta(b.category);
@@ -88,6 +89,24 @@ export default function BudgetChartSection({ budgets, spendingByCategory, getCat
                 >
                   {Math.round(item.pct)}%
                 </span>
+                {onEdit && (
+                  <button
+                    onClick={() => onEdit(item)}
+                    className="text-[#CBD5E0] hover:text-[#FF6A00] transition-colors p-0.5"
+                    aria-label="Edit budget"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={() => onDelete(item.id)}
+                    className="text-[#CBD5E0] hover:text-[#FF6B6B] transition-colors p-0.5"
+                    aria-label="Hapus budget"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
             <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden">

@@ -343,6 +343,8 @@ export default function BudgetPage() {
             spendingByCategory={spendingByCategory}
             getCategoryMeta={getCategoryMeta}
             formatCurrency={formatCurrency}
+            onEdit={openEdit}
+            onDelete={handleDelete}
           />
         )}
 
@@ -368,18 +370,7 @@ export default function BudgetPage() {
               <Plus className="w-4 h-4" /> Buat Budget Pertama
             </button>
           </div>
-        ) : (
-          budgets.map(budget => (
-            <BudgetCard
-              key={budget.id}
-              budget={budget}
-              categoryMeta={getCategoryMeta(budget.category)}
-              spent={spendingByCategory[budget.category] || 0}
-              onEdit={openEdit}
-              onDelete={handleDelete}
-            />
-          ))
-        )}
+        ) : null}
       </div>
 
       {/* Modal */}
