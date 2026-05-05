@@ -53,8 +53,19 @@ export default function AddInvestmentModal({ onClose, onSave }) {
   const labelCls = "text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto overscroll-contain">
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-[90] bg-black/40 sm:backdrop-blur-sm" onClick={onClose} />
+      {/* Floating popup — same pattern as AddTransactionModal */}
+      <div
+        className="fixed z-[100] pointer-events-none flex justify-center sm:inset-0 sm:items-center"
+        style={{
+          left: 0,
+          right: 0,
+          bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+          top: '64px'
+        }}>
+        <div role="dialog" aria-modal="true" className="bg-white rounded-3xl shadow-2xl p-6 overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-[#1A1A1A]">
             {lang === "en" ? "Add Investment" : "Tambah Investasi"}
@@ -161,7 +172,8 @@ export default function AddInvestmentModal({ onClose, onSave }) {
         >
           {saving ? "Menyimpan..." : (lang === "en" ? "Add Investment" : "Tambah Investasi")}
         </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

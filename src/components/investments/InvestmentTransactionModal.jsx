@@ -34,8 +34,19 @@ export default function InvestmentTransactionModal({ investment, type, onClose, 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl p-6 max-h-[90vh] overflow-y-auto overscroll-contain">
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-[90] bg-black/50 sm:backdrop-blur-sm" onClick={onClose} />
+      {/* Floating popup — same pattern as AddTransactionModal */}
+      <div
+        className="fixed z-[100] pointer-events-none flex justify-center sm:inset-0 sm:items-center"
+        style={{
+          left: 0,
+          right: 0,
+          bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+          top: '64px'
+        }}>
+        <div role="dialog" aria-modal="true" className="bg-white rounded-3xl shadow-2xl p-6 overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
@@ -95,7 +106,8 @@ export default function InvestmentTransactionModal({ investment, type, onClose, 
         >
           {saving ? "Menyimpan..." : `${label} ${amountDisplay ? "Rp " + amountDisplay : ""}`}
         </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
