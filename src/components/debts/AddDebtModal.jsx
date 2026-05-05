@@ -75,8 +75,8 @@ export default function AddDebtModal({ onClose, onSave, debt }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-        <div role="dialog" aria-modal="true" className="bg-white my-6 p-6 rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto overscroll-contain">
+      <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm sm:p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+        <div role="dialog" aria-modal="true" className="bg-white p-6 rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl max-h-[88vh] sm:max-h-[90vh] overflow-y-auto overscroll-contain animate-slide-up-sheet" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-[#1A1A1A]">{isEdit ? "Edit Utang/Kredit" : "Tambah Utang/Kredit"}</h2>
             <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A] tap-highlight-fix"><X className="w-5 h-5" /></button>

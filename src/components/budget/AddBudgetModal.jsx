@@ -76,8 +76,8 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
   "";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" className="bg-white my-20 p-6 rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto overscroll-contain">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm sm:p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div role="dialog" aria-modal="true" className="bg-white p-6 rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl max-h-[88vh] sm:max-h-[90vh] overflow-y-auto overscroll-contain" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-[#1A1A1A]">
             {isEditing ? t("budget_edit_title") : t("budget_add_title")}

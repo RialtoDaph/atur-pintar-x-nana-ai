@@ -67,7 +67,7 @@ export default function AddGoalModal({ goal, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50">
       <div className="bg-white w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl max-h-[92vh] flex flex-col animate-slide-up-sheet">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-[#F2F4F7]">
