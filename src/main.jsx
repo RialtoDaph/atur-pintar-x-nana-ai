@@ -1,3 +1,4 @@
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ErrorBoundary from '@/components/utils/ErrorBoundary'
 import App from '@/App.jsx'
