@@ -120,7 +120,7 @@ function AccountModal({ account, defaultType, onClose, onSave }) {
 function calcCompletion(user) {
   if (!user) return 0;
   const fields = [
-    !!user.full_name,
+    !!(user.display_name || user.full_name),
     !!user.photo_url,
     !!user.whatsapp,
     !!user.date_of_birth,
