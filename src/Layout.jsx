@@ -4,7 +4,7 @@ import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCa
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
 import AdminNotificationPanel from "@/components/notifications/AdminNotificationPanel";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
 import ReminderNotificationPopup from "@/components/reminders/ReminderNotificationPopup";
@@ -351,10 +351,9 @@ function LayoutInner({ children, currentPageName }) {
         {mobileMainNav.map((item, idx) => {
           const active = currentPageName === item.page;
           return (
-            <>
-              {idx === 2 && <div key="fab-spacer" className="w-16 flex-shrink-0" aria-hidden="true" />}
+            <React.Fragment key={`nav-${item.page}`}>
+              {idx === 2 && <div className="w-16 flex-shrink-0" aria-hidden="true" />}
               <button
-                key={`tab-${item.page}`}
                 onClick={() => handleTabClick(item.page)}
                 className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
                 active ? "text-[#F97316]" : "text-[#888]"}`}>
@@ -368,7 +367,7 @@ function LayoutInner({ children, currentPageName }) {
                 )}
                 {item.label}
               </button>
-            </>);
+            </React.Fragment>);
 
         })}
       </div>
