@@ -236,7 +236,7 @@ export default function BudgetPage() {
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
       {/* Header */}
-      <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+      <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
         <div className="max-w-2xl mx-auto">
           {/* Row 1: Title + primary action */}
           <div className="flex items-center justify-between mb-4">
@@ -288,7 +288,7 @@ export default function BudgetPage() {
       </div>
 
       {/* Budget list */}
-      <div className="max-w-2xl mx-auto px-5 mt-4 space-y-3">
+      <div className="max-w-2xl mx-auto px-5 -mt-14 space-y-3">
         {/* Nana AI Savings Recommendation */}
         {budgetLimitReached && (
           <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 border border-[#FF6A00]/20">
