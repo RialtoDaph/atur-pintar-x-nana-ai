@@ -5,6 +5,35 @@
     "display_name": {
       "type": "string",
       "description": "Nama tampilan yang bisa diubah user (terpisah dari full_name dari akun login)"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "URL foto profil user"
+    },
+    "whatsapp": {
+      "type": "string",
+      "description": "Nomor WhatsApp user"
+    },
+    "city": {
+      "type": "string",
+      "description": "Kota domisili"
+    },
+    "job": {
+      "type": "string",
+      "description": "Pekerjaan user"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal lahir user"
+    },
+    "monthly_salary": {
+      "type": "number",
+      "description": "Pendapatan bulanan dalam IDR"
+    },
+    "motivation": {
+      "type": "string",
+      "description": "Motivasi finansial user"
     }
   }
 }
