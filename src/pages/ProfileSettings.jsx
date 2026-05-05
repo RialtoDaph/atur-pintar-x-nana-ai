@@ -281,10 +281,27 @@ export default function ProfileSettings() {
 
       <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
 
-        {/* ── Profile + Completion Card (merged) ────────────── */}
+        {/* ── Profile + Completion Card (merged, completion on top) ── */}
         {user && !editingProfile && (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="p-5">
+            {/* Simple completion bar on top */}
+            <div className="px-5 pt-4 pb-3">
+              <div className="flex items-center gap-2">
+                <p className="text-[11px] font-medium text-[#8FA4C8]">Kelengkapan Profil</p>
+                <div className="flex-1 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${completion}%`,
+                      background: completion === 100 ? "#22C55E" : completion >= 60 ? "#F97316" : "#FBBF24"
+                    }}
+                  />
+                </div>
+                <p className="text-[11px] font-bold text-[#FF6A00]">{completion}%</p>
+              </div>
+            </div>
+
+            <div className="px-5 pb-5">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
                   {user.photo_url
@@ -303,28 +320,6 @@ export default function ProfileSettings() {
                   <Pencil className="w-4 h-4 text-[#8FA4C8]" />
                 </button>
               </div>
-            </div>
-
-            {/* Divider + Completion bar */}
-            <div className="px-5 py-4 border-t border-[#F2F4F7] bg-[#FAFBFC]">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold text-[#1A1A1A]">Kelengkapan Profil</p>
-                <p className="text-xs font-bold text-[#FF6A00]">{completion}%</p>
-              </div>
-              <div className="w-full h-2 bg-[#F2F4F7] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${completion}%`,
-                    background: completion === 100 ? "#22C55E" : completion >= 60 ? "#F97316" : "#FBBF24"
-                  }}
-                />
-              </div>
-              {completion < 100 && (
-                <p className="text-[10px] text-[#8FA4C8] mt-1.5">
-                  {completion < 50 ? "Lengkapi profil untuk pengalaman lebih personal 👆" : "Hampir lengkap! Isi sisa info profil kamu ✨"}
-                </p>
-              )}
             </div>
           </div>
         )}
