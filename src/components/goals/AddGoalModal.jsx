@@ -76,7 +76,7 @@ export default function AddGoalModal({ goal, onClose, onSave }) {
         style={{
           left: 0,
           right: 0,
-          bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+          bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
           top: '64px'
         }}>
         <div
