@@ -199,16 +199,15 @@ export default function DebtsPage() {
             )}
           </div>
 
-          {/* Row 2: Stats pill */}
-          <div className="flex items-center justify-between bg-white/5 rounded-full px-4 py-2 border border-white/10">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-[#8FA4C8] text-xs font-medium">{t('debts_total')}</span>
-              <span className="text-white text-sm font-bold truncate">{formatCurrency(totalDebt)}</span>
+          {/* Row 2: Stats */}
+          <div className="grid grid-cols-2 gap-2 bg-white/5 rounded-2xl p-3 border border-white/10">
+            <div className="min-w-0">
+              <p className="text-[#8FA4C8] text-[11px] font-medium mb-0.5">{t('debts_total')}</p>
+              <p className="text-white text-base font-bold truncate">{formatCurrency(totalDebt)}</p>
             </div>
-            <span className="text-[#8FA4C8] text-xs">·</span>
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-[#8FA4C8] text-xs font-medium">{t('debts_monthly')}</span>
-              <span className="text-white text-sm font-bold truncate">{formatCurrency(totalMonthly)}</span>
+            <div className="min-w-0 border-l border-white/10 pl-3">
+              <p className="text-[#8FA4C8] text-[11px] font-medium mb-0.5">{t('debts_monthly')}</p>
+              <p className="text-white text-base font-bold truncate">{formatCurrency(totalMonthly)}</p>
             </div>
           </div>
         </div>
