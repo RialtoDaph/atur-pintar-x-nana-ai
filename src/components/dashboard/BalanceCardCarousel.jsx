@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { TrendingUp, TrendingDown, Wallet, Eye, EyeOff, Users, LineChart } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, Eye, EyeOff, Users, LineChart, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AccountAvatar from "@/components/ui/AccountAvatar";
 import { base44 } from "@/api/base44Client";
@@ -18,6 +18,7 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
   const [sharedWallets, setSharedWallets] = useState([]);
   const [investments, setInvestments] = useState([]);
   const [investmentTxs, setInvestmentTxs] = useState([]);
+  const [debts, setDebts] = useState([]);
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
@@ -38,6 +39,8 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
       // Load investments + transactions
       base44.entities.Investment.filter({ created_by: u.email }).then(setInvestments).catch(() => {});
       base44.entities.InvestmentTransaction.filter({ created_by: u.email }).then(setInvestmentTxs).catch(() => {});
+      // Load active debts
+      base44.entities.Debt.filter({ created_by: u.email, status: "active" }).then(setDebts).catch(() => {});
     }).catch(() => {});
   }, []);
 
@@ -78,6 +81,12 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
   const invSaldoAktif = invTotalBeli - invTotalJual;
   const invRealisasi = invTotalJual - invTotalBeli;
   const isProfit = invRealisasi >= 0;
+
+  // Debt metrics
+  const totalDebtRemaining = debts.reduce((s, d) => s + (d.remaining_amount || 0), 0);
+  const totalDebtOriginal = debts.reduce((s, d) => s + (d.total_amount || 0), 0);
+  const totalMonthlyPayment = debts.reduce((s, d) => s + (d.monthly_payment || 0), 0);
+  const debtPaidPercent = totalDebtOriginal > 0 ? Math.round(((totalDebtOriginal - totalDebtRemaining) / totalDebtOriginal) * 100) : 0;
 
   if (loading) {
     return <div className="rounded-2xl animate-pulse h-36 bg-white/10" />;
@@ -271,6 +280,58 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
               </button>
         }
           </div>
+        </div>
+
+  },
+  {
+    key: "debts",
+    content:
+    <div>
+          <p className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-1">Utang & Cicilan</p>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <p className="text-white/60 text-xs mb-0.5">Total Sisa Utang</p>
+              <p className={`text-3xl font-black tracking-tight ${totalDebtRemaining > 0 ? "text-[#ff8080]" : "text-white"}`}>
+                {hidden ? <span className="tracking-[0.2em]">{HIDDEN}</span> : `Rp ${compactRupiah(totalDebtRemaining)}`}
+              </p>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate("/Debts"); }}
+              className="text-right tap-highlight-fix"
+              title="Buka Utang"
+            >
+              <p className="text-white/50 text-[10px] mb-0.5">{debts.length} aktif</p>
+              <CreditCard className="w-5 h-5 text-white/40 ml-auto hover:text-white/70 transition-colors" />
+            </button>
+          </div>
+          {debts.length === 0 ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate("/Debts"); }}
+              className="w-full flex items-center justify-center gap-1.5 bg-[#FF6A00]/20 border border-[#FF6A00]/30 rounded-lg px-3 h-10 text-[#FF9A50] text-xs font-semibold">
+              + Catat Utang
+            </button>
+          ) : (
+            <div className="flex gap-3">
+              <div className="flex-1 flex items-center gap-2 bg-white/8 rounded-xl px-3 py-2">
+                <div className="w-7 h-7 rounded-full bg-orange-500/20 flex items-center justify-center">
+                  <TrendingDown className="w-3.5 h-3.5 text-[#FF9A50]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white/50 text-[9px] uppercase tracking-wider">Cicilan/Bln</p>
+                  <p className="text-white text-xs font-bold truncate">{hidden ? HIDDEN : `Rp ${compactRupiah(totalMonthlyPayment)}`}</p>
+                </div>
+              </div>
+              <div className="flex-1 flex items-center gap-2 bg-white/8 rounded-xl px-3 py-2">
+                <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center">
+                  <TrendingUp className="w-3.5 h-3.5 text-[#99ff80]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white/50 text-[9px] uppercase tracking-wider">Terbayar</p>
+                  <p className="text-[#99ff80] text-xs font-bold truncate">{hidden ? HIDDEN : `${debtPaidPercent}%`}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
   }];
