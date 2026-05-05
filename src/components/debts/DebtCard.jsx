@@ -61,7 +61,7 @@ export default function DebtCard({ debt, type, onPay, onEdit, onMarkPaid, onDele
             <MoreVertical className="w-4 h-4" />
           </button>
           {menuOpen && (
-            <div className="absolute right-0 top-9 z-10 w-44 bg-white rounded-xl shadow-lg border border-[#E2E8F0] py-1 overflow-hidden">
+            <div className="absolute right-0 top-9 z-20 w-44 bg-white rounded-xl shadow-lg border border-[#E2E8F0] py-1 overflow-hidden">
               <button
                 onClick={() => { setMenuOpen(false); onEdit(debt); }}
                 className="w-full px-3 py-2 text-left text-sm text-[#1A1A1A] hover:bg-[#F8FAFC] flex items-center gap-2"
