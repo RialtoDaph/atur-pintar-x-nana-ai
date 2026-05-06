@@ -243,15 +243,13 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Budget Alert & Goals Progress — 2 columns on desktop */}
-              <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-4">
-                <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
-                  <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
-                </Suspense>
-                <Suspense fallback={<div className="bg-white rounded-2xl h-24 animate-pulse shadow-sm" />}>
-                  <GoalsProgressWidget goals={goals} loading={goalsLoading} />
-                </Suspense>
-              </div>
+              {/* Budget Alert & Goals Progress — moved to main column for larger layout */}
+              <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
+                <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
+              </Suspense>
+              <Suspense fallback={<div className="bg-white rounded-2xl h-24 animate-pulse shadow-sm" />}>
+                <GoalsProgressWidget goals={goals} loading={goalsLoading} />
+              </Suspense>
 
               {/* Today Transactions — main content */}
               {user?.onboarding_completed && (
