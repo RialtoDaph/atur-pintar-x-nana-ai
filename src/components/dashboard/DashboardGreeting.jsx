@@ -44,21 +44,21 @@ export default function DashboardGreeting({ user, gamificationProfile }) {
 
   return (
     <div className="flex items-center justify-between mb-4">
-      <h2 className="text-white text-xl font-bold">{greeting}</h2>
+      <h2 className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-xl font-bold">{greeting}</h2>
       <div className="flex items-center gap-2">
         {streak > 0 && (
           <Link
             to="/Gamifikasi"
-            className="flex items-center gap-1 bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors px-2.5 py-1 rounded-full tap-highlight-fix"
+            className="flex items-center gap-1 bg-white/10 sm:bg-black/5 hover:bg-white/20 sm:hover:bg-black/10 active:bg-white/25 transition-colors px-2.5 py-1 rounded-full tap-highlight-fix"
             title="Lihat progres gamifikasi"
           >
             <span className="text-sm">🔥</span>
-            <span className="text-white text-[11px] font-bold">{streak}hari</span>
+            <span className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-[11px] font-bold">{streak}hari</span>
           </Link>
         )}
         <button
           onClick={toggleDark}
-          className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-base hover:bg-white/20 transition-all tap-highlight-fix"
+          className="w-8 h-8 rounded-full bg-white/10 sm:bg-black/5 flex items-center justify-center text-base hover:bg-white/20 sm:hover:bg-black/10 transition-all tap-highlight-fix"
           title={isDark ? "Mode Terang" : "Mode Gelap"}
         >
           {isDark ? "🌙" : "☀️"}

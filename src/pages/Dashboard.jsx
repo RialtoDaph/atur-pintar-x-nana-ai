@@ -191,8 +191,8 @@ export default function Dashboard() {
       <div className="min-h-screen bg-[#F2F4F7] pb-8">
         {user && <RecurringManager userEmail={user.email} />}
 
-        {/* Top Header */}
-        <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] px-5 pt-6 pb-14">
+        {/* Top Header — transparent on desktop, dark on mobile */}
+        <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] sm:bg-none sm:bg-transparent px-5 pt-6 pb-14 sm:pb-6">
           <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto">
             {/* 1. Greeting */}
             <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
@@ -209,7 +209,7 @@ export default function Dashboard() {
         </div>
 
         {/* Body — mobile: stacked. tablet/desktop: 12-col grid (main 8 + side 4) */}
-        <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto px-4 -mt-8 relative z-10">
+        <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto px-4 -mt-8 sm:mt-0 relative z-10">
           <div className="space-y-3 lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0 lg:items-start">
 
             {/* ── MAIN COLUMN (lg: 8/12) ─────────────────────────── */}
