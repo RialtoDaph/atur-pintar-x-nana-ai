@@ -376,7 +376,7 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
           key={idx}
           onClick={() => setCurrentSlide(idx)}
           className={`rounded-full transition-all duration-200 ${
-          idx === currentSlide ? "w-5 h-1.5 bg-[#FF6A00]" : "w-1.5 h-1.5 bg-white/25"}`
+          idx === currentSlide ? "w-5 h-1.5 bg-[#FF6A00]" : "w-1.5 h-1.5 bg-white/25 sm:bg-black/20 dark:sm:bg-white/25"}`
           } />
 
         )}
