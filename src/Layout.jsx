@@ -218,12 +218,15 @@ function LayoutInner({ children, currentPageName }) {
         html.dark { color-scheme: dark; }
       `}</style>
 
-      {/* Desktop sidebar — shows on sm+ (tablet and desktop) */}
-      <div className="hidden sm:flex fixed left-0 top-0 h-full w-52 bg-[#0A0A0A] flex-col px-3 py-6 z-40" style={{ boxShadow: '4px 0 24px rgba(0,0,0,0.5)' }}>
-        {/* Logo */}
-        <div className="mb-6 px-2 flex items-center gap-2">
-          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-8 h-8" />
-          <div>
+      {/* Desktop sidebar — slim 64px by default, expands to 224px on hover */}
+      <div
+        className="hidden sm:flex group fixed left-0 top-0 h-full w-16 hover:w-56 bg-[#0A0A0A] flex-col px-2 hover:px-3 py-6 z-40 overflow-hidden transition-[width,padding] duration-300 ease-out"
+        style={{ boxShadow: '4px 0 24px rgba(0,0,0,0.5)' }}>
+
+        {/* Logo — only icon when collapsed, with text when expanded */}
+        <div className="mb-6 h-8 px-1 flex items-center gap-2">
+          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-8 h-8 flex-shrink-0" />
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
             <p className="text-base font-bold text-white tracking-tight leading-tight">Atur Pintar</p>
             <p className="text-[10px] text-[#8FA4C8] leading-tight">Financial Tracker</p>
           </div>
@@ -237,14 +240,15 @@ function LayoutInner({ children, currentPageName }) {
                 key={item.page}
                 to={createPageUrl(item.page)}
                 data-tour={item.tourId || undefined}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+                title={item.label}
+                className={`flex items-center gap-2.5 h-9 px-3 rounded-lg text-[13px] font-medium transition-all duration-150 ${
                 active ?
                 "bg-[#F97316] text-white shadow-md" :
                 "text-[#888] hover:text-white hover:bg-white/10 active:bg-white/15"}`
                 }>
 
                 <item.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{item.label}</span>
+                <span className="truncate opacity-0 group-hover:opacity-100 transition-opacity duration-200">{item.label}</span>
               </Link>);
 
           })}
@@ -253,13 +257,14 @@ function LayoutInner({ children, currentPageName }) {
         {/* Search */}
         <button
           onClick={() => setShowSearch(true)}
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-[#888] hover:text-white hover:bg-white/10 transition-colors w-full tap-highlight-fix">
+          title={t('search_placeholder')}
+          className="flex items-center gap-2.5 h-9 px-3 rounded-lg text-[13px] font-medium text-[#888] hover:text-white hover:bg-white/10 transition-colors w-full tap-highlight-fix">
 
           <Search className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate">{t('search_placeholder')}</span>
+          <span className="truncate opacity-0 group-hover:opacity-100 transition-opacity duration-200">{t('search_placeholder')}</span>
         </button>
 
-        {/* Settings group at bottom */}
+        {/* Settings group */}
         <div className="border-t border-white/10 pt-1.5 mt-1.5 space-y-0.5">
           {navSettingsItems.map((item) => {
             const active = currentPageName === item.page;
@@ -267,14 +272,15 @@ function LayoutInner({ children, currentPageName }) {
               <Link
                 key={item.page}
                 to={createPageUrl(item.page)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+                title={item.label}
+                className={`flex items-center gap-2.5 h-9 px-3 rounded-lg text-[13px] font-medium transition-colors ${
                 active ?
                 "bg-[#F97316] text-white shadow-sm" :
                 "text-[#888] hover:text-white hover:bg-white/10"}`
                 }>
 
                 <item.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{item.label}</span>
+                <span className="truncate opacity-0 group-hover:opacity-100 transition-opacity duration-200">{item.label}</span>
               </Link>);
 
           })}
@@ -284,12 +290,13 @@ function LayoutInner({ children, currentPageName }) {
         <div className="space-y-0.5 mt-1.5">
           <Link
             to={createPageUrl("ProfileSettings")}
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-[#888] hover:text-white hover:bg-white/10 transition-colors">
+            title={displayName || t('profile')}
+            className="flex items-center gap-2.5 h-9 px-2 rounded-lg text-[13px] font-medium text-[#888] hover:text-white hover:bg-white/10 transition-colors">
 
-            <div className="w-5 h-5 rounded-full bg-[#F97316] flex items-center justify-center text-white text-[9px] font-bold overflow-hidden flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-[#F97316] flex items-center justify-center text-white text-[10px] font-bold overflow-hidden flex-shrink-0">
               {user?.photo_url ? <img src={user.photo_url} alt="avatar" className="w-full h-full object-cover" /> : initials}
             </div>
-            <span className="truncate">{displayName || t('profile')}</span>
+            <span className="truncate opacity-0 group-hover:opacity-100 transition-opacity duration-200">{displayName || t('profile')}</span>
           </Link>
         </div>
       </div>
@@ -330,7 +337,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Main content */}
-      <div ref={mainContentRef} className="sm:ml-52 pt-14 sm:pt-4 overflow-y-auto"
+      <div ref={mainContentRef} className="sm:ml-16 pt-14 sm:pt-4 overflow-y-auto"
         style={{ paddingBottom: window.innerWidth >= 640 ? '16px' : (currentPageName === "Nana" ? '0px' : 'calc(80px + env(safe-area-inset-bottom, 0px))') }}>
         <AnimatePresence mode="sync">
           <motion.div
