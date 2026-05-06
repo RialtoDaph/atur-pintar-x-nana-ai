@@ -135,7 +135,7 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
   }
 
   return (
-    <>
+    <div className="space-y-3">
       {/* Daily Missions — hidden when all done so it doesn't clutter the dashboard */}
       {activeMissions.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm p-4">
@@ -217,6 +217,6 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
