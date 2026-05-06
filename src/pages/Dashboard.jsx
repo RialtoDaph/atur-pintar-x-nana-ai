@@ -223,10 +223,10 @@ export default function Dashboard() {
 
         {/* Body — mobile: stacked. tablet/desktop: 4-column grid */}
         <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto px-4 -mt-8 sm:mt-0 relative z-10">
-          <div className="space-y-3 lg:grid lg:grid-cols-4 lg:gap-4 lg:space-y-0 lg:items-start">
+          <div className="space-y-3 lg:grid lg:grid-cols-5 lg:gap-4 lg:space-y-0 lg:items-start">
 
-            {/* ── MAIN COLUMN (3/4) ─────────────────────────── */}
-            <div className="space-y-3 lg:col-span-3 lg:space-y-4">
+            {/* ── MAIN COLUMN (4/5) ─────────────────────────── */}
+            <div className="space-y-3 lg:col-span-4 lg:space-y-4">
               {/* Sample data banner & subscription banners — keep here at top of main */}
               {showSampleBanner && (
                 <SampleDataBanner onDismiss={() => { setShowSampleBanner(false); loadData(); }} />
@@ -257,7 +257,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* ── SIDE COLUMN (1/4) ─────────────────────────── */}
+            {/* ── SIDE COLUMN (1/5) ─────────────────────────── */}
             <div className="space-y-3 lg:col-span-1 lg:space-y-4">
               {/* Daily Missions — only on mobile/tablet (desktop shows it next to balance card) */}
               <div className="lg:hidden">
