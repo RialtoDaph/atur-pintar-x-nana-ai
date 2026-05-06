@@ -218,10 +218,10 @@ function LayoutInner({ children, currentPageName }) {
         html.dark { color-scheme: dark; }
       `}</style>
 
-      {/* Desktop sidebar — slim 64px by default, expands to 224px on hover */}
+      {/* Desktop sidebar — floating, slim 56px by default, expands to 224px on hover */}
       <div
-        className="hidden sm:flex group fixed left-0 top-0 h-full w-16 hover:w-56 bg-[#0A0A0A] flex-col px-2 hover:px-3 py-6 z-40 overflow-hidden transition-[width,padding] duration-300 ease-out"
-        style={{ boxShadow: '4px 0 24px rgba(0,0,0,0.5)' }}>
+        className="hidden sm:flex group fixed left-3 top-3 bottom-3 w-14 hover:w-56 bg-[#0A0A0A] rounded-2xl flex-col px-2 hover:px-3 py-4 z-40 overflow-hidden transition-[width,padding] duration-300 ease-out"
+        style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
 
         {/* Logo — only icon when collapsed, with text when expanded */}
         <div className="mb-6 h-8 px-1 flex items-center gap-2">
@@ -337,7 +337,7 @@ function LayoutInner({ children, currentPageName }) {
       </div>
 
       {/* Main content */}
-      <div ref={mainContentRef} className="sm:ml-16 pt-14 sm:pt-4 overflow-y-auto"
+      <div ref={mainContentRef} className="sm:ml-20 pt-14 sm:pt-4 overflow-y-auto"
         style={{ paddingBottom: window.innerWidth >= 640 ? '16px' : (currentPageName === "Nana" ? '0px' : 'calc(80px + env(safe-area-inset-bottom, 0px))') }}>
         <AnimatePresence mode="sync">
           <motion.div
