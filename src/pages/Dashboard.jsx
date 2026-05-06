@@ -243,15 +243,13 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Budget Alert & Goals Progress — 2 kolom di desktop, stack di mobile */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
-                  <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
-                </Suspense>
-                <Suspense fallback={<div className="bg-white rounded-2xl h-24 animate-pulse shadow-sm" />}>
-                  <GoalsProgressWidget goals={goals} loading={goalsLoading} />
-                </Suspense>
-              </div>
+              {/* Budget Alert & Goals Progress — moved to main column for larger layout */}
+              <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
+                <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
+              </Suspense>
+              <Suspense fallback={<div className="bg-white rounded-2xl h-24 animate-pulse shadow-sm" />}>
+                <GoalsProgressWidget goals={goals} loading={goalsLoading} />
+              </Suspense>
 
               {/* Today Transactions — main content */}
               {user?.onboarding_completed && (
