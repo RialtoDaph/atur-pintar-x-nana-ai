@@ -107,13 +107,13 @@ export default function InvestmentsPage() {
   if (!loading && !isPremium) {
     return (
       <div className="min-h-screen bg-[#F2F4F7] pb-8">
-        <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+        <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
           <div className="max-w-2xl mx-auto">
             <p className="text-[#8FA4C8] text-sm font-medium">Portofolio</p>
             <h1 className="text-white text-2xl font-bold mt-0.5">Investasi</h1>
           </div>
         </div>
-        <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
+        <div className="max-w-2xl mx-auto px-5 -mt-14 space-y-3">
           <PremiumBlurCard>
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <p className="font-bold text-[#1A1A1A] mb-2">Portofolio Investasi</p>
@@ -135,16 +135,16 @@ export default function InvestmentsPage() {
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-8">
       {/* Header */}
-      <div className="bg-[#0A0A0A] px-5 pt-10 pb-6">
+      <div className="bg-[#0A0A0A] px-5 pt-10 pb-20">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[#8FA4C8] text-sm font-medium">Portofolio</p>
               <h1 className="text-white text-2xl font-bold mt-0.5">Investasi</h1>
             </div>
             <button
               onClick={() => setShowAdd(true)}
-              className="h-10 px-4 rounded-full bg-[#FF6A00] flex items-center shadow-lg hover:bg-[#e05e00] transition-colors"
+              className="h-10 px-4 rounded-full bg-[#F97316] flex items-center shadow-lg hover:bg-[#EA580C] active:scale-95 transition-all"
             >
               <span className="text-white text-sm font-semibold">Invest</span>
             </button>
@@ -161,7 +161,7 @@ export default function InvestmentsPage() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-5 mt-4 space-y-3">
+      <div className="max-w-2xl mx-auto px-5 -mt-14 space-y-3">
         {loading ? (
           [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" />)
         ) : investments.length === 0 ? (
