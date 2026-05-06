@@ -227,6 +227,17 @@ export default function Dashboard() {
 
             {/* ── MAIN COLUMN (4/5) ─────────────────────────── */}
             <div className="space-y-3 lg:col-span-4 lg:space-y-4">
+              {/* Daily Missions — di mobile muncul di atas (setelah balance card), di desktop sudah ditampilkan di header */}
+              <div className="lg:hidden">
+                {user?.onboarding_completed && (
+                  <DailyMissionsCard
+                    user={user}
+                    gamificationProfile={activeGamProfile}
+                    onProfileUpdate={setGamProfile}
+                  />
+                )}
+              </div>
+
               {/* Sample data banner & subscription banners — keep here at top of main */}
               {showSampleBanner && (
                 <SampleDataBanner onDismiss={() => { setShowSampleBanner(false); loadData(); }} />
@@ -261,16 +272,6 @@ export default function Dashboard() {
 
             {/* ── SIDE COLUMN (1/5) ─────────────────────────── */}
             <div className="space-y-3 lg:col-span-1 lg:space-y-4">
-              {/* Daily Missions — only on mobile/tablet (desktop shows it next to balance card) */}
-              <div className="lg:hidden">
-                {user?.onboarding_completed && (
-                  <DailyMissionsCard
-                    user={user}
-                    gamificationProfile={activeGamProfile}
-                    onProfileUpdate={setGamProfile}
-                  />
-                )}
-              </div>
               {user?.onboarding_completed && (
                 <BossBattleCard
                   user={user}
