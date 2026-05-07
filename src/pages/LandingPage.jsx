@@ -614,8 +614,8 @@ export default function LandingPage() {
         .g-text { background: linear-gradient(135deg,#FF6A00 0%,#FFB347 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .glow { box-shadow: 0 0 40px rgba(255,106,0,0.28); }
         .card-d { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
-        .iphone-frame { background:#111; border-radius:44px; border:3px solid #333; position:relative; padding:14px; box-shadow:0 30px 80px rgba(0,0,0,0.7),inset 0 0 0 1px #222; }
-        .iphone-notch { width:90px; height:22px; background:#111; border-radius:0 0 14px 14px; margin:0 auto -8px; position:relative; z-index:1; }
+        .iphone-frame { background:#111; border-radius:44px; border:3px solid #333; position:relative; padding:0; box-shadow:0 30px 80px rgba(0,0,0,0.7),inset 0 0 0 1px #222; overflow:hidden; }
+        .iphone-notch { width:90px; height:22px; background:#111; border-radius:0 0 14px 14px; margin:0 auto; position:absolute; top:0; left:50%; transform:translateX(-50%); z-index:2; }
       `}</style>
 
       {/* FOMO Toast */}
@@ -815,7 +815,7 @@ export default function LandingPage() {
           <Reveal delay={120}>
             <div className="mx-auto iphone-frame" style={{ width: 280 }}>
               <div className="iphone-notch" />
-              <div className="overflow-hidden rounded-[30px] bg-black relative" style={{ aspectRatio: "9/16" }}>
+              <div className="bg-black relative" style={{ aspectRatio: "9/16" }}>
                 <iframe
                   src={VIDEO_URL}
                   className="absolute inset-0 w-full h-full border-0"
