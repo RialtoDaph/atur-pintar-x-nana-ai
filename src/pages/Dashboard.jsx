@@ -16,6 +16,7 @@ import RecurringManager from "@/components/transactions/RecurringManager";
 import { useGamification } from "@/hooks/useGamification";
 
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
+import DashboardTopTabs from "@/components/dashboard/DashboardTopTabs";
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
 import BossBattleCard from "@/components/gamification/BossBattleCard";
 import StreakCelebrationPopup from "@/components/dashboard/StreakCelebrationPopup";
@@ -194,6 +195,9 @@ export default function Dashboard() {
         {/* Top Header — transparent on desktop, dark on mobile */}
         <div className="bg-gradient-to-b from-[#0A0A0A] to-[#0d0d0d] sm:bg-none sm:bg-transparent px-5 pt-6 pb-14 sm:pb-6">
           <div className="max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto">
+            {/* 0. Top tabs (desktop only) */}
+            <DashboardTopTabs />
+
             {/* 1. Greeting */}
             <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
 

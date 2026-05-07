@@ -118,14 +118,11 @@ function LayoutInner({ children, currentPageName }) {
 
   const navItems = [
   { name: "Dashboard", label: t('nav_home'), icon: LayoutDashboard, page: "Dashboard" },
-  { name: "Transactions", label: t('nav_transactions'), icon: ArrowLeftRight, page: "Transactions" },
   { name: "Goals", label: t('nav_goals'), icon: Target, page: "Goals" },
   { name: "Budget", label: t('nav_budget'), icon: PiggyBank, page: "Budget" },
   { name: "Debts", label: t('nav_debts'), icon: CreditCard, page: "Debts" },
   { name: "Accounts", label: "Rekening", icon: Wallet, page: "Accounts" },
-  { name: "SharedFinance", label: "Keuangan Bersama", icon: Users, page: "SharedFinance" },
-  { name: "Analytics", label: t('nav_analytics'), icon: BarChart2, page: "Analytics" },
-  { name: "Tips", label: t('nav_tips'), icon: Lightbulb, page: "Tips", tourId: "tips-nav-link" }];
+  { name: "SharedFinance", label: "Keuangan Bersama", icon: Users, page: "SharedFinance" }];
 
 
   const navSettingsItems = [
