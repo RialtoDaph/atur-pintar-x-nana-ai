@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle, Mail, Instagram, Twitter, Sparkles, ChevronRig
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const NANA_AVATAR_URL = "https://api.dicebear.com/7.x/adventurer/svg?seed=Nana&backgroundColor=f97316";
-const VIDEO_URL = "https://www.youtube.com/embed/6KazLzryNbM?rel=0&modestbranding=1&playsinline=1";
+const VIDEO_URL = "https://www.youtube.com/embed/6KazLzryNbM";
 
 // ─── Matrix background ────────────────────────────────────────────────────────
 function MatrixBackground() {
@@ -614,7 +614,7 @@ export default function LandingPage() {
         .g-text { background: linear-gradient(135deg,#FF6A00 0%,#FFB347 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .glow { box-shadow: 0 0 40px rgba(255,106,0,0.28); }
         .card-d { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
-        .iphone-frame { background:#111; border-radius:44px; border:3px solid #333; position:relative; padding:6px; box-shadow:0 30px 80px rgba(0,0,0,0.7),inset 0 0 0 1px #222; }
+        .iphone-frame { background:#111; border-radius:44px; border:3px solid #333; position:relative; padding:14px; box-shadow:0 30px 80px rgba(0,0,0,0.7),inset 0 0 0 1px #222; }
         .iphone-notch { width:90px; height:22px; background:#111; border-radius:0 0 14px 14px; margin:0 auto -8px; position:relative; z-index:1; }
       `}</style>
 
@@ -813,14 +813,17 @@ export default function LandingPage() {
             <p className="text-white/40 text-sm mb-10">Web app — buka browser, langsung bisa. Tanpa install apapun.</p>
           </Reveal>
           <Reveal delay={120}>
-            <div className="mx-auto rounded-[30px] overflow-hidden bg-black relative" style={{ width: 280, aspectRatio: "9/16", boxShadow: "0 30px 80px rgba(0,0,0,0.7)" }}>
-              <iframe
-                src={VIDEO_URL}
-                className="absolute inset-0 w-full h-full border-0"
-                style={{ transform: "scale(1.05)", transformOrigin: "center" }}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                title="Demo Atur Pintar" />
+            <div className="mx-auto iphone-frame" style={{ width: 280 }}>
+              <div className="iphone-notch" />
+              <div className="overflow-hidden rounded-[30px] bg-black" style={{ aspectRatio: "9/16" }}>
+                <iframe
+                  src={VIDEO_URL} className="px-4 w-full h-full"
+
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Demo Atur Pintar" />
+                
+              </div>
             </div>
             <p className="text-white/25 text-xs mt-5">iOS & Android segera hadir.</p>
           </Reveal>
