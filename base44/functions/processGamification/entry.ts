@@ -96,7 +96,22 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ── 2. Streak update (Bug 1) ──────────────────────────────────────────────
+    // ── 2. Streak update ──────────────────────────────────────────────────────
+    // Streak hanya naik kalau trigger berasal dari aktivitas user yang nyata.
+    // Trigger "daily_check" (misal saat user buka dashboard) TIDAK boleh menyentuh
+    // streak atau last_activity_date — ini cuma untuk recalc skor & cek achievement.
+    const ACTIVITY_TRIGGERS = new Set([
+      "transaction_created",
+      "goal_created",
+      "goal_updated",
+      "budget_created",
+      "nana_message_sent",
+      "persona_created",
+      "mood_checkin",
+      "onboarding_completed",
+    ]);
+    const isActivity = ACTIVITY_TRIGGERS.has(trigger);
+
     const today = todayStr();
     const yesterday = yesterdayStr();
     const last = profile.last_activity_date;
@@ -104,15 +119,24 @@ Deno.serve(async (req) => {
     let newStreak = profile.daily_streak || 0;
     let streakChanged = false;
 
-    if (last === today) {
-      // Same day — no change
-    } else if (last === yesterday) {
-      newStreak = (profile.daily_streak || 0) + 1;
-      streakChanged = true;
+    if (isActivity) {
+      if (last === today) {
+        // Same day — no change
+      } else if (last === yesterday) {
+        newStreak = (profile.daily_streak || 0) + 1;
+        streakChanged = true;
+      } else {
+        // More than 1 day ago or null — start fresh at 1
+        newStreak = 1;
+        streakChanged = true;
+      }
     } else {
-      // More than 1 day ago or null — reset to 1
-      newStreak = 1;
-      streakChanged = true;
+      // Non-activity trigger (e.g. daily_check): if streak should already be reset
+      // because user skipped >1 day, reflect that here without touching last_activity_date.
+      if (last && last !== today && last !== yesterday && (profile.daily_streak || 0) > 0) {
+        newStreak = 0;
+        streakChanged = true;
+      }
     }
 
     const newLongest = Math.max(profile.longest_streak || 0, newStreak);
@@ -280,14 +304,17 @@ Deno.serve(async (req) => {
     const finalLevel = getLevelFromXP(newXP);
 
     // ── 6. Save updated profile (including synced achievements array) ─────────
+    // Hanya update last_activity_date kalau ini benar-benar aktivitas user.
     const profileUpdates = {
       total_points: newXP,
       level: finalLevel,
       daily_streak: newStreak,
       longest_streak: newLongest,
-      last_activity_date: today,
       achievements: profile.achievements || [],
     };
+    if (isActivity) {
+      profileUpdates.last_activity_date = today;
+    }
     await base44.entities.GamificationProfile.update(profile.id, profileUpdates);
     results.push("profile_updated");
 
