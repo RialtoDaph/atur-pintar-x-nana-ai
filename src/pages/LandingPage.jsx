@@ -817,6 +817,7 @@ export default function LandingPage() {
               <iframe
                 src={VIDEO_URL}
                 className="absolute inset-0 w-full h-full border-0"
+                style={{ transform: "scale(1.05)", transformOrigin: "center" }}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 title="Demo Atur Pintar" />
