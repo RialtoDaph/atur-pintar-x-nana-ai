@@ -334,7 +334,7 @@ function FaqSection() {
 const SPAM_NAME_PATTERNS = ["http", "https", ".com", ".net", ".org", ".id", "www.", "evil", "hack", "click", "klik"];
 function isValidName(name) {
   const lower = name.toLowerCase();
-  return !SPAM_NAME_PATTERNS.some((p) => lower.includes(p));
+  return !SPAM_NAME_PATTERNS.some(p => lower.includes(p));
 }
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
@@ -359,7 +359,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
     const newErrors = {};
     if (!isValidName(form.name)) newErrors.name = "Nama tidak valid, mohon isi nama asli kamu";
     if (!isValidEmail(form.email)) newErrors.email = "Format email tidak valid";
-    if (Object.keys(newErrors).length > 0) {setErrors(newErrors);return;}
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
     setErrors({});
 
     setLoading(true);
@@ -373,7 +373,7 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
         biggest_money_problem: form.biggest_money_problem || undefined,
         current_finance_tracking_method: form.current_finance_tracking_method,
         early_access_interest: form.early_access_interest,
-        honeypot
+        honeypot,
       });
       if (res.data?.error) throw new Error(res.data.error);
       const qNum = fomoCounter + 1;
@@ -447,23 +447,23 @@ function WaitingListSection({ fomoCounter, incrementCounter }) {
           <form onSubmit={handleSubmit} className="card-d rounded-2xl p-6 space-y-4">
             {/* Honeypot - hidden from real users */}
             <div style={{ position: "absolute", left: "-9999px", top: "-9999px", opacity: 0, pointerEvents: "none" }} aria-hidden="true">
-              <input tabIndex={-1} autoComplete="off" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+              <input tabIndex={-1} autoComplete="off" value={honeypot} onChange={e => setHoneypot(e.target.value)} />
             </div>
 
-            {errors.general &&
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-xs font-medium">
+            {errors.general && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-xs font-medium">
                 {errors.general}
               </div>
-            }
+            )}
 
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Nama lengkap *</label>
-              <input required value={form.name} onChange={(e) => {setForm((f) => ({ ...f, name: e.target.value }));setErrors((er) => ({ ...er, name: undefined }));}} placeholder="Nama kamu" className={`bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.name ? "border-red-500/60" : "border-white/10"}`} />
+              <input required value={form.name} onChange={(e) => { setForm((f) => ({ ...f, name: e.target.value })); setErrors(er => ({ ...er, name: undefined })); }} placeholder="Nama kamu" className={`bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.name ? "border-red-500/60" : "border-white/10"}`} />
               {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Email aktif *</label>
-              <input required type="email" value={form.email} onChange={(e) => {setForm((f) => ({ ...f, email: e.target.value }));setErrors((er) => ({ ...er, email: undefined }));}} placeholder="email@kamu.com" className={`bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.email ? "border-red-500/60" : "border-white/10"}`} />
+              <input required type="email" value={form.email} onChange={(e) => { setForm((f) => ({ ...f, email: e.target.value })); setErrors(er => ({ ...er, email: undefined })); }} placeholder="email@kamu.com" className={`bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.email ? "border-red-500/60" : "border-white/10"}`} />
               {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
             </div>
             <div>
@@ -813,12 +813,12 @@ export default function LandingPage() {
             <p className="text-white/40 text-sm mb-10">Web app — buka browser, langsung bisa. Tanpa install apapun.</p>
           </Reveal>
           <Reveal delay={120}>
-            <div className="mx-auto iphone-frame my-1" style={{ width: 240 }}>
+            <div className="mx-auto iphone-frame" style={{ width: 280 }}>
               <div className="iphone-notch" />
               <div className="overflow-hidden rounded-[30px] bg-black relative" style={{ aspectRatio: "9/16" }}>
                 <iframe
                   src={VIDEO_URL}
-                  className="absolute inset-0 w-full h-full border-0 px-4"
+                  className="absolute inset-0 w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title="Demo Atur Pintar" />
