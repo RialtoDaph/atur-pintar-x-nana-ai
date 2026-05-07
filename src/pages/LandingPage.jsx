@@ -815,14 +815,13 @@ export default function LandingPage() {
           <Reveal delay={120}>
             <div className="mx-auto iphone-frame" style={{ width: 280 }}>
               <div className="iphone-notch" />
-              <div className="overflow-hidden rounded-[30px] bg-black" style={{ aspectRatio: "9/16" }}>
+              <div className="overflow-hidden rounded-[30px] bg-black relative" style={{ aspectRatio: "9/16" }}>
                 <iframe
-                  src={VIDEO_URL} className="px-4 w-full h-full"
-
+                  src={VIDEO_URL}
+                  className="absolute inset-0 w-full h-full block border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title="Demo Atur Pintar" />
-                
               </div>
             </div>
             <p className="text-white/25 text-xs mt-5">iOS & Android segera hadir.</p>
