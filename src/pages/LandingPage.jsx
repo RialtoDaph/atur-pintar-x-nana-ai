@@ -816,15 +816,9 @@ export default function LandingPage() {
             <div className="mx-auto iphone-frame" style={{ width: 280 }}>
               <div className="iphone-notch" />
               <div className="overflow-hidden rounded-[30px] bg-black relative" style={{ aspectRatio: "9/16" }}>
-                {/* Scale iframe up so the YouTube vertical video fills the entire phone screen with no letterbox bars */}
                 <iframe
                   src={VIDEO_URL}
-                  className="absolute top-1/2 left-1/2 border-0"
-                  style={{
-                    width: "177.78%",
-                    height: "177.78%",
-                    transform: "translate(-50%, -50%)"
-                  }}
+                  className="absolute inset-0 w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title="Demo Atur Pintar" />
