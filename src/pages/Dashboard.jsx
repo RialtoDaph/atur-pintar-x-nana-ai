@@ -17,6 +17,7 @@ import { useGamification } from "@/hooks/useGamification";
 
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
+import UMKMPintarAdBanner from "@/components/dashboard/UMKMPintarAdBanner";
 import BossBattleCard from "@/components/gamification/BossBattleCard";
 import StreakCelebrationPopup from "@/components/dashboard/StreakCelebrationPopup";
 import AchievementPopup from "@/components/dashboard/AchievementPopup";
@@ -287,6 +288,9 @@ export default function Dashboard() {
           </div>
           <div className="h-4" />
         </div>
+
+        {/* Sponsored banner — paling bawah sebelum bottom nav */}
+        <UMKMPintarAdBanner />
 
         {showAddTransaction && (
           <AddTransactionModal
