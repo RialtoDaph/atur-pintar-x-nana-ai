@@ -200,7 +200,12 @@ export default function Dashboard() {
               <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
             </div>
 
-            {/* Balance Card + (Greeting stacked above Daily Missions) side-by-side on desktop */}
+            {/* Desktop: Greeting + streak + dark mode sejajar di atas balance card */}
+            <div className="hidden lg:block">
+              <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
+            </div>
+
+            {/* Balance Card + Daily Missions side-by-side on desktop */}
             <div className="lg:grid lg:grid-cols-12 lg:gap-4 lg:items-start">
               <div className="lg:col-span-6">
                 <BalanceCardCarousel
@@ -212,7 +217,6 @@ export default function Dashboard() {
                 />
               </div>
               <div className="hidden lg:block lg:col-span-6 space-y-4">
-                <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
                 {user?.onboarding_completed && (
                   <DailyMissionsCard
                     user={user}
