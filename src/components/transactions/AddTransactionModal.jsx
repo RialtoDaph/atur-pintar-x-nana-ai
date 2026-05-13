@@ -213,30 +213,37 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       const response = await base44.functions.invoke("extractReceiptData", { file_url });
-      const extracted = response.data?.data;
-      if (extracted?.total_amount) {
-        setReceiptData({ ...extracted, image_url: file_url });
-        setTab("expense");
-        setAmountRaw(String(Math.round(extracted.total_amount)));
-        if (extracted.date) setDate(extracted.date);
-        if (extracted.store_name) setNote(extracted.store_name);
-        if (extracted.category) setCategory(extracted.category);
-        // Save to ReceiptScan entity
-        base44.entities.ReceiptScan.create({
-          image_url: file_url,
-          merchant_name: extracted.store_name || "",
-          total_amount: extracted.total_amount || 0,
-          scan_date: extracted.date || new Date().toLocaleDateString("en-CA"),
-          suggested_category: extracted.category || "",
-          scanned_at: new Date().toISOString(),
-          status: "pending",
-        }).catch(() => {});
-        toast.success("Struk berhasil dipindai!");
-      } else {
-        toast.error("Gagal membaca struk.");
+      const payload = response?.data || {};
+      const extracted = payload.data;
+
+      if (payload.status === "error" || payload.error) {
+        toast.error("Gagal membaca struk: " + (payload.error || "respons tidak valid"));
+        return;
       }
-    } catch {
-      toast.error("Gagal memindai struk.");
+      if (!extracted || !extracted.total_amount) {
+        toast.error("Struk tidak terbaca jelas. Coba foto ulang dengan pencahayaan lebih baik.");
+        return;
+      }
+
+      setReceiptData({ ...extracted, image_url: file_url });
+      setTab("expense");
+      setAmountRaw(String(Math.round(extracted.total_amount)));
+      if (extracted.date) setDate(extracted.date);
+      if (extracted.store_name) setNote(extracted.store_name);
+      if (extracted.category) setCategory(extracted.category);
+      base44.entities.ReceiptScan.create({
+        image_url: file_url,
+        merchant_name: extracted.store_name || "",
+        total_amount: extracted.total_amount || 0,
+        scan_date: extracted.date || new Date().toLocaleDateString("en-CA"),
+        suggested_category: extracted.category || "",
+        scanned_at: new Date().toISOString(),
+        status: "pending",
+      }).catch(() => {});
+      toast.success("Struk berhasil dipindai!");
+    } catch (err) {
+      console.error("Scan receipt failed:", err);
+      toast.error("Gagal memindai struk: " + (err?.message || "coba lagi"));
     } finally {
       setScanning(false);
       e.target.value = "";
