@@ -230,7 +230,26 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
       setAmountRaw(String(Math.round(extracted.total_amount)));
       if (extracted.date) setDate(extracted.date);
       if (extracted.store_name) setNote(extracted.store_name);
-      if (extracted.category) setCategory(extracted.category);
+      // Map AI category string ("food", "transport", ...) → GlobalCategory ID
+      if (extracted.category) {
+        const aiCat = extracted.category.toLowerCase();
+        const keywordMap = {
+          food: ["makan", "food", "kuliner", "restoran", "warung"],
+          transport: ["transport", "bensin", "ojek", "taksi", "parkir"],
+          shopping: ["belanja", "shopping", "groceries"],
+          health: ["kesehatan", "health", "obat", "medis"],
+          entertainment: ["hiburan", "entertainment", "rekreasi"],
+          education: ["pendidikan", "education", "sekolah", "kursus"],
+          utilities: ["tagihan", "utilities", "listrik", "internet", "air"],
+        };
+        const keywords = keywordMap[aiCat] || [aiCat];
+        const expenseCats = globalCategories.filter(c => c.type === "expense" || c.type === "both");
+        const matched = expenseCats.find(c => {
+          const name = c.name.toLowerCase();
+          return keywords.some(kw => name.includes(kw) || kw.includes(name));
+        });
+        if (matched) setCategory(matched.id);
+      }
       base44.entities.ReceiptScan.create({
         image_url: file_url,
         merchant_name: extracted.store_name || "",
