@@ -234,20 +234,36 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
       if (extracted.category) {
         const aiCat = extracted.category.toLowerCase();
         const keywordMap = {
-          food: ["makan", "food", "kuliner", "restoran", "warung"],
-          transport: ["transport", "bensin", "ojek", "taksi", "parkir"],
-          shopping: ["belanja", "shopping", "groceries"],
-          health: ["kesehatan", "health", "obat", "medis"],
-          entertainment: ["hiburan", "entertainment", "rekreasi"],
-          education: ["pendidikan", "education", "sekolah", "kursus"],
-          utilities: ["tagihan", "utilities", "listrik", "internet", "air"],
+          food: ["makan", "food", "kuliner", "restoran", "warung", "jajan", "minum"],
+          transport: ["transport", "bensin", "ojek", "taksi", "parkir", "bbm", "kendaraan", "tol"],
+          shopping: ["belanja", "shopping", "groceries", "kebutuhan", "rumah tangga"],
+          health: ["kesehatan", "health", "obat", "medis", "apotek", "dokter"],
+          entertainment: ["hiburan", "entertainment", "rekreasi", "nonton", "game"],
+          education: ["pendidikan", "education", "sekolah", "kursus", "buku"],
+          utilities: ["tagihan", "utilities", "listrik", "internet", "air", "pulsa"],
+          other: ["lain", "lainnya", "other"],
         };
         const keywords = keywordMap[aiCat] || [aiCat];
         const expenseCats = globalCategories.filter(c => c.type === "expense" || c.type === "both");
-        const matched = expenseCats.find(c => {
+        // 1. Try matching subcategories first (more specific)
+        let matched = expenseCats.find(c => {
+          if (!c.is_subcategory) return false;
           const name = c.name.toLowerCase();
           return keywords.some(kw => name.includes(kw) || kw.includes(name));
         });
+        // 2. Fallback to parent category
+        if (!matched) {
+          matched = expenseCats.find(c => {
+            if (c.is_subcategory) return false;
+            const name = c.name.toLowerCase();
+            return keywords.some(kw => name.includes(kw) || kw.includes(name));
+          });
+        }
+        // 3. Final fallback: pick "Lainnya" / "Other" or first parent category
+        if (!matched) {
+          matched = expenseCats.find(c => !c.is_subcategory && /lain|other/i.test(c.name))
+            || expenseCats.find(c => !c.is_subcategory);
+        }
         if (matched) setCategory(matched.id);
       }
       base44.entities.ReceiptScan.create({
