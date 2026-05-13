@@ -129,6 +129,17 @@ export default function Transactions() {
 
   useEffect(() => { fetchData(); }, []);
 
+  // Re-fetch when a transaction is added/edited elsewhere (e.g., FAB in Layout)
+  useEffect(() => {
+    const onRefresh = () => fetchData(true);
+    window.addEventListener("refresh-dashboard", onRefresh);
+    window.addEventListener("transaction-added", onRefresh);
+    return () => {
+      window.removeEventListener("refresh-dashboard", onRefresh);
+      window.removeEventListener("transaction-added", onRefresh);
+    };
+  }, []);
+
   // Filtered transactions for Riwayat tab.
   // Exclude soft-deleted records and recurring TEMPLATES (templates show only in Rutin tab).
   const filtered = transactions.filter(tx => {
