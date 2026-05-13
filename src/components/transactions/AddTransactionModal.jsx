@@ -149,7 +149,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
   const selectedAccount = accounts.find(a => a.id === accountId);
   const amount = parseAmount(amountRaw);
-  const canSave = amount > 0 && accountId && !!category;
+  const canSave = amount > 0 && accountId;
 
   async function doSave() {
     setSaving(true);
@@ -158,7 +158,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
         amount,
         type: tab,
         date,
-        category,
+        category: category || "other",
         note,
         account_id: accountId,
         time: time || undefined,
@@ -234,26 +234,20 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
       if (extracted.category) {
         const aiCat = extracted.category.toLowerCase();
         const keywordMap = {
-          food: ["makan", "food", "kuliner", "restoran", "warung", "jajan", "minum"],
-          transport: ["transport", "bensin", "ojek", "taksi", "parkir", "bbm", "kendaraan", "tol"],
-          shopping: ["belanja", "shopping", "groceries", "kebutuhan", "rumah tangga"],
-          health: ["kesehatan", "health", "obat", "medis", "apotek", "dokter"],
-          entertainment: ["hiburan", "entertainment", "rekreasi", "nonton", "game"],
-          education: ["pendidikan", "education", "sekolah", "kursus", "buku"],
-          utilities: ["tagihan", "utilities", "listrik", "internet", "air", "pulsa"],
-          other: ["lain", "lainnya", "other"],
+          food: ["makan", "food", "kuliner", "restoran", "warung"],
+          transport: ["transport", "bensin", "ojek", "taksi", "parkir"],
+          shopping: ["belanja", "shopping", "groceries"],
+          health: ["kesehatan", "health", "obat", "medis"],
+          entertainment: ["hiburan", "entertainment", "rekreasi"],
+          education: ["pendidikan", "education", "sekolah", "kursus"],
+          utilities: ["tagihan", "utilities", "listrik", "internet", "air"],
         };
         const keywords = keywordMap[aiCat] || [aiCat];
         const expenseCats = globalCategories.filter(c => c.type === "expense" || c.type === "both");
-        // Match against global categories by name
-        let matched = expenseCats.find(c => {
+        const matched = expenseCats.find(c => {
           const name = c.name.toLowerCase();
           return keywords.some(kw => name.includes(kw) || kw.includes(name));
         });
-        // Fallback: pick "Lainnya" / "Other" or first available
-        if (!matched) {
-          matched = expenseCats.find(c => /lain|other/i.test(c.name)) || expenseCats[0];
-        }
         if (matched) setCategory(matched.id);
       }
       base44.entities.ReceiptScan.create({
