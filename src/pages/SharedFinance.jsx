@@ -473,26 +473,27 @@ export default function SharedFinance() {
     if (!joinCode.trim() || !user) return;
     setJoinError("");
     setJoining(true);
-    const all = await base44.entities.SharedWallet.list();
-    const target = all.find((w) => w.invite_code === joinCode.trim().toUpperCase());
-    if (!target) {setJoinError("Kode undangan tidak valid");setJoining(false);return;}
-    if ((target.members || []).includes(user.email)) {setJoinError("Anda sudah tergabung");setJoining(false);return;}
-    // Re-fetch the latest wallet state right before merging to reduce race-condition overwrites
-    const fresh = await base44.entities.SharedWallet.filter({ id: target.id }).then((r) => r?.[0]).catch(() => target);
-    const baseMembers = fresh?.members || target.members || [];
-    const basePending = fresh?.pending_invites || target.pending_invites || [];
-    const updated = await base44.entities.SharedWallet.update(target.id, {
-      members: [...new Set([...baseMembers, user.email])],
-      pending_invites: basePending.filter((e) => e !== user.email)
-    });
-    setWallets((prev) => prev.some((w) => w.id === target.id) ? prev.map((w) => w.id === target.id ? updated : w) : [...prev, updated]);
-    setWalletTxsMap((prev) => ({ ...prev, [target.id]: [] }));
-    setShowJoin(false);
-    setJoinCode("");
-    setJoinError("");
-    setJoining(false);
-    toast.success(`Berhasil bergabung ke "${target.name}"!`);
-    loadAll();
+    try {
+      const res = await base44.functions.invoke("joinSharedWallet", { invite_code: joinCode.trim().toUpperCase() });
+      const data = res?.data || {};
+      if (!data.success) {
+        setJoinError(data.error || "Kode undangan tidak valid");
+        setJoining(false);
+        return;
+      }
+      const updated = data.wallet;
+      setWallets((prev) => prev.some((w) => w.id === updated.id) ? prev.map((w) => w.id === updated.id ? updated : w) : [...prev, updated]);
+      setWalletTxsMap((prev) => ({ ...prev, [updated.id]: [] }));
+      setShowJoin(false);
+      setJoinCode("");
+      setJoinError("");
+      toast.success(`Berhasil bergabung ke "${updated.name}"!`);
+      loadAll();
+    } catch (e) {
+      setJoinError(e?.response?.data?.error || "Kode undangan tidak valid");
+    } finally {
+      setJoining(false);
+    }
   }
 
   async function handleAcceptInvite(wallet) {
