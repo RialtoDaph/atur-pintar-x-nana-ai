@@ -207,12 +207,42 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   }
 
   async function handleScanReceipt(e) {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = "";
+
+    // Validasi file SEBELUM upload
+    if (!file.type.startsWith("image/")) {
+      toast.error("File harus berupa gambar (JPG/PNG)");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Ukuran gambar maksimal 10MB. Coba kompres dulu.");
+      return;
+    }
+    if (file.size < 1024) {
+      toast.error("Gambar terlalu kecil/rusak. Coba foto ulang.");
+      return;
+    }
+
+    // Util timeout
+    const withTimeout = (p, ms, label) => Promise.race([
+      p,
+      new Promise((_, rej) => setTimeout(() => rej(new Error(`${label} timeout (${ms / 1000}s)`)), ms))
+    ]);
+
     setScanning(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const response = await base44.functions.invoke("extractReceiptData", { file_url });
+      const { file_url } = await withTimeout(
+        base44.integrations.Core.UploadFile({ file }),
+        30000,
+        "Upload gambar"
+      );
+      const response = await withTimeout(
+        base44.functions.invoke("extractReceiptData", { file_url }),
+        60000,
+        "Pembacaan struk"
+      );
       const payload = response?.data || {};
       const extracted = payload.data;
 
@@ -221,7 +251,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
         return;
       }
       if (!extracted || !extracted.total_amount) {
-        toast.error("Struk tidak terbaca jelas. Coba foto ulang dengan pencahayaan lebih baik.");
+        toast.error("Struk tidak terbaca jelas. Coba foto ulang dengan cahaya cukup & seluruh struk masuk frame.");
         return;
       }
 
@@ -262,10 +292,16 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
       toast.success("Struk berhasil dipindai!");
     } catch (err) {
       console.error("Scan receipt failed:", err);
-      toast.error("Gagal memindai struk: " + (err?.message || "coba lagi"));
+      const msg = err?.message || "coba lagi";
+      if (msg.includes("timeout")) {
+        toast.error(`${msg}. Coba foto yang lebih jelas.`);
+      } else if (msg.toLowerCase().includes("network") || msg.toLowerCase().includes("fetch")) {
+        toast.error("Koneksi bermasalah. Cek internet kamu lalu coba lagi.");
+      } else {
+        toast.error("Gagal memindai struk: " + msg);
+      }
     } finally {
       setScanning(false);
-      e.target.value = "";
     }
   }
 
