@@ -48,37 +48,60 @@ export default function OnboardingQuestionnaire({ onClose }) {
   }, [screen, questionIndex]);
 
   // Android hardware back button: intercept and navigate to previous screen
-  // instead of exiting the app. Push a sentinel state on mount; on popstate,
-  // step back through the onboarding flow.
+  // instead of exiting the app. Refs hold latest state so the handler can be
+  // registered once on mount (no leaked history entries).
+  const stateRef = useRef({ screen, questionIndex, answers });
+  stateRef.current = { screen, questionIndex, answers };
+
   useEffect(() => {
+    // Push a single sentinel state. We re-push only AFTER the user pops it,
+    // so the history stack stays at most +1 entry while onboarding is open.
     window.history.pushState({ onboarding: true }, "");
+
     const handler = () => {
-      // Always re-push so we keep intercepting subsequent back presses
+      if (isSavingRef.current) {
+        // During save, immediately re-push to keep blocking back
+        window.history.pushState({ onboarding: true }, "");
+        return;
+      }
+      const { screen: s, questionIndex: qi, answers: ans } = stateRef.current;
+
+      if (s === SCREEN.WELCOME || s === SCREEN.WELCOME_GAME) {
+        // Terminal screens: stay (re-push so back keeps no-op)
+        window.history.pushState({ onboarding: true }, "");
+        return;
+      }
+
+      // Re-push so we keep intercepting subsequent back presses
       window.history.pushState({ onboarding: true }, "");
-      if (isSavingRef.current) return; // ignore during save
-      if (screen === SCREEN.QUIZ && questionIndex > 0) {
+
+      if (s === SCREEN.QUIZ && qi > 0) {
         setQuestionIndex(i => i - 1);
         setAnswers(prev => prev.slice(0, -1));
-      } else if (screen === SCREEN.QUIZ) {
+      } else if (s === SCREEN.QUIZ) {
         setScreen(SCREEN.QUIZ_INTRO);
-      } else if (screen === SCREEN.PERSONA) {
-        // Going back from persona = re-do last quiz question
+      } else if (s === SCREEN.PERSONA) {
         setScreen(SCREEN.QUIZ);
         setQuestionIndex(QUESTIONS.length - 1);
         setAnswers(prev => prev.slice(0, -1));
-      } else if (screen === SCREEN.GOAL) {
-        // Skipped quiz → back to intro; otherwise back to persona reveal
-        setScreen(answers.length === 0 ? SCREEN.QUIZ_INTRO : SCREEN.PERSONA);
-      } else if (screen === SCREEN.INCOME) {
+      } else if (s === SCREEN.GOAL) {
+        setScreen(ans.length === 0 ? SCREEN.QUIZ_INTRO : SCREEN.PERSONA);
+      } else if (s === SCREEN.INCOME) {
         setScreen(SCREEN.GOAL);
-      } else if (screen === SCREEN.QUIZ_INTRO) {
+      } else if (s === SCREEN.QUIZ_INTRO) {
         setScreen(SCREEN.WELCOME);
       }
-      // SCREEN.WELCOME and SCREEN.WELCOME_GAME: no-op (stay)
     };
     window.addEventListener("popstate", handler);
-    return () => window.removeEventListener("popstate", handler);
-  }, [screen, questionIndex, answers.length]);
+    return () => {
+      window.removeEventListener("popstate", handler);
+      // Cleanup: pop our sentinel entry so the history stack returns to its
+      // pre-onboarding state. Guarded so it only fires if our state is on top.
+      if (window.history.state?.onboarding) {
+        window.history.back();
+      }
+    };
+  }, []);
 
   function handleAnswer(key) {
     const newAnswers = [...answers, key];

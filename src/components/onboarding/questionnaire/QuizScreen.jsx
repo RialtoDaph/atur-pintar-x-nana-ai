@@ -1,18 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { ScreenWrapper } from "./shared";
 
 // ─── Screen 4–8: Quiz Questions ──────────────────────────────────────────────
+// Parent uses `key={quiz-${questionIndex}}` so this component fully remounts
+// per question — useState initializer is sufficient for pre-fill, no effect needed.
 export default function QuizScreen({ questionIndex, totalQuestions, question, previousAnswer, onAnswer, onBack, canGoBack }) {
   const [selected, setSelected] = useState(previousAnswer || null);
   const isTransitioning = useRef(false);
-
-  // Reset transition lock when question changes (e.g. user goes back)
-  useEffect(() => {
-    isTransitioning.current = false;
-    setSelected(previousAnswer || null);
-  }, [questionIndex, previousAnswer]);
 
   function handleSelect(key) {
     if (isTransitioning.current) return;
