@@ -5,13 +5,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const TOUR_STEPS = [
-  { id: "balance-card", page: "Dashboard", title: "Kartu Ringkasan 💰", desc: "Geser ke kiri atau ketuk kartu untuk lihat 5 ringkasan: Bulan Ini, Semua Rekening, Investasi, Utang, dan Keuangan Bersama. Titik oranye di bawah menunjukkan slide aktif.", placement: "bottom" },
-  { id: "add-transaction-btn", page: "Dashboard", title: "Catat Transaksi ➕", desc: "Ketuk tombol + untuk catat pemasukan atau pengeluaran baru. Pilih rekening dan kategori dalam hitungan detik.", placement: "top" },
-  { id: "nana-tab", page: "Dashboard", title: "Tanya Nana AI 🤖", desc: "Tanya Nana untuk saran keuangan personal, analisis pengeluaran, dan tips menabung kapan saja.", placement: "top" },
-  { id: "analytics-tab", page: "Dashboard", title: "Lihat Analytics 📊", desc: "Pantau pola pengeluaran, kategori favorit, dan insight keuangan bulanan kamu di sini.", placement: "top" },
-  { id: "accounts-page-header", page: "Accounts", title: "Kelola Rekening 🏦", desc: "Tambah bank, e-wallet, dan cash di satu tempat. Saldo selalu tersinkronisasi otomatis tiap transaksi.", placement: "bottom" },
-  { id: "profile-avatar", page: "Dashboard", title: "Siap Mulai! 🎉", desc: "Pengaturan akun dan profil ada di ikon ini. Selamat menggunakan Atur Pintar, kontrol uangmu mulai sekarang!", placement: "bottom" },
-];
+{ id: "balance-card", page: "Dashboard", title: "Kartu Ringkasan 💰", desc: "Geser ke kiri atau ketuk kartu untuk lihat 5 ringkasan: Bulan Ini, Semua Rekening, Investasi, Utang, dan Keuangan Bersama. Titik oranye di bawah menunjukkan slide aktif.", placement: "bottom" },
+{ id: "add-transaction-btn", page: "Dashboard", title: "Catat Transaksi ➕", desc: "Ketuk tombol + untuk catat pemasukan atau pengeluaran baru. Pilih rekening dan kategori dalam hitungan detik.", placement: "top" },
+{ id: "nana-tab", page: "Dashboard", title: "Tanya Nana AI 🤖", desc: "Tanya Nana untuk saran keuangan personal, analisis pengeluaran, dan tips menabung kapan saja.", placement: "top" },
+{ id: "analytics-tab", page: "Dashboard", title: "Lihat Analytics 📊", desc: "Pantau pola pengeluaran, kategori favorit, dan insight keuangan bulanan kamu di sini.", placement: "top" },
+{ id: "accounts-page-header", page: "Accounts", title: "Kelola Rekening 🏦", desc: "Tambah bank, e-wallet, dan cash di satu tempat. Saldo selalu tersinkronisasi otomatis tiap transaksi.", placement: "bottom" },
+{ id: "profile-avatar", page: "Dashboard", title: "Siap Mulai! 🎉", desc: "Pengaturan akun dan profil ada di ikon ini. Selamat menggunakan Atur Pintar, kontrol uangmu mulai sekarang!", placement: "bottom" }];
+
 
 const TOOLTIP_WIDTH = 280;
 const TOOLTIP_HEIGHT = 160;
@@ -57,8 +57,8 @@ export default function TourGuide({ onComplete }) {
   const isLast = stepIndex === TOUR_STEPS.length - 1;
 
   function clearTimers() {
-    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-    if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
+    if (intervalRef.current) {clearInterval(intervalRef.current);intervalRef.current = null;}
+    if (timeoutRef.current) {clearTimeout(timeoutRef.current);timeoutRef.current = null;}
   }
 
   // Navigate to correct page when step changes
@@ -89,7 +89,7 @@ export default function TourGuide({ onComplete }) {
         if (scrollable) {
           const elRect = el.getBoundingClientRect();
           const containerRect = scrollable.getBoundingClientRect();
-          const targetScroll = scrollable.scrollTop + elRect.top - containerRect.top - (window.innerHeight / 2) + elRect.height / 2;
+          const targetScroll = scrollable.scrollTop + elRect.top - containerRect.top - window.innerHeight / 2 + elRect.height / 2;
           scrollable.scrollTo({ top: Math.max(0, targetScroll), behavior: "smooth" });
         } else {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -117,33 +117,33 @@ export default function TourGuide({ onComplete }) {
   useEffect(() => () => clearTimers(), []);
 
   function handleNext() {
-    if (isLast) onComplete();
-    else setStepIndex(i => i + 1);
+    if (isLast) onComplete();else
+    setStepIndex((i) => i + 1);
   }
 
   function handlePrev() {
-    if (stepIndex > 0) setStepIndex(i => i - 1);
+    if (stepIndex > 0) setStepIndex((i) => i - 1);
   }
 
   const tooltipStyle = getTooltipStyle(targetRect, currentStep.placement);
   const spotlight = targetRect ? {
     top: targetRect.top - 6, left: targetRect.left - 6,
-    width: targetRect.width + 12, height: targetRect.height + 12,
+    width: targetRect.width + 12, height: targetRect.height + 12
   } : null;
 
   const fallbackStyle = !targetRect ? {
-    bottom: 120, left: "50%", marginLeft: -(TOOLTIP_WIDTH / 2), width: TOOLTIP_WIDTH,
+    bottom: 120, left: "50%", marginLeft: -(TOOLTIP_WIDTH / 2), width: TOOLTIP_WIDTH
   } : {};
 
   // Render dim overlay as 4 separate rects around the spotlight so the spotlight area
   // itself is a true hole — clicks pass through to the highlighted element (e.g. swiping the balance card).
   const overlayBg = "rgba(0,0,0,0.65)";
   const dimRects = spotlight ? [
-    { top: 0, left: 0, width: "100%", height: spotlight.top },
-    { top: spotlight.top + spotlight.height, left: 0, width: "100%", bottom: 0 },
-    { top: spotlight.top, left: 0, width: spotlight.left, height: spotlight.height },
-    { top: spotlight.top, left: spotlight.left + spotlight.width, right: 0, height: spotlight.height },
-  ] : [{ top: 0, left: 0, right: 0, bottom: 0 }];
+  { top: 0, left: 0, width: "100%", height: spotlight.top },
+  { top: spotlight.top + spotlight.height, left: 0, width: "100%", bottom: 0 },
+  { top: spotlight.top, left: 0, width: spotlight.left, height: spotlight.height },
+  { top: spotlight.top, left: spotlight.left + spotlight.width, right: 0, height: spotlight.height }] :
+  [{ top: 0, left: 0, right: 0, bottom: 0 }];
 
   if (showWelcome) {
     return createPortal(
@@ -159,14 +159,14 @@ export default function TourGuide({ onComplete }) {
           <div className="flex flex-col gap-2">
             <button
               onClick={() => setShowWelcome(false)}
-              className="w-full py-3 rounded-2xl bg-[#FF6A00] text-white font-bold text-sm hover:bg-[#e05e00] transition-colors tap-highlight-fix"
-            >
+              className="w-full py-3 rounded-2xl bg-[#FF6A00] text-white font-bold text-sm hover:bg-[#e05e00] transition-colors tap-highlight-fix">
+              
               Mulai Tur 🚀
             </button>
             <button
               onClick={onComplete}
-              className="w-full py-2.5 text-[#8FA4C8] text-xs font-medium hover:text-white transition-colors tap-highlight-fix"
-            >
+              className="w-full py-2.5 text-[#8FA4C8] text-xs font-medium hover:text-white transition-colors tap-highlight-fix">
+              
               Nanti aja
             </button>
           </div>
@@ -178,36 +178,36 @@ export default function TourGuide({ onComplete }) {
 
   return createPortal(
     <div data-tour-overlay="true" className="fixed inset-0 z-[9999]" style={{ pointerEvents: "none" }}>
-      {dimRects.map((style, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{ ...style, background: overlayBg, pointerEvents: "all" }}
-          onClick={handleNext}
-        />
-      ))}
-      {spotlight && (
-        <div
-          className="absolute rounded-xl pointer-events-none"
-          style={{
-            top: spotlight.top, left: spotlight.left,
-            width: spotlight.width, height: spotlight.height,
-            border: "2px solid #FF6A00",
-            boxShadow: "0 0 0 1px rgba(255,106,0,0.3)"
-          }}
-        />
+      {dimRects.map((style, i) =>
+      <div
+        key={i}
+        className="absolute"
+        style={{ ...style, background: overlayBg, pointerEvents: "all" }}
+        onClick={handleNext} />
+
       )}
+      {spotlight &&
+      <div
+        className="absolute rounded-xl pointer-events-none"
+        style={{
+          top: spotlight.top, left: spotlight.left,
+          width: spotlight.width, height: spotlight.height,
+          border: "2px solid #FF6A00",
+          boxShadow: "0 0 0 1px rgba(255,106,0,0.3)"
+        }} />
+
+      }
 
       <div
-        className="absolute bg-[#0A0A0A] border border-[#FF6A00]/40 rounded-2xl p-4 shadow-2xl"
+        className="absolute bg-[#0A0A0A] border border-[#FF6A00]/40 rounded-2xl shadow-2xl px-4 py-4 my-1"
         style={{ ...(targetRect ? tooltipStyle : fallbackStyle), pointerEvents: "all", zIndex: 10000 }}
-        onClick={e => e.stopPropagation()}
-      >
+        onClick={(e) => e.stopPropagation()}>
+        
         <div className="flex items-center justify-between mb-3">
           <div className="flex gap-1">
-            {TOUR_STEPS.map((_, i) => (
-              <div key={i} className={`h-1.5 rounded-full transition-all ${i === stepIndex ? "w-5 bg-[#FF6A00]" : "w-1.5 bg-white/20"}`} />
-            ))}
+            {TOUR_STEPS.map((_, i) =>
+            <div key={i} className={`h-1.5 rounded-full transition-all ${i === stepIndex ? "w-5 bg-[#FF6A00]" : "w-1.5 bg-white/20"}`} />
+            )}
           </div>
           <button onClick={onComplete} className="text-[#8FA4C8] hover:text-white transition-colors tap-highlight-fix">
             <X className="w-3.5 h-3.5" />
@@ -222,13 +222,13 @@ export default function TourGuide({ onComplete }) {
             Lewati
           </button>
           <div className="flex gap-2">
-            {stepIndex > 0 && (
-              <button onClick={handlePrev} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-colors tap-highlight-fix">
+            {stepIndex > 0 &&
+            <button onClick={handlePrev} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-colors tap-highlight-fix">
                 <ArrowLeft className="w-3 h-3" /> Kembali
               </button>
-            )}
+            }
             <button onClick={handleNext} className="flex items-center gap-1 px-4 py-1.5 rounded-xl bg-[#FF6A00] text-white text-xs font-bold hover:bg-[#e05e00] transition-colors tap-highlight-fix">
-              {isLast ? "Selesai 🎉" : (<>Lanjut <ArrowRight className="w-3 h-3" /></>)}
+              {isLast ? "Selesai 🎉" : <>Lanjut <ArrowRight className="w-3 h-3" /></>}
             </button>
           </div>
         </div>
