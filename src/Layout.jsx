@@ -1,6 +1,7 @@
 import { createPageUrl } from "@/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, Settings, Bell, Lightbulb, Search, Grid3x3, ArrowLeft, Wallet, Users, Sparkles, Plus } from "lucide-react";
+import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
 import AdminNotificationPanel from "@/components/notifications/AdminNotificationPanel";
@@ -177,6 +178,26 @@ function LayoutInner({ children, currentPageName }) {
       tabHistory.current[currentPageName] = currentPageName;
     }
   }, [currentPageName]);
+
+  // FAB click: guard — require at least 1 account before opening AddTransactionModal
+  const handleFabClick = async () => {
+    if (showAddTransaction) { setShowAddTransaction(false); return; }
+    try {
+      const u = user || (await base44.auth.me());
+      const accs = await base44.entities.Account.filter({ created_by: u.email });
+      if (!accs || accs.length === 0) {
+        toast.error("Buat rekening dulu yuk sebelum catat transaksi", {
+          action: { label: "Buat Rekening", onClick: () => navigate(createPageUrl("Accounts")) },
+          duration: 5000,
+        });
+        return;
+      }
+      setShowAddTransaction(true);
+    } catch {
+      // fallback: open modal anyway if check fails
+      setShowAddTransaction(true);
+    }
+  };
 
   // Handle tab clicks - navigate with React Router for soft navigation
   const handleTabClick = (tabName) => {
@@ -388,7 +409,7 @@ function LayoutInner({ children, currentPageName }) {
       {/* Mobile FAB - center-bottom, toggles Plus↔X (X when modal open) */}
       {!isNestedPage && currentPageName !== "Nana" &&
       <button
-        onClick={() => setShowAddTransaction(v => !v)}
+        onClick={handleFabClick}
         data-tour="add-transaction-btn"
         className="fixed left-1/2 -translate-x-1/2 z-[80] flex items-center justify-center rounded-full active:scale-95 transition-all duration-200 tap-highlight-fix sm:hidden"
         style={{
@@ -410,7 +431,7 @@ function LayoutInner({ children, currentPageName }) {
 
       {/* Desktop FAB - bottom right */}
       <button
-        onClick={() => setShowAddTransaction(v => !v)}
+        onClick={handleFabClick}
         className="fixed z-[80] bg-[#FF6B35] items-center justify-center rounded-full shadow-lg active:scale-95 transition-all duration-200 tap-highlight-fix hidden sm:flex"
         style={{
           width: 56, height: 56,
