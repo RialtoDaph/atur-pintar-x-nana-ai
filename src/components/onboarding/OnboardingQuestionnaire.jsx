@@ -247,10 +247,19 @@ function Screen3({ onNext }) {
 // ─── Screen 4–8: Quiz Questions ──────────────────────────────────────────────
 function QuizScreen({ questionIndex, totalQuestions, question, onAnswer, onBack, canGoBack }) {
   const [selected, setSelected] = useState(null);
+  const isTransitioning = useRef(false);
 
   function handleSelect(key) {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
     setSelected(key);
     setTimeout(() => onAnswer(key), 500);
+  }
+
+  function handleBack() {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+    onBack();
   }
 
   return (
@@ -261,7 +270,7 @@ function QuizScreen({ questionIndex, totalQuestions, question, onAnswer, onBack,
           <div className="flex items-center gap-2">
             {canGoBack && (
               <button
-                onClick={onBack}
+                onClick={handleBack}
                 className="flex items-center gap-1 text-[#FF6B35] font-medium tap-highlight-fix"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
@@ -379,8 +388,11 @@ function Screen10({ onNext }) {
   const [selected, setSelected] = useState(null);
   const [customGoal, setCustomGoal] = useState("");
 
+  const isValid = selected && (selected !== "custom" || customGoal.trim().length > 0);
+
   function handleNext() {
-    const goal = selected === "custom" ? customGoal : selected;
+    if (!isValid) return;
+    const goal = selected === "custom" ? customGoal.trim() : selected;
     onNext(goal);
   }
 
@@ -429,9 +441,16 @@ function Screen10({ onNext }) {
           <input
             type="text"
             placeholder="Nabung buat apa?"
+            maxLength={50}
             className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35] bg-white mb-3"
             value={customGoal}
             onChange={e => setCustomGoal(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter" && isValid) {
+                e.preventDefault();
+                handleNext();
+              }
+            }}
             autoFocus
           />
         )}
@@ -444,7 +463,7 @@ function Screen10({ onNext }) {
       <div className="px-6 pb-8">
         <CTAButton
           onClick={handleNext}
-          disabled={!selected || (selected === "custom" && !customGoal.trim())}
+          disabled={!isValid}
         >
           Lanjut →
         </CTAButton>
@@ -464,7 +483,7 @@ function Screen11({ onNext, loading, error }) {
           <NanaAvatar size="sm" />
           <div className="bg-[#F2F4F7] rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
             <p className="text-sm text-[#1A1A1A] leading-relaxed">
-              Terakhir, biar gue bisa bantu yang relevan, gue perlu tau income bulanan kamu.
+              Terakhir, biar Nana bisa kasih saran yang relevan, Nana perlu tau income bulanan kamu.
             </p>
           </div>
         </div>
@@ -740,7 +759,6 @@ export default function OnboardingQuestionnaire({ onClose }) {
             primaryGoal={primaryGoal}
             primaryGoalLabel={primaryGoalLabel}
             onDone={() => {
-              localStorage.setItem("onboarding_done", "true");
               onClose();
             }}
           />
