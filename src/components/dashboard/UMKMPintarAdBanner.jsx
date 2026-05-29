@@ -110,14 +110,14 @@ export default function UMKMPintarAdBanner() {
                     className="font-bold leading-none"
                     style={{ color: "#E8520A", fontSize: 11 }}
                   >
-                    UP
+                    V
                   </span>
                 </div>
                 <span
                   className="text-white font-bold"
                   style={{ fontSize: 14 }}
                 >
-                  UMKM Pintar
+                  Vrekas.id
                 </span>
                 <span
                   className="font-bold"
@@ -225,7 +225,7 @@ export default function UMKMPintarAdBanner() {
               {/* CTA */}
               <button
                 onClick={() =>
-                  window.open("https://umkmpintar.base44.app", "_blank")
+                  window.open("https://vrekas.id", "_blank")
                 }
                 className="text-white font-bold active:scale-95 transition-transform tap-highlight-fix whitespace-nowrap"
                 style={{
