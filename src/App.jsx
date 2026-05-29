@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { base44 } from '@/api/base44Client';
 import { queryClientInstance } from '@/lib/query-client'
@@ -10,28 +10,39 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
-import Subscription from '@/pages/Subscription';
+import AdminProtect from '@/components/admin/AdminProtect';
+
+// Eager — needed for first paint (public landing + lightweight pages)
 import LandingPage from '@/pages/LandingPage';
-import AdminSubscriptions from '@/pages/AdminSubscriptions';
-import Dashboard from '@/pages/Dashboard';
-import ProfileSettings from '@/pages/ProfileSettings';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
-import Accounts from '@/pages/Accounts';
-import SharedFinance from '@/pages/SharedFinance';
-import AdminDashboard from '@/pages/AdminDashboard';
-import AdminUsers from '@/pages/AdminUsers';
-import AdminLogs from '@/pages/AdminLogs';
-import AdminNotifications from '@/pages/AdminNotifications';
-import AdminCategories from '@/pages/AdminCategories';
-import AdminSettings from '@/pages/AdminSettings';
-import AdminDefaultAccounts from '@/pages/AdminDefaultAccounts';
 import MaintenancePage from '@/pages/MaintenancePage';
-import About from '@/pages/About';
-import ReceiptScanHistory from '@/pages/ReceiptScanHistory';
-import Gamifikasi from '@/pages/Gamifikasi';
-import Investments from '@/pages/Investments';
-import AdminProtect from '@/components/admin/AdminProtect';
+
+// Lazy — loaded only when user navigates to them
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const Subscription = lazy(() => import('@/pages/Subscription'));
+const ProfileSettings = lazy(() => import('@/pages/ProfileSettings'));
+const Accounts = lazy(() => import('@/pages/Accounts'));
+const SharedFinance = lazy(() => import('@/pages/SharedFinance'));
+const About = lazy(() => import('@/pages/About'));
+const ReceiptScanHistory = lazy(() => import('@/pages/ReceiptScanHistory'));
+const Gamifikasi = lazy(() => import('@/pages/Gamifikasi'));
+const Investments = lazy(() => import('@/pages/Investments'));
+const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
+const AdminUsers = lazy(() => import('@/pages/AdminUsers'));
+const AdminLogs = lazy(() => import('@/pages/AdminLogs'));
+const AdminNotifications = lazy(() => import('@/pages/AdminNotifications'));
+const AdminCategories = lazy(() => import('@/pages/AdminCategories'));
+const AdminSettings = lazy(() => import('@/pages/AdminSettings'));
+const AdminDefaultAccounts = lazy(() => import('@/pages/AdminDefaultAccounts'));
+const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
+
+// Suspense fallback — minimal spinner matching app design
+const PageLoader = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-[#F2F4F7]">
+    <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+  </div>
+);
 
 const { Pages, Layout } = pagesConfig;
 
@@ -91,6 +102,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route path="/" element={<Navigate to="/Dashboard" replace />} />
       <Route path="/Dashboard" element={
@@ -138,6 +150,7 @@ const AuthenticatedApp = () => {
       <Route path="/TermsOfService" element={<TermsOfService />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
   );
 };
 
