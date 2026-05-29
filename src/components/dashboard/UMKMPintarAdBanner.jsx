@@ -53,22 +53,12 @@ export default function UMKMPintarAdBanner() {
                 Sponsored
               </span>
               <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>·</span>
-              <div
-                className="flex items-center justify-center flex-shrink-0"
-                style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg, #3B82F6, #06B6D4)",
-                }}
-              >
-                <span
-                  className="text-white font-bold leading-none"
-                  style={{ fontSize: 7 }}
-                >
-                  AP
-                </span>
-              </div>
+              <img
+                src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png"
+                alt="Atur Pintar"
+                className="flex-shrink-0 object-contain"
+                style={{ width: 14, height: 14 }}
+              />
               <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>
                 by Atur Pintar
               </span>
