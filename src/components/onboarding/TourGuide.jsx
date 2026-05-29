@@ -129,18 +129,37 @@ export default function TourGuide({ onComplete }) {
     bottom: 100, left: "50%", transform: "translateX(-50%)", width: TOOLTIP_WIDTH,
   } : {};
 
+  // Render dim overlay as 4 separate rects around the spotlight so the spotlight area
+  // itself is a true hole — clicks pass through to the highlighted element (e.g. swiping the balance card).
+  const overlayBg = "rgba(0,0,0,0.65)";
+  const dimRects = spotlight ? [
+    { top: 0, left: 0, width: "100%", height: spotlight.top },
+    { top: spotlight.top + spotlight.height, left: 0, width: "100%", bottom: 0 },
+    { top: spotlight.top, left: 0, width: spotlight.left, height: spotlight.height },
+    { top: spotlight.top, left: spotlight.left + spotlight.width, right: 0, height: spotlight.height },
+  ] : [{ top: 0, left: 0, right: 0, bottom: 0 }];
+
   return createPortal(
     <div data-tour-overlay="true" className="fixed inset-0 z-[9999]" style={{ pointerEvents: "none" }}>
-      <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: "all" }} onClick={handleNext}>
-        <defs>
-          <mask id="spotlight-mask">
-            <rect width="100%" height="100%" fill="white" />
-            {spotlight && <rect x={spotlight.left} y={spotlight.top} width={spotlight.width} height={spotlight.height} rx="12" fill="black" />}
-          </mask>
-        </defs>
-        <rect width="100%" height="100%" fill="rgba(0,0,0,0.65)" mask="url(#spotlight-mask)" />
-        {spotlight && <rect x={spotlight.left} y={spotlight.top} width={spotlight.width} height={spotlight.height} rx="12" fill="none" stroke="#FF6A00" strokeWidth="2" />}
-      </svg>
+      {dimRects.map((style, i) => (
+        <div
+          key={i}
+          className="absolute"
+          style={{ ...style, background: overlayBg, pointerEvents: "all" }}
+          onClick={handleNext}
+        />
+      ))}
+      {spotlight && (
+        <div
+          className="absolute rounded-xl pointer-events-none"
+          style={{
+            top: spotlight.top, left: spotlight.left,
+            width: spotlight.width, height: spotlight.height,
+            border: "2px solid #FF6A00",
+            boxShadow: "0 0 0 1px rgba(255,106,0,0.3)"
+          }}
+        />
+      )}
 
       <div
         className="absolute bg-[#0A0A0A] border border-[#FF6A00]/40 rounded-2xl p-4 shadow-2xl"
