@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const TOUR_STEPS = [
-  { id: "balance-card", page: "Dashboard", title: "Selamat datang di Dashboard 💰", desc: "Di sini kamu bisa lihat saldo, pemasukan, dan pengeluaran bulan ini dalam satu tampilan.", placement: "bottom" },
+  { id: "balance-card", page: "Dashboard", title: "Kartu Ringkasan 💰", desc: "Geser ke kiri atau ketuk kartu untuk lihat 5 ringkasan: Bulan Ini, Semua Rekening, Investasi, Utang, dan Keuangan Bersama. Titik oranye di bawah menunjukkan slide aktif.", placement: "bottom" },
   { id: "add-transaction-btn", page: "Dashboard", title: "Catat Transaksi ➕", desc: "Ketuk tombol + untuk catat pemasukan atau pengeluaran baru. Pilih rekening dan kategori dalam hitungan detik.", placement: "top" },
   { id: "nana-tab", page: "Dashboard", title: "Tanya Nana AI 🤖", desc: "Tanya Nana untuk saran keuangan personal, analisis pengeluaran, dan tips menabung kapan saja.", placement: "top" },
   { id: "analytics-tab", page: "Dashboard", title: "Lihat Analytics 📊", desc: "Pantau pola pengeluaran, kategori favorit, dan insight keuangan bulanan kamu di sini.", placement: "top" },
