@@ -316,8 +316,13 @@ export default function Dashboard() {
         )}
 
         {showOnboarding && (
-          <OnboardingQuestionnaire onClose={() => {
+          <OnboardingQuestionnaire onClose={async () => {
             setShowOnboarding(false);
+            // Refetch user so onboarding_completed flag flips and gated widgets render
+            try {
+              const fresh = await base44.auth.me();
+              setUser(fresh);
+            } catch {}
             loadData();
           }} />
         )}
