@@ -223,7 +223,7 @@ function Screen1({ onNext }) {
 }
 
 // ─── Screen 3: Intro Quiz ────────────────────────────────────────────────────
-function Screen3({ onNext }) {
+function Screen3({ onNext, onSkip }) {
   return (
     <ScreenWrapper>
       <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-10">
@@ -235,10 +235,16 @@ function Screen3({ onNext }) {
           Gak ada jawaban yang salah, yang salah itu kalau bohong ke diri sendiri. 😄
         </p>
       </div>
-      <div className="px-6 pb-8">
+      <div className="px-6 pb-8 space-y-3">
         <CTAButton onClick={onNext}>
           Mulai Quiz →
         </CTAButton>
+        <button
+          onClick={onSkip}
+          className="w-full py-3 text-sm font-medium text-[#8FA4C8] hover:text-[#FF6B35] transition-colors tap-highlight-fix"
+        >
+          Lewati quiz, isi yang penting aja
+        </button>
       </div>
     </ScreenWrapper>
   );
@@ -730,7 +736,16 @@ export default function OnboardingQuestionnaire({ onClose }) {
           <Screen1 key="s1" onNext={() => setScreen(SCREEN.QUIZ_INTRO)} />
         )}
         {screen === SCREEN.QUIZ_INTRO && (
-          <Screen3 key="s3" onNext={() => { setScreen(SCREEN.QUIZ); setQuestionIndex(0); setAnswers([]); }} />
+          <Screen3
+            key="s3"
+            onNext={() => { setScreen(SCREEN.QUIZ); setQuestionIndex(0); setAnswers([]); }}
+            onSkip={() => {
+              // Skip quiz: default persona "balanced", lanjut ke goal selection
+              setPersona("balanced");
+              setAnswers([]);
+              setScreen(SCREEN.GOAL);
+            }}
+          />
         )}
         {screen === SCREEN.QUIZ && (
           <QuizScreen
