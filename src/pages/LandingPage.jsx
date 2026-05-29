@@ -121,15 +121,15 @@ function ScrollProgress() {
 
 // ─── NANA Chat Demo ───────────────────────────────────────────────────────────
 const NANA_RESPONSES = [
-{ keywords: ["nabung", "tabung", "saving"], reply: "Dari pola yang sering aku lihat, nabung itu lebih berhasil kalau langsung disisihkan di awal bulan — bukan nunggu sisa akhir bulan. Coba tentukan nominal tetap dulu, sekecil apapun itu. Konsistensi lebih penting dari jumlahnya." },
-{ keywords: ["boros", "hemat", "pengeluaran berlebih"], reply: "Ngerasa boros itu wajar — biasanya bukan soal jumlah pengeluarannya, tapi karena belum ada tracking yang jelas. Coba catat pengeluaran selama 3 hari aja dulu. Dari situ biasanya langsung kelihatan polanya." },
-{ keywords: ["investasi", "invest", "saham", "reksa"], reply: "Sebelum investasi, pastikan dulu kamu punya dana darurat minimal 3 bulan pengeluaran. Kalau sudah ada, reksa dana pasar uang bisa jadi titik mulai yang aman — risikonya rendah dan bisa dicairkan kapan saja." },
-{ keywords: ["gaji", "salary", "penghasilan", "income"], reply: "Gaji berapapun bisa diatur kalau sistemnya sudah jelas. Formula 50-30-20 bisa jadi titik awal — 50% untuk kebutuhan, 30% keinginan, 20% tabungan. Proporsinya bisa disesuaikan dengan kondisi kamu." },
-{ keywords: ["hutang", "utang", "cicilan", "kredit"], reply: "Ada dua strategi yang umum dipakai. Pertama, bayar yang bunga paling besar dulu — debt avalanche, paling hemat secara matematis. Kedua, bayar yang nominal paling kecil dulu — debt snowball, lebih terasa progresnya. Pilih yang paling cocok sama psikologi kamu." },
-{ keywords: ["budget", "anggaran", "planning"], reply: "Mulai dari catat semua pengeluaran bulan lalu — dari situ kamu bisa lihat mana yang fixed dan mana yang variable. Setelah itu baru tentukan batas untuk tiap kategori. Jangan terlalu ketat di awal, nanti susah diikutin." },
-{ keywords: ["darurat", "emergency"], reply: "Standarnya 3–6 bulan pengeluaran bulanan kamu. Simpan di tempat yang likuid — rekening tabungan biasa atau reksa dana pasar uang, bukan deposito yang ada jatuh temponya." },
+{ keywords: ["nabung", "tabung", "saving"], reply: "Dari pola yang sering aku lihat, nabung itu lebih berhasil kalau langsung disisihkan di awal bulan, bukan nunggu sisa akhir bulan. Coba tentukan nominal tetap dulu, sekecil apapun itu. Konsistensi lebih penting dari jumlahnya." },
+{ keywords: ["boros", "hemat", "pengeluaran berlebih"], reply: "Ngerasa boros itu wajar, biasanya bukan soal jumlah pengeluarannya, tapi karena belum ada tracking yang jelas. Coba catat pengeluaran selama 3 hari aja dulu. Dari situ biasanya langsung kelihatan polanya." },
+{ keywords: ["investasi", "invest", "saham", "reksa"], reply: "Sebelum investasi, pastikan dulu kamu punya dana darurat minimal 3 bulan pengeluaran. Kalau sudah ada, reksa dana pasar uang bisa jadi titik mulai yang aman, risikonya rendah dan bisa dicairkan kapan saja." },
+{ keywords: ["gaji", "salary", "penghasilan", "income"], reply: "Gaji berapapun bisa diatur kalau sistemnya sudah jelas. Formula 50-30-20 bisa jadi titik awal: 50% untuk kebutuhan, 30% keinginan, 20% tabungan. Proporsinya bisa disesuaikan dengan kondisi kamu." },
+{ keywords: ["hutang", "utang", "cicilan", "kredit"], reply: "Ada dua strategi yang umum dipakai. Pertama, bayar yang bunga paling besar dulu (debt avalanche), paling hemat secara matematis. Kedua, bayar yang nominal paling kecil dulu (debt snowball), lebih terasa progresnya. Pilih yang paling cocok sama psikologi kamu." },
+{ keywords: ["budget", "anggaran", "planning"], reply: "Mulai dari catat semua pengeluaran bulan lalu, dari situ kamu bisa lihat mana yang fixed dan mana yang variable. Setelah itu baru tentukan batas untuk tiap kategori. Jangan terlalu ketat di awal, nanti susah diikutin." },
+{ keywords: ["darurat", "emergency"], reply: "Standarnya 3 sampai 6 bulan pengeluaran bulanan kamu. Simpan di tempat yang likuid seperti rekening tabungan biasa atau reksa dana pasar uang, bukan deposito yang ada jatuh temponya." },
 { keywords: ["belanja", "shopee", "tokopedia", "lazada", "online"], reply: "Platform belanja online memang dirancang supaya kamu impulsif. Coba pakai teknik wishlist 24 jam: kalau mau beli sesuatu, masukin wishlist dulu. Tunggu sehari. Kalau masih mau, baru beli. Lebih dari 60% biasanya sudah tidak jadi." },
-{ keywords: ["motor", "mobil", "rumah", "kpr", "beli"], reply: "Bagus punya tujuan yang spesifik. Tentukan harga targetnya, lalu bagi dengan berapa bulan kamu mau mencapainya — itu nominal yang harus disisihkan tiap bulan. Yang penting angkanya jelas dulu." }];
+{ keywords: ["motor", "mobil", "rumah", "kpr", "beli"], reply: "Bagus punya tujuan yang spesifik. Tentukan harga targetnya, lalu bagi dengan berapa bulan kamu mau mencapainya, itu nominal yang harus disisihkan tiap bulan. Yang penting angkanya jelas dulu." }];
 
 
 function getNanaReply(input) {
@@ -149,7 +149,7 @@ const QUICK_QUESTIONS = [
 
 function NanaChatDemo({ scrollToWaitingList }) {
   const [messages, setMessages] = useState([
-  { role: "nana", text: "Halo! Aku Nana, asisten keuangan kamu 👋 Tanya apa saja soal keuangan — nabung, investasi, hutang, atau apapun yang lagi bikin pusing." }]
+  { role: "nana", text: "Halo! Aku Nana, asisten keuangan kamu 👋 Tanya apa saja soal keuangan, nabung, investasi, hutang, atau apapun yang lagi bikin pusing." }]
   );
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -190,7 +190,7 @@ function NanaChatDemo({ scrollToWaitingList }) {
           <h2 className="text-2xl sm:text-3xl font-black text-white mb-1 text-center">Kenalan sama Nana.</h2>
         </Reveal>
         <Reveal delay={60}>
-          <p className="text-center text-white/40 text-xs mb-6">AI bestie finansialmu — tanya apa saja soal keuangan.</p>
+          <p className="text-center text-white/40 text-xs mb-6">AI bestie finansialmu, tanya apa saja soal keuangan.</p>
         </Reveal>
         <Reveal delay={120}>
           <div className="card-d rounded-2xl overflow-hidden">
@@ -288,10 +288,10 @@ function NanaChatDemo({ scrollToWaitingList }) {
 const FAQS = [
 { q: "Apakah Atur Pintar gratis?", a: "Ya, ada versi gratis selamanya. Kamu bisa catat transaksi, pakai Nana AI 5x sehari, dan akses fitur gamifikasi tanpa bayar apapun." },
 { q: "Apakah data keuangan saya aman?", a: "Data kamu dienkripsi dan tidak pernah dijual ke pihak ketiga. Atur Pintar tidak punya akses ke rekening bank kamu — semua diinput manual oleh kamu sendiri." },
-{ q: "Bisa dipakai di HP?", a: "Bisa langsung dari browser HP kamu — tidak perlu install apapun. Web app sudah fully responsive dan terasa seperti aplikasi native." },
+{ q: "Bisa dipakai di HP?", a: "Bisa langsung dari browser HP kamu, tidak perlu install apapun. Web app sudah fully responsive dan terasa seperti aplikasi native." },
 { q: "Kapan versi iOS & Android rilis?", a: "Aplikasi mobile untuk App Store dan Play Store sedang dalam tahap finalisasi. Sementara itu, web app sudah siap dipakai dengan semua fitur lengkap." },
 { q: "Gimana cara mulai?", a: "Klik tombol 'Mulai Gratis', daftar pakai email, dan kamu langsung bisa pakai semua fitur dasar tanpa bayar apapun." },
-{ q: "Bedanya Free dan Plus?", a: "Free: tracker lengkap, Nana AI 5x/hari, 1 goal. Plus (Rp 49rb/bln): Nana AI unlimited, analytics advanced, shared wallet unlimited, dan semua fitur premium lainnya." }];
+{ q: "Bedanya Free dan Plus?", a: "Free: tracker lengkap, Nana AI 5x per hari, 1 goal. Plus (Rp 49rb per bulan): Nana AI unlimited, analytics advanced, shared wallet unlimited, dan semua fitur premium lainnya." }];
 
 
 function FaqSection() {
@@ -411,7 +411,7 @@ function NewsletterSection() {
           <div className="text-center mb-8">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Dapat tips langsung ke inbox.</h2>
             <p className="text-[#FF6A00] font-bold text-lg mb-3">Newsletter Atur Pintar.</p>
-            <p className="text-white/50 text-sm">Tips keuangan ringan, update fitur baru, dan cerita seru — tanpa spam.</p>
+            <p className="text-white/50 text-sm">Tips keuangan ringan, update fitur baru, dan cerita seru, tanpa spam.</p>
           </div>
         </Reveal>
 
@@ -597,7 +597,7 @@ export default function LandingPage() {
 
           <Reveal delay={160}>
             <p className="text-base sm:text-lg text-white/55 max-w-xl mb-10 leading-relaxed mx-auto sm:mx-0">
-              Bukan karena harus — tapi karena seru.<br />
+              Bukan karena harus, tapi karena seru.<br />
               Catat duit, naik level, saingan sama teman.<br />
               Atur Pintar hadir buat kamu yang capek merasa <em>guilty</em> soal keuangan.
             </p>
@@ -653,7 +653,7 @@ export default function LandingPage() {
           </div>
           <Reveal delay={200}>
             <p className="text-center text-white/45 text-sm italic max-w-lg mx-auto leading-relaxed">
-              "Kamu gak sendiri. Dan kamu gak butuh lebih banyak teori — kamu butuh cara yang bikin kamu mau lakuin."
+              "Kamu gak sendiri. Dan kamu gak butuh lebih banyak teori, kamu butuh cara yang bikin kamu mau lakuin."
             </p>
           </Reveal>
         </div>
@@ -671,8 +671,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
             { icon: "🎮", title: "Keuangan yang terasa kayak game.", desc: "Setiap kebiasaan finansial yang kamu lakuin = XP. Naik level, unlock fitur baru, jaga streak harianmu. Duit diatur sambil ngerasa menang tiap hari." },
-            { icon: "✨", title: "Kenalan sama Nana — AI bestie finansialmu.", desc: "Bukan chatbot kaku. Nana tau pola pengeluaranmu, kasih insight yang jujur, dan cukup lucu buat bikin kamu gak mager buka app. Dia di pihak kamu — selalu." },
-            { icon: "🏆", title: "Saingan nabung sama teman.", desc: "Shared wallet, leaderboard, dan challenge bareng. Karena kadang yang bikin kamu konsisten bukan aplikasinya — tapi tahu temenmu lagi ngejar juga." },
+            { icon: "✨", title: "Kenalan sama Nana, AI bestie finansialmu.", desc: "Bukan chatbot kaku. Nana tau pola pengeluaranmu, kasih insight yang jujur, dan cukup lucu buat bikin kamu gak mager buka app. Dia di pihak kamu, selalu." },
+            { icon: "🏆", title: "Saingan nabung sama teman.", desc: "Shared wallet, leaderboard, dan challenge bareng. Karena kadang yang bikin kamu konsisten bukan aplikasinya, tapi tahu temenmu lagi ngejar juga." },
             { icon: "🔥", title: "Kebiasaan kecil, hasil nyata.", desc: "Daily missions yang ringan, achievable, dan numpuk jadi perubahan besar. Satu habit per hari sudah cukup untuk mulai." }].
             map((f, i) =>
             <Reveal key={i} delay={i * 70}>
@@ -735,7 +735,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Lihat langsung cara kerjanya.</h2>
           </Reveal>
           <Reveal delay={60}>
-            <p className="text-white/40 text-sm mb-10">Web app — buka browser, langsung bisa. Tanpa install apapun.</p>
+            <p className="text-white/40 text-sm mb-10">Web app, buka browser, langsung bisa. Tanpa install apapun.</p>
           </Reveal>
           <Reveal delay={120}>
             <div className="mx-auto iphone-frame" style={{ width: 280 }}>
@@ -867,7 +867,7 @@ export default function LandingPage() {
                 <Mail className="w-3.5 h-3.5" />
                 admin@aturpintar.id
               </a>
-              <p className="text-white/20 text-[11px]">aturpintar.app</p>
+              <p className="text-white/20 text-[11px]">aturpintar.id</p>
               <div className="flex items-center gap-3 mt-3">
                 <a href="https://instagram.com/aturpintar" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
                   <Instagram className="w-3.5 h-3.5" />
@@ -879,7 +879,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-white/5 pt-5">
-            <p className="text-white/20 text-xs text-center">© 2026 PT Rideff Vreka Tech. All rights reserved. · admin@aturpintar.id · aturpintar.app</p>
+            <p className="text-white/20 text-xs text-center">© 2026 PT Rideff Vreka Tech. All rights reserved. · admin@aturpintar.id · aturpintar.id</p>
           </div>
         </div>
       </footer>
