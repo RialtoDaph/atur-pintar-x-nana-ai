@@ -10,8 +10,19 @@ const VIDEO_URL = "https://www.youtube.com/embed/6KazLzryNbM";
 // ─── Matrix background ────────────────────────────────────────────────────────
 function MatrixBackground() {
   const canvasRef = useRef(null);
+  const [enabled, setEnabled] = useState(false);
+
+  // Only enable on desktop (>=768px) AND when user has no reduced-motion preference
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const isDesktop = window.innerWidth >= 768;
+    if (!prefersReducedMotion && isDesktop) setEnabled(true);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     let w = canvas.width = window.innerWidth;
     let h = canvas.height = window.innerHeight;
@@ -19,7 +30,10 @@ function MatrixBackground() {
     const drops = Array(cols).fill(1);
     const chars = "01アイウエオカキクケコABCDEF∑∆∫πΩ";
     let raf;
+    let running = !document.hidden;
+
     const draw = () => {
+      if (!running) { raf = null; return; }
       ctx.fillStyle = "rgba(10,10,10,0.06)";
       ctx.fillRect(0, 0, w, h);
       ctx.font = "13px monospace";
@@ -36,10 +50,22 @@ function MatrixBackground() {
       raf = requestAnimationFrame(draw);
     };
     draw();
+
     const onResize = () => {w = canvas.width = window.innerWidth;h = canvas.height = window.innerHeight;};
+    const onVisibility = () => {
+      running = !document.hidden;
+      if (running && !raf) draw();
+    };
     window.addEventListener("resize", onResize);
-    return () => {cancelAnimationFrame(raf);window.removeEventListener("resize", onResize);};
-  }, []);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [enabled]);
+
+  if (!enabled) return null;
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, opacity: 0.45 }} />;
 }
 
@@ -103,11 +129,19 @@ function FomoToast({ data, visible }) {
 function ScrollProgress() {
   const [pct, setPct] = useState(0);
   useEffect(() => {
-    const onScroll = () => {
+    let ticking = false;
+    const update = () => {
       const el = document.documentElement;
       const scrolled = el.scrollTop || document.body.scrollTop;
       const total = el.scrollHeight - el.clientHeight;
       setPct(total > 0 ? scrolled / total * 100 : 0);
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -449,6 +483,38 @@ function NewsletterSection() {
 
 }
 
+// ─── Lazy YouTube ─────────────────────────────────────────────────────────────
+function LazyYouTube({ src }) {
+  const ref = useRef(null);
+  const [load, setLoad] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setLoad(true); obs.disconnect(); }
+    }, { rootMargin: "200px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="w-full h-full">
+      {load ? (
+        <iframe
+          src={src}
+          className="w-full h-full px-5"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title="Demo Atur Pintar" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-black">
+          <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-[#FF6A00] animate-spin" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── AnimatedCounter ──────────────────────────────────────────────────────────
 function AnimatedCounter({ value }) {
   const [display, setDisplay] = useState(value);
@@ -546,8 +612,6 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden">
       <MatrixBackground />
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        * { font-family: 'Inter', sans-serif; }
         .g-text { background: linear-gradient(135deg,#FF6A00 0%,#FFB347 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .glow { box-shadow: 0 0 40px rgba(255,106,0,0.28); }
         .card-d { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
@@ -741,13 +805,7 @@ export default function LandingPage() {
             <div className="mx-auto iphone-frame" style={{ width: 280 }}>
               <div className="iphone-notch" />
               <div className="overflow-hidden rounded-[30px] bg-black" style={{ aspectRatio: "9/16" }}>
-                <iframe
-                  src={VIDEO_URL} className="w-full h-full px-5"
-
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  title="Demo Atur Pintar" />
-                
+                <LazyYouTube src={VIDEO_URL} />
               </div>
             </div>
             <p className="text-white/25 text-xs mt-5">iOS & Android segera hadir.</p>
