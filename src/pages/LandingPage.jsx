@@ -7,65 +7,55 @@ import { ArrowRight, CheckCircle, Mail, Instagram, Twitter, Sparkles, ChevronRig
 const NANA_AVATAR_URL = "https://api.dicebear.com/7.x/adventurer/svg?seed=Nana&backgroundColor=f97316";
 const VIDEO_URL = "https://www.youtube.com/embed/6KazLzryNbM";
 
-// ─── Matrix background ────────────────────────────────────────────────────────
+// ─── Matrix background (static snapshot — drawn once, no animation) ──────────
 function MatrixBackground() {
   const canvasRef = useRef(null);
-  const [enabled, setEnabled] = useState(false);
-
-  // Only enable on desktop (>=768px) AND when user has no reduced-motion preference
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const isDesktop = window.innerWidth >= 768;
-    if (!prefersReducedMotion && isDesktop) setEnabled(true);
-  }, []);
 
   useEffect(() => {
-    if (!enabled) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    let w = canvas.width = window.innerWidth;
-    let h = canvas.height = window.innerHeight;
-    const cols = Math.floor(w / 18);
-    const drops = Array(cols).fill(1);
-    const chars = "01アイウエオカキクケコABCDEF∑∆∫πΩ";
-    let raf;
-    let running = !document.hidden;
 
-    const draw = () => {
-      if (!running) { raf = null; return; }
-      ctx.fillStyle = "rgba(10,10,10,0.06)";
+    const drawSnapshot = () => {
+      const w = canvas.width = window.innerWidth;
+      const h = canvas.height = window.innerHeight;
+      ctx.fillStyle = "#0A0A0A";
       ctx.fillRect(0, 0, w, h);
       ctx.font = "13px monospace";
-      drops.forEach((y, i) => {
-        const char = chars[Math.floor(Math.random() * chars.length)];
-        const progress = y / (h / 13);
-        if (progress < 0.3) ctx.fillStyle = `rgba(255,106,0,${0.6 + Math.random() * 0.4})`;else
-        if (progress < 0.6) ctx.fillStyle = `rgba(255,179,71,${0.3 + Math.random() * 0.3})`;else
-        ctx.fillStyle = `rgba(255,106,0,${0.05 + Math.random() * 0.15})`;
-        ctx.fillText(char, i * 18, y * 13);
-        if (y * 13 > h && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
-      });
-      raf = requestAnimationFrame(draw);
+      const chars = "01アイウエオカキクケコABCDEF∑∆∫πΩ";
+      const colStep = 18;
+      const rowStep = 13;
+      // Draw a static "frozen frame" of matrix rain
+      for (let x = 0; x < w; x += colStep) {
+        const trailLen = 8 + Math.floor(Math.random() * 18);
+        const startY = Math.floor(Math.random() * (h / rowStep));
+        for (let i = 0; i < trailLen; i++) {
+          const y = (startY + i) * rowStep;
+          if (y > h) break;
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          const fade = i / trailLen;
+          if (fade < 0.2) ctx.fillStyle = `rgba(255,106,0,${0.85 - fade})`;
+          else if (fade < 0.5) ctx.fillStyle = `rgba(255,179,71,${0.5 - fade * 0.4})`;
+          else ctx.fillStyle = `rgba(255,106,0,${Math.max(0.05, 0.25 - fade * 0.2)})`;
+          ctx.fillText(char, x, y);
+        }
+      }
     };
-    draw();
 
-    const onResize = () => {w = canvas.width = window.innerWidth;h = canvas.height = window.innerHeight;};
-    const onVisibility = () => {
-      running = !document.hidden;
-      if (running && !raf) draw();
+    drawSnapshot();
+    // Redraw on resize (debounced)
+    let resizeTimer;
+    const onResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(drawSnapshot, 200);
     };
     window.addEventListener("resize", onResize);
-    document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      cancelAnimationFrame(raf);
+      clearTimeout(resizeTimer);
       window.removeEventListener("resize", onResize);
-      document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [enabled]);
+  }, []);
 
-  if (!enabled) return null;
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, opacity: 0.45 }} />;
 }
 
