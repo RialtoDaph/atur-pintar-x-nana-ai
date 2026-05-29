@@ -826,7 +826,7 @@ Atur Pintar hadir buat kamu yang capek merasa guilty soal keuangan.
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black g-text mb-4 leading-tight">Duit bukan musuh.<br />Malas yang musuh.</h2>
             </Reveal>
             <Reveal delay={100}>
-              <p className="text-white/60 text-base mb-10 max-w-md mx-auto">Semua pada nyerang d</p>
+              <p className="text-white/60 text-base mb-10 max-w-md mx-auto">Semua pada nyerang dompet kamu dari berbagai arah, atur pintar bantu kamu p</p>
             </Reveal>
             <Reveal delay={180}>
               <div className="flex justify-center">
