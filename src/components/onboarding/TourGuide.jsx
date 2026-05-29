@@ -65,10 +65,10 @@ export default function TourGuide({ onComplete }) {
   useEffect(() => {
     if (showWelcome) return;
     const targetPath = `/${currentStep.page}`;
-    if (!location.pathname.startsWith(targetPath)) {
+    if (location.pathname !== targetPath) {
       navigate(createPageUrl(currentStep.page));
     }
-  }, [stepIndex, showWelcome]);
+  }, [stepIndex, showWelcome, currentStep.page, location.pathname, navigate]);
 
   // Find and highlight element after step/navigation changes
   useEffect(() => {
@@ -183,7 +183,6 @@ export default function TourGuide({ onComplete }) {
           key={i}
           className="absolute"
           style={{ ...style, background: overlayBg, pointerEvents: "all" }}
-          onClick={handleNext}
         />
       ))}
       {spotlight && (
