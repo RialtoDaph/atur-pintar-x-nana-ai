@@ -153,14 +153,18 @@ function ScreenWrapper({ children }) {
 }
 
 function NanaAvatar({ size = "lg", excited = false }) {
-  const sz = size === "lg" ? "w-20 h-20 text-4xl" : "w-12 h-12 text-2xl";
+  const sz = size === "lg" ? "w-20 h-20" : "w-12 h-12";
   return (
     <motion.div
       animate={excited ? { scale: [1, 1.15, 0.95, 1.05, 1], rotate: [0, -5, 5, -3, 0] } : {}}
       transition={{ duration: 0.6, repeat: excited ? Infinity : 0, repeatDelay: 2 }}
-      className={`${sz} rounded-full bg-gradient-to-br from-[#FF6B35] to-[#FF9A5C] flex items-center justify-center shadow-lg mx-auto`}
+      className={`${sz} rounded-full overflow-hidden shadow-lg mx-auto ring-2 ring-[#FF6B35]/30`}
     >
-      ✨
+      <img
+        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png"
+        alt="Nana"
+        className="w-full h-full object-cover"
+      />
     </motion.div>
   );
 }
