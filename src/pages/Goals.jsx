@@ -59,20 +59,34 @@ export default function Goals() {
 
   useEffect(() => {
     if (!user?.email) return;
-    const unsub1 = base44.entities.SavingsGoal.subscribe(() => loadData());
-    const unsub2 = base44.entities.Transaction.subscribe(() => loadData());
-    return () => { unsub1(); unsub2(); };
+    let timeout;
+    const debouncedReload = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => loadData(), 800);
+    };
+    const unsub1 = base44.entities.SavingsGoal.subscribe(debouncedReload);
+    const unsub2 = base44.entities.Transaction.subscribe(debouncedReload);
+    return () => { clearTimeout(timeout); unsub1(); unsub2(); };
   }, [user?.email]);
 
   async function loadData() {
-    setLoading(true);
-    const [g, goalTxs] = await Promise.all([
-      base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
-      goalId ? base44.entities.Transaction.filter({ goal_id: goalId, created_by: user.email }, "-created_date") : Promise.resolve([]),
-    ]);
-    setGoals(g);
-    setTransactions(goalTxs);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const [g, goalTxs] = await Promise.all([
+        base44.entities.SavingsGoal.filter({ created_by: user.email }, "-created_date"),
+        goalId ? base44.entities.Transaction.filter({ goal_id: goalId, created_by: user.email }, "-created_date") : Promise.resolve([]),
+      ]);
+      setGoals(g);
+      setTransactions(goalTxs);
+    } catch (err) {
+      if (err?.message?.toLowerCase?.().includes("rate limit")) {
+        // Silently ignore rate limit — subscription will retry later
+      } else {
+        console.error("Failed to load goals:", err);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleTransaction(amount, type, note) {
