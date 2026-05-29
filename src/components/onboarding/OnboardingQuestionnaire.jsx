@@ -207,7 +207,7 @@ function Screen1({ onNext }) {
         >
           <h1 className="text-3xl font-bold text-[#1A1A1A] mb-3">Halo! 👋</h1>
           <p className="text-[#4A5568] text-sm leading-relaxed max-w-xs mx-auto">
-            Aku <strong>Nana</strong> — dan aku bakal jadi teman finansial kamu yang paling jujur (dan paling lucu) yang pernah ada.
+            Aku <strong>Nana</strong>, dan aku bakal jadi teman finansial kamu yang paling jujur (dan paling lucu) yang pernah ada.
             <br /><br />
             Sebelum mulai, aku mau kenalan dulu sama kamu. Cuma 2 menit. Janji.
           </p>
@@ -232,7 +232,7 @@ function Screen3({ onNext }) {
         <p className="text-[#4A5568] text-sm leading-relaxed max-w-xs mx-auto mb-8">
           5 pertanyaan singkat biar Nana tau gimana cara terbaik bantu kamu.
           <br /><br />
-          Gak ada jawaban yang salah — yang salah itu kalau bohong ke diri sendiri. 😄
+          Gak ada jawaban yang salah, yang salah itu kalau bohong ke diri sendiri. 😄
         </p>
         {/* Progress dots */}
         <div className="flex gap-2 mb-8">
@@ -468,7 +468,7 @@ function Screen11({ onNext, loading }) {
           <NanaAvatar size="sm" />
           <div className="bg-[#F2F4F7] rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
             <p className="text-sm text-[#1A1A1A] leading-relaxed">
-              Terakhir — biar gue bisa bantu yang relevan, gue perlu tau income bulanan kamu.
+              Terakhir, biar gue bisa bantu yang relevan, gue perlu tau income bulanan kamu.
             </p>
           </div>
         </div>
@@ -531,7 +531,7 @@ function Screen12({ persona, primaryGoal, primaryGoalLabel, onDone }) {
           <div className="text-5xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">Selamat datang di<br />Atur Pintar!</h2>
           <p className="text-sm text-[#4A5568]">
-            Kamu resmi jadi <strong>Level 1 — Newbie Ngatur.</strong><br />
+            Kamu resmi jadi <strong>Level 1, Newbie Ngatur.</strong><br />
             Dan perjalanan naik level dimulai sekarang.
           </p>
         </motion.div>
