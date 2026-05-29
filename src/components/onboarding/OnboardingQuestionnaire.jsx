@@ -275,15 +275,6 @@ function QuizScreen({ questionIndex, totalQuestions, question, onAnswer }) {
             transition={{ duration: 0.4 }}
           />
         </div>
-        {/* Step dots */}
-        <div className="flex gap-1.5 mt-2">
-          {Array.from({ length: totalQuestions }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 rounded-full flex-1 transition-all duration-300 ${i <= questionIndex ? "bg-[#FF6B35]" : "bg-[#E2E8F0]"}`}
-            />
-          ))}
-        </div>
       </div>
 
       <div className="flex-1 px-6 pb-6">
