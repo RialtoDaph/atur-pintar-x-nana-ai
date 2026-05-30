@@ -17,6 +17,7 @@ import LandingPage from '@/pages/LandingPage';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import MaintenancePage from '@/pages/MaintenancePage';
+import TourGuide from '@/components/onboarding/TourGuide';
 
 // Lazy — loaded only when user navigates to them
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
@@ -54,6 +55,7 @@ const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     base44.entities.AppConfig.list().then(configs => {
@@ -61,7 +63,12 @@ const AuthenticatedApp = () => {
         setMaintenanceMode(true);
       }
     }).catch(() => {});
-    base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
+    base44.auth.me().then(u => {
+      setCurrentUser(u);
+      if (u?.onboarding_completed && !u?.tour_completed) {
+        setTimeout(() => setShowTour(true), 1800);
+      }
+    }).catch(() => {});
   }, []);
 
   // Show loading spinner while checking app public settings or auth
@@ -150,6 +157,12 @@ const AuthenticatedApp = () => {
       <Route path="/TermsOfService" element={<TermsOfService />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    {showTour && (
+      <TourGuide onComplete={async () => {
+        setShowTour(false);
+        try { await base44.auth.updateMe({ tour_completed: true }); } catch {}
+      }} />
+    )}
     </Suspense>
   );
 };

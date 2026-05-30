@@ -14,7 +14,6 @@ import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSetti
 import GlobalSearch from "@/components/search/GlobalSearch";
 import DashboardTopTabs from "@/components/dashboard/DashboardTopTabs";
 import { AnimatePresence, motion } from "framer-motion";
-import TourGuide from "@/components/onboarding/TourGuide";
 function LayoutInner({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [showAddTransaction, setShowAddTransaction] = useState(false);
@@ -23,7 +22,6 @@ function LayoutInner({ children, currentPageName }) {
   const [showAlertsDrawer, setShowAlertsDrawer] = useState(false);
   const [anyModalOpen, setAnyModalOpen] = useState(false);
   const [unreadAlertCount, setUnreadAlertCount] = useState(0);
-  const [showTour, setShowTour] = useState(false);
   const [unreadAdminCount, setUnreadAdminCount] = useState(0);
   const { t } = useAppSettings();
   const location = useLocation();
@@ -40,9 +38,6 @@ function LayoutInner({ children, currentPageName }) {
   useEffect(() => {
     base44.auth.me().then((u) => {
       setUser(u);
-      if (u?.onboarding_completed && !u?.tour_completed) {
-        setTimeout(() => setShowTour(true), 1800);
-      }
       // Log login
       base44.functions.invoke('logUserLogin', {}).catch(() => {});
 
@@ -477,13 +472,6 @@ function LayoutInner({ children, currentPageName }) {
       {/* Global Search */}
       {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
 
-      {/* Tour Guide - lives in Layout so it persists across page navigations */}
-      {showTour &&
-      <TourGuide onComplete={async () => {
-        setShowTour(false);
-        await base44.auth.updateMe({ tour_completed: true });
-      }} />
-      }
     </div>);
 
 }
