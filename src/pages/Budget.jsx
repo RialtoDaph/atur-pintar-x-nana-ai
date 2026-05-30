@@ -12,17 +12,6 @@ import { useAppSettings } from "@/components/utils/useAppSettings";
 import { completeMission } from "@/hooks/useGamificationActions";
 import { useToast } from "@/components/ui/use-toast";
 
-const DEFAULT_CATEGORIES = [
-  { key: "housing",       label_id: "Rumah/Sewa",         label_en: "Housing/Rent",    emoji: "🏠", color: "#4F7CFF" },
-  { key: "food",          label_id: "Makanan & Minuman",   label_en: "Food & Drinks",   emoji: "🍔", color: "#00C9A7" },
-  { key: "transport",     label_id: "Transportasi",        label_en: "Transport",       emoji: "🚗", color: "#F5A623" },
-  { key: "health",        label_id: "Kesehatan",           label_en: "Health",          emoji: "❤️", color: "#FF6B6B" },
-  { key: "entertainment", label_id: "Hiburan",             label_en: "Entertainment",   emoji: "🎬", color: "#9B59B6" },
-  { key: "shopping",      label_id: "Belanja",             label_en: "Shopping",        emoji: "🛍️", color: "#E91E8C" },
-  { key: "subscriptions", label_id: "Langganan",           label_en: "Subscriptions",   emoji: "📱", color: "#1ABC9C" },
-  { key: "other",         label_id: "Lainnya",             label_en: "Other",           emoji: "📦", color: "#95A5A6" },
-];
-
 function getMonthKey(offset = 0) {
   const d = new Date();
   d.setDate(1);

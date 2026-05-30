@@ -7,6 +7,7 @@ import FeedbackModal from "@/components/settings/FeedbackModal";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+// useNavigate kept — used by handleRestartTour
 
 const LANGUAGES = [
   { code: "id", label: "Indonesia", flag: "🇮🇩" },

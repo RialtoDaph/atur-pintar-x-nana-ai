@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import PremiumBlurCard from "@/components/subscription/PremiumBlurCard";
-import { Plus, Trash2, TrendingUp, ShoppingCart, TrendingDown, Wallet } from "lucide-react";
+import { Trash2, TrendingUp, ShoppingCart, TrendingDown } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { INVESTMENT_TYPES_MAP } from "@/components/investments/investmentConstants";
 import AddInvestmentModal from "@/components/investments/AddInvestmentModal.jsx";

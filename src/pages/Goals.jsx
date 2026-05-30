@@ -132,24 +132,29 @@ export default function Goals() {
     const newAmount = (goal.current_amount || 0) + amount;
     const isCompleted = (goal.target_amount || 0) > 0 && newAmount >= goal.target_amount;
     const newStatus = isCompleted ? "completed" : goal.status;
-    await Promise.all([
-      (async () => {
-        const tx = await base44.entities.Transaction.create({
-          type: "savings", amount, account_id: accountId,
-          goal_id: goal.id, date, note: note || `Tabungan ${goal.name}`,
-        });
-        window.dispatchEvent(new CustomEvent("transaction-added"));
-        return tx;
-      })(),
-      base44.entities.SavingsGoal.update(goal.id, { current_amount: newAmount, status: newStatus }),
-      base44.entities.Account.filter({ id: accountId }).then(([acc]) => {
-        if (acc) return base44.entities.Account.update(accountId, { balance: Math.max((acc.balance || 0) - amount, 0) });
-      }),
-    ]);
-    setSavingsGoal(null);
-    if (newStatus === "completed") toast.success(`🎉 Goal "${goal.name}" berhasil tercapai!`);
-    else toast.success("Dana berhasil ditambahkan.");
-    loadData();
+    try {
+      await Promise.all([
+        (async () => {
+          const tx = await base44.entities.Transaction.create({
+            type: "savings", amount, account_id: accountId,
+            goal_id: goal.id, date, note: note || `Tabungan ${goal.name}`,
+          });
+          window.dispatchEvent(new CustomEvent("transaction-added"));
+          return tx;
+        })(),
+        base44.entities.SavingsGoal.update(goal.id, { current_amount: newAmount, status: newStatus }),
+        base44.entities.Account.filter({ id: accountId }).then(([acc]) => {
+          if (acc) return base44.entities.Account.update(accountId, { balance: Math.max((acc.balance || 0) - amount, 0) });
+        }),
+      ]);
+      setSavingsGoal(null);
+      if (newStatus === "completed") toast.success(`🎉 Goal "${goal.name}" berhasil tercapai!`);
+      else toast.success("Dana berhasil ditambahkan.");
+      loadData();
+    } catch {
+      toast.error("Gagal menambahkan dana. Coba lagi.");
+      loadData();
+    }
   }
 
   async function handleDelete() {

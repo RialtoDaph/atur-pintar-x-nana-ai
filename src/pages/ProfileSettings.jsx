@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   LogOut, Trash2, Crown, Pencil, Lock, ChevronRight,
-  Plus, Star, RefreshCw, X, Check, AlertTriangle, Settings as SettingsIcon
+  Plus, X, Check, AlertTriangle, Settings as SettingsIcon
 } from "lucide-react";
 import ChangePasswordModal from "@/components/profile/ChangePasswordModal";
 import EditProfileForm from "@/components/profile/EditProfileForm";
@@ -15,17 +15,7 @@ import { createPageUrl } from "@/utils";
 import RiskProfileAssessment from "@/components/settings/RiskProfileAssessment";
 import { toast } from "sonner";
 
-// ─── Account presets ────────────────────────────────────────────────────────
-const ACCOUNT_PRESETS = [
-  { group: "Bank", icon: "🏦", color: "#1976D2", items: ["BCA", "Mandiri", "BNI", "BRI", "BSI", "Jenius", "SeaBank"] },
-  { group: "E-Wallet", icon: "📱", color: "#7B1FA2", items: ["GoPay", "OVO", "DANA", "ShopeePay", "LinkAja"] },
-  { group: "Investment", icon: "📈", color: "#16A34A", items: ["Bibit", "Pluang", "Bareksa", "Manulife", "BNI Investasi", "Ipotfund", "CommonWealth"] },
-  { group: "Cash", icon: "💵", color: "#388E3C", items: ["Dompet", "Celengan", "Kas"] },
-];
-
-const TYPE_MAP = { "Bank": "bank", "E-Wallet": "ewallet", "Cash": "cash", "Investment": "investment" };
 const DEFAULT_ICONS = ["🏦", "💵", "📱", "💳", "🏧", "🐷", "💰", "🎯"];
-const DEFAULT_COLORS = ["#F97316", "#1976D2", "#388E3C", "#7B1FA2", "#F57C00", "#E91E63", "#00BCD4", "#607D8B"];
 
 function formatRupiah(n) {
   if (n === undefined || n === null) return "Rp 0";
@@ -172,9 +162,6 @@ export default function ProfileSettings() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteInfo, setDeleteInfo] = useState(null);
   const [deletingAcc, setDeletingAcc] = useState(false);
-  const [syncing, setSyncing] = useState(null);
-  const [presetOpen, setPresetOpen] = useState(null);
-  const [defaultAccountType, setDefaultAccountType] = useState("bank");
   const [showAddBottomSheet, setShowAddBottomSheet] = useState(false);
   const [bottomSheetType, setBottomSheetType] = useState("bank");
 
@@ -217,48 +204,10 @@ export default function ProfileSettings() {
     setDeleteInfo(null);
   }
 
-  async function syncBalance(acc) {
-    setSyncing(acc.id);
-    const txs = await base44.entities.Transaction.filter({ account_id: acc.id });
-    // Exclude soft-deleted AND recurring templates (only generated children affect balance)
-    const real = txs.filter(t => !t.is_deleted && !(t.is_recurring === true && !t.is_recurring_child));
-    const income = real.filter(t => t.type === 'income').reduce((s, t) => s + (t.amount || 0), 0);
-    const expense = real.filter(t => t.type === 'expense').reduce((s, t) => s + (t.amount || 0), 0);
-    const savings = real.filter(t => t.type === 'savings').reduce((s, t) => s + (t.amount || 0), 0);
-    const newBalance = income - expense - savings;
-    await base44.entities.Account.update(acc.id, { balance: newBalance });
-    setAccounts(prev => prev.map(a => a.id === acc.id ? { ...a, balance: newBalance } : a));
-    toast.success(`Saldo ${acc.name}: ${formatRupiah(newBalance)}`);
-    setSyncing(null);
-  }
-
-  async function setDefault(acc) {
-    // Only update accounts whose is_default flag actually changes — saves writes
-    const toUpdate = accounts.filter(a => (a.id === acc.id) !== !!a.is_default);
-    await Promise.all(toUpdate.map(a => base44.entities.Account.update(a.id, { is_default: a.id === acc.id })));
-    setAccounts(prev => prev.map(a => ({ ...a, is_default: a.id === acc.id })));
-  }
-
-  async function addPreset(preset, itemName) {
-    const typeKey = TYPE_MAP[preset.group] || "bank";
-    const created = await base44.entities.Account.create({
-      name: itemName,
-      type: typeKey,
-      balance: 0,
-      icon: preset.icon,
-      color: preset.color,
-      is_default: accounts.length === 0,
-    });
-    setAccounts(prev => [...prev, created]);
-    toast.success(`${itemName} ditambahkan ✓`);
-    setPresetOpen(null);
-  }
-
   if (screen === "risk") return <RiskScreen onBack={() => setScreen("main")} />;
 
   const completion = calcCompletion(user);
   const totalBalance = accounts.reduce((s, a) => s + (a.balance || 0), 0);
-  const typeLabel = { bank: "Bank", cash: "Cash", ewallet: "E-Wallet", other: "Lainnya" };
 
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-10">

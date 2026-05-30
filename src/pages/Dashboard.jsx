@@ -144,11 +144,7 @@ export default function Dashboard() {
 
   const { data: gamProfiles = [] } = useQuery({
     queryKey: ["gam_profile", user?.email],
-    queryFn: async () => {
-      const list = await base44.entities.GamificationProfile.filter({ created_by: user.email });
-      if (list?.[0]) setGamProfile(list[0]);
-      return list;
-    },
+    queryFn: () => base44.entities.GamificationProfile.filter({ created_by: user.email }),
     enabled,
     staleTime: 30 * 1000,
   });

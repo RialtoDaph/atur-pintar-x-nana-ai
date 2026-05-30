@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, CreditCard, CheckCircle, Pencil, Crown, Eye } from "lucide-react";
+import { Trash2, CreditCard, CheckCircle, Crown, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import AddDebtModal from "@/components/debts/AddDebtModal.jsx";
 import PayDebtModal from "@/components/debts/PayDebtModal";

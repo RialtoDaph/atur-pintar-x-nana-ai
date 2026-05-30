@@ -6,10 +6,10 @@ import { useAppConfig } from "@/components/utils/useAppConfig";
 const FEATURES_FREE = [
   "Catat transaksi (unlimited)",
   "Dashboard keuangan",
-  "Chat Nana AI Setiap Hari",
-  "Anggaran dan lainnya (terbatas)",
+  "Nana AI (5 chat/hari)",
+  "2 budget, 2 goals, 2 utang",
 ];
-const LIMITS_FREE = ["❌ Fitur Investasi", "❌ Analitik lanjutan (blur)", "❌ Nana AI > 30 chat/bln"];
+const LIMITS_FREE = ["❌ Fitur Investasi", "❌ Analitik lanjutan (blur)", "❌ Export PDF & Google Sheets"];
 const FEATURES_MONTHLY = [
   "Semua fitur Free",
   "Anggaran & Goals unlimited",
@@ -84,9 +84,8 @@ export default function Subscription() {
           setUser(u => ({ ...u, subscription_status: "pending", subscription_plan: planKey }));
           setSuccessPlan("pending");
         },
-        onError: (result) => {
+        onError: () => {
           setPaymentError("Pembayaran gagal. Silakan coba lagi.");
-          console.error("Payment error", result);
         },
         onClose: () => {
           // User closed without paying — do nothing
