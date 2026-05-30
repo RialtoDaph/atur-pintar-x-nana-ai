@@ -2,12 +2,6 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Sparkles, Plus, RefreshCw, TrendingDown, PiggyBank, Wallet, Receipt, Target, BarChart3, CreditCard, Coins } from "lucide-react";
 
-const FALLBACK = [
-  { label: "Analisa pengeluaran", question: "Tolong analisa pengeluaran aku bulan ini secara detail. Kategori mana yang paling boros dan apa saranmu?", icon: "spending" },
-  { label: "Boleh jajan?", question: "Hari ini aku boleh jajan berapa biar tetap aman sampai akhir bulan?", icon: "wallet" },
-  { label: "Progress tabungan", question: "Gimana progress semua tujuan tabunganku? Yang mana yang paling perlu didorong?", icon: "goal" },
-];
-
 const ICON_MAP = {
   spending: TrendingDown,
   wallet: Wallet,
@@ -42,23 +36,27 @@ export default function NanaQuickActions({ onSelect, disabled, contextSnapshot }
     setLoading(true);
     try {
       const ctx = contextSnapshot ? buildShortContext(contextSnapshot) : "";
+      const recentChat = await fetchRecentUserChat();
       const avoidList = Array.from(seenLabels).slice(-12).join(" | ");
+      const isEmptyUser = isContextEmpty(contextSnapshot);
 
-      const prompt = `Kamu adalah Nana AI, asisten keuangan. Buatkan 3 saran percakapan yang relevan untuk user ini sekarang.
+      const prompt = `Kamu adalah Nana AI, asisten keuangan. Buatkan 3 saran percakapan yang RELEVAN untuk user INI berdasarkan data & interaksinya.
 
-Setiap saran punya 2 bagian:
-1. "label" — judul super pendek 2-4 kata (yang muncul di tombol). HARUS singkat & rapi, contoh: "Analisa makan", "Cek budget transport", "Strategi lunas KPR".
-2. "question" — pertanyaan lengkap natural dari sudut pandang USER ke Nana, 1-2 kalimat, spesifik ke data user (sebut angka/nama kategori/goal jika relevan).
+ATURAN PENTING:
+- Saran HARUS berdasarkan data user di bawah (jangan ngarang angka/kategori yang tidak ada di data).
+- Kalau riwayat chat user ada, prioritaskan saran yang melanjutkan/menyambung topik terakhir.
+- ${isEmptyUser ? "User BELUM punya data finansial (transaksi/budget/goal kosong) → buat saran ONBOARDING: cara mulai catat, buat goal pertama, atur budget, dll. JANGAN sebut angka palsu." : "User punya data finansial → buat saran SPESIFIK menyebut nama kategori/goal/utang yang nyata dari data."}
+
+Setiap saran punya 3 field:
+1. "label" — judul super pendek 2-4 kata (yang muncul di tombol). Contoh: "Analisa makan", "Cek budget transport", "Strategi lunas KPR", "Mulai catat transaksi".
+2. "question" — pertanyaan lengkap natural dari sudut pandang USER ke Nana, 1-2 kalimat.
 3. "icon" — pilih satu: spending, wallet, goal, budget, bill, debt, saving, invest.
 
-Aturan label:
-- Maks 4 kata, tidak boleh panjang
-- Tidak pakai tanda tanya
-- Konsisten panjangnya (jangan ada yang 2 kata lalu yang lain 6 kata)
+Aturan label: maks 4 kata, tanpa tanda tanya, panjang konsisten.
 
-Variatif topik (campur: budget, tabungan, utang, tagihan, kebiasaan, investasi).
 JANGAN ulang label ini: ${avoidList || "(belum ada)"}
 
+${recentChat}
 ${ctx}
 
 Output JSON saja.`;
@@ -94,9 +92,7 @@ Output JSON saja.`;
           icon: s.icon || "spending",
         }));
 
-      if (items.length === 0) {
-        if (isInitial) setSuggestions(FALLBACK);
-      } else {
+      if (items.length > 0) {
         setSuggestions(items);
         // Cap memory: keep only last 24 labels to avoid unbounded growth
         setSeenLabels((prev) => {
@@ -105,13 +101,13 @@ Output JSON saja.`;
         });
       }
     } catch {
-      if (isInitial) setSuggestions(FALLBACK);
+      // Silent fail — keep previous suggestions or skeleton
     } finally {
       setLoading(false);
     }
   }
 
-  const display = suggestions.length > 0 ? suggestions : FALLBACK;
+  const display = suggestions;
 
   return (
     <div className="mb-2">
@@ -131,32 +127,45 @@ Output JSON saja.`;
       </div>
 
       <div className="grid grid-cols-3 gap-1.5">
-        {display.map((s, i) => {
-          const Icon = ICON_MAP[s.icon] || TrendingDown;
-          return (
-            <button
-              key={`${s.label}-${i}`}
-              onClick={() => !disabled && onSelect(s.question)}
-              disabled={disabled || loading}
-              title={s.question}
-              className="flex items-start gap-1.5 px-2 py-2 bg-white dark:bg-[#1A1E25] border border-[#E2E8F0] dark:border-[#2D2D2D] rounded-xl hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 dark:hover:bg-[#FF6A00]/10 transition-all disabled:opacity-40 tap-highlight-fix text-left min-w-0"
-            >
-              <Icon className="w-3.5 h-3.5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
-              <span
-                className="text-[11px] font-medium text-[#1A1A1A] dark:text-white leading-tight break-words"
-                style={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  wordBreak: 'break-word',
-                }}
+        {display.length === 0
+          ? [0, 1, 2].map((i) => (
+              <div
+                key={`skel-${i}`}
+                className="flex items-start gap-1.5 px-2 py-2 bg-white dark:bg-[#1A1E25] border border-[#E2E8F0] dark:border-[#2D2D2D] rounded-xl min-w-0 animate-pulse"
               >
-                {s.label}
-              </span>
-            </button>
-          );
-        })}
+                <div className="w-3.5 h-3.5 rounded-full bg-[#E2E8F0] dark:bg-[#2D2D2D] flex-shrink-0 mt-0.5" />
+                <div className="flex-1 space-y-1">
+                  <div className="h-2 bg-[#E2E8F0] dark:bg-[#2D2D2D] rounded w-full" />
+                  <div className="h-2 bg-[#E2E8F0] dark:bg-[#2D2D2D] rounded w-2/3" />
+                </div>
+              </div>
+            ))
+          : display.map((s, i) => {
+              const Icon = ICON_MAP[s.icon] || TrendingDown;
+              return (
+                <button
+                  key={`${s.label}-${i}`}
+                  onClick={() => !disabled && onSelect(s.question)}
+                  disabled={disabled || loading}
+                  title={s.question}
+                  className="flex items-start gap-1.5 px-2 py-2 bg-white dark:bg-[#1A1E25] border border-[#E2E8F0] dark:border-[#2D2D2D] rounded-xl hover:border-[#FF6A00] hover:bg-[#FF6A00]/5 dark:hover:bg-[#FF6A00]/10 transition-all disabled:opacity-40 tap-highlight-fix text-left min-w-0"
+                >
+                  <Icon className="w-3.5 h-3.5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
+                  <span
+                    className="text-[11px] font-medium text-[#1A1A1A] dark:text-white leading-tight break-words"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      wordBreak: 'break-word',
+                    }}
+                  >
+                    {s.label}
+                  </span>
+                </button>
+              );
+            })}
       </div>
     </div>
   );
@@ -167,6 +176,34 @@ function trimLabel(label) {
   const cleaned = String(label).replace(/[?!.]+$/g, "").trim();
   const words = cleaned.split(/\s+/);
   return words.slice(0, 5).join(" ");
+}
+
+// Detect if user has no financial data yet — avoid AI hallucinating fake numbers
+function isContextEmpty(s) {
+  if (!s) return true;
+  const hasTx = (s.thisMonth?.income || 0) > 0 || (s.thisMonth?.expense || 0) > 0;
+  const hasGoals = (s.goals?.length || 0) > 0;
+  const hasBudgets = (s.budgetStatus?.length || 0) > 0;
+  const hasDebts = (s.debts?.length || 0) > 0;
+  return !hasTx && !hasGoals && !hasBudgets && !hasDebts;
+}
+
+// Fetch last 5 user chat messages to ground suggestions in real interaction history
+async function fetchRecentUserChat() {
+  try {
+    const me = await base44.auth.me();
+    if (!me?.email) return "";
+    const msgs = await base44.entities.NanaConversation.filter({ created_by: me.email, role: "user" }, "-created_date", 5);
+    if (!msgs?.length) return "";
+    const lines = msgs
+      .map((m) => (m.message || "").replace(/\[mood:[^\]]+\]\s*/g, "").trim())
+      .filter((x) => x && x.length < 200)
+      .slice(0, 5);
+    if (!lines.length) return "";
+    return `[Riwayat 5 pertanyaan terakhir user ke Nana:\n${lines.map((l, i) => `${i + 1}. ${l}`).join("\n")}]`;
+  } catch {
+    return "";
+  }
 }
 
 // Build a short, focused context for suggestion generation only
