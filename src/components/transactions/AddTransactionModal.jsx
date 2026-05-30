@@ -32,7 +32,6 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   useLockBodyScroll();
   const [tab, setTab] = useState("expense");
   const [amountRaw, setAmountRaw] = useState(initialValues.amount ? String(initialValues.amount) : "");
-  const [amountFocused, setAmountFocused] = useState(false);
   const [category, setCategory] = useState(initialValues.category || "");
   const [note, setNote] = useState(initialValues.note || "");
   const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
@@ -418,9 +417,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                   placeholder="0"
                   className="text-3xl font-bold bg-transparent border-none outline-none text-center w-full max-w-[220px]"
                   style={{ color: amountRaw ? typeColor : "#CBD5E0" }}
-                  value={amountFocused ? amountRaw : formatDisplay(amountRaw)}
-                  onFocus={() => setAmountFocused(true)}
-                  onBlur={() => setAmountFocused(false)}
+                  value={formatDisplay(amountRaw)}
                   onChange={e => setAmountRaw(e.target.value.replace(/\D/g, ""))}
                   autoComplete="off"
                 />
