@@ -1,10 +1,9 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { ArrowRight, CheckCircle, Mail, Instagram, Twitter, Sparkles, ChevronRight, ChevronDown, ChevronUp, X } from "lucide-react";
+import { ArrowRight, CheckCircle, Mail, Instagram, Twitter, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const NANA_AVATAR_URL = "https://api.dicebear.com/7.x/adventurer/svg?seed=Nana&backgroundColor=f97316";
 const VIDEO_URL = "https://www.youtube.com/embed/6KazLzryNbM";
 
 // ─── Brush Background (orange brushstroke glows — pure CSS, zero JS cost) ────
@@ -169,7 +168,7 @@ const QUICK_QUESTIONS = [
 { emoji: "💸", label: "Atur hutang", text: "Gimana cara atur hutang yang banyak?" }];
 
 
-function NanaChatDemo({ scrollToWaitingList }) {
+function NanaChatDemo() {
   const [messages, setMessages] = useState([
   { role: "nana", text: "Halo! Aku Nana, asisten keuangan kamu 👋 Tanya apa saja soal keuangan, nabung, investasi, hutang, atau apapun yang lagi bikin pusing." }]
   );
@@ -180,7 +179,12 @@ function NanaChatDemo({ scrollToWaitingList }) {
   const [showQuick, setShowQuick] = useState(true);
   const bottomRef = useRef(null);
 
-  useEffect(() => {bottomRef.current?.scrollIntoView({ behavior: "smooth" });}, [messages, typing]);
+  useEffect(() => {
+    const el = bottomRef.current;
+    if (!el) return;
+    const container = el.parentElement;
+    if (container) container.scrollTop = container.scrollHeight;
+  }, [messages, typing]);
 
   const sendMessage = (text) => {
     if (!text.trim() || typing || done) return;
@@ -452,12 +456,12 @@ function NewsletterSection() {
 
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Nama *</label>
-              <input required value={form.name} onChange={(e) => {setForm((f) => ({ ...f, name: e.target.value }));setErrors((er) => ({ ...er, name: undefined }));}} placeholder="Nama kamu" className={`bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.name ? "border-red-500/60" : "border-white/10"}`} />
+              <input required value={form.name} onChange={(e) => {setForm((f) => ({ ...f, name: e.target.value }));setErrors((er) => ({ ...er, name: undefined }));}} placeholder="Nama kamu" className={`bg-white/5 text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.name ? "border-red-500/60" : "border-white/10"}`} />
               {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Email aktif *</label>
-              <input required type="email" value={form.email} onChange={(e) => {setForm((f) => ({ ...f, email: e.target.value }));setErrors((er) => ({ ...er, email: undefined }));}} placeholder="email@kamu.com" className={`bg-[hsl(var(--foreground))] text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.email ? "border-red-500/60" : "border-white/10"}`} />
+              <input required type="email" value={form.email} onChange={(e) => {setForm((f) => ({ ...f, email: e.target.value }));setErrors((er) => ({ ...er, email: undefined }));}} placeholder="email@kamu.com" className={`bg-white/5 text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.email ? "border-red-500/60" : "border-white/10"}`} />
               {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
             </div>
             <button type="submit" disabled={loading} className="w-full py-4 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-black text-base rounded-full transition-all disabled:opacity-60 mt-2">
@@ -503,47 +507,15 @@ function LazyYouTube({ src }) {
   );
 }
 
-// ─── AnimatedCounter ──────────────────────────────────────────────────────────
-function AnimatedCounter({ value }) {
-  const [display, setDisplay] = useState(value);
-  const prev = useRef(value);
-  useEffect(() => {
-    if (value === prev.current) return;
-    const start = prev.current;
-    const end = value;
-    const duration = 600;
-    const startTime = Date.now();
-    const tick = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      setDisplay(Math.round(start + (end - start) * progress));
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-    prev.current = value;
-  }, [value]);
-  return <span>{display.toLocaleString("id-ID")}</span>;
-}
-
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function LandingPage() {
   const pricingRef = useRef(null);
   const howRef = useRef(null);
-  const waitingListRef = useRef(null);
 
   useEffect(() => {window.scrollTo(0, 0);}, []);
 
-  const [featureWaitingList, setFeatureWaitingList] = useState(true);
-  const [fomoCounter, setFomoCounter] = useState(637);
   const [fomoToast, setFomoToast] = useState(null);
   const [fomoVisible, setFomoVisible] = useState(false);
-
-  // Load AppConfig
-  useEffect(() => {
-    base44.entities.AppConfig.list().then((configs) => {
-      if (configs?.length) setFeatureWaitingList(configs[0].feature_waiting_list ?? true);
-    }).catch(() => {});
-  }, []);
 
   // FOMO toast logic
   useEffect(() => {
@@ -553,39 +525,39 @@ export default function LandingPage() {
     let count = 0;
     let cityIdx = 0;
     let timeIdx = 0;
+    let interval = null;
+    const hideTimers = [];
 
     const showToast = () => {
       if (count >= 10) return;
       const name = allNames[count % allNames.length];
       const city = allCities[cityIdx % allCities.length];
       const time = allTimes[timeIdx % allTimes.length];
-      cityIdx++;timeIdx++;
+      cityIdx++; timeIdx++;
       setFomoToast({ name, city, time });
       setFomoVisible(true);
-      setFomoCounter((prev) => prev + 1);
       count++;
-      setTimeout(() => setFomoVisible(false), 5000);
+      hideTimers.push(setTimeout(() => setFomoVisible(false), 5000));
     };
 
     const firstTimer = setTimeout(() => {
       showToast();
-      if (count < 10) {
-        const interval = setInterval(() => {
-          if (count >= 10) {clearInterval(interval);return;}
-          showToast();
-        }, 20000 + Math.random() * 10000);
-        return () => clearInterval(interval);
-      }
+      interval = setInterval(() => {
+        if (count >= 10) { clearInterval(interval); interval = null; return; }
+        showToast();
+      }, 20000 + Math.random() * 10000);
     }, 8000);
 
-    return () => clearTimeout(firstTimer);
+    return () => {
+      clearTimeout(firstTimer);
+      if (interval) clearInterval(interval);
+      hideTimers.forEach(clearTimeout);
+    };
   }, []);
 
   const scrollToNewsletter = useCallback(() => {
     document.getElementById("newsletter-section")?.scrollIntoView({ behavior: "smooth" });
   }, []);
-
-  const incrementCounter = useCallback(() => setFomoCounter((prev) => prev + 1), []);
 
   const LEVELS = [
   { icon: "🌱", level: "Lv.1", label: "Newbie Ngatur" },
@@ -740,7 +712,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── NANA CHAT DEMO ── */}
-      <NanaChatDemo scrollToWaitingList={scrollToNewsletter} />
+      <NanaChatDemo />
 
       {/* ── GAMIFIKASI ── */}
       <section className="pb-16 px-5 sm:px-12 lg:px-20 relative z-10">
@@ -805,7 +777,6 @@ export default function LandingPage() {
       <FaqSection />
 
       {/* ── PRICING ── */}
-      {true &&
       <section ref={pricingRef} className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
           <div className="max-w-3xl mx-auto">
             <Reveal>
@@ -847,7 +818,7 @@ export default function LandingPage() {
                   )}
                   </div>
                   <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 rounded-xl bg-white text-[#FF6A00] font-bold text-sm hover:bg-white/90 transition-colors">
-                    Coba 30 Hari Gratis →
+                    Upgrade ke Plus →
                   </button>
                 </div>
               </Reveal>
@@ -857,13 +828,11 @@ export default function LandingPage() {
             </Reveal>
           </div>
         </section>
-      }
 
       {/* ── NEWSLETTER ── */}
       <NewsletterSection />
 
       {/* ── FINAL CTA ── */}
-      {true &&
       <section className="pb-0 px-5 sm:px-12 lg:px-20 relative z-10">
           <div className="relative rounded-3xl overflow-hidden py-20 px-8 sm:px-16 text-center" style={{ background: "#1A1A2E" }}>
             <div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-[#FF6A00]/10 blur-[80px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
@@ -886,7 +855,6 @@ export default function LandingPage() {
             </Reveal>
           </div>
         </section>
-      }
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-white/5 pt-10 pb-8 px-5 sm:px-12 lg:px-20 relative z-10 mt-16">
