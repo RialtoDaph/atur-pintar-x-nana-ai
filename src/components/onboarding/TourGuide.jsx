@@ -81,13 +81,19 @@ export default function TourGuide({ onComplete }) {
     setTargetRect(null);
 
     let attempts = 0;
-    const maxAttempts = 150; // ~15 seconds total — covers lazy-loaded pages
+    const maxAttempts = 200; // ~20 seconds total — covers lazy-loaded pages + AnimatePresence transitions
 
     function tryFind() {
       attempts++;
-      const el = document.querySelector(`[data-tour="${currentStep.id}"]`);
+      // Find element that's actually rendered (has size) — skip hidden duplicates (e.g. desktop FAB hidden on mobile)
+      const candidates = document.querySelectorAll(`[data-tour="${currentStep.id}"]`);
+      let el = null;
+      for (const c of candidates) {
+        const r = c.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) { el = c; break; }
+      }
       if (el) {
-        const scrollable = document.querySelector(".overflow-y-auto");
+        const scrollable = el.closest(".overflow-y-auto") || document.querySelector(".overflow-y-auto");
         if (scrollable) {
           const elRect = el.getBoundingClientRect();
           const containerRect = scrollable.getBoundingClientRect();
@@ -97,9 +103,16 @@ export default function TourGuide({ onComplete }) {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
         }
         timeoutRef.current = setTimeout(() => {
-          const rect = getRect(currentStep.id);
-          setTargetRect(rect);
-        }, 600);
+          // Re-query after scroll — AnimatePresence may have re-mounted
+          const candidates2 = document.querySelectorAll(`[data-tour="${currentStep.id}"]`);
+          for (const c of candidates2) {
+            const r = c.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0) {
+              setTargetRect({ top: r.top, left: r.left, width: r.width, height: r.height, bottom: r.bottom, right: r.right });
+              return;
+            }
+          }
+        }, 700);
         return;
       }
       if (attempts < maxAttempts) {
@@ -107,7 +120,9 @@ export default function TourGuide({ onComplete }) {
       }
     }
 
-    timeoutRef.current = setTimeout(tryFind, 400);
+    // Longer initial delay on mobile to let AnimatePresence finish exit animation (300ms) + lazy chunk load
+    const initialDelay = window.innerWidth < 640 ? 800 : 400;
+    timeoutRef.current = setTimeout(tryFind, initialDelay);
 
     return () => clearTimers();
   }, [stepIndex, location.pathname, showWelcome, currentStep.id, currentStep.page]);
