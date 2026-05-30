@@ -94,7 +94,11 @@ export default function TourGuide({ onComplete }) {
     if (showWelcome) return;
     const targetPath = `/${currentStep.page}`;
     if (location.pathname !== targetPath) {
-      navigate(createPageUrl(currentStep.page));
+      // Small delay to let any open menu/sheet close before navigation
+      const t = setTimeout(() => {
+        navigate(createPageUrl(currentStep.page));
+      }, 50);
+      return () => clearTimeout(t);
     }
   }, [stepIndex, showWelcome, currentStep.page, location.pathname, navigate]);
 
@@ -216,12 +220,24 @@ export default function TourGuide({ onComplete }) {
   }, [showWelcome, targetRect !== null, currentStep.id]);
 
   function handleNext() {
-    if (isLast) onComplete();
-    else setStepIndex(i => i + 1);
+    if (isLast) { onComplete(); return; }
+    const nextStep = TOUR_STEPS[stepIndex + 1];
+    const nextPath = `/${nextStep.page}`;
+    // Navigate FIRST, then advance step — ensures the page transition starts immediately
+    if (location.pathname !== nextPath) {
+      navigate(createPageUrl(nextStep.page));
+    }
+    setStepIndex(i => i + 1);
   }
 
   function handlePrev() {
-    if (stepIndex > 0) setStepIndex(i => i - 1);
+    if (stepIndex === 0) return;
+    const prevStep = TOUR_STEPS[stepIndex - 1];
+    const prevPath = `/${prevStep.page}`;
+    if (location.pathname !== prevPath) {
+      navigate(createPageUrl(prevStep.page));
+    }
+    setStepIndex(i => i - 1);
   }
 
   const tooltipStyle = getTooltipStyle(targetRect, currentStep.placement);
