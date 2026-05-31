@@ -53,8 +53,13 @@ function AccountModal({ account, defaultType, onClose, onSave }) {
       <div
         role="dialog"
         aria-modal="true"
-        className="fixed bottom-0 left-0 right-0 z-[95] bg-white rounded-t-3xl shadow-2xl overscroll-contain animate-slide-up-sheet"
-        style={{ maxHeight: "85dvh", display: "flex", flexDirection: "column" }}
+        className="fixed left-0 right-0 z-[95] bg-white rounded-t-3xl shadow-2xl overscroll-contain animate-slide-up-sheet sm:bottom-0"
+        style={{
+          maxHeight: "85dvh",
+          display: "flex",
+          flexDirection: "column",
+          bottom: window.innerWidth < 640 ? 'calc(72px + env(safe-area-inset-bottom, 0px))' : 0
+        }}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
