@@ -6,6 +6,7 @@ import { Wallet, Plus, Pencil, Trash2, Star, X, Check, AlertTriangle, RefreshCw,
 import { toast } from "sonner";
 import AccountLogo from "@/components/ui/AccountLogo";
 import AddAccountBottomSheet from "@/components/profile/AddAccountBottomSheet";
+import EditAccountModal from "@/components/profile/EditAccountModal";
 import { recalculateAccountBalance } from "@/components/utils/accountSync";
 
 
@@ -14,241 +15,7 @@ function formatRupiah(n) {
   return "Rp " + Number(n).toLocaleString("id-ID");
 }
 
-function AccountModal({ account, onClose, onSave }) {
-  const [form, setForm] = useState({
-    name: account?.name || "",
-    type: account?.type || "bank",
-    balance: account?.balance || 0,
-    icon: account?.icon || "🏦",
-    color: account?.color || "#F97316",
-    logo_url: account?.logo_url || "",
-    institution: account?.institution || "",
-    is_default: account?.is_default || false,
-  });
-  const [saving, setSaving] = useState(false);
-  const [defaultAccounts, setDefaultAccounts] = useState([]);
-  const [search, setSearch] = useState("");
-  const [showTemplates, setShowTemplates] = useState(!account?.id);
-
-  useEffect(() => {
-    if (!account?.id) {
-      base44.entities.DefaultAccount.filter({ is_active: true }, "sort_order").then(list => {
-        setDefaultAccounts(list || []);
-      }).catch(() => {});
-    }
-  }, [account?.id]);
-
-  function applyTemplate(da) {
-    setForm(f => ({
-      ...f,
-      name: da.name,
-      type: da.type || "bank",
-      icon: da.icon || "🏦",
-      color: da.color || "#F97316",
-      logo_url: da.logo_url || "",
-      institution: da.institution || da.name,
-    }));
-    setShowTemplates(false);
-  }
-
-  const filteredDefaults = defaultAccounts.filter(da =>
-    da.name.toLowerCase().includes(search.toLowerCase()) ||
-    (da.institution || "").toLowerCase().includes(search.toLowerCase())
-  );
-
-  async function handleSave() {
-    if (!form.name.trim()) { toast.error("Pilih rekening terlebih dahulu"); return; }
-    setSaving(true);
-    const balance = form.balance || 0;
-    if (account?.id) {
-      // Jika saldo diubah manual, jangan set balance + adjustment tx (akan double-count saat sync).
-      // Approach: hanya update meta fields; biarkan adjustment tx yang menggerakkan balance via syncBalance.
-      const oldBalance = account.balance || 0;
-      const diff = balance - oldBalance;
-      const { balance: _omitBalance, _balanceDisplay, ...metaForm } = form;
-      const updated = await base44.entities.Account.update(account.id, diff !== 0 ? metaForm : form);
-      if (diff !== 0) {
-        await base44.entities.Transaction.create({
-          account_id: account.id,
-          amount: Math.abs(diff),
-          type: diff > 0 ? "income" : "expense",
-          category: "other",
-          note: `Penyesuaian saldo ${form.name}`,
-          date: new Date().toISOString().split("T")[0],
-        });
-        // Apply incremental balance update once (single source of truth)
-        await base44.entities.Account.update(account.id, { balance });
-      }
-      onSave({ ...updated, balance: diff !== 0 ? balance : updated.balance });
-    } else {
-      const created = await base44.entities.Account.create(form);
-      // Catat saldo awal sebagai transaksi income jika > 0
-      if (balance > 0) {
-        await base44.entities.Transaction.create({
-          account_id: created.id,
-          amount: balance,
-          type: "income",
-          category: "other",
-          note: `Saldo awal ${form.name}`,
-          date: new Date().toISOString().split("T")[0],
-        });
-      }
-      onSave(created);
-    }
-    setSaving(false);
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-xl">
-        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#F2F4F7]">
-          <p className="font-bold text-[#1A1A1A]">{account?.id ? "Edit Rekening" : "Tambah Rekening"}</p>
-          <button onClick={onClose} className="p-2 rounded-xl hover:bg-[#F2F4F7]"><X className="w-5 h-5 text-[#8FA4C8]" /></button>
-        </div>
-        <div className="px-5 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
-
-          {/* NEW ACCOUNT: template picker first */}
-          {!account?.id && (
-            <>
-              {/* Selected preview or prompt */}
-              {form.name ? (
-                <div className="flex items-center gap-3 p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                  {form.logo_url ? (
-                    <AccountLogo logoUrl={form.logo_url} size="w-10 h-10" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (form.color || "#F97316") + "20" }}>
-                      <span className="text-sm">{form.icon || "🏦"}</span>
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-[#1A1A1A]">{form.name}</p>
-                    <p className="text-[10px] text-[#8FA4C8]">{form.type === "bank" ? "Bank" : form.type === "ewallet" ? "E-Wallet" : form.type === "cash" ? "Cash" : "Lainnya"}</p>
-                  </div>
-                  <button onClick={() => { setForm(f => ({ ...f, name: "", logo_url: "", color: "#F97316", type: "bank" })); setShowTemplates(true); }}
-                    className="text-xs text-[#F97316] font-semibold">Ganti</button>
-                </div>
-              ) : (
-                <p className="text-xs text-[#8FA4C8] text-center py-1">Pilih institusi di bawah</p>
-              )}
-
-              {/* Template list */}
-              {showTemplates && (
-                <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
-                  <div className="flex items-center gap-2 px-3 py-2 border-b border-[#F2F4F7]">
-                    <Search className="w-3.5 h-3.5 text-[#8FA4C8]" />
-                    <input
-                      value={search}
-                      onChange={e => setSearch(e.target.value)}
-                      placeholder="Cari bank, e-wallet..."
-                      className="flex-1 text-xs text-[#1A1A1A] outline-none bg-transparent"
-                    />
-                  </div>
-                  <div className="max-h-52 overflow-y-auto divide-y divide-[#F2F4F7]">
-                    {filteredDefaults.map(da => (
-                      <button key={da.id} onClick={() => applyTemplate(da)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#F8FAFC] active:bg-[#F2F4F7] transition-colors text-left">
-                        {da.logo_url ? (
-                            <AccountLogo 
-                              logoUrl={da.logo_url} 
-                              size="w-8 h-8"
-                              fallback={
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (da.color || "#F97316") + "20" }}>
-                                  <span className="text-sm">{da.icon || "🏦"}</span>
-                                </div>
-                              }
-                            />
-                          ) : (
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (da.color || "#F97316") + "20" }}>
-                              <span className="text-sm">{da.icon || "🏦"}</span>
-                            </div>
-                          )}
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold text-[#1A1A1A] truncate">{da.name}</p>
-                          <p className="text-[10px] text-[#8FA4C8]">{da.type === "bank" ? "Bank" : da.type === "ewallet" ? "E-Wallet" : da.type === "cash" ? "Cash" : "Lainnya"}</p>
-                        </div>
-                      </button>
-                    ))}
-                    {filteredDefaults.length === 0 && (
-                      <p className="text-xs text-[#8FA4C8] text-center py-4">Tidak ada hasil</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* EDIT: show account preview */}
-          {account?.id && (
-            <div className="flex items-center gap-3 p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-              {account.logo_url ? (
-                <AccountLogo 
-                  logoUrl={account.logo_url} 
-                  size="w-10 h-10"
-                  fallback={
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (account.color || "#F97316") + "20" }}>
-                      <span className="text-sm">{account.icon || "🏦"}</span>
-                    </div>
-                  }
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (account.color || "#F97316") + "20" }}>
-                  <span className="text-sm">{account.icon || "🏦"}</span>
-                </div>
-              )}
-              <div>
-                <p className="text-sm font-bold text-[#1A1A1A]">{account.name}</p>
-                <p className="text-[10px] text-[#8FA4C8]">{account.type === "bank" ? "Bank" : account.type === "ewallet" ? "E-Wallet" : account.type === "cash" ? "Cash" : "Lainnya"}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Balance input — always shown */}
-          <div>
-            <p className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5">
-              {account?.id ? "Ubah Saldo" : "Saldo Awal"}
-            </p>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm">Rp</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={form._balanceDisplay ?? (form.balance ? Number(form.balance).toLocaleString("id-ID") : "")}
-                onChange={e => {
-                  const raw = e.target.value.replace(/[^0-9]/g, "");
-                  setForm(f => ({ ...f, balance: parseFloat(raw) || 0, _balanceDisplay: raw === "" ? "" : Number(raw).toLocaleString("id-ID") }));
-                }}
-                placeholder="0"
-                className="w-full pl-10 pr-4 py-3 bg-[#F2F4F7] rounded-xl text-sm text-[#1A1A1A] outline-none focus:ring-2 focus:ring-[#F97316]/30 font-bold"
-              />
-            </div>
-            {account?.id && (
-              <p className="text-[10px] text-[#8FA4C8] mt-2">Saldo saat ini: <span className="font-bold text-[#1A1A1A]">{formatRupiah(account.balance)}</span></p>
-            )}
-          </div>
-
-          {/* Default toggle */}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[#1A1A1A]">Rekening Utama</p>
-              <p className="text-xs text-[#8FA4C8]">Digunakan sebagai default di transaksi baru</p>
-            </div>
-            <button onClick={() => setForm(f => ({ ...f, is_default: !f.is_default }))}
-              className={`w-11 h-6 rounded-full transition-colors relative ${form.is_default ? "bg-[#F97316]" : "bg-[#E2E8F0]"}`}>
-              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${form.is_default ? "left-6" : "left-1"}`} />
-            </button>
-          </div>
-        </div>
-        <div className="px-5 pb-6 pt-2">
-          <button onClick={handleSave} disabled={saving || (!account?.id && !form.name.trim()) || (!account?.id && form.balance === 0 && !form._balanceDisplay)}
-            className="w-full py-3.5 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
-            {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check className="w-4 h-4" />}
-            {account?.id ? "Simpan Perubahan" : "Simpan"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+// Legacy AccountModal removed — now uses EditAccountModal from @/components/profile/EditAccountModal.
 
 export default function Accounts() {
   const [accounts, setAccounts] = useState([]);
@@ -460,13 +227,14 @@ export default function Accounts() {
       )}
 
       {showModal && editAccount && (
-        <AccountModal
+        <EditAccountModal
           account={editAccount}
           onClose={() => { setShowModal(false); setEditAccount(null); }}
           onSave={(acc) => {
             setAccounts(prev => prev.map(a => a.id === acc.id ? acc : a));
             setShowModal(false);
             setEditAccount(null);
+            toast.success(`${acc.name} diperbarui ✓`);
           }}
         />
       )}
