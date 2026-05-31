@@ -4,7 +4,6 @@ import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCa
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
-import AdminNotificationPanel from "@/components/notifications/AdminNotificationPanel";
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
@@ -76,19 +75,9 @@ function LayoutInner({ children, currentPageName }) {
         setUnreadAdminCount(relevant.length);
       }).catch(() => {});
 
-      // Fetch upcoming reminders
-      base44.entities.Reminder.filter({ is_active: true, created_by: u.email }).then((reminders) => {
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-        const upcoming = reminders.filter((r) => {
-          if (r.last_dismissed_month === currentMonth) return false;
-          const thisMonth = new Date(now.getFullYear(), now.getMonth(), r.due_day);
-          const target = thisMonth < now ? new Date(now.getFullYear(), now.getMonth() + 1, r.due_day) : thisMonth;
-          const days = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
-          return days <= 7;
-        });
-        setUnreadAlertCount((prev) => prev + upcoming.length);
-      }).catch(() => {});
+      // Note: upcoming reminders intentionally NOT added to unreadAlertCount —
+      // reminders are shown in their own tab and counted there. Mixing them into
+      // the alert badge caused double-counting with the admin/alert totals.
     }).catch(() => {});
   }, []);
 
@@ -334,7 +323,7 @@ function LayoutInner({ children, currentPageName }) {
           }
 
           <div className="flex items-center gap-2">
-            <button onClick={() => {setShowAlertsDrawer(true);setUnreadAlertCount(0);}} className="relative w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
+            <button onClick={() => {setShowAlertsDrawer(true);setUnreadAlertCount(0);setUnreadAdminCount(0);}} className="relative w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
               <Bell className="w-4 h-4" />
               {unreadAlertCount + unreadAdminCount > 0 &&
               <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-white text-[9px] font-bold flex items-center justify-center">
@@ -467,7 +456,7 @@ function LayoutInner({ children, currentPageName }) {
 
 
       {/* Alerts & Notifications Drawer */}
-      {showAlertsDrawer && <AlertsDrawer onClose={() => {setShowAlertsDrawer(false);setUnreadAdminCount(0);}} user={user} />}
+      {showAlertsDrawer && <AlertsDrawer onClose={() => setShowAlertsDrawer(false)} user={user} />}
 
       {/* Global Search */}
       {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}

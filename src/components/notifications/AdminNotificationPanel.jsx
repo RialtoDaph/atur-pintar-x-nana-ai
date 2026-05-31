@@ -28,18 +28,17 @@ export default function AdminNotificationPanel({ user, onClose }) {
   async function markAsRead(notif) {
     try {
       const readBy = notif.read_by || [];
-      if (!readBy.includes(user.email)) {
-        readBy.push(user.email);
-      }
-      
-      const shouldMarkRead = notif.target_type === 'specific' || 
-        (notif.target_type === 'all' && readBy.length > 0);
-      
-      await base44.entities.AdminNotification.update(notif.id, {
-        read_by: readBy,
-        is_read: shouldMarkRead
-      });
-      
+      if (readBy.includes(user.email)) return; // already read by this user
+      const newReadBy = [...readBy, user.email];
+
+      // For broadcast (target_type === 'all'), do NOT touch is_read — it's a
+      // shared record and would leak read-status to other users. Only flip
+      // is_read for user-specific notifications.
+      const update = notif.target_type === 'specific'
+        ? { read_by: newReadBy, is_read: true }
+        : { read_by: newReadBy };
+
+      await base44.entities.AdminNotification.update(notif.id, update);
       await loadNotifications();
     } catch (error) {
       console.error('Error marking as read:', error);
