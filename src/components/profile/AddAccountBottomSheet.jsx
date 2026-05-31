@@ -45,19 +45,15 @@ function FormBottomSheet({ preset, accountType, onBack, onClose, onSave }) {
   return (
     <>
       <div className="fixed inset-0 bg-black/60 z-[90]" onClick={onClose} />
+      <div className="fixed inset-0 z-[95] flex items-center justify-center p-4 pointer-events-none">
       <div
         role="dialog"
         aria-modal="true"
-        className="fixed bottom-0 left-0 right-0 z-[95] bg-white rounded-t-3xl shadow-2xl overscroll-contain animate-slide-up-sheet"
-        style={{ maxHeight: "85dvh", display: "flex", flexDirection: "column" }}
+        className="bg-white rounded-3xl shadow-2xl w-full max-w-md pointer-events-auto overscroll-contain"
+        style={{ maxHeight: "90dvh", display: "flex", flexDirection: "column" }}
       >
-        {/* Handle */}
-        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 bg-[#E2E8F0] rounded-full" />
-        </div>
-
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-2 pb-4 border-b border-[#F2F4F7] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#F2F4F7] flex-shrink-0">
           <div className="flex items-center gap-2">
             <button onClick={onBack} className="p-2 rounded-xl bg-[#F2F4F7]">
               <ChevronLeft className="w-5 h-5 text-[#8FA4C8]" />
@@ -149,7 +145,7 @@ function FormBottomSheet({ preset, accountType, onBack, onClose, onSave }) {
         </div>
 
         {/* CTA */}
-        <div className="px-5 pt-3 pb-6 flex-shrink-0 border-t border-[#F2F4F7]">
+        <div className="px-5 pt-3 pb-5 flex-shrink-0 border-t border-[#F2F4F7]">
           <button
             onClick={handleSave}
             disabled={saving || !namaRekening.trim()}
@@ -163,6 +159,7 @@ function FormBottomSheet({ preset, accountType, onBack, onClose, onSave }) {
             {saving ? "Menyimpan..." : "Simpan Rekening"}
           </button>
         </div>
+      </div>
       </div>
     </>
   );
@@ -202,20 +199,16 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/60 z-[90]" onClick={onClose} />
 
-      {/* Bottom Sheet */}
+      {/* Floating card */}
+      <div className="fixed inset-0 z-[95] flex items-center justify-center p-4 pointer-events-none">
       <div
         role="dialog"
         aria-modal="true"
-        className="fixed bottom-0 left-0 right-0 z-[95] bg-white rounded-t-3xl shadow-2xl overscroll-contain animate-slide-up-sheet"
-        style={{ maxHeight: "80dvh", display: "flex", flexDirection: "column" }}
+        className="bg-white rounded-3xl shadow-2xl w-full max-w-md pointer-events-auto overscroll-contain"
+        style={{ maxHeight: "85dvh", display: "flex", flexDirection: "column" }}
       >
-        {/* Handle bar */}
-        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 bg-[#E2E8F0] rounded-full" />
-        </div>
-
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-2 pb-4 border-b border-[#F2F4F7] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#F2F4F7] flex-shrink-0">
           <div>
             <p className="font-bold text-[#1A1A1A] text-base">Pilih {typeLabel[accountType]}</p>
             <p className="text-xs text-[#8FA4C8] mt-0.5">Tap untuk memilih rekening</p>
@@ -272,6 +265,7 @@ export default function AddAccountBottomSheet({ accountType, onClose, onSave }) 
             </div>
           )}
         </div>
+      </div>
       </div>
     </>
   );
