@@ -1,20 +1,12 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-
-const LEVEL_THRESHOLDS = [
-  { level: 1, name: "Newbie Ngatur", min: 0, max: 499 },
-  { level: 2, name: "Si Pencatat", min: 500, max: 1499 },
-  { level: 3, name: "Budgeter Muda", min: 1500, max: 2999 },
-  { level: 4, name: "Social Saver", min: 3000, max: 5999 },
-  { level: 5, name: "Financial Aware", min: 6000, max: 9999 },
-  { level: 6, name: "Investor Pemula", min: 10000, max: 19999 },
-  { level: 7, name: "Atur Pintar Pro", min: 20000, max: Infinity },
-];
+import { LEVELS } from "@/hooks/useGamification";
+import { completeMission } from "@/hooks/useGamificationActions";
 
 function getLevelInfo(xp) {
-  const current = LEVEL_THRESHOLDS.find(l => xp >= l.min && xp <= l.max) || LEVEL_THRESHOLDS[0];
-  const next = LEVEL_THRESHOLDS.find(l => l.level === current.level + 1);
+  const current = LEVELS.find(l => xp >= l.min && xp <= l.max) || LEVELS[0];
+  const next = LEVELS.find(l => l.level === current.level + 1);
   return { current, next };
 }
 
@@ -90,39 +82,26 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
   async function handleComplete(mission) {
     if (mission.is_completed) return;
 
-    // Optimistic update - remove completed mission from list
+    // Optimistic update — remove completed mission from list
     setMissions(prev => prev.filter(m => m.id !== mission.id));
 
-    // Update mission
-    await base44.entities.DailyMission.update(mission.id, { is_completed: true });
+    // Track previous level to detect level-up after backend awards XP
+    const prevXP = gamificationProfile?.total_points || 0;
+    const prevLevelInfo = getLevelInfo(prevXP);
 
-    // Update gamification
+    // Delegate to backend (marks mission + awards XP authoritatively via processGamification).
+    // This avoids race conditions where multiple parallel writes to total_points overwrite each other.
+    await completeMission(user.email, mission.mission_key);
+
+    // Refresh profile from DB to get authoritative XP/level
     const profiles = await base44.entities.GamificationProfile.filter({ created_by: user.email }).catch(() => []);
-    let profile = profiles?.[0];
+    const sorted = (profiles || []).sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
+    const fresh = sorted[0];
+    if (!fresh) return;
 
-    if (!profile) {
-      profile = await base44.entities.GamificationProfile.create({
-        total_points: 0, level: 1, daily_streak: 0, last_activity_date: today,
-      });
-    }
+    const newLevelInfo = getLevelInfo(fresh.total_points || 0);
 
-    const newXP = (profile.total_points || 0) + (mission.xp_reward || 0);
-    const prevLevelInfo = getLevelInfo(profile.total_points || 0);
-    const newLevelInfo = getLevelInfo(newXP);
-
-    // Only award XP — streak is owned by processGamification (called when transactions/goals are created)
-    await base44.entities.GamificationProfile.update(profile.id, {
-      total_points: newXP,
-      level: newLevelInfo.current.level,
-    });
-
-    if (onProfileUpdate) {
-      onProfileUpdate({
-        ...profile,
-        total_points: newXP,
-        level: newLevelInfo.current.level,
-      });
-    }
+    if (onProfileUpdate) onProfileUpdate(fresh);
 
     if (newLevelInfo.current.level > prevLevelInfo.current.level) {
       setShowLevelUp(newLevelInfo.current);

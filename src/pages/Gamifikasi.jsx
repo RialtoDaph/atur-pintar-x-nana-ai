@@ -1,25 +1,15 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import { ACHIEVEMENTS_DEF } from "@/hooks/useGamification";
+import { ACHIEVEMENTS_DEF, LEVELS } from "@/hooks/useGamification";
 import BossBattleCard from "@/components/gamification/BossBattleCard";
 import ChallengeSection from "@/components/gamification/ChallengeSection";
 import LeaderboardTab from "@/components/gamification/LeaderboardTab";
 import { expireChallenges } from "@/lib/updateChallengesAfterTransaction";
 
-const LEVEL_THRESHOLDS = [
-  { level: 1, name: "Newbie Ngatur", min: 0, max: 499 },
-  { level: 2, name: "Si Pencatat", min: 500, max: 1499 },
-  { level: 3, name: "Budgeter Muda", min: 1500, max: 2999 },
-  { level: 4, name: "Social Saver", min: 3000, max: 5999 },
-  { level: 5, name: "Financial Aware", min: 6000, max: 9999 },
-  { level: 6, name: "Investor Pemula", min: 10000, max: 19999 },
-  { level: 7, name: "Atur Pintar Pro", min: 20000, max: Infinity },
-];
-
 function getLevelInfo(xp) {
-  const current = LEVEL_THRESHOLDS.find(l => xp >= l.min && xp <= l.max) || LEVEL_THRESHOLDS[0];
-  const next = LEVEL_THRESHOLDS.find(l => l.level === current.level + 1);
+  const current = LEVELS.find(l => xp >= l.min && xp <= l.max) || LEVELS[0];
+  const next = LEVELS.find(l => l.level === current.level + 1);
   return { current, next };
 }
 
@@ -51,7 +41,9 @@ export default function Gamifikasi() {
         base44.entities.Achievement.filter({ created_by: u.email }).catch(() => []),
         base44.entities.FinancialHealthScore.filter({ created_by: u.email }).catch(() => []),
       ]);
-      setGamificationProfile(profiles?.[0] || null);
+      // Pick highest-XP profile (matches backend) to handle stray duplicates safely
+      const sortedProfiles = (profiles || []).sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
+      setGamificationProfile(sortedProfiles[0] || null);
       setAchievements(achs || []);
       const sorted = (fhsList || []).sort((a, b) => (b.month || "").localeCompare(a.month || ""));
       setFhsScore(sorted?.[0] || null);

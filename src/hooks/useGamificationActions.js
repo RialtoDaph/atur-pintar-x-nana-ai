@@ -1,80 +1,42 @@
 /**
- * useGamificationActions — lightweight client-side helpers for:
- * 1. updateStreak: updates daily_streak on every user activity
- * 2. completeMission: marks today's DailyMission complete + awards XP
+ * useGamificationActions — thin client helpers that DELEGATE to backend.
+ *
+ * IMPORTANT: All XP / streak / level logic is owned by `processGamification`
+ * (backend). Never write to GamificationProfile directly from the frontend —
+ * doing so causes race conditions with the backend processor.
+ *
+ * - completeMission: marks today's DailyMission complete and asks backend to
+ *   award XP via processGamification (trigger="mission_completed").
+ *   Safe to call multiple times — DailyMission filter checks is_completed=false.
  */
 import { base44 } from "@/api/base44Client";
-import { format, subDays } from "date-fns";
-
-// Synced with processGamification backend & useGamification hook
-const LEVEL_THRESHOLDS = [
-  { level: 1, min: 0 },
-  { level: 2, min: 500 },
-  { level: 3, min: 1500 },
-  { level: 4, min: 3000 },
-  { level: 5, min: 6000 },
-  { level: 6, min: 10000 },
-  { level: 7, min: 20000 },
-];
-
-function getLevelFromXP(xp) {
-  let level = LEVEL_THRESHOLDS[0];
-  for (const l of LEVEL_THRESHOLDS) {
-    if (xp >= l.min) level = l;
-  }
-  return level.level;
-}
-
-async function getOrCreateProfile(userEmail) {
-  const profiles = await base44.entities.GamificationProfile.filter({ created_by: userEmail }).catch(() => []);
-  if (profiles && profiles.length > 0) {
-    return [...profiles].sort((a, b) => (b.total_points || 0) - (a.total_points || 0))[0];
-  }
-  return base44.entities.GamificationProfile.create({
-    daily_streak: 0, longest_streak: 0, total_points: 0, level: 1,
-    achievements: [], last_activity_date: null,
-  });
-}
+import { format } from "date-fns";
 
 /**
- * Update daily streak for the current user.
- * Safe to call on any user interaction — handles dedup (same-day) internally.
+ * @deprecated Streak is now handled exclusively by the backend `processGamification`
+ * function (triggered on activity like transaction_created/goal_created/etc).
+ * This stub exists only to keep older imports compiling — it is a no-op.
  */
-export async function updateStreak(userEmail) {
-  if (!userEmail) return;
-  const today = format(new Date(), "yyyy-MM-dd");
-  const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
-
-  const profile = await getOrCreateProfile(userEmail);
-  const last = profile.last_activity_date;
-
-  // Already counted today — nothing to do
-  if (last === today) return;
-
-  let newStreak;
-  if (last === yesterday) {
-    newStreak = (profile.daily_streak || 0) + 1;
-  } else {
-    newStreak = 1;
-  }
-
-  await base44.entities.GamificationProfile.update(profile.id, {
-    daily_streak: newStreak,
-    longest_streak: Math.max(profile.longest_streak || 0, newStreak),
-    last_activity_date: today,
-  });
+export async function updateStreak() {
+  // No-op: backend processGamification owns streak logic.
 }
 
 /**
- * Complete a DailyMission for today and award XP.
+ * Mark a daily mission as completed (frontend-only mark) and let the backend
+ * processGamification award XP and handle level/achievements.
+ *
+ * Note: `cek_budget` is fired client-side (user viewed Budget page).
+ * `catat_transaksi` and `tanya_nana` are auto-completed by the
+ * `completeDailyMission` backend automation when the Transaction /
+ * NanaConversation is created — but calling here as a fallback is safe
+ * (the mission filter on is_completed=false makes it idempotent).
+ *
  * mission_key: "catat_transaksi" | "tanya_nana" | "cek_budget"
- * Safe to call multiple times — only acts when mission exists and is_completed=false.
  */
 export async function completeMission(userEmail, missionKey) {
   if (!userEmail || !missionKey) return;
   const today = format(new Date(), "yyyy-MM-dd");
 
-  // Find today's incomplete mission
   const missions = await base44.entities.DailyMission.filter({
     created_by: userEmail,
     date: today,
@@ -85,18 +47,13 @@ export async function completeMission(userEmail, missionKey) {
   if (!missions || missions.length === 0) return; // already done or doesn't exist
 
   const mission = missions[0];
-  const xpReward = mission.xp_reward || 0;
 
-  // Mark complete
-  await base44.entities.DailyMission.update(mission.id, { is_completed: true });
+  // Mark mission completed (frontend-safe — only flips the boolean)
+  await base44.entities.DailyMission.update(mission.id, { is_completed: true }).catch(() => {});
 
-  // Award XP only (streak is handled separately by updateStreak)
-  if (xpReward > 0) {
-    const profile = await getOrCreateProfile(userEmail);
-    const newXP = (profile.total_points || 0) + xpReward;
-    await base44.entities.GamificationProfile.update(profile.id, {
-      total_points: newXP,
-      level: getLevelFromXP(newXP),
-    });
-  }
+  // Ask backend to award XP authoritatively (avoids race with processGamification)
+  base44.functions.invoke("processGamification", {
+    trigger: "mission_completed",
+    metadata: { mission_key: missionKey, xp_reward: mission.xp_reward || 0 },
+  }).catch(() => {});
 }
