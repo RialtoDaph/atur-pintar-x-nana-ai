@@ -168,6 +168,7 @@ export default function InvestmentsPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 -mt-14 space-y-3">
+        <InvestmentNanaPanel investments={investments} />
         {loading ? (
           [...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-28 animate-pulse" />)
         ) : investments.length === 0 ? (
@@ -259,7 +260,6 @@ export default function InvestmentsPage() {
           })
         )}
 
-        <InvestmentNanaPanel investments={investments} />
         <RiskProfileRecommendation investments={investments} />
         <EducationResources />
       </div>
