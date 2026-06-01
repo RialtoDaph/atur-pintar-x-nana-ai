@@ -124,9 +124,9 @@ export function useGamification(user) {
         setTimeout(() => setXpFloatMsg(null), 2000);
       }
 
-      // Streak popup — only show when streak actually changed today (avoid showing on every action of the same day)
+      // Streak popup — muncul tiap transaksi pertama di hari itu (saat streak naik / mulai baru)
       const newStreak = data.streak || 0;
-      if (data.streakChanged && newStreak > 1) {
+      if (data.streakChanged && newStreak >= 1) {
         setStreakPopup({ message: `🔥 Streak ${newStreak} hari!`, streak: newStreak });
       }
 
