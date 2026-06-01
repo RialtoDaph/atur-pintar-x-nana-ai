@@ -4,7 +4,11 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 // Sync dengan card yang benar-benar dirender di pages/Analytics
 const ALL_CARDS = [
-  { id: "spending_chart", label: "Pengeluaran per Kategori", emoji: "🥧" },
+  { id: "behavior_hero", label: "Insight Utama", emoji: "🎯" },
+  { id: "behavior_insights", label: "Kebiasaanmu", emoji: "🧠" },
+  { id: "nana_ai_hub", label: "Nana AI Hub", emoji: "✨" },
+  { id: "spending_chart", label: "Kategori Keuangan", emoji: "🛍️" },
+  { id: "portfolio_summary", label: "Portofolio Investasi", emoji: "💼" },
 ];
 
 export default function AnalyticsCardManager({ cards, onSave, onClose }) {

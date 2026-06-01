@@ -15,7 +15,11 @@ import NanaAIHub from "@/components/analytics/NanaAIHub";
 import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
 
 const DEFAULT_ANALYTICS_CARDS = [
+  { id: "behavior_hero", visible: true },
+  { id: "behavior_insights", visible: true },
+  { id: "nana_ai_hub", visible: true },
   { id: "spending_chart", visible: true },
+  { id: "portfolio_summary", visible: true },
 ];
 
 const DEFAULT_CATEGORIES_FLAT = [
@@ -352,50 +356,56 @@ export default function Analytics() {
         </div>
 
         {/* 🎯 Behavior Hero — auto-pick insight terkuat (ikut filter periode) */}
-        <BehaviorHeroCard
-          transactions={transactions}
-          allCategoriesConfig={allCategoriesConfig}
-          filterPeriod={filterPeriod}
-          customDateRange={customDateRange}
-        />
-
-        {/* 🧠 Kebiasaanmu — 5 tabs (Merchant, 50/30/20, No-Spend, Pola, Heatmap) */}
-        {isPremium ? (
-          <BehaviorInsightsTabs
+        {isCardVisible("behavior_hero") && (
+          <BehaviorHeroCard
             transactions={transactions}
+            allCategoriesConfig={allCategoriesConfig}
             filterPeriod={filterPeriod}
             customDateRange={customDateRange}
-            allCategoriesConfig={allCategoriesConfig}
           />
-        ) : (
-          <PremiumBlurCard title="🧠 Kebiasaanmu">
+        )}
+
+        {/* 🧠 Kebiasaanmu — 5 tabs (Merchant, 50/30/20, No-Spend, Pola, Heatmap) */}
+        {isCardVisible("behavior_insights") && (
+          isPremium ? (
             <BehaviorInsightsTabs
               transactions={transactions}
               filterPeriod={filterPeriod}
               customDateRange={customDateRange}
               allCategoriesConfig={allCategoriesConfig}
             />
-          </PremiumBlurCard>
+          ) : (
+            <PremiumBlurCard title="🧠 Kebiasaanmu">
+              <BehaviorInsightsTabs
+                transactions={transactions}
+                filterPeriod={filterPeriod}
+                customDateRange={customDateRange}
+                allCategoriesConfig={allCategoriesConfig}
+              />
+            </PremiumBlurCard>
+          )
         )}
 
         {/* ✨ Nana AI Hub — 5 tabs (Narasi, Tren, Forecast, Harian, Budget) */}
-        <NanaAIHub
-          trendData={trendData}
-          pieData={pieData}
-          totalIncome={totalIncome}
-          totalExpenses={periodExpenses}
-          savingsRate={savingsRate}
-          periodLabel={formatPeriodLabel(filterPeriod)}
-          periodSubtitle={periodSubtitle}
-          hasPrevData={hasPrevData}
-          prevIncome={prevIncome}
-          prevExpenses={prevExpenses}
-          prevSavingsRate={prevSavingsRate}
-          budgets={budgets}
-          transactions={transactions}
-          filterPeriod={filterPeriod}
-          customDateRange={customDateRange}
-        />
+        {isCardVisible("nana_ai_hub") && (
+          <NanaAIHub
+            trendData={trendData}
+            pieData={pieData}
+            totalIncome={totalIncome}
+            totalExpenses={periodExpenses}
+            savingsRate={savingsRate}
+            periodLabel={formatPeriodLabel(filterPeriod)}
+            periodSubtitle={periodSubtitle}
+            hasPrevData={hasPrevData}
+            prevIncome={prevIncome}
+            prevExpenses={prevExpenses}
+            prevSavingsRate={prevSavingsRate}
+            budgets={budgets}
+            transactions={transactions}
+            filterPeriod={filterPeriod}
+            customDateRange={customDateRange}
+          />
+        )}
 
         {/* 🛍️ Kategori Keuangan */}
         {isCardVisible("spending_chart") && (
@@ -413,7 +423,9 @@ export default function Analytics() {
         )}
 
         {/* 💼 Portofolio Investasi */}
-        <PortfolioSummary user={user} periodSubtitle={periodSubtitle} />
+        {isCardVisible("portfolio_summary") && (
+          <PortfolioSummary user={user} periodSubtitle={periodSubtitle} />
+        )}
 
       </div>
 
