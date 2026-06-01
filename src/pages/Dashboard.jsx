@@ -222,7 +222,7 @@ export default function Dashboard() {
               <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
             </div>
 
-            {/* Desktop: top bar (search + streak + bell + Catat Transaksi) then greeting */}
+            {/* Desktop: top bar contains greeting + search + streak + bell + Catat Transaksi (1 baris) */}
             <div className="hidden lg:block">
               <DashboardDesktopTopBar
                 user={user}
@@ -230,7 +230,6 @@ export default function Dashboard() {
                 unreadCount={desktopUnreadCount}
                 onAddTransaction={() => setShowAddTransaction(true)}
               />
-              <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
             </div>
 
             {/* Mobile: Balance card stays here (unchanged). Desktop: moved to body grid below. */}

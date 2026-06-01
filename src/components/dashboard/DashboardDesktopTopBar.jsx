@@ -3,10 +3,11 @@ import { Search, Bell, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
+import { sanitizeDisplayName } from "@/components/dashboard/DashboardGreeting";
 
 /**
  * Desktop-only top bar for the Dashboard page.
- * Mirrors mockup: [Search input] [🔥 streak] [🔔 bell] [+ Catat Transaksi]
+ * Layout: [Greeting] [Search] [🔥 streak] [🔔 bell] [+ Catat Transaksi]
  * Hidden on mobile (mobile uses Layout's existing header + FAB).
  */
 export default function DashboardDesktopTopBar({
@@ -19,12 +20,28 @@ export default function DashboardDesktopTopBar({
   const [showAlerts, setShowAlerts] = useState(false);
   const streak = gamificationProfile?.daily_streak ?? 0;
 
+  const hour = new Date().getHours();
+  const emailPrefix = user?.email?.split("@")[0];
+  const name = sanitizeDisplayName(user?.full_name)
+    || (emailPrefix ? emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) : null)
+    || "Kamu";
+  let greeting;
+  if (hour >= 6 && hour < 11) greeting = `Pagi, ${name}!`;
+  else if (hour >= 11 && hour < 15) greeting = `Halo, ${name}!`;
+  else if (hour >= 15 && hour < 19) greeting = `Sore, ${name}!`;
+  else greeting = `Malam, ${name}!`;
+
   return (
     <div className="hidden lg:flex items-center gap-3 mb-4">
+      {/* Greeting — compact, left-aligned */}
+      <div className="flex-shrink-0 pr-2">
+        <h2 className="text-lg font-bold text-[#1A1A1A] dark:text-white leading-tight whitespace-nowrap">{greeting}</h2>
+      </div>
+
       {/* Search */}
       <button
         onClick={() => setShowSearch(true)}
-        className="flex-1 flex items-center gap-3 h-11 px-4 rounded-full bg-white border border-[#E2E8F0] hover:border-[#CBD5E1] transition-colors text-left shadow-sm"
+        className="flex-1 min-w-0 flex items-center gap-3 h-11 px-4 rounded-full bg-white border border-[#E2E8F0] hover:border-[#CBD5E1] transition-colors text-left shadow-sm"
       >
         <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
         <span className="text-sm text-gray-400">Cari transaksi, kategori, rekening...</span>
