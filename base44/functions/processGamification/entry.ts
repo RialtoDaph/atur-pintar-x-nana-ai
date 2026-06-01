@@ -235,12 +235,19 @@ Deno.serve(async (req) => {
       unlockedAchievements.push(def);
       newXP += def.xp;
 
-      // Find existing locked record or create new
+      // Find existing record (locked OR with stale metadata from old schema versions)
       const existing = (achievementRecords || []).find(a => a.achievement_key === key);
       if (existing) {
+        // Always re-sync metadata to current ACHIEVEMENTS_DEF — fixes records created
+        // with old titles/xp/icons (e.g. "Kenalan Sama Nana!" vs current "🤖 Sapa Nana!").
         await base44.entities.Achievement.update(existing.id, {
           is_unlocked: true,
           unlocked_at: new Date().toISOString(),
+          title: def.title,
+          description: def.hint,
+          icon: def.icon,
+          category: def.category,
+          xp_reward: def.xp,
         }).catch(() => {});
       } else {
         await base44.entities.Achievement.create({
@@ -255,11 +262,11 @@ Deno.serve(async (req) => {
         }).catch(() => {});
       }
 
-      // Also sync achievement_key into GamificationProfile.achievements array
-      // (profile variable is in outer scope and will be updated in step 6)
-      if (!profile.achievements) profile.achievements = [];
-      if (!profile.achievements.includes(key)) {
-        profile.achievements = [...profile.achievements, key];
+      // Also sync achievement_key into freshProfile.achievements array
+      // (we'll use freshProfile.achievements in step 6 — not the stale outer `profile`).
+      if (!freshProfile.achievements) freshProfile.achievements = [];
+      if (!freshProfile.achievements.includes(key)) {
+        freshProfile.achievements = [...freshProfile.achievements, key];
       }
     }
 
@@ -281,8 +288,15 @@ Deno.serve(async (req) => {
       await tryUnlock("transaction_100", txCount >= 100);
     }
 
-    // Goal achievements
-    if (trigger === "goal_created" || trigger === "goal_updated" || trigger === "daily_check") {
+    // Goal achievements — also check on transaction_created because savings transactions
+    // bump goal.current_amount (Goals.handleAddSavings / handleTransaction) without firing
+    // a separate goal_updated trigger.
+    if (
+      trigger === "goal_created" ||
+      trigger === "goal_updated" ||
+      trigger === "transaction_created" ||
+      trigger === "daily_check"
+    ) {
       const goals = await base44.entities.SavingsGoal.filter({ created_by: userEmail }).catch(() => []);
       await tryUnlock("first_goal", (goals || []).length >= 1);
       await tryUnlock("goal_50pct", (goals || []).some(g => g.target_amount > 0 && (g.current_amount || 0) / g.target_amount >= 0.5));
@@ -369,7 +383,7 @@ Deno.serve(async (req) => {
       level: finalLevel,
       daily_streak: newStreak,
       longest_streak: newLongest,
-      achievements: profile.achievements || [],
+      achievements: freshProfile.achievements || profile.achievements || [],
       streak_freezes_available: freezesAvailable,
       streak_freeze_last_regen: freezeLastRegen,
     };
