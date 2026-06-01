@@ -414,21 +414,6 @@ function LayoutInner({ children, currentPageName }) {
         </button>
       }
 
-      {/* Desktop FAB - bottom right */}
-      <button
-        onClick={handleFabClick}
-        className="fixed z-[80] bg-[#FF6B35] items-center justify-center rounded-full shadow-lg active:scale-95 transition-all duration-200 tap-highlight-fix hidden sm:flex"
-        style={{
-          width: 56, height: 56,
-          bottom: 24,
-          right: 24,
-          background: showAddTransaction ? '#1A1A1A' : '#FF6B35',
-          transform: showAddTransaction ? 'rotate(135deg)' : 'rotate(0deg)',
-          boxShadow: '0 4px 16px rgba(255,107,53,0.4)'
-        }}>
-          <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-        </button>
-
       {showAddTransaction &&
       <AddTransactionModal
         goals={[]}
