@@ -140,7 +140,7 @@ function LayoutInner({ children, currentPageName }) {
   }, []);
 
   // Detect if we're on a nested page (detail view)
-  const mainPages = ["Dashboard", "Transactions", "Goals", "Budget", "Debts", "Investments", "Analytics", "Tips", "Reminders", "Alerts", "Settings", "Accounts", "SharedFinance", "ProfileSettings"];
+  const mainPages = ["Dashboard", "Transactions", "Goals", "Budget", "Debts", "Investments", "Analytics", "Tips", "Reminders", "Alerts", "Settings", "Accounts", "SharedFinance", "ProfileSettings", "Gamifikasi"];
   const isNestedPage = !mainPages.includes(currentPageName);
 
   // Handle browser back button (hardware back on Android, swipe-back on iOS)
