@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { LEVELS } from "@/hooks/useGamification";
@@ -177,8 +178,11 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
         </div>
       )}
 
-      {/* Level Progress Bar */}
-      <div className="bg-white rounded-2xl shadow-sm p-4">
+      {/* Level Progress Bar — clickable to Gamifikasi page */}
+      <Link
+        to="/Gamifikasi"
+        className="block bg-white rounded-2xl shadow-sm p-4 hover:shadow-md active:scale-[0.99] transition-all tap-highlight-fix"
+      >
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-bold text-[#1A1A1A]">⚡ Level {lvl.level} — {lvl.name}</p>
           <span className="text-xs font-bold text-[#FF6B35]">{xp.toLocaleString("id-ID")} XP</span>
@@ -199,7 +203,7 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
         ) : (
           <p className="text-xs text-[#FF6B35] font-semibold">Level Maksimal tercapai! 🏆</p>
         )}
-      </div>
+      </Link>
 
       {/* Level Up Modal */}
       <AnimatePresence>
