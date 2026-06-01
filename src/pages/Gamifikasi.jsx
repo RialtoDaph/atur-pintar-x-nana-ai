@@ -70,7 +70,11 @@ export default function Gamifikasi() {
   const xpInLevel = xp - lvl.min;
   const xpNeeded = nextLvl ? nextLvl.min - lvl.min : 1;
   const pct = nextLvl ? Math.min((xpInLevel / xpNeeded) * 100, 100) : 100;
-  const unlockedKeys = achievements.map(a => a.achievement_key);
+  // Dedupe + only count records that are actually unlocked.
+  // Some legacy rows have is_unlocked=false or duplicate keys, so we filter and uniq.
+  const unlockedKeys = Array.from(new Set(
+    (achievements || []).filter(a => a.is_unlocked).map(a => a.achievement_key)
+  ));
 
   return (
     <div className="min-h-screen bg-[#F2F4F7] pb-10">
@@ -183,7 +187,20 @@ export default function Gamifikasi() {
               </div>
               <div className="text-right">
                 <p className="text-xs text-[#8FA4C8]">Bonus XP</p>
-                <p className="text-xl font-bold text-[#FF6B35]">{achievements.reduce((s, r) => s + (r.xp_reward || 0), 0).toLocaleString("id-ID")} XP</p>
+                <p className="text-xl font-bold text-[#FF6B35]">{
+                  (() => {
+                    // Sum XP from unique unlocked achievement keys only (no duplicates).
+                    const seen = new Set();
+                    let total = 0;
+                    for (const r of (achievements || [])) {
+                      if (!r.is_unlocked) continue;
+                      if (seen.has(r.achievement_key)) continue;
+                      seen.add(r.achievement_key);
+                      total += (r.xp_reward || 0);
+                    }
+                    return total.toLocaleString("id-ID");
+                  })()
+                } XP</p>
               </div>
             </div>
 
