@@ -58,8 +58,8 @@ Format: poin singkat, angka konkret, maksimal 150 kata. Bahasa Indonesia santai.
         onClick={() => { if (!advice && !loading) getAdvice(); else setExpanded(e => !e); }}
         className="w-full flex items-center gap-3 p-4 hover:bg-[#F8FAFC] transition-colors text-left"
       >
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${urgentCount > 0 ? "bg-[#F5A623]/10" : "bg-[#4F7CFF]/10"}`}>
-          <Target className={`w-5 h-5 ${urgentCount > 0 ? "text-[#F5A623]" : "text-[#4F7CFF]"}`} />
+        <div className={`w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ${urgentCount > 0 ? "ring-[#F5A623]/30" : "ring-[#4F7CFF]/20"}`}>
+          <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png" alt="Nana AI" className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-[#1A1A1A]">
