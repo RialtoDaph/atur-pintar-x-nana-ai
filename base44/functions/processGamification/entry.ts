@@ -272,16 +272,18 @@ Deno.serve(async (req) => {
 
     // ── 5. Check achievements by trigger ─────────────────────────────────────
 
-    // Streak achievements
-    await tryUnlock("streak_3", newStreak >= 3);
-    await tryUnlock("streak_7", newStreak >= 7);
-    await tryUnlock("streak_14", newStreak >= 14);
-    await tryUnlock("streak_30", newStreak >= 30);
+    // Streak achievements — based on LONGEST streak ever reached (not current).
+    // Once earned, never lost even if current streak resets to 0.
+    await tryUnlock("streak_3", newLongest >= 3);
+    await tryUnlock("streak_7", newLongest >= 7);
+    await tryUnlock("streak_14", newLongest >= 14);
+    await tryUnlock("streak_30", newLongest >= 30);
 
-    // Transaction achievements
+    // Transaction achievements — count ALL transactions (not capped at 200).
+    // Use a higher fetch limit so transaction_50/100 unlock correctly for power users.
     if (trigger === "transaction_created" || trigger === "daily_check") {
-      const txCount = await base44.entities.Transaction.filter({ created_by: userEmail }, "-date", 200)
-        .then(r => (r || []).length).catch(() => 0);
+      const allTx = await base44.entities.Transaction.filter({ created_by: userEmail, is_deleted: false }, "-date", 1000).catch(() => []);
+      const txCount = (allTx || []).length;
       await tryUnlock("first_transaction", txCount >= 1);
       await tryUnlock("transaction_10", txCount >= 10);
       await tryUnlock("transaction_50", txCount >= 50);
@@ -308,8 +310,9 @@ Deno.serve(async (req) => {
       const budgets = await base44.entities.Budget.filter({ created_by: userEmail }).catch(() => []);
       await tryUnlock("first_budget", (budgets || []).length >= 1);
 
-      // budget_stay: all budgets for last month were not exceeded
-      if (trigger === "daily_check") {
+      // budget_stay: all budgets for last month were not exceeded.
+      // Check on every trigger (not just daily_check) so it unlocks the moment user opens app.
+      {
         const lastMonth = (() => {
           const d = new Date();
           d.setMonth(d.getMonth() - 1);
@@ -452,14 +455,26 @@ Deno.serve(async (req) => {
           // Award XP on completion — accumulate into newXP so multiple challenges in one run all count
           if (newStatus === "completed" && ch.xp_reward) {
             newXP += ch.xp_reward;
-            await base44.entities.GamificationProfile.update(profile.id, {
-              total_points: newXP,
-              level: getLevelFromXP(newXP),
-            }).catch(() => {});
           }
           results.push(`challenge_${ch.challenge_key}_progressed`);
         }
       }
+
+      // After challenge XP added, re-check level achievements (challenge XP might push to next level)
+      const lvlAfterChallenges = getLevelFromXP(newXP);
+      await tryUnlock("level_2", lvlAfterChallenges >= 2);
+      await tryUnlock("level_3", lvlAfterChallenges >= 3);
+      await tryUnlock("level_4", lvlAfterChallenges >= 4);
+      await tryUnlock("level_5", lvlAfterChallenges >= 5);
+      await tryUnlock("level_6", lvlAfterChallenges >= 6);
+      await tryUnlock("level_7", lvlAfterChallenges >= 7);
+
+      // Final profile sync after challenges + level achievements
+      await base44.entities.GamificationProfile.update(profile.id, {
+        total_points: newXP,
+        level: getLevelFromXP(newXP),
+        achievements: freshProfile.achievements || [],
+      }).catch(() => {});
     }
 
     // ── 8. FinancialHealthScore init/recalc (Bug 4) ───────────────────────────
