@@ -7,7 +7,123 @@ export default function UMKMPintarAdBanner() {
   if (dismissed) return null;
 
   return (
-    <div className="mx-4 mb-4">
+    <>
+      {/* ===== DESKTOP — slim 1-row banner ===== */}
+      <div className="hidden sm:block mx-4 mb-4">
+        <div
+          className="relative overflow-hidden flex items-center gap-3"
+          style={{
+            borderRadius: 12,
+            background:
+              "linear-gradient(135deg, #1C0A00 0%, #2A1200 60%, #1C0A00 100%)",
+            border: "1px solid rgba(232,82,10,0.2)",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+            padding: "10px 14px",
+          }}
+        >
+          {/* Top orange thin gradient line */}
+          <div
+            className="absolute top-0 left-0 right-0"
+            style={{
+              height: 2,
+              background: "linear-gradient(90deg, transparent, #E8520A, transparent)",
+            }}
+          />
+
+          {/* Logo */}
+          <div
+            className="flex items-center justify-center flex-shrink-0 overflow-hidden"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              background: "#000",
+              border: "1px solid rgba(232,82,10,0.5)",
+            }}
+          >
+            <img
+              src="https://media.base44.com/images/public/69a82e8090f60786b869983c/3a4fdd82d_TangkapanLayar2026-05-08pukul224953.png"
+              alt="Vrekas.id"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Brand + Tagline */}
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            <span className="text-white font-bold flex-shrink-0" style={{ fontSize: 13 }}>
+              Vrekas.id
+            </span>
+            <span
+              className="font-bold flex-shrink-0"
+              style={{
+                fontSize: 9,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                color: "#E8520A",
+                background: "rgba(232,82,10,0.18)",
+                border: "1px solid rgba(232,82,10,0.4)",
+                padding: "1px 5px",
+                borderRadius: 4,
+              }}
+            >
+              GRATIS
+            </span>
+            <span
+              className="truncate"
+              style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}
+            >
+              Invoice, slip gaji & kwitansi profesional dalam menit.
+            </span>
+          </div>
+
+          {/* Sponsored tag */}
+          <span
+            className="flex-shrink-0 hidden md:inline"
+            style={{
+              fontSize: 9,
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "rgba(255,255,255,0.3)",
+            }}
+          >
+            Sponsored
+          </span>
+
+          {/* CTA */}
+          <button
+            onClick={() => window.open("https://vrekas.id", "_blank")}
+            className="text-white font-bold active:scale-95 transition-transform tap-highlight-fix whitespace-nowrap flex-shrink-0"
+            style={{
+              fontSize: 11,
+              padding: "6px 12px",
+              borderRadius: 8,
+              background: "linear-gradient(135deg, #F06020, #E8520A)",
+              boxShadow: "0 2px 8px rgba(232,82,10,0.35)",
+            }}
+          >
+            Coba Gratis →
+          </button>
+
+          {/* Close */}
+          <button
+            onClick={() => setDismissed(true)}
+            aria-label="Tutup iklan"
+            className="flex-shrink-0 flex items-center justify-center tap-highlight-fix transition-colors hover:bg-white/15"
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: 6,
+              background: "rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.5)",
+            }}
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+
+      {/* ===== MOBILE — original layout ===== */}
+      <div className="sm:hidden mx-4 mb-4">
       <div
         className="relative overflow-hidden"
         style={{
@@ -231,6 +347,7 @@ export default function UMKMPintarAdBanner() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
