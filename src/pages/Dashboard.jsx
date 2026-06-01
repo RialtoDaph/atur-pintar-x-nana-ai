@@ -172,7 +172,11 @@ export default function Dashboard() {
     queryKey: ["gam_profile", user?.email],
     queryFn: () => base44.entities.GamificationProfile.filter({ created_by: user.email }),
     enabled,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+    placeholderData: (prev) => prev,
   });
 
   const activeGamProfile = gamProfile || gamProfiles?.[0] || null;
