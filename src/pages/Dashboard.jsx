@@ -16,6 +16,7 @@ import RecurringManager from "@/components/transactions/RecurringManager";
 import { useGamification } from "@/hooks/useGamification";
 
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
+import DashboardDesktopTopBar from "@/components/dashboard/DashboardDesktopTopBar";
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
 import UMKMPintarAdBanner from "@/components/dashboard/UMKMPintarAdBanner";
 import BossBattleCard from "@/components/gamification/BossBattleCard";
@@ -42,6 +43,7 @@ export default function Dashboard() {
   const [showSampleBanner, setShowSampleBanner] = useState(hasSampleData);
   const [lastTxAddedAt, setLastTxAddedAt] = useState(null);
   const [gamProfile, setGamProfile] = useState(null);
+  const [desktopUnreadCount, setDesktopUnreadCount] = useState(0);
 
   const gamification = useGamification(user);
 
@@ -65,6 +67,30 @@ export default function Dashboard() {
     if (user?.onboarding_completed) {
       gamification.checkStreakOnLoad();
     }
+  }, [user?.email]);
+
+  // Unread count for desktop top bar (alerts + admin notifications)
+  useEffect(() => {
+    if (!user?.email) return;
+    let cancelled = false;
+    Promise.all([
+      base44.entities.Alert.filter({ created_by: user.email, status: "unread" }).catch(() => []),
+      base44.entities.AdminNotification.list().catch(() => []),
+    ]).then(([alerts, notifs]) => {
+      if (cancelled) return;
+      const seen = new Set();
+      let alertCount = 0;
+      for (const a of alerts || []) {
+        const key = `${a.title}::${a.category || ""}`;
+        if (!seen.has(key)) { seen.add(key); alertCount++; }
+      }
+      const adminCount = (notifs || []).filter(n =>
+        (n.target_type === "all" || n.target_email === user.email) &&
+        !n.read_by?.includes(user.email)
+      ).length;
+      setDesktopUnreadCount(Math.min(alertCount, 10) + adminCount);
+    });
+    return () => { cancelled = true; };
   }, [user?.email]);
 
   useEffect(() => {
@@ -196,8 +222,14 @@ export default function Dashboard() {
               <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
             </div>
 
-            {/* Desktop: Greeting + streak + dark mode sejajar di atas balance card */}
+            {/* Desktop: top bar (search + streak + bell + Catat Transaksi) then greeting */}
             <div className="hidden lg:block">
+              <DashboardDesktopTopBar
+                user={user}
+                gamificationProfile={activeGamProfile}
+                unreadCount={desktopUnreadCount}
+                onAddTransaction={() => setShowAddTransaction(true)}
+              />
               <DashboardGreeting user={user} gamificationProfile={activeGamProfile} />
             </div>
 
