@@ -44,7 +44,7 @@ export default function DashboardGreeting({ user, gamificationProfile }) {
   }
 
   return (
-    <div className="flex items-center justify-between mb-4">
+    <div className="relative z-20 flex items-center justify-between mb-4">
       <h2 className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-xl font-bold">{greeting}</h2>
       <div className="flex items-center gap-2">
         <Link
