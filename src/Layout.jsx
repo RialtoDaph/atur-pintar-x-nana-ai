@@ -342,13 +342,13 @@ function LayoutInner({ children, currentPageName }) {
             <DashboardTopTabs />
           </div>
         )}
-        <AnimatePresence mode="sync">
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentPageName}
-            initial={{ opacity: 0, x: isNestedPage ? 50 : -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: isNestedPage ? -50 : 50 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
             className="sm:max-w-6xl sm:mx-auto">
             
             {children}
