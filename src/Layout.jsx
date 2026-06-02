@@ -197,17 +197,11 @@ function LayoutInner({ children, currentPageName }) {
     }
   };
 
-  // Save scroll position when leaving a page
+  // Scroll-to-top setiap pindah halaman (fix: page baru muncul di bawah karena scroll position lama nyangkut)
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (mainContentRef.current) {
-      scrollPositions.current[currentPageName] = mainContentRef.current.scrollTop;
-    }
-  }, [currentPageName]);
-
-  // Restore scroll position when returning to a page
-  useEffect(() => {
-    if (mainContentRef.current && scrollPositions.current[currentPageName]) {
-      mainContentRef.current.scrollTop = scrollPositions.current[currentPageName];
+      mainContentRef.current.scrollTop = 0;
     }
   }, [currentPageName]);
 
