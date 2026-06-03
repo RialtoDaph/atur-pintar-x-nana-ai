@@ -155,7 +155,8 @@ export default function NanaChatDemo() {
                 <div className="flex gap-2">
                   <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()}
                     placeholder="Atau ketik sendiri..." disabled={typing || done}
-                    className="bg-white/5 text-white px-3 py-2.5 text-xs rounded-xl flex-1 border border-white/8 placeholder-white/25 outline-none focus:border-[#F97316]/40 disabled:opacity-40" />
+                    style={{ fontSize: "16px" }}
+                    className="bg-white/5 text-white px-3 py-2.5 sm:text-xs rounded-xl flex-1 border border-white/8 placeholder-white/25 outline-none focus:border-[#F97316]/40 disabled:opacity-40" />
                   <button onClick={handleSend} disabled={typing || !input.trim() || done}
                     className="w-9 h-9 rounded-xl bg-[#F97316] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40">
                     <ArrowRight className="w-3.5 h-3.5" />

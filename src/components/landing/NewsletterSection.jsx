@@ -40,7 +40,6 @@ export default function NewsletterSection() {
       });
       if (res.data?.error) throw new Error(res.data.error);
       setSuccess(true);
-      if (window.confetti) window.confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#F97316", "#FFB347", "#ffffff"] });
     } catch (err) {
       const msg = err.message || "";
       if (msg.includes("rate") || msg.includes("banyak") || msg.includes("limit")) {

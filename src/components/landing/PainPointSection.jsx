@@ -11,7 +11,8 @@ export default function PainPointSection() {
     <section className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
       <div className="max-w-3xl mx-auto">
         <Reveal>
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-10 text-center">Jujur deh...</h2>
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-3 text-center">Pernah ngerasa gini?</h2>
+          <p className="text-center text-white/45 text-sm mb-10">Kalau jawabannya iya, kamu bukan satu-satunya.</p>
         </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {PAIN_POINTS.map((c, i) => (
