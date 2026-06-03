@@ -19,7 +19,7 @@ import DashboardGreeting from "@/components/dashboard/DashboardGreeting";
 import DashboardDesktopTopBar from "@/components/dashboard/DashboardDesktopTopBar";
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
 import UMKMPintarAdBanner from "@/components/dashboard/UMKMPintarAdBanner";
-import BossBattleCard from "@/components/gamification/BossBattleCard";
+import BossBattleFloating from "@/components/gamification/BossBattleFloating";
 import StreakCelebrationPopup from "@/components/dashboard/StreakCelebrationPopup";
 import AchievementPopup from "@/components/dashboard/AchievementPopup";
 import LevelUpModal from "@/components/gamification/LevelUpModal";
@@ -280,14 +280,6 @@ export default function Dashboard() {
             {user?.onboarding_completed && (
               <TodayTransactionsCard transactions={transactions} allCategories={allCategories} />
             )}
-
-            {user?.onboarding_completed && (
-              <BossBattleCard
-                user={user}
-                gamificationProfile={activeGamProfile}
-                onProfileUpdate={setGamProfile}
-              />
-            )}
           </div>
 
           {/* ============ DESKTOP LAYOUT (2 columns, mockup-style) ============ */}
@@ -341,13 +333,6 @@ export default function Dashboard() {
                 <GoalsProgressWidget goals={goals} loading={goalsLoading} />
               </Suspense>
 
-              {user?.onboarding_completed && (
-                <BossBattleCard
-                  user={user}
-                  gamificationProfile={activeGamProfile}
-                  onProfileUpdate={setGamProfile}
-                />
-              )}
             </div>
 
           </div>
@@ -356,6 +341,13 @@ export default function Dashboard() {
 
         {/* Sponsored banner — paling bawah sebelum bottom nav */}
         <UMKMPintarAdBanner />
+
+        {/* Floating Boss Battle — bottom-right, replaces inline card */}
+        <BossBattleFloating
+          user={user}
+          gamificationProfile={activeGamProfile}
+          onProfileUpdate={setGamProfile}
+        />
 
         {showAddTransaction && (
           <AddTransactionModal
