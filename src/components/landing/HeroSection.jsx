@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Reveal from "./Reveal";
+import TrustStrip from "./TrustStrip";
 
 export default function HeroSection({ onScrollToNewsletter }) {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export default function HeroSection({ onScrollToNewsletter }) {
         <Reveal>
           <div className="inline-flex items-center gap-2 bg-[#F97316]/10 border border-[#F97316]/25 rounded-full px-4 py-1.5 mb-7">
             <Sparkles className="w-3 h-3 text-[#F97316]" />
-            <span className="text-[11px] text-[#F97316] font-bold uppercase tracking-wide">AI-Powered Personal Finance</span>
+            <span className="text-[11px] text-[#F97316] font-bold uppercase tracking-wide">Early Access · AI-Powered</span>
           </div>
         </Reveal>
 
@@ -31,7 +32,7 @@ export default function HeroSection({ onScrollToNewsletter }) {
         </Reveal>
 
         <Reveal delay={240}>
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start mb-8">
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start mb-6">
             <button
               onClick={() => navigate("/register")}
               className="group flex items-center gap-2.5 bg-[#F97316] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center">
@@ -40,18 +41,25 @@ export default function HeroSection({ onScrollToNewsletter }) {
             </button>
             <button
               onClick={() => document.getElementById("video-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="flex items-center gap-2 text-white/60 hover:text-white border border-white/10 hover:border-white/25 font-semibold text-sm px-6 py-4 rounded-2xl transition-all w-full sm:w-auto justify-center">
-              Lihat cara kerjanya dulu ↓
+              className="flex items-center gap-2 text-white/60 hover:text-white font-semibold text-sm px-6 py-4 transition-all w-full sm:w-auto justify-center">
+              Lihat cara kerjanya ↓
             </button>
           </div>
         </Reveal>
 
-        <Reveal delay={300}>
-          <div className="text-sm text-white/50 text-center sm:text-left">
-            <button onClick={onScrollToNewsletter} className="text-white/60 hover:text-white font-semibold underline underline-offset-4 decoration-[#F97316]/40 transition-colors">
-              Atau langganan newsletter dulu →
-            </button>
+        <Reveal delay={280}>
+          <div className="mb-6">
+            <TrustStrip />
           </div>
+        </Reveal>
+
+        <Reveal delay={320}>
+          <p className="text-xs text-white/35 text-center sm:text-left">
+            Mau dapet update dulu?{" "}
+            <button onClick={onScrollToNewsletter} className="text-white/55 hover:text-white underline underline-offset-2 decoration-[#F97316]/40 transition-colors">
+              Langganan newsletter
+            </button>
+          </p>
         </Reveal>
       </div>
     </section>

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
 import BrushBackground from "@/components/landing/BrushBackground";
-import FomoToast from "@/components/landing/FomoToast";
 import ScrollProgress from "@/components/landing/ScrollProgress";
 import LandingNav from "@/components/landing/LandingNav";
 import HeroSection from "@/components/landing/HeroSection";
@@ -10,6 +9,7 @@ import FeaturesSection from "@/components/landing/FeaturesSection";
 import NanaChatDemo from "@/components/landing/NanaChatDemo";
 import GamificationSection from "@/components/landing/GamificationSection";
 import VideoSection from "@/components/landing/VideoSection";
+import TestimonialSection from "@/components/landing/TestimonialSection";
 import FaqSection from "@/components/landing/FaqSection";
 import PricingSection from "@/components/landing/PricingSection";
 import NewsletterSection from "@/components/landing/NewsletterSection";
@@ -37,7 +37,6 @@ export default function LandingPage() {
         .iphone-notch { width:90px; height:22px; background:#111; border-radius:0 0 14px 14px; margin:0 auto -8px; position:relative; z-index:1; }
       `}</style>
 
-      <FomoToast />
       <ScrollProgress />
 
       <LandingNav howRef={howRef} pricingRef={pricingRef} />
@@ -48,6 +47,7 @@ export default function LandingPage() {
       <NanaChatDemo />
       <GamificationSection />
       <VideoSection />
+      <TestimonialSection />
       <FaqSection />
       <PricingSection ref={pricingRef} />
       <NewsletterSection />
