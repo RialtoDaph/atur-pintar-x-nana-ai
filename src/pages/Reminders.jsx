@@ -66,8 +66,8 @@ function NanaReminderTip({ reminder, daysLeft }) {
       )}
       {loading && <p className="text-[10px] text-[#8FA4C8] animate-pulse">Nana sedang berpikir...</p>}
       {tip && (
-        <div className="flex items-start gap-1.5 bg-[#FFF7ED] border border-[#FF6A00]/20 rounded-xl px-3 py-2 mt-1">
-          <Sparkles className="w-3 h-3 text-[#FF6A00] flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-1.5 bg-[#FFF7ED] border border-[#F97316]/20 rounded-xl px-3 py-2 mt-1">
+          <Sparkles className="w-3 h-3 text-[#F97316] flex-shrink-0 mt-0.5" />
           <p className="text-[11px] text-[#EA580C] leading-relaxed">{tip}</p>
         </div>
       )}
@@ -153,7 +153,7 @@ export default function Reminders() {
           </div>
           <button
             onClick={() => { setEditing(null); setShowAdd(true); }}
-            className="w-9 h-9 rounded-full bg-[#FF6A00] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
+            className="w-9 h-9 rounded-full bg-[#F97316] flex items-center justify-center shadow-lg hover:bg-[#e05e00] transition-colors"
           >
             <Plus className="w-4 h-4 text-white" />
           </button>
@@ -164,7 +164,7 @@ export default function Reminders() {
 
         {/* Summary */}
         {activeReminders.length > 0 && (
-          <div className="bg-[#FF6A00] rounded-2xl p-4 text-white">
+          <div className="bg-[#F97316] rounded-2xl p-4 text-white">
             <p className="text-xs opacity-80 font-medium">{t('reminders_total_active')}</p>
             <p className="text-2xl font-bold mt-0.5">{formatCurrency(totalDue)}</p>
             <p className="text-xs opacity-70 mt-1">{activeReminders.length} {t('reminders_active_count')}</p>
@@ -181,7 +181,7 @@ export default function Reminders() {
           <div className="bg-white rounded-2xl p-10 text-center">
             <Bell className="w-10 h-10 text-[#E2E8F0] mx-auto mb-3" />
             <p className="text-[#8FA4C8] text-sm">{t('reminders_empty')}</p>
-            <button onClick={() => setShowAdd(true)} className="mt-3 text-sm font-semibold text-[#FF6A00]">
+            <button onClick={() => setShowAdd(true)} className="mt-3 text-sm font-semibold text-[#F97316]">
               {t('reminders_add_first')}
             </button>
           </div>
@@ -277,7 +277,7 @@ export default function Reminders() {
                       <p className="font-medium text-[#0A0A0A] text-sm truncate">{r.title}</p>
                       <p className="text-xs text-[#8FA4C8]">{t('reminders_due_day')} {r.due_day} · {r.amount ? formatCurrency(r.amount) : cfg.label}</p>
                     </div>
-                    <button onClick={() => toggleActive(r)} className="text-[#8FA4C8] hover:text-[#FF6A00] transition-colors">
+                    <button onClick={() => toggleActive(r)} className="text-[#8FA4C8] hover:text-[#F97316] transition-colors">
                       <ToggleLeft className="w-6 h-6" />
                     </button>
                     <button onClick={() => setDeleteConfirm(r.id)} className="text-[#FF6B6B]">

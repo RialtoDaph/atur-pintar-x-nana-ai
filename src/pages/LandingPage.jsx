@@ -122,7 +122,7 @@ function ScrollProgress() {
   }, []);
   return (
     <div style={{ position: "fixed", right: 4, top: "50%", transform: "translateY(-50%)", zIndex: 9998, height: 160, width: 3, borderRadius: 4, background: "rgba(255,106,0,0.12)", pointerEvents: "none" }}>
-      <div ref={fillRef} style={{ width: "100%", height: "0%", background: "#FF6A00", borderRadius: 4, transition: "height 0.1s" }} />
+      <div ref={fillRef} style={{ width: "100%", height: "0%", background: "#F97316", borderRadius: 4, transition: "height 0.1s" }} />
     </div>);
 
 }
@@ -209,7 +209,7 @@ function NanaChatDemo() {
           <div className="card-d rounded-2xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-white/8">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-[#F97316] flex items-center justify-center flex-shrink-0">
                 <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="Nana" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
               </div>
               <div>
@@ -231,7 +231,7 @@ function NanaChatDemo() {
                 <div className="flex flex-wrap gap-1.5">
                   {QUICK_QUESTIONS.map((q, i) =>
                 <button key={i} onClick={() => sendMessage(q.text)} disabled={typing}
-                className="flex items-center gap-1 text-[10px] text-white/70 border border-white/10 hover:border-[#FF6A00]/50 hover:text-white bg-white/4 hover:bg-[#FF6A00]/10 rounded-full px-2.5 py-1 transition-all disabled:opacity-40">
+                className="flex items-center gap-1 text-[10px] text-white/70 border border-white/10 hover:border-[#F97316]/50 hover:text-white bg-white/4 hover:bg-[#F97316]/10 rounded-full px-2.5 py-1 transition-all disabled:opacity-40">
                       <span>{q.emoji}</span> {q.label}
                     </button>
                 )}
@@ -244,11 +244,11 @@ function NanaChatDemo() {
               {messages.map((m, i) =>
               <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : ""}`}>
                   {m.role === "nana" &&
-                <div className="w-6 h-6 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full overflow-hidden bg-[#F97316] flex items-center justify-center flex-shrink-0 mt-0.5">
                       <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="N" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
                     </div>
                 }
-                  <div className={`rounded-2xl px-3 py-2.5 max-w-[85%] text-xs leading-relaxed ${m.role === "nana" ? "bg-white/6 rounded-tl-sm text-white/80" : "bg-[#FF6A00] rounded-tr-sm text-white"}`}>
+                  <div className={`rounded-2xl px-3 py-2.5 max-w-[85%] text-xs leading-relaxed ${m.role === "nana" ? "bg-white/6 rounded-tl-sm text-white/80" : "bg-[#F97316] rounded-tr-sm text-white"}`}>
                     {m.text}
                   </div>
                   {m.role === "user" &&
@@ -258,7 +258,7 @@ function NanaChatDemo() {
               )}
               {typing &&
               <div className="flex gap-2">
-                  <div className="w-6 h-6 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full overflow-hidden bg-[#F97316] flex items-center justify-center flex-shrink-0">
                     <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="N" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
                   </div>
                   <div className="bg-white/6 rounded-2xl rounded-tl-sm px-3 py-2.5">
@@ -272,15 +272,15 @@ function NanaChatDemo() {
             {/* Input */}
             <div className="px-3 pb-3 border-t border-white/8 pt-2">
               {done ?
-              <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 bg-[#FF6A00] rounded-xl text-white text-sm font-bold hover:bg-[#e05e00] transition-colors">
+              <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 bg-[#F97316] rounded-xl text-white text-sm font-bold hover:bg-[#e05e00] transition-colors">
                   Mulai Gratis Sekarang →
                 </button> :
               <div className="flex gap-2">
                   <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Atau ketik sendiri..." disabled={typing || done}
-                className="bg-white/5 text-white px-3 py-2.5 text-xs rounded-xl flex-1 border border-white/8 placeholder-white/25 outline-none focus:border-[#FF6A00]/40 disabled:opacity-40" />
+                className="bg-white/5 text-white px-3 py-2.5 text-xs rounded-xl flex-1 border border-white/8 placeholder-white/25 outline-none focus:border-[#F97316]/40 disabled:opacity-40" />
                   <button onClick={handleSend} disabled={typing || !input.trim() || done}
-                className="w-9 h-9 rounded-xl bg-[#FF6A00] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40">
+                className="w-9 h-9 rounded-xl bg-[#F97316] flex items-center justify-center text-white hover:bg-[#e05e00] transition-colors disabled:opacity-40">
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -327,7 +327,7 @@ function FaqSection() {
                 className="w-full flex items-center justify-between p-5 text-left gap-4">
                 
                   <span className="text-white font-semibold text-sm">{faq.q}</span>
-                  {open === i ? <ChevronUp className="w-4 h-4 text-[#FF6A00] flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
+                  {open === i ? <ChevronUp className="w-4 h-4 text-[#F97316] flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
                 </button>
                 {open === i &&
               <div className="px-5 pb-5">
@@ -384,7 +384,7 @@ function NewsletterSection() {
       });
       if (res.data?.error) throw new Error(res.data.error);
       setSuccess(true);
-      if (window.confetti) window.confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#FF6A00", "#FFB347", "#ffffff"] });
+      if (window.confetti) window.confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#F97316", "#FFB347", "#ffffff"] });
     } catch (err) {
       const msg = err.message || "";
       if (msg.includes("rate") || msg.includes("banyak") || msg.includes("limit")) {
@@ -401,11 +401,11 @@ function NewsletterSection() {
     return (
       <section id="newsletter-section" className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
         <div className="max-w-lg mx-auto card-d rounded-3xl p-10 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#FF6A00]/20 flex items-center justify-center mx-auto mb-5">
-            <CheckCircle className="w-8 h-8 text-[#FF6A00]" />
+          <div className="w-16 h-16 rounded-full bg-[#F97316]/20 flex items-center justify-center mx-auto mb-5">
+            <CheckCircle className="w-8 h-8 text-[#F97316]" />
           </div>
           <h2 className="text-2xl font-black text-white mb-2">Yeay! 🎉</h2>
-          <p className="text-[#FF6A00] font-bold text-lg mb-3">Kamu sudah berlangganan.</p>
+          <p className="text-[#F97316] font-bold text-lg mb-3">Kamu sudah berlangganan.</p>
           <p className="text-white/60 text-sm leading-relaxed">
             Tips keuangan, update fitur baru, dan cerita seru dari Nana akan mampir ke inbox kamu.
           </p>
@@ -423,7 +423,7 @@ function NewsletterSection() {
         <Reveal>
           <div className="text-center mb-8">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Dapat tips langsung ke inbox.</h2>
-            <p className="text-[#FF6A00] font-bold text-lg mb-3">Newsletter Atur Pintar.</p>
+            <p className="text-[#F97316] font-bold text-lg mb-3">Newsletter Atur Pintar.</p>
             <p className="text-white/50 text-sm">Tips keuangan ringan, update fitur baru, dan cerita seru, tanpa spam.</p>
           </div>
         </Reveal>
@@ -443,15 +443,15 @@ function NewsletterSection() {
 
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Nama *</label>
-              <input required value={form.name} onChange={(e) => {setForm((f) => ({ ...f, name: e.target.value }));setErrors((er) => ({ ...er, name: undefined }));}} placeholder="Nama kamu" className={`bg-white/5 text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.name ? "border-red-500/60" : "border-white/10"}`} />
+              <input required value={form.name} onChange={(e) => {setForm((f) => ({ ...f, name: e.target.value }));setErrors((er) => ({ ...er, name: undefined }));}} placeholder="Nama kamu" className={`bg-white/5 text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#F97316]/50 ${errors.name ? "border-red-500/60" : "border-white/10"}`} />
               {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
             </div>
             <div>
               <label className="text-white/60 text-xs mb-1.5 block">Email aktif *</label>
-              <input required type="email" value={form.email} onChange={(e) => {setForm((f) => ({ ...f, email: e.target.value }));setErrors((er) => ({ ...er, email: undefined }));}} placeholder="email@kamu.com" className={`bg-white/5 text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#FF6A00]/50 ${errors.email ? "border-red-500/60" : "border-white/10"}`} />
+              <input required type="email" value={form.email} onChange={(e) => {setForm((f) => ({ ...f, email: e.target.value }));setErrors((er) => ({ ...er, email: undefined }));}} placeholder="email@kamu.com" className={`bg-white/5 text-white px-4 py-3 text-sm rounded-xl w-full border placeholder-white/25 outline-none focus:border-[#F97316]/50 ${errors.email ? "border-red-500/60" : "border-white/10"}`} />
               {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
             </div>
-            <button type="submit" disabled={loading} className="w-full py-4 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-black text-base rounded-full transition-all disabled:opacity-60 mt-2">
+            <button type="submit" disabled={loading} className="w-full py-4 bg-[#F97316] hover:bg-[#e05e00] text-white font-black text-base rounded-full transition-all disabled:opacity-60 mt-2">
               {loading ? "Berlangganan..." : "Langganan Newsletter →"}
             </button>
             <p className="text-center text-white/30 text-xs">Gratis. Bisa unsubscribe kapan saja.</p>
@@ -487,7 +487,7 @@ function LazyYouTube({ src }) {
           title="Demo Atur Pintar" />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">
-          <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-[#FF6A00] animate-spin" />
+          <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-[#F97316] animate-spin" />
         </div>
       )}
     </div>
@@ -559,7 +559,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans overflow-x-hidden">
       <BrushBackground />
       <style>{`
-        .g-text { background: linear-gradient(135deg,#FF6A00 0%,#FFB347 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .g-text { background: linear-gradient(135deg,#F97316 0%,#FFB347 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .glow { box-shadow: 0 0 40px rgba(255,106,0,0.28); }
         .card-d { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
         .iphone-frame { background:#111; border-radius:44px; border:3px solid #333; position:relative; padding:14px; box-shadow:0 30px 80px rgba(0,0,0,0.7),inset 0 0 0 1px #222; }
@@ -583,7 +583,7 @@ export default function LandingPage() {
           <button onClick={() => pricingRef.current?.scrollIntoView({ behavior: "smooth" })} className="text-xs text-white/50 hover:text-white transition-colors">Harga</button>
           <Link to="/About" className="text-xs text-white/50 hover:text-white transition-colors">Tentang</Link>
         </div>
-        <button onClick={() => base44.auth.redirectToLogin()} className="text-xs font-bold bg-[#FF6A00] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
+        <button onClick={() => base44.auth.redirectToLogin()} className="text-xs font-bold bg-[#F97316] hover:bg-[#e05e00] text-white px-4 py-2 rounded-full transition-colors ml-auto">
           Masuk / Daftar
         </button>
       </nav>
@@ -593,9 +593,9 @@ export default function LandingPage() {
         <div className="absolute top-10 left-0 w-[600px] h-[500px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(255,106,0,0.06) 0%, transparent 70%)" }} />
         <div className="max-w-3xl mx-auto sm:mx-0">
           <Reveal>
-            <div className="inline-flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/25 rounded-full px-4 py-1.5 mb-7">
-              <Sparkles className="w-3 h-3 text-[#FF6A00]" />
-              <span className="text-[11px] text-[#FF6A00] font-bold uppercase tracking-wide">AI-Powered Personal Finance</span>
+            <div className="inline-flex items-center gap-2 bg-[#F97316]/10 border border-[#F97316]/25 rounded-full px-4 py-1.5 mb-7">
+              <Sparkles className="w-3 h-3 text-[#F97316]" />
+              <span className="text-[11px] text-[#F97316] font-bold uppercase tracking-wide">AI-Powered Personal Finance</span>
             </div>
           </Reveal>
 
@@ -618,7 +618,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start mb-8">
               <button
                 onClick={() => base44.auth.redirectToLogin()}
-                className="group flex items-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center">
+                className="group flex items-center gap-2.5 bg-[#F97316] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95 w-full sm:w-auto justify-center">
                 
                 Mulai Gratis Sekarang
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -634,7 +634,7 @@ export default function LandingPage() {
 
           <Reveal delay={300}>
             <div className="text-sm text-white/50 text-center sm:text-left">
-              <button onClick={scrollToNewsletter} className="text-white/60 hover:text-white font-semibold underline underline-offset-4 decoration-[#FF6A00]/40 transition-colors">
+              <button onClick={scrollToNewsletter} className="text-white/60 hover:text-white font-semibold underline underline-offset-4 decoration-[#F97316]/40 transition-colors">
                 Atau langganan newsletter dulu →
               </button>
             </div>
@@ -706,7 +706,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto card-d rounded-3xl p-6 sm:p-8 overflow-hidden">
           <Reveal>
             <div className="mb-5">
-              <span className="text-[10px] font-black text-[#FF6A00] uppercase tracking-widest">Gamifikasi</span>
+              <span className="text-[10px] font-black text-[#F97316] uppercase tracking-widest">Gamifikasi</span>
               <h2 className="text-2xl sm:text-3xl font-black text-white mt-1 mb-1">Level up bukan cuma di game.</h2>
               <p className="text-white/40 text-xs leading-relaxed">Setiap kebiasaan finansial yang kamu lakuin punya reward nyata.</p>
             </div>
@@ -719,7 +719,7 @@ export default function LandingPage() {
                 style={{ background: `linear-gradient(135deg, rgba(255,106,0,${0.2 + i * 0.13}) 0%, rgba(255,179,71,${0.25 + i * 0.1}) 100%)`, border: "1px solid rgba(255,106,0,0.25)" }}>
                     {lv.icon}
                   </div>
-                  <p className="text-[9px] font-black text-[#FF6A00]">{lv.level}</p>
+                  <p className="text-[9px] font-black text-[#F97316]">{lv.level}</p>
                   <p className="text-[8px] text-white/35 text-center leading-tight">{lv.label}</p>
                 </div>
               )}
@@ -731,7 +731,7 @@ export default function LandingPage() {
                 XP nambah tiap catat, jaga streak & dengerin Nana.<br />
                 <span className="text-white/65 font-semibold">Karena konsistensi harusnya ada rewardnya.</span>
               </p>
-              <button onClick={() => base44.auth.redirectToLogin()} className="flex-shrink-0 flex items-center gap-1.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all whitespace-nowrap">
+              <button onClick={() => base44.auth.redirectToLogin()} className="flex-shrink-0 flex items-center gap-1.5 bg-[#F97316] hover:bg-[#e05e00] text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all whitespace-nowrap">
                 Mulai Gratis →
               </button>
             </div>
@@ -790,8 +790,8 @@ export default function LandingPage() {
                 </div>
               </Reveal>
               <Reveal delay={120}>
-                <div className="relative rounded-2xl p-7 flex flex-col h-full bg-[#FF6A00] border-2 border-[#FF6A00]">
-                  <div className="absolute -top-3.5 left-6 bg-white text-[#FF6A00] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">POPULER ⭐</div>
+                <div className="relative rounded-2xl p-7 flex flex-col h-full bg-[#F97316] border-2 border-[#F97316]">
+                  <div className="absolute -top-3.5 left-6 bg-white text-[#F97316] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">POPULER ⭐</div>
                   <span className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-3">Plus</span>
                   <p className="text-3xl font-black text-white mb-0.5">Rp 49.000</p>
                   <p className="text-white/70 text-xs mb-1">per bulan</p>
@@ -804,7 +804,7 @@ export default function LandingPage() {
                       </div>
                   )}
                   </div>
-                  <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 rounded-xl bg-white text-[#FF6A00] font-bold text-sm hover:bg-white/90 transition-colors">
+                  <button onClick={() => base44.auth.redirectToLogin()} className="w-full py-3 rounded-xl bg-white text-[#F97316] font-bold text-sm hover:bg-white/90 transition-colors">
                     Upgrade ke Plus →
                   </button>
                 </div>
@@ -832,7 +832,7 @@ export default function LandingPage() {
             </Reveal>
             <Reveal delay={180}>
               <div className="flex justify-center">
-                <button onClick={() => base44.auth.redirectToLogin()} className="group flex items-center justify-center gap-2.5 bg-[#FF6A00] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95">
+                <button onClick={() => base44.auth.redirectToLogin()} className="group flex items-center justify-center gap-2.5 bg-[#F97316] hover:bg-[#e05e00] text-white font-bold text-base px-8 py-4 rounded-2xl transition-all glow hover:scale-105 active:scale-95">
                   Mulai Gratis Sekarang →
                 </button>
               </div>

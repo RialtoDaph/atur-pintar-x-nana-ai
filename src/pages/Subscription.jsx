@@ -117,9 +117,9 @@ export default function Subscription() {
       label: "Premium",
       price: configLoading ? "..." : formatRp(monthlyPrice),
       period: "per bulan",
-      borderColor: "border-[#FF6A00]",
+      borderColor: "border-[#F97316]",
       badge: "Populer",
-      badgeColor: "bg-[#FF6A00] text-white",
+      badgeColor: "bg-[#F97316] text-white",
       features: FEATURES_MONTHLY,
       limits: [],
     },
@@ -150,10 +150,10 @@ export default function Subscription() {
 
         {/* Status Banners */}
         {isPremium && (
-          <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-2xl p-4 flex items-center gap-3">
-            <Crown className="w-5 h-5 text-[#FF6A00]" />
+          <div className="bg-[#F97316]/10 border border-[#F97316]/30 rounded-2xl p-4 flex items-center gap-3">
+            <Crown className="w-5 h-5 text-[#F97316]" />
             <div>
-              <p className="text-sm font-bold text-[#FF6A00]">Kamu sudah Premium!</p>
+              <p className="text-sm font-bold text-[#F97316]">Kamu sudah Premium!</p>
               {user?.subscription_end_date && (
                 <p className="text-xs text-[#8FA4C8]">Aktif hingga {new Date(user.subscription_end_date).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}</p>
               )}
@@ -194,7 +194,7 @@ export default function Subscription() {
                   <ul className="space-y-2 mb-5">
                     {plan.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs text-[#1A1A1A]">
-                        <Check className="w-3.5 h-3.5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
+                        <Check className="w-3.5 h-3.5 text-[#F97316] flex-shrink-0 mt-0.5" />
                         {f}
                       </li>
                     ))}
@@ -208,7 +208,7 @@ export default function Subscription() {
                       {user?.subscription_plan === "free" || !user?.subscription_plan ? "Paket Aktif" : "Paket Gratis"}
                     </div>
                   ) : isActive ? (
-                    <div className="w-full py-2.5 rounded-xl text-sm font-semibold text-center bg-[#FF6A00]/10 text-[#FF6A00]">
+                    <div className="w-full py-2.5 rounded-xl text-sm font-semibold text-center bg-[#F97316]/10 text-[#F97316]">
                       ✓ Aktif
                     </div>
                   ) : isPending ? (
@@ -220,7 +220,7 @@ export default function Subscription() {
                       onClick={() => handleBuy(plan.key)}
                       disabled={loadingSnap}
                       className={`w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
-                        plan.key === "premium_monthly" ? "bg-[#FF6A00] hover:bg-[#e05e00]" : "bg-purple-500 hover:bg-purple-600"
+                        plan.key === "premium_monthly" ? "bg-[#F97316] hover:bg-[#e05e00]" : "bg-purple-500 hover:bg-purple-600"
                       }`}
                     >
                       {loadingSnap ? (
@@ -242,7 +242,7 @@ export default function Subscription() {
           <ol className="space-y-2">
             {["Pilih paket Premium yang kamu inginkan.", "Klik 'Bayar Sekarang' dan selesaikan pembayaran via Midtrans.", "Langganan aktif otomatis setelah pembayaran dikonfirmasi."].map((step, i) => (
               <li key={i} className="flex items-start gap-3 text-sm text-[#1A1A1A]">
-                <span className="w-5 h-5 rounded-full bg-[#FF6A00] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                <span className="w-5 h-5 rounded-full bg-[#F97316] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                 {step}
               </li>
             ))}
@@ -259,7 +259,7 @@ export default function Subscription() {
             </div>
             <p className="text-xl font-bold text-[#1A1A1A] mb-1">Pembayaran Berhasil! 🎉</p>
             <p className="text-sm text-[#8FA4C8] mt-1 mb-3">
-              Selamat! Kamu sekarang pengguna <span className="font-bold text-[#FF6A00]">Premium</span>.
+              Selamat! Kamu sekarang pengguna <span className="font-bold text-[#F97316]">Premium</span>.
             </p>
             <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 text-left mb-5 space-y-1.5">
               <div className="flex justify-between text-xs">
@@ -282,7 +282,7 @@ export default function Subscription() {
             </div>
             <button
               onClick={() => setSuccessPlan(null)}
-              className="w-full py-3 bg-[#FF6A00] text-white rounded-xl font-semibold text-sm hover:bg-[#e05e00] transition-colors"
+              className="w-full py-3 bg-[#F97316] text-white rounded-xl font-semibold text-sm hover:bg-[#e05e00] transition-colors"
             >
               Mulai Gunakan Fitur Premium
             </button>
@@ -297,7 +297,7 @@ export default function Subscription() {
             <Clock className="w-12 h-12 text-amber-500 mx-auto mb-4" />
             <p className="text-xl font-bold text-[#1A1A1A] mb-1">Pembayaran Diproses</p>
             <p className="text-sm text-[#8FA4C8] mt-1 mb-5">Pembayaran kamu sedang diverifikasi. Akses premium akan aktif setelah konfirmasi (maks 1×24 jam).</p>
-            <button onClick={() => setSuccessPlan(null)} className="w-full py-3 bg-[#FF6A00] text-white rounded-xl font-semibold text-sm hover:bg-[#e05e00] transition-colors">
+            <button onClick={() => setSuccessPlan(null)} className="w-full py-3 bg-[#F97316] text-white rounded-xl font-semibold text-sm hover:bg-[#e05e00] transition-colors">
               OK, Mengerti
             </button>
           </div>

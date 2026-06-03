@@ -95,7 +95,7 @@ export default function Gamifikasi() {
               onClick={() => setTab(t.key)}
               className={`flex items-center gap-1.5 px-4 py-3.5 text-xs font-bold whitespace-nowrap border-b-2 transition-all ${
                 tab === t.key
-                  ? "border-[#FF6B35] text-[#FF6B35]"
+                  ? "border-[#F97316] text-[#F97316]"
                   : "border-transparent text-[#8FA4C8] hover:text-[#4A5568]"
               }`}
             >
@@ -114,19 +114,19 @@ export default function Gamifikasi() {
             {/* Level card */}
             <div className="bg-white rounded-2xl shadow-sm p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#FFD700] flex items-center justify-center shadow-md shadow-[#FF6B35]/25">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F97316] to-[#FFD700] flex items-center justify-center shadow-md shadow-[#F97316]/25">
                   <p className="text-white font-black text-lg">{lvl.level}</p>
                 </div>
                 <div>
                   <p className="text-xs text-[#8FA4C8] font-semibold">Level saat ini</p>
                   <p className="text-base font-bold text-[#1A1A1A]">{lvl.name}</p>
-                  <p className="text-xs font-bold text-[#FF6B35]">{xp.toLocaleString("id-ID")} XP</p>
+                  <p className="text-xs font-bold text-[#F97316]">{xp.toLocaleString("id-ID")} XP</p>
                 </div>
               </div>
               <div className="h-2.5 bg-[#F2F4F7] rounded-full overflow-hidden mb-1.5">
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: "linear-gradient(90deg, #FF6B35, #FFD700)" }}
+                  style={{ background: "linear-gradient(90deg, #F97316, #FFD700)" }}
                   initial={{ width: 0 }}
                   animate={{ width: `${pct}%` }}
                   transition={{ duration: 0.7 }}
@@ -135,22 +135,22 @@ export default function Gamifikasi() {
               {nextLvl ? (
                 <p className="text-xs text-[#8FA4C8]">{(nextLvl.min - xp).toLocaleString("id-ID")} XP lagi → Level {nextLvl.level}: {nextLvl.name}</p>
               ) : (
-                <p className="text-xs text-[#FF6B35] font-semibold">Level Maksimal! 🏆</p>
+                <p className="text-xs text-[#F97316] font-semibold">Level Maksimal! 🏆</p>
               )}
             </div>
 
             {/* Stats grid */}
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white rounded-2xl shadow-sm p-4 text-center">
-                <p className="text-2xl font-black text-[#FF6B35]">{gamificationProfile?.daily_streak || 0}</p>
+                <p className="text-2xl font-black text-[#F97316]">{gamificationProfile?.daily_streak || 0}</p>
                 <p className="text-[10px] text-[#8FA4C8] font-semibold mt-0.5">🔥 Streak</p>
               </div>
               <div className="bg-white rounded-2xl shadow-sm p-4 text-center">
-                <p className="text-2xl font-black text-[#FF6B35]">{fhsScore?.total_score ?? "--"}</p>
+                <p className="text-2xl font-black text-[#F97316]">{fhsScore?.total_score ?? "--"}</p>
                 <p className="text-[10px] text-[#8FA4C8] font-semibold mt-0.5">❤️ FHS Score</p>
               </div>
               <div className="bg-white rounded-2xl shadow-sm p-4 text-center">
-                <p className="text-2xl font-black text-[#FF6B35]">{unlockedKeys.length}</p>
+                <p className="text-2xl font-black text-[#F97316]">{unlockedKeys.length}</p>
                 <p className="text-[10px] text-[#8FA4C8] font-semibold mt-0.5">🏅 Achievement</p>
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function Gamifikasi() {
                   ❄️ {gamificationProfile?.streak_freezes_available ?? 0} freeze
                 </span>
               </div>
-              <p className="text-3xl font-black text-[#FF6B35]">{gamificationProfile?.daily_streak || 0} <span className="text-base font-semibold text-[#8FA4C8]">hari berturut-turut</span></p>
+              <p className="text-3xl font-black text-[#F97316]">{gamificationProfile?.daily_streak || 0} <span className="text-base font-semibold text-[#8FA4C8]">hari berturut-turut</span></p>
               <p className="text-xs text-[#8FA4C8] mt-1">Terakhir aktif: {gamificationProfile?.last_activity_date || "-"}</p>
               {gamificationProfile?.streak_freeze_last_used && (
                 <p className="text-[11px] text-[#1A1A1A] mt-2 bg-[#F2F4F7] px-2 py-1.5 rounded-lg">
@@ -187,7 +187,7 @@ export default function Gamifikasi() {
               </div>
               <div className="text-right">
                 <p className="text-xs text-[#8FA4C8]">Bonus XP</p>
-                <p className="text-xl font-bold text-[#FF6B35]">{
+                <p className="text-xl font-bold text-[#F97316]">{
                   (() => {
                     // Sum XP from unique unlocked achievement keys only (no duplicates).
                     const seen = new Set();
@@ -214,11 +214,11 @@ export default function Gamifikasi() {
                     {catDefs.map(a => {
                       const isUnlocked = unlockedKeys.includes(a.key);
                       return (
-                        <div key={a.key} className={`bg-white rounded-2xl p-4 shadow-sm border-2 transition-all ${isUnlocked ? "border-[#FF6B35]/30" : "border-transparent opacity-50"}`}>
+                        <div key={a.key} className={`bg-white rounded-2xl p-4 shadow-sm border-2 transition-all ${isUnlocked ? "border-[#F97316]/30" : "border-transparent opacity-50"}`}>
                           <div className={`text-3xl mb-2 ${!isUnlocked ? "grayscale" : ""}`}>{a.icon}</div>
                           <p className={`text-sm font-bold ${isUnlocked ? "text-[#1A1A1A]" : "text-[#8FA4C8]"}`}>{a.title}</p>
                           <p className="text-xs text-[#8FA4C8] mt-0.5">{a.hint}</p>
-                          <p className={`text-xs font-bold mt-2 ${isUnlocked ? "text-[#FF6B35]" : "text-[#CBD5E0]"}`}>+{a.xp} XP</p>
+                          <p className={`text-xs font-bold mt-2 ${isUnlocked ? "text-[#F97316]" : "text-[#CBD5E0]"}`}>+{a.xp} XP</p>
                           {!isUnlocked && <p className="text-[10px] text-[#CBD5E0] mt-1">🔒 Belum terkunci</p>}
                         </div>
                       );
@@ -257,7 +257,7 @@ export default function Gamifikasi() {
             {/* Total contribution */}
             <div className="bg-white rounded-2xl shadow-sm p-4">
               <p className="text-xs text-[#8FA4C8] font-semibold uppercase tracking-widest mb-1">Total Kontribusimu</p>
-              <p className="text-2xl font-black text-[#FF6B35]">
+              <p className="text-2xl font-black text-[#F97316]">
                 {(allContrib || 0).toLocaleString("id-ID")} <span className="text-sm font-semibold text-[#8FA4C8]">total damage</span>
               </p>
             </div>

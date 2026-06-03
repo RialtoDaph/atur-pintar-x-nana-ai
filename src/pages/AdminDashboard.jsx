@@ -137,7 +137,7 @@ export default function AdminDashboard() {
   if (loading) return (
     <AdminLayout currentPage="AdminDashboard">
       <div className="flex items-center justify-center h-screen">
-        <div className="w-8 h-8 border-4 border-[#FF6A00] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin" />
       </div>
     </AdminLayout>
   );
@@ -216,17 +216,17 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-xs text-[#8FA4C8] font-medium mb-2">MRR (Monthly Recurring Revenue)</p>
-            <p className="text-3xl font-bold text-[#FF6A00]">Rp {fmt(stats?.totalMRR)}</p>
+            <p className="text-3xl font-bold text-[#F97316]">Rp {fmt(stats?.totalMRR)}</p>
             <p className="text-xs text-[#8FA4C8] mt-2">From {stats?.premiumUsers} premium users</p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-xs text-[#8FA4C8] font-medium mb-2">Premium Conversion</p>
-            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.conversionRate}%</p>
+            <p className="text-3xl font-bold text-[#F97316]">{stats?.conversionRate}%</p>
             <p className="text-xs text-[#8FA4C8] mt-2">{stats?.premiumUsers}/{stats?.totalUsers} users</p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-xs text-[#8FA4C8] font-medium mb-2">Pending Payments</p>
-            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.pendingPaymentCount || 0}</p>
+            <p className="text-3xl font-bold text-[#F97316]">{stats?.pendingPaymentCount || 0}</p>
             <p className="text-xs text-[#8FA4C8] mt-2">{stats?.pendingPaymentCount === 0 ? "✓ Aman" : "Perlu review"}</p>
           </div>
           </div>
@@ -235,12 +235,12 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-xs text-[#8FA4C8] font-medium mb-2">Onboarding Completion</p>
-            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.onboardingRate}%</p>
+            <p className="text-3xl font-bold text-[#F97316]">{stats?.onboardingRate}%</p>
             <p className="text-xs text-[#8FA4C8] mt-2">{stats?.completedOnboarding}/{stats?.totalUsers} users</p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
             <p className="text-xs text-[#8FA4C8] font-medium mb-2">Premium Rate</p>
-            <p className="text-3xl font-bold text-[#FF6A00]">{stats?.totalUsers > 0 ? Math.round((stats?.premiumUsers / stats?.totalUsers) * 100) : 0}%</p>
+            <p className="text-3xl font-bold text-[#F97316]">{stats?.totalUsers > 0 ? Math.round((stats?.premiumUsers / stats?.totalUsers) * 100) : 0}%</p>
             <p className="text-xs text-[#8FA4C8] mt-2">{stats?.premiumUsers}/{stats?.totalUsers} users</p>
           </div>
         </div>
@@ -255,14 +255,14 @@ export default function AdminDashboard() {
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar dataKey="newUsers" fill="#FF6A00" radius={[4, 4, 0, 0]} name="New Users" />
+                <Bar dataKey="newUsers" fill="#F97316" radius={[4, 4, 0, 0]} name="New Users" />
               </BarChart>
             </ResponsiveContainer>
           </div>
         )}
 
         {/* Not Onboarded Widget */}
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0] mb-6 cursor-pointer hover:border-[#FF6A00]/40 transition-colors" onClick={() => setNotOnboardedModal(true)}>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0] mb-6 cursor-pointer hover:border-[#F97316]/40 transition-colors" onClick={() => setNotOnboardedModal(true)}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
                          });
                          setSendingReminder(prev => ({ ...prev, [u.id]: false }));
                        }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6A00] text-white text-xs font-bold rounded-lg hover:bg-[#e05e00] disabled:opacity-50 transition-colors flex-shrink-0">
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F97316] text-white text-xs font-bold rounded-lg hover:bg-[#e05e00] disabled:opacity-50 transition-colors flex-shrink-0">
                       {sendingReminder[u.id] ? <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send className="w-3 h-3" />}
                       Kirim Reminder
                     </button>
