@@ -143,7 +143,6 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
             onChange={e => setForm(f => ({ ...f, next_due_date: e.target.value }))}
           />
         </div>
-        <div className="mb-2" />
 
         <button
           onClick={handleSave}
