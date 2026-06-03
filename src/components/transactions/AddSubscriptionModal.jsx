@@ -52,7 +52,7 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px)+90px)] sm:pb-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
@@ -76,7 +76,7 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
                 key={ic}
                 onClick={() => setForm(f => ({ ...f, icon: ic }))}
                 className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
-                  form.icon === ic ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0]"
+                  form.icon === ic ? "border-[#F97316] bg-[#F97316]/10" : "border-[#E2E8F0]"
                 }`}
               >
                 {ic}
@@ -89,7 +89,7 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
         <div className="mb-4">
           <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Nama Langganan</label>
           <input
-            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC]"
             placeholder="e.g. Netflix, Spotify..."
             value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -102,12 +102,12 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm">Rp</span>
             <input
-              type="number"
+              type="text"
               inputMode="numeric"
-              className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-lg font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+              className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-lg font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC]"
               placeholder="0"
               value={form.amount}
-              onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
+              onChange={e => setForm(f => ({ ...f, amount: e.target.value.replace(/[^0-9]/g, "") }))}
             />
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
                 onClick={() => setForm(f => ({ ...f, billing_cycle: c.key }))}
                 className={`py-2.5 rounded-xl text-xs font-semibold border transition-all tap-highlight-fix ${
                   form.billing_cycle === c.key
-                    ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]"
+                    ? "border-[#F97316] bg-[#F97316]/10 text-[#F97316]"
                     : "border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A]"
                 }`}
               >
@@ -137,7 +137,7 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
           <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Jatuh Tempo Berikutnya</label>
           <input
             type="date"
-            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC]"
             value={form.next_due_date}
             onChange={e => setForm(f => ({ ...f, next_due_date: e.target.value }))}
           />
@@ -146,7 +146,7 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
         <button
           onClick={handleSave}
           disabled={saving || !form.name.trim() || !form.amount}
-          className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] hover:bg-[#e05e00] disabled:opacity-40 transition-colors tap-highlight-fix"
+          className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#F97316] hover:bg-[#ea6a0e] disabled:opacity-40 transition-colors tap-highlight-fix"
         >
           {saving ? "Menyimpan..." : "Tambah Langganan"}
         </button>
