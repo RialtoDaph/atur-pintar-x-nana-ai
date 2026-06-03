@@ -10,6 +10,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
+import RouteErrorBoundary from '@/components/utils/RouteErrorBoundary';
 import AdminProtect from '@/components/admin/AdminProtect';
 
 // Eager — needed for first paint (public landing + lightweight pages)
@@ -38,9 +39,9 @@ const AdminSettings = lazy(() => import('@/pages/AdminSettings'));
 const AdminDefaultAccounts = lazy(() => import('@/pages/AdminDefaultAccounts'));
 const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
 
-// Suspense fallback — minimal spinner matching app design
+// Suspense fallback — inline spinner that respects layout (sidebar/nav stay visible)
 const PageLoader = () => (
-  <div className="fixed inset-0 flex items-center justify-center bg-[#F2F4F7]">
+  <div className="min-h-[60vh] flex items-center justify-center">
     <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
   </div>
 );
@@ -48,8 +49,10 @@ const PageLoader = () => (
 const { Pages, Layout } = pagesConfig;
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
-  <Layout currentPageName={currentPageName}>{children}</Layout>
-  : <>{children}</>;
+  <Layout currentPageName={currentPageName}>
+    <RouteErrorBoundary pageKey={currentPageName}>{children}</RouteErrorBoundary>
+  </Layout>
+  : <RouteErrorBoundary pageKey={currentPageName}>{children}</RouteErrorBoundary>;
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
