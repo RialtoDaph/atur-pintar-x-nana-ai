@@ -10,7 +10,7 @@ function generateCode() {
 }
 
 function Avatar({ email, size = 7 }) {
-  const colors = ["#FF6A00", "#4F7CFF", "#22C55E", "#A855F7", "#EC4899", "#14B8A6"];
+  const colors = ["#F97316", "#4F7CFF", "#22C55E", "#A855F7", "#EC4899", "#14B8A6"];
   const colorIdx = email ? email.charCodeAt(0) % colors.length : 0;
   const px = size * 4; // tailwind unit (4px) → literal pixels
   return (
@@ -72,26 +72,26 @@ function AddSharedTxModal({ wallet, user, onClose, onSave }) {
             value={form.amount}
             onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
             placeholder="Jumlah (Rp)"
-            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF6A00]/30" />
+            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
           
           <input
             value={form.note}
             onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
             placeholder="Catatan (opsional)"
-            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF6A00]/30" />
+            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
           
           <input
             type="date"
             value={form.date}
             onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF6A00]/30" />
+            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
           
         </div>
         <div className="px-5 pb-6">
           <button
             onClick={handleSave}
             disabled={saving || !form.amount}
-            className="w-full py-3.5 bg-[#FF6A00] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full py-3.5 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
             
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
             Simpan Transaksi
@@ -157,7 +157,7 @@ function WalletCard({ wallet, currentUserEmail, walletTxs, onLeave, onKickMember
           </div>
           <button
             onClick={() => onAddTx(wallet)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#FF6A00] text-white text-xs font-bold flex-shrink-0">
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#F97316] text-white text-xs font-bold flex-shrink-0">
             
             <Plus className="w-3.5 h-3.5" /> Transaksi
           </button>
@@ -188,7 +188,7 @@ function WalletCard({ wallet, currentUserEmail, walletTxs, onLeave, onKickMember
             {isOwner &&
             <button
               onClick={() => setShowInviteInput((v) => !v)}
-              className="text-[10px] font-bold text-[#FF6A00] flex items-center gap-0.5">
+              className="text-[10px] font-bold text-[#F97316] flex items-center gap-0.5">
               
                 <UserPlus className="w-3 h-3" /> Undang
               </button>
@@ -231,12 +231,12 @@ function WalletCard({ wallet, currentUserEmail, walletTxs, onLeave, onKickMember
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="email@contoh.com"
               type="email"
-              className="flex-1 px-3 py-2 bg-[#F2F4F7] rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#FF6A00]/30" />
+              className="flex-1 px-3 py-2 bg-[#F2F4F7] rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#F97316]/30" />
             
               <button
               onClick={handleInvite}
               disabled={inviting || !inviteEmail.trim()}
-              className="px-3 py-2 bg-[#FF6A00] text-white rounded-xl text-xs font-bold disabled:opacity-50">
+              className="px-3 py-2 bg-[#F97316] text-white rounded-xl text-xs font-bold disabled:opacity-50">
               
                 {inviting ? <Loader2 className="w-3 h-3 animate-spin" /> : "Kirim"}
               </button>
@@ -255,7 +255,7 @@ function WalletCard({ wallet, currentUserEmail, walletTxs, onLeave, onKickMember
             onClick={() => {navigator.clipboard.writeText(wallet.invite_code);toast.success("Kode disalin!");}}
             className="p-2 bg-white rounded-xl shadow-sm hover:shadow-md transition-all">
             
-              <Copy className="w-4 h-4 text-[#FF6A00]" />
+              <Copy className="w-4 h-4 text-[#F97316]" />
             </button>
           </div>
         }
@@ -566,7 +566,7 @@ export default function SharedFinance() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F2F4F7] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#F2F4F7] border-t-[#FF6A00] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#F2F4F7] border-t-[#F97316] rounded-full animate-spin" />
       </div>);
 
   }
@@ -610,12 +610,12 @@ export default function SharedFinance() {
 
         <div className="grid grid-cols-2 gap-3">
           <button onClick={() => setShowCreate(true)}
-          className="bg-[#FF6A00] text-white py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
+          className="bg-[#F97316] text-white py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
             <Plus className="w-4 h-4" /> Buat Dompet
           </button>
           <button onClick={() => {setShowJoin(true);setJoinError("");}}
           className="bg-white border border-[#E2E8F0] text-[#1A1A1A] py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
-            <Link className="w-4 h-4 text-[#FF6A00]" /> Masukkan Kode
+            <Link className="w-4 h-4 text-[#F97316]" /> Masukkan Kode
           </button>
         </div>
 
@@ -654,24 +654,24 @@ export default function SharedFinance() {
               <div className="flex gap-2 flex-wrap">
                 {ICONS.map((ic) =>
               <button key={ic} onClick={() => setCreateForm((f) => ({ ...f, icon: ic }))}
-              className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center ${createForm.icon === ic ? "ring-2 ring-[#FF6A00] bg-[#FF6A00]/10" : "bg-[#F2F4F7]"}`}>
+              className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center ${createForm.icon === ic ? "ring-2 ring-[#F97316] bg-[#F97316]/10" : "bg-[#F2F4F7]"}`}>
                     {ic}
                   </button>
               )}
               </div>
               <input value={createForm.name} onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Nama dompet (e.g., Keuangan Keluarga)"
-            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF6A00]/30" />
+            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
               <input value={createForm.description} onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
             placeholder="Deskripsi (opsional)"
-            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF6A00]/30" />
+            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
               <input value={createForm.inviteEmail} onChange={(e) => setCreateForm((f) => ({ ...f, inviteEmail: e.target.value }))}
             placeholder="Undang via email (opsional)" type="email"
-            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#FF6A00]/30" />
+            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
             </div>
             <div className="px-5 pb-6">
               <button onClick={handleCreate} disabled={saving || !createForm.name.trim()}
-            className="w-full py-3.5 bg-[#FF6A00] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full py-3.5 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                 Buat Dompet Bersama
               </button>
@@ -694,7 +694,7 @@ export default function SharedFinance() {
               <p className="text-sm text-[#8FA4C8]">Minta kode undangan 8 karakter dari owner dompet bersama.</p>
               <input value={joinCode} onChange={(e) => {setJoinCode(e.target.value.toUpperCase());setJoinError("");}}
             placeholder="Contoh: AB1C2D3E" maxLength={8}
-            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-xl font-bold tracking-[0.4em] text-center text-[#1A1A1A] outline-none focus:ring-2 focus:ring-[#FF6A00]/30 uppercase" />
+            className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-xl font-bold tracking-[0.4em] text-center text-[#1A1A1A] outline-none focus:ring-2 focus:ring-[#F97316]/30 uppercase" />
               {joinError &&
             <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
                   <p className="text-sm text-red-600 font-medium">{joinError}</p>
@@ -703,7 +703,7 @@ export default function SharedFinance() {
             </div>
             <div className="px-5 pb-6">
               <button onClick={handleJoin} disabled={joining || joinCode.length !== 8}
-            className="w-full py-3.5 bg-[#FF6A00] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full py-3.5 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
                 {joining ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                 Bergabung
               </button>

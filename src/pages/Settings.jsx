@@ -83,7 +83,7 @@ export default function Settings() {
             {settings?.settings_unlocked ? (
               <span className="text-[10px] font-semibold text-white bg-green-500 px-2 py-0.5 rounded-full">🔓 Terbuka</span>
             ) : (
-              <span className="text-[10px] font-semibold text-white bg-[#FF6A00] px-2 py-0.5 rounded-full">🔒 Terkunci</span>
+              <span className="text-[10px] font-semibold text-white bg-[#F97316] px-2 py-0.5 rounded-full">🔒 Terkunci</span>
             )}
           </div>
           <div className="px-5 pb-4 space-y-3">
@@ -96,8 +96,8 @@ export default function Settings() {
                     onClick={() => selectLanguage(l.code)}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-sm font-medium ${
                       language === l.code
-                        ? 'border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00]'
-                        : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#FF6A00]/50'
+                        ? 'border-[#F97316] bg-[#F97316]/5 text-[#F97316]'
+                        : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#F97316]/50'
                     }`}
                   >
                     <span>{l.flag}</span> {l.label}
@@ -112,7 +112,7 @@ export default function Settings() {
                   <p className="text-sm font-semibold text-[#1A1A1A]">{LANGUAGES.find((l) => l.code === language)?.label}</p>
                   <p className="text-xs text-[#8FA4C8]">{t('settings_language')}</p>
                 </div>
-                <Check className="w-4 h-4 text-[#FF6A00] ml-auto" />
+                <Check className="w-4 h-4 text-[#F97316] ml-auto" />
               </div>
             )}
 
@@ -125,8 +125,8 @@ export default function Settings() {
                     onClick={() => selectCurrency(c.code)}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-sm font-medium ${
                       currency === c.code
-                        ? 'border-[#FF6A00] bg-[#FF6A00]/5 text-[#FF6A00]'
-                        : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#FF6A00]/50'
+                        ? 'border-[#F97316] bg-[#F97316]/5 text-[#F97316]'
+                        : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A] hover:border-[#F97316]/50'
                     }`}
                   >
                     <span>{c.flag}</span> {c.label}
@@ -141,7 +141,7 @@ export default function Settings() {
                   <p className="text-sm font-semibold text-[#1A1A1A]">{CURRENCIES.find((c) => c.code === currency)?.label}</p>
                   <p className="text-xs text-[#8FA4C8]">{CURRENCIES.find((c) => c.code === currency)?.symbol} · {currency}</p>
                 </div>
-                <Check className="w-4 h-4 text-[#FF6A00] ml-auto" />
+                <Check className="w-4 h-4 text-[#F97316] ml-auto" />
               </div>
             )}
 
@@ -160,7 +160,7 @@ export default function Settings() {
             onClick={() => setShowExport(true)}
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
-            <Download className="w-5 h-5 text-[#FF6A00]" />
+            <Download className="w-5 h-5 text-[#F97316]" />
             <div className="text-left">
               <p className="font-medium text-[#1A1A1A] text-sm">Ekspor Laporan</p>
               <p className="text-xs text-[#8FA4C8]">Unduh transaksi sebagai CSV atau PDF</p>
@@ -183,12 +183,12 @@ export default function Settings() {
             disabled={restartingTour}
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
-            <MapPin className="w-5 h-5 text-[#FF6A00]" />
+            <MapPin className="w-5 h-5 text-[#F97316]" />
             <div className="text-left flex-1">
               <p className="font-medium text-[#1A1A1A] text-sm">Mulai Tour Ulang</p>
               <p className="text-xs text-[#8FA4C8]">Lihat panduan fitur-fitur Atur Pintar dari awal</p>
             </div>
-            {restartingTour && <div className="w-4 h-4 border-2 border-[#FF6A00] border-t-transparent rounded-full animate-spin" />}
+            {restartingTour && <div className="w-4 h-4 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />}
           </button>
         </div>
 
@@ -202,7 +202,7 @@ export default function Settings() {
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
             aria-label="Buka form feedback"
           >
-            <MessageSquare className="w-5 h-5 text-[#FF6A00]" />
+            <MessageSquare className="w-5 h-5 text-[#F97316]" />
             <div className="text-left">
               <p className="font-medium text-[#1A1A1A] text-sm">Kirim Feedback</p>
               <p className="text-xs text-[#8FA4C8]">Bantu kami untuk terus berkembang</p>
@@ -220,7 +220,7 @@ export default function Settings() {
               to={createPageUrl("AdminDashboard")}
               className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
             >
-              <ShieldCheck className="w-5 h-5 text-[#FF6A00]" />
+              <ShieldCheck className="w-5 h-5 text-[#F97316]" />
               <div className="text-left">
                 <p className="font-medium text-[#1A1A1A] text-sm">Admin Dashboard</p>
                 <p className="text-xs text-[#8FA4C8]">Kelola pengguna, kategori & sistem</p>
@@ -238,7 +238,7 @@ export default function Settings() {
             to="/PrivacyPolicy"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
-            <ShieldCheck className="w-5 h-5 text-[#FF6A00]" />
+            <ShieldCheck className="w-5 h-5 text-[#F97316]" />
             <div className="text-left">
               <p className="font-medium text-[#1A1A1A] text-sm">Kebijakan Privasi</p>
               <p className="text-xs text-[#8FA4C8]">Pelajari bagaimana kami melindungi data kamu</p>

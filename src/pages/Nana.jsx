@@ -413,7 +413,7 @@ function NanaInner() {
                   </span>
                 )}
                 {todayXP > 0 && (
-                  <span className="text-[10px] bg-[#FF6A00]/20 text-[#FF9A40] px-1.5 py-0.5 rounded-full font-bold">
+                  <span className="text-[10px] bg-[#F97316]/20 text-[#FF9A40] px-1.5 py-0.5 rounded-full font-bold">
                     +{todayXP} XP
                   </span>
                 )}
@@ -445,7 +445,7 @@ function NanaInner() {
           <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-4">
             {loading ? (
               <div className="flex justify-center pt-10">
-                <div className="w-6 h-6 border-2 border-[#FF6A00] border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : visibleMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center gap-4 px-6">
@@ -488,7 +488,7 @@ function NanaInner() {
                       )}
                       <div className={`max-w-[82%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed shadow-sm ${
                         msg.role === "user"
-                          ? "bg-[#FF6A00] text-white rounded-br-md"
+                          ? "bg-[#F97316] text-white rounded-br-md"
                           : "bg-white dark:bg-[#1A1E25] border border-[#E2E8F0] dark:border-[#2D2D2D] text-[#1A1A1A] dark:text-white rounded-bl-md"
                       }`}>
                         {msg.role === "assistant" ? (() => {
@@ -545,10 +545,10 @@ function NanaInner() {
           <div className="flex-shrink-0 px-4 pt-2 bg-[#F2F4F7] dark:bg-[#0F1114] border-t border-[#E2E8F0] dark:border-[#2D2D2D]" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
             {isLimitReached ? (
               <div className="bg-white dark:bg-[#1A1E25] rounded-2xl border border-[#E2E8F0] dark:border-[#2D2D2D] p-5 text-center shadow-sm">
-                <Crown className="w-6 h-6 text-[#FF6A00] mx-auto mb-2" />
+                <Crown className="w-6 h-6 text-[#F97316] mx-auto mb-2" />
                 <p className="text-sm font-semibold text-[#1A1A1A] dark:text-white mb-1">Batas pesan tercapai</p>
                 <p className="text-xs text-[#8FA4C8] mb-4">{msgCount}/{FREE_MSG_LIMIT} pesan bulan ini. Upgrade untuk chat tanpa batas.</p>
-                <Link to="/Subscription" className="inline-block px-5 py-2 bg-[#FF6A00] text-white rounded-xl text-sm font-semibold hover:bg-[#e05e00] transition-colors">
+                <Link to="/Subscription" className="inline-block px-5 py-2 bg-[#F97316] text-white rounded-xl text-sm font-semibold hover:bg-[#e05e00] transition-colors">
                   Upgrade Premium
                 </Link>
               </div>
@@ -609,7 +609,7 @@ function NanaInner() {
                       <button
                         onClick={() => sendMessage()}
                         disabled={!input.trim() || sending}
-                        className="w-9 h-9 rounded-full bg-[#FF6A00] flex items-center justify-center disabled:opacity-40 hover:bg-[#e05e00] transition-colors tap-highlight-fix"
+                        className="w-9 h-9 rounded-full bg-[#F97316] flex items-center justify-center disabled:opacity-40 hover:bg-[#e05e00] transition-colors tap-highlight-fix"
                         title="Kirim"
                       >
                         <Send className="w-4 h-4 text-white" />

@@ -162,14 +162,14 @@ export default function ProfileSettings() {
                       }}
                     />
                   </div>
-                  <p className="text-[11px] font-bold text-[#FF6A00]">{completion}%</p>
+                  <p className="text-[11px] font-bold text-[#F97316]">{completion}%</p>
                 </div>
               </div>
             )}
 
             <div className={`px-5 ${completion < 100 ? 'pb-5' : 'py-5'}`}>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#FF6A00] flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#F97316] flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
                   {user.photo_url
                     ? <img src={user.photo_url} alt="Foto" className="w-full h-full object-cover" />
                     : (user.display_name || user.full_name)?.[0]?.toUpperCase() || "U"}
@@ -178,7 +178,7 @@ export default function ProfileSettings() {
                   <p className="font-bold text-[#1A1A1A] text-lg truncate">{user.display_name || user.full_name || t('settings_user_label')}</p>
                   <p className="text-sm text-[#8FA4C8] mt-0.5 truncate">{user.email}</p>
                   {user.job && <p className="text-xs text-[#8FA4C8] mt-0.5 truncate">💼 {user.job}{user.city ? ` · 📍 ${user.city}` : ""}</p>}
-                  {user.role && <p className="text-xs font-semibold text-[#FF6A00] mt-1 uppercase tracking-wider">{user.role}</p>}
+                  {user.role && <p className="text-xs font-semibold text-[#F97316] mt-1 uppercase tracking-wider">{user.role}</p>}
                 </div>
                 <button onClick={() => setEditingProfile(true)}
                   className="w-10 h-10 rounded-full bg-[#F2F4F7] flex items-center justify-center hover:bg-[#E2E8F0] transition-colors flex-shrink-0">
@@ -204,7 +204,7 @@ export default function ProfileSettings() {
               <p className="text-base font-bold text-[#1A1A1A]">Rekening & Dompet</p>
               <p className="text-xs text-[#8FA4C8] mt-0.5">Total: <span className="font-semibold text-[#1A1A1A]">{formatRupiah(totalBalance)}</span></p>
             </div>
-            <Link to={createPageUrl("Accounts")} className="text-xs font-semibold text-[#FF6A00] hover:opacity-80 transition-opacity">
+            <Link to={createPageUrl("Accounts")} className="text-xs font-semibold text-[#F97316] hover:opacity-80 transition-opacity">
               Semua →
             </Link>
           </div>
@@ -231,7 +231,7 @@ export default function ProfileSettings() {
                           onClick={() => { setEditAccount(acc); setShowAccountModal(true); }}
                           className="flex-shrink-0 bg-white border border-[#E2E8F0] rounded-xl px-2.5 py-2 text-left hover:border-[#F97316]/50 transition-all flex items-center gap-2 min-w-0"
                           style={{ maxWidth: 140 }}>
-                          <AccountAvatar logoUrl={acc.logo_url} name={acc.name} color={acc.color || "#FF6A00"} />
+                          <AccountAvatar logoUrl={acc.logo_url} name={acc.name} color={acc.color || "#F97316"} />
                           <div className="min-w-0">
                             <p className="text-[11px] font-semibold text-[#1A1A1A] truncate leading-tight">{acc.name}</p>
                             <p className="text-[10px] font-bold truncate" style={{ color: (acc.balance || 0) < 0 ? "#EF4444" : "#27AE60" }}>
@@ -259,7 +259,7 @@ export default function ProfileSettings() {
           <Link to={createPageUrl("Subscription")}
             className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-b border-[#F2F4F7]">
             <div className="w-8 h-8 rounded-xl bg-[#FFF3E0] flex items-center justify-center flex-shrink-0">
-              <Crown className="w-4 h-4 text-[#FF6A00]" />
+              <Crown className="w-4 h-4 text-[#F97316]" />
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-medium text-[#1A1A1A]">Langganan</p>

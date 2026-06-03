@@ -419,7 +419,7 @@ export default function Goals() {
           <GoalsNanaPanel goals={goals} />
 
           {goalsLimitReached && (
-            <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 border border-[#FF6A00]/20">
+            <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 border border-[#F97316]/20">
               <Crown className="w-5 h-5 text-[#F97316] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[#1A1A1A]">Batas {FREE_GOALS_LIMIT} tujuan tercapai</p>

@@ -330,7 +330,7 @@ export default function Analytics() {
               <Link
                 to={createPageUrl("Gamifikasi")}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all tap-highlight-fix ${
-                  streak > 0 ? "bg-[#FF6A00] text-white" : "bg-white/20 text-white"
+                  streak > 0 ? "bg-[#F97316] text-white" : "bg-white/20 text-white"
                 }`}
               >
                 <Flame className="w-3 h-3" />

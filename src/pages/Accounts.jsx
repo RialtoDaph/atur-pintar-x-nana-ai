@@ -159,13 +159,13 @@ export default function Accounts() {
                                 logoUrl={acc.logo_url} 
                                 size="w-10 h-10"
                                 fallback={
-                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
+                                  <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#F97316") + "20" }}>
                                     <span className="text-sm">{acc.icon || "🏦"}</span>
                                   </div>
                                 }
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#FF6A00") + "20" }}>
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (acc.color || "#F97316") + "20" }}>
                                 <span className="text-sm">{acc.icon || "🏦"}</span>
                               </div>
                             )}
