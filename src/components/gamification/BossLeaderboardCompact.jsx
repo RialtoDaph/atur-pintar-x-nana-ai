@@ -3,6 +3,10 @@ import { base44 } from "@/api/base44Client";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
+// Module-level cache — leaderboard tidak berubah cepat, cache 60 detik
+let _cache = { data: null, ts: 0 };
+const CACHE_MS = 60 * 1000;
+
 /**
  * Compact leaderboard for the floating Boss Battle popup.
  * Shows top 5 contributors + "my rank" callout if not in top 5.
@@ -14,11 +18,21 @@ export default function BossLeaderboardCompact() {
 
   useEffect(() => {
     let cancelled = false;
+
+    // Serve from cache if fresh
+    if (_cache.data && Date.now() - _cache.ts < CACHE_MS) {
+      setEntries(_cache.data.entries || []);
+      setMyRank(typeof _cache.data.myRank === "number" ? _cache.data.myRank : -1);
+      setLoading(false);
+      return;
+    }
+
     base44.functions
       .invoke("getLeaderboard", {})
       .then((resp) => {
         if (cancelled) return;
         const data = resp?.data || {};
+        _cache = { data, ts: Date.now() };
         setEntries(data.entries || []);
         setMyRank(typeof data.myRank === "number" ? data.myRank : -1);
       })
