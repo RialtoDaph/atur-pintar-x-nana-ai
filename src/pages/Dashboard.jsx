@@ -25,12 +25,7 @@ import AchievementPopup from "@/components/dashboard/AchievementPopup";
 import LevelUpModal from "@/components/gamification/LevelUpModal";
 
 const BudgetAlertWidget = lazy(() => import("@/components/dashboard/BudgetAlertWidget"));
-const CashflowForecast = lazy(() => import("@/components/dashboard/CashflowForecast"));
 const GoalsProgressWidget = lazy(() => import("@/components/dashboard/GoalsProgressWidget"));
-
-const LazyFallback = () => (
-  <div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />
-);
 
 export default function Dashboard() {
   const { t } = useAppSettings();
@@ -40,7 +35,6 @@ export default function Dashboard() {
   const [showNanaIntro, setShowNanaIntro] = useState(false);
   const [user, setUser] = useState(null);
   const [showSampleBanner, setShowSampleBanner] = useState(hasSampleData);
-  const [lastTxAddedAt, setLastTxAddedAt] = useState(null);
   const [gamProfile, setGamProfile] = useState(null);
   const [desktopUnreadCount, setDesktopUnreadCount] = useState(0);
 
@@ -373,7 +367,6 @@ export default function Dashboard() {
                 await syncAccountBalance(data.account_id, data.amount, data.type, 1);
               }
               setShowAddTransaction(false);
-              setLastTxAddedAt(Date.now());
               // Gamification handled by the "transaction-added" listener (see useEffect above) —
               // calling it here too would double-invoke processGamification.
               window.dispatchEvent(new CustomEvent("transaction-added"));
