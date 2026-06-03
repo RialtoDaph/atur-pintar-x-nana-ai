@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import BossBattleCard from "./BossBattleCard";
+import BossLeaderboardCompact from "./BossLeaderboardCompact";
 
 /**
  * Floating Boss Battle launcher — bottom-right on both mobile & desktop.
@@ -55,10 +56,11 @@ export default function BossBattleFloating({ user, gamificationProfile, onProfil
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className="fixed z-[101] left-3 right-3 sm:left-auto sm:right-6 sm:w-[360px]"
               style={{
+                top: "calc(56px + env(safe-area-inset-top, 0px) + 8px)",
                 bottom: "calc(96px + env(safe-area-inset-bottom, 0px) + 16px)",
               }}
             >
-              <div className="relative">
+              <div className="relative h-full flex flex-col">
                 <button
                   onClick={() => setOpen(false)}
                   aria-label="Tutup"
@@ -66,11 +68,14 @@ export default function BossBattleFloating({ user, gamificationProfile, onProfil
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
-                <BossBattleCard
-                  user={user}
-                  gamificationProfile={gamificationProfile}
-                  onProfileUpdate={onProfileUpdate}
-                />
+                <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
+                  <BossLeaderboardCompact />
+                  <BossBattleCard
+                    user={user}
+                    gamificationProfile={gamificationProfile}
+                    onProfileUpdate={onProfileUpdate}
+                  />
+                </div>
               </div>
             </motion.div>
           </>
