@@ -40,9 +40,9 @@ export default function HeroSection({ onScrollToNewsletter }) {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
             <button
-              onClick={() => document.getElementById("video-section")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.getElementById("features-section")?.scrollIntoView({ behavior: "smooth" })}
               className="flex items-center gap-2 text-white/60 hover:text-white font-semibold text-sm px-6 py-4 transition-all w-full sm:w-auto justify-center">
-              Lihat cara kerjanya ↓
+              Lihat fiturnya dulu ↓
             </button>
           </div>
         </Reveal>

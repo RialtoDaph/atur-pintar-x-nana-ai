@@ -10,7 +10,7 @@ const FEATURES = [
 
 const FeaturesSection = forwardRef(function FeaturesSection(_, ref) {
   return (
-    <section ref={ref} className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
+    <section ref={ref} id="features-section" className="pb-24 px-5 sm:px-12 lg:px-20 relative z-10">
       <div className="max-w-4xl mx-auto">
         <Reveal>
           <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 text-center">Kenalan sama cara baru ngatur uang.</h2>

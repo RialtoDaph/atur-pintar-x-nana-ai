@@ -78,9 +78,9 @@ export default function NewsletterSection() {
       <div className="max-w-lg mx-auto">
         <Reveal>
           <div className="text-center mb-8">
-            <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Dapat tips langsung ke inbox.</h2>
-            <p className="text-[#F97316] font-bold text-lg mb-3">Newsletter Atur Pintar.</p>
-            <p className="text-white/50 text-sm">Tips keuangan ringan, update fitur baru, dan cerita seru, tanpa spam.</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">Belum siap daftar? Tetap stay updated.</h2>
+            <p className="text-[#F97316] font-bold text-lg mb-3">Newsletter + Early Access Updates.</p>
+            <p className="text-white/50 text-sm">Tips keuangan ringan, update fitur baru, dan akses awal ke rilis berikutnya. Tanpa spam.</p>
           </div>
         </Reveal>
 

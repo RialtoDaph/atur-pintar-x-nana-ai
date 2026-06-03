@@ -6,12 +6,13 @@ import LandingNav from "@/components/landing/LandingNav";
 import HeroSection from "@/components/landing/HeroSection";
 import PainPointSection from "@/components/landing/PainPointSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import NanaChatDemo from "@/components/landing/NanaChatDemo";
-import GamificationSection from "@/components/landing/GamificationSection";
 import VideoSection from "@/components/landing/VideoSection";
+import GamificationSection from "@/components/landing/GamificationSection";
 import TestimonialSection from "@/components/landing/TestimonialSection";
-import FaqSection from "@/components/landing/FaqSection";
 import PricingSection from "@/components/landing/PricingSection";
+import FaqSection from "@/components/landing/FaqSection";
 import NewsletterSection from "@/components/landing/NewsletterSection";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import LandingFooter from "@/components/landing/LandingFooter";
@@ -44,12 +45,13 @@ export default function LandingPage() {
       <HeroSection onScrollToNewsletter={scrollToNewsletter} />
       <PainPointSection />
       <FeaturesSection ref={howRef} />
+      <HowItWorksSection />
       <NanaChatDemo />
-      <GamificationSection />
       <VideoSection />
+      <GamificationSection />
       <TestimonialSection />
-      <FaqSection />
       <PricingSection ref={pricingRef} />
+      <FaqSection />
       <NewsletterSection />
       <FinalCtaSection />
       <LandingFooter />

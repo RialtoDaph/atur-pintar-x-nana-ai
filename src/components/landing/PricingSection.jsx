@@ -30,7 +30,7 @@ const PricingSection = forwardRef(function PricingSection(_, ref) {
                 ))}
               </div>
               <button onClick={() => navigate("/register")} className="w-full py-3 rounded-xl border border-[#F97316]/50 text-[#F97316] font-bold text-sm hover:bg-[#F97316]/10 transition-colors">
-                Mulai Gratis →
+                Pilih Free →
               </button>
             </div>
           </Reveal>
