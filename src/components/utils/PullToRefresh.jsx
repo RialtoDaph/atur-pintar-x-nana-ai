@@ -1,10 +1,12 @@
 import { useState, useRef, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
+import { haptic } from "@/hooks/useHaptic";
 
 export default function PullToRefresh({ onRefresh, children }) {
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(null);
+  const hapticFired = useRef(false);
   const THRESHOLD = 70;
 
   const onTouchStart = useCallback((e) => {
@@ -18,7 +20,15 @@ export default function PullToRefresh({ onRefresh, children }) {
     const delta = e.touches[0].clientY - startY.current;
     if (delta > 0) {
       e.preventDefault();
-      setPullDistance(Math.min(delta * 0.5, THRESHOLD + 20));
+      const next = Math.min(delta * 0.5, THRESHOLD + 20);
+      setPullDistance(next);
+      // Fire haptic once when crossing threshold (signals "release to refresh")
+      if (next >= THRESHOLD && !hapticFired.current) {
+        haptic.light();
+        hapticFired.current = true;
+      } else if (next < THRESHOLD && hapticFired.current) {
+        hapticFired.current = false;
+      }
     }
   }, [refreshing]);
 
@@ -31,6 +41,7 @@ export default function PullToRefresh({ onRefresh, children }) {
     }
     setPullDistance(0);
     startY.current = null;
+    hapticFired.current = false;
   }, [pullDistance, refreshing, onRefresh]);
 
   const progress = Math.min(pullDistance / THRESHOLD, 1);

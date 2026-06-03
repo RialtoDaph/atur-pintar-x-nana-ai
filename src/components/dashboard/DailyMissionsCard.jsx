@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { LEVELS } from "@/hooks/useGamification";
 import { completeMission } from "@/hooks/useGamificationActions";
+import { haptic } from "@/hooks/useHaptic";
 
 function getLevelInfo(xp) {
   const current = LEVELS.find(l => xp >= l.min && xp <= l.max) || LEVELS[0];
@@ -85,6 +86,9 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
   async function handleComplete(mission) {
     if (mission.is_completed) return;
 
+    // Haptic feedback — celebrate the completion
+    haptic.success();
+
     // Optimistic update — remove completed mission from list
     setMissions(prev => prev.filter(m => m.id !== mission.id));
 
@@ -107,6 +111,7 @@ export default function DailyMissionsCard({ user, gamificationProfile, onProfile
     if (onProfileUpdate) onProfileUpdate(fresh);
 
     if (newLevelInfo.current.level > prevLevelInfo.current.level) {
+      haptic.heavy();
       setShowLevelUp(newLevelInfo.current);
     }
   }

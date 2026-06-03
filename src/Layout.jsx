@@ -4,6 +4,7 @@ import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCa
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
+import { haptic } from "@/hooks/useHaptic";
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
@@ -165,6 +166,7 @@ function LayoutInner({ children, currentPageName }) {
 
   // FAB click: guard — require at least 1 account before opening AddTransactionModal
   const handleFabClick = async () => {
+    haptic.medium();
     if (showAddTransaction) { setShowAddTransaction(false); return; }
     try {
       const u = user || (await base44.auth.me());
