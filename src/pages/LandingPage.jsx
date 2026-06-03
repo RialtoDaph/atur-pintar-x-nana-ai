@@ -887,7 +887,7 @@ export default function LandingPage() {
                 <a href="https://instagram.com/aturpintar" target="_blank" rel="noopener noreferrer" aria-label="Instagram Atur Pintar" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
                   <Instagram className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://tiktok.com/@aturpintar" target="_blank" rel="noopener noreferrer" aria-label="TikTok Atur Pintar" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
+                <a href="https://tiktok.com/@aturpintar.id" target="_blank" rel="noopener noreferrer" aria-label="TikTok Atur Pintar" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
                   <TikTokIcon />
                 </a>
                 <a href="https://facebook.com/aturpintar" target="_blank" rel="noopener noreferrer" aria-label="Facebook Page Atur Pintar" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
