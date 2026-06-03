@@ -1,40 +1,43 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
+import useLockBodyScroll from "@/hooks/useLockBodyScroll";
 
-const ICON_OPTIONS = ["💳", "🎬", "🎵", "📺", "📰", "☁️", "🎮", "📱", "🛒", "🏋️", "📚", "⭐"];
-const CYCLE_OPTIONS = [
-  { value: "monthly", label: "Bulanan" },
-  { value: "quarterly", label: "Triwulan" },
-  { value: "yearly", label: "Tahunan" },
+const ICONS = ["💳", "🎬", "🎵", "📺", "📰", "☁️", "🎮", "📱", "🛒", "🏋️", "📚", "⭐"];
+const CYCLES = [
+  { key: "monthly", label: "Bulanan" },
+  { key: "quarterly", label: "Triwulan" },
+  { key: "yearly", label: "Tahunan" },
 ];
 
 export default function AddSubscriptionModal({ onClose, onSaved }) {
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [icon, setIcon] = useState("💳");
-  const [billingCycle, setBillingCycle] = useState("monthly");
-  const [nextDueDate, setNextDueDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 30);
-    return d.toISOString().split("T")[0];
+  useLockBodyScroll();
+  const [form, setForm] = useState({
+    name: "",
+    amount: "",
+    icon: "💳",
+    billing_cycle: "monthly",
+    next_due_date: (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30);
+      return d.toISOString().split("T")[0];
+    })(),
   });
   const [saving, setSaving] = useState(false);
 
   async function handleSave() {
-    if (!name.trim()) { toast.error("Nama langganan wajib diisi"); return; }
-    const amt = parseFloat(amount);
+    if (!form.name.trim()) { toast.error("Nama langganan wajib diisi"); return; }
+    const amt = parseFloat(form.amount);
     if (!amt || amt <= 0) { toast.error("Nominal harus lebih dari 0"); return; }
     setSaving(true);
     try {
       await base44.entities.Subscription.create({
-        name: name.trim(),
+        name: form.name.trim(),
         amount: amt,
-        icon,
-        billing_cycle: billingCycle,
-        next_due_date: nextDueDate,
+        icon: form.icon,
+        billing_cycle: form.billing_cycle,
+        next_due_date: form.next_due_date,
         status: "active",
       });
       toast.success("Langganan ditambahkan");
@@ -48,121 +51,106 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
   }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-[80] flex items-end sm:items-center sm:justify-center"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px)+100px)] sm:pb-6 max-h-[90vh] overflow-y-auto overscroll-contain"
       >
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-        <motion.div
-          className="relative w-full sm:max-w-md bg-[#1A1E25] rounded-t-2xl sm:rounded-2xl z-10 pb-8 sm:pb-5"
-          initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-          transition={{ type: "spring", damping: 28, stiffness: 300 }}
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-[#1A1A1A]">Tambah Langganan</h2>
+          <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A]">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Icon picker */}
+        <div className="mb-4">
+          <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">Ikon</label>
+          <div className="flex flex-wrap gap-2">
+            {ICONS.map(ic => (
+              <button
+                key={ic}
+                onClick={() => setForm(f => ({ ...f, icon: ic }))}
+                className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
+                  form.icon === ic ? "border-[#FF6A00] bg-[#FF6A00]/10" : "border-[#E2E8F0]"
+                }`}
+              >
+                {ic}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Name */}
+        <div className="mb-4">
+          <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Nama Langganan</label>
+          <input
+            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+            placeholder="e.g. Netflix, Spotify..."
+            value={form.name}
+            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+          />
+        </div>
+
+        {/* Amount */}
+        <div className="mb-4">
+          <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Nominal</label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-sm">Rp</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              className="w-full border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-lg font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+              placeholder="0"
+              value={form.amount}
+              onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        {/* Billing cycle */}
+        <div className="mb-4">
+          <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-2 block">Siklus</label>
+          <div className="grid grid-cols-3 gap-2">
+            {CYCLES.map(c => (
+              <button
+                key={c.key}
+                onClick={() => setForm(f => ({ ...f, billing_cycle: c.key }))}
+                className={`py-2.5 rounded-xl text-xs font-semibold border transition-all tap-highlight-fix ${
+                  form.billing_cycle === c.key
+                    ? "border-[#FF6A00] bg-[#FF6A00]/10 text-[#FF6A00]"
+                    : "border-[#E2E8F0] bg-[#F8FAFC] text-[#1A1A1A]"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Next due date */}
+        <div className="mb-6">
+          <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Jatuh Tempo Berikutnya</label>
+          <input
+            type="date"
+            className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#FF6A00] bg-[#F8FAFC]"
+            value={form.next_due_date}
+            onChange={e => setForm(f => ({ ...f, next_due_date: e.target.value }))}
+          />
+        </div>
+
+        <button
+          onClick={handleSave}
+          disabled={saving || !form.name.trim() || !form.amount}
+          className="w-full py-3.5 rounded-xl font-bold text-sm text-white bg-[#FF6A00] hover:bg-[#e05e00] disabled:opacity-40 transition-colors tap-highlight-fix"
         >
-          {/* Handle (mobile) */}
-          <div className="flex justify-center pt-3 pb-1 sm:hidden">
-            <div className="w-10 h-1 rounded-full bg-white/20" />
-          </div>
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 pt-3 pb-2">
-            <p className="text-white font-semibold text-base">Tambah Langganan</p>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="px-5 pt-2 space-y-4">
-            {/* Icon picker */}
-            <div>
-              <p className="text-[11px] text-[#8FA4C8] mb-2">Ikon</p>
-              <div className="flex flex-wrap gap-2">
-                {ICON_OPTIONS.map((emo) => (
-                  <button
-                    key={emo}
-                    onClick={() => setIcon(emo)}
-                    className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center tap-highlight-fix transition-all ${
-                      icon === emo ? "bg-[#F97316] ring-2 ring-[#F97316]/40" : "bg-white/10"
-                    }`}
-                  >
-                    {emo}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Name */}
-            <div>
-              <p className="text-[11px] text-[#8FA4C8] mb-1.5">Nama langganan</p>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Netflix, Spotify"
-                className="w-full bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F97316]/40"
-              />
-            </div>
-
-            {/* Amount */}
-            <div>
-              <p className="text-[11px] text-[#8FA4C8] mb-1.5">Nominal (Rp)</p>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0"
-                className="w-full bg-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-[#F97316]/40"
-              />
-            </div>
-
-            {/* Billing cycle */}
-            <div>
-              <p className="text-[11px] text-[#8FA4C8] mb-1.5">Siklus</p>
-              <div className="grid grid-cols-3 gap-2">
-                {CYCLE_OPTIONS.map((c) => (
-                  <button
-                    key={c.value}
-                    onClick={() => setBillingCycle(c.value)}
-                    className={`py-2.5 rounded-xl text-xs font-semibold tap-highlight-fix transition-all ${
-                      billingCycle === c.value ? "bg-[#F97316] text-white" : "bg-white/10 text-[#8FA4C8]"
-                    }`}
-                  >
-                    {c.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Next due date */}
-            <div>
-              <p className="text-[11px] text-[#8FA4C8] mb-1.5">Jatuh tempo berikutnya</p>
-              <input
-                type="date"
-                value={nextDueDate}
-                onChange={(e) => setNextDueDate(e.target.value)}
-                className="w-full bg-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-[#F97316]/40"
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={onClose}
-                className="flex-1 py-3 rounded-xl border border-white/20 text-white text-sm font-semibold tap-highlight-fix"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex-1 py-3 rounded-xl bg-[#F97316] text-white text-sm font-semibold tap-highlight-fix disabled:opacity-60"
-              >
-                {saving ? "Menyimpan..." : "Simpan"}
-              </button>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          {saving ? "Menyimpan..." : "Tambah Langganan"}
+        </button>
+      </div>
+    </div>
   );
 }
