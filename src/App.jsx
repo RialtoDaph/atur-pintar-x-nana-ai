@@ -8,10 +8,10 @@ import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
 import RouteErrorBoundary from '@/components/utils/RouteErrorBoundary';
 import AdminProtect from '@/components/admin/AdminProtect';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Eager — needed for first paint (public landing + lightweight pages)
 import LandingPage from '@/pages/LandingPage';
@@ -19,6 +19,12 @@ import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import MaintenancePage from '@/pages/MaintenancePage';
 import TourGuide from '@/components/onboarding/TourGuide';
+
+// Auth pages (custom auth) — eager so /login loads instantly
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 
 // Lazy — loaded only when user navigates to them
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
@@ -55,7 +61,7 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <RouteErrorBoundary pageKey={currentPageName}>{children}</RouteErrorBoundary>;
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings } = useAuth();
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [showTour, setShowTour] = useState(false);
@@ -88,76 +94,68 @@ const AuthenticatedApp = () => {
     return <MaintenancePage />;
   }
 
-  // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Allow landing page to be public
-      const publicPaths = ['/', '/LandingPage', '/PrivacyPolicy', '/TermsOfService'];
-      if (publicPaths.includes(window.location.pathname)) {
-        return (
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-            <Route path="/TermsOfService" element={<TermsOfService />} />
-            <Route path="*" element={<LandingPage />} />
-          </Routes>
-        );
-      }
-      navigateToLogin();
-      return null;
-    }
-  }
-
   // Render the main app
+  // Public routes: /login, /register, /forgot-password, /reset-password, /LandingPage, /PrivacyPolicy, /TermsOfService
+  // All other routes are gated by ProtectedRoute → unauthenticated users redirect to /login
   return (
     <Suspense fallback={<PageLoader />}>
     <Routes>
-      <Route path="/" element={<Navigate to="/Dashboard" replace />} />
-      <Route path="/Dashboard" element={
-        <LayoutWrapper currentPageName="Dashboard">
-          <Dashboard />
-        </LayoutWrapper>
-      } />
-      {Object.entries(Pages).filter(([path]) => !['Dashboard', 'LandingPage', 'Reminders'].includes(path)).map(([path, Page]) => (
-        <Route
-          key={path}
-          path={`/${path}`}
-          element={
-            <LayoutWrapper currentPageName={path}>
-              <Page />
-            </LayoutWrapper>
-          }
-        />
-      ))}
+      {/* ── Public auth pages ── */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* ── Public marketing/legal pages ── */}
       <Route path="/LandingPage" element={<LandingPage />} />
-      <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
-      <Route path="/AdminSubscriptions" element={<LayoutWrapper currentPageName="AdminSubscriptions"><AdminSubscriptions /></LayoutWrapper>} />
-      <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
-      <Route path="/Notifications" element={<Navigate to="/Dashboard" replace />} />
-      <Route path="/Reminders" element={<Navigate to="/Dashboard" replace />} />
-      <Route path="/Alerts" element={<Navigate to="/Dashboard" replace />} />
-      <Route path="/Accounts" element={<LayoutWrapper currentPageName="Accounts"><Accounts /></LayoutWrapper>} />
-      <Route path="/SharedFinance" element={<LayoutWrapper currentPageName="SharedFinance"><SharedFinance /></LayoutWrapper>} />
-      <Route path="/Menu" element={<Navigate to="/Accounts" replace />} />
-      <Route path="/AdminDashboard" element={<LayoutWrapper currentPageName="AdminDashboard"><AdminProtect><AdminDashboard /></AdminProtect></LayoutWrapper>} />
-      <Route path="/AdminUsers" element={<LayoutWrapper currentPageName="AdminUsers"><AdminProtect><AdminUsers /></AdminProtect></LayoutWrapper>} />
-      <Route path="/AdminLogs" element={<LayoutWrapper currentPageName="AdminLogs"><AdminProtect><AdminLogs /></AdminProtect></LayoutWrapper>} />
-      <Route path="/AdminNotifications" element={<LayoutWrapper currentPageName="AdminNotifications"><AdminProtect><AdminNotifications /></AdminProtect></LayoutWrapper>} />
-      <Route path="/AdminCategories" element={<LayoutWrapper currentPageName="AdminCategories"><AdminProtect><AdminCategories /></AdminProtect></LayoutWrapper>} />
-      <Route path="/AdminSettings" element={<LayoutWrapper currentPageName="AdminSettings"><AdminProtect><AdminSettings /></AdminProtect></LayoutWrapper>} />
-      <Route path="/AdminDefaultAccounts" element={<LayoutWrapper currentPageName="AdminDefaultAccounts"><AdminProtect><AdminDefaultAccounts /></AdminProtect></LayoutWrapper>} />
-      <Route path="/AdminAIInsights" element={<Navigate to="/AdminDashboard" replace />} />
-      <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />
-      <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />
-      <Route path="/About" element={<About />} />
-      <Route path="/Achievements" element={<Navigate to="/Gamifikasi" replace />} />
-      <Route path="/ReceiptScanHistory" element={<LayoutWrapper currentPageName="ReceiptScanHistory"><ReceiptScanHistory /></LayoutWrapper>} />
-      <Route path="/Gamifikasi" element={<LayoutWrapper currentPageName="Gamifikasi"><Gamifikasi /></LayoutWrapper>} />
-      <Route path="/Investments" element={<LayoutWrapper currentPageName="Investments"><Investments /></LayoutWrapper>} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
+      <Route path="/About" element={<About />} />
+
+      {/* ── Gated app routes ── */}
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/" element={<Navigate to="/Dashboard" replace />} />
+        <Route path="/Dashboard" element={
+          <LayoutWrapper currentPageName="Dashboard">
+            <Dashboard />
+          </LayoutWrapper>
+        } />
+        {Object.entries(Pages).filter(([path]) => !['Dashboard', 'LandingPage', 'Reminders'].includes(path)).map(([path, Page]) => (
+          <Route
+            key={path}
+            path={`/${path}`}
+            element={
+              <LayoutWrapper currentPageName={path}>
+                <Page />
+              </LayoutWrapper>
+            }
+          />
+        ))}
+        <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
+        <Route path="/AdminSubscriptions" element={<LayoutWrapper currentPageName="AdminSubscriptions"><AdminSubscriptions /></LayoutWrapper>} />
+        <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
+        <Route path="/Notifications" element={<Navigate to="/Dashboard" replace />} />
+        <Route path="/Reminders" element={<Navigate to="/Dashboard" replace />} />
+        <Route path="/Alerts" element={<Navigate to="/Dashboard" replace />} />
+        <Route path="/Accounts" element={<LayoutWrapper currentPageName="Accounts"><Accounts /></LayoutWrapper>} />
+        <Route path="/SharedFinance" element={<LayoutWrapper currentPageName="SharedFinance"><SharedFinance /></LayoutWrapper>} />
+        <Route path="/Menu" element={<Navigate to="/Accounts" replace />} />
+        <Route path="/AdminDashboard" element={<LayoutWrapper currentPageName="AdminDashboard"><AdminProtect><AdminDashboard /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminUsers" element={<LayoutWrapper currentPageName="AdminUsers"><AdminProtect><AdminUsers /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminLogs" element={<LayoutWrapper currentPageName="AdminLogs"><AdminProtect><AdminLogs /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminNotifications" element={<LayoutWrapper currentPageName="AdminNotifications"><AdminProtect><AdminNotifications /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminCategories" element={<LayoutWrapper currentPageName="AdminCategories"><AdminProtect><AdminCategories /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminSettings" element={<LayoutWrapper currentPageName="AdminSettings"><AdminProtect><AdminSettings /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminDefaultAccounts" element={<LayoutWrapper currentPageName="AdminDefaultAccounts"><AdminProtect><AdminDefaultAccounts /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminAIInsights" element={<Navigate to="/AdminDashboard" replace />} />
+        <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />
+        <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />
+        <Route path="/Achievements" element={<Navigate to="/Gamifikasi" replace />} />
+        <Route path="/ReceiptScanHistory" element={<LayoutWrapper currentPageName="ReceiptScanHistory"><ReceiptScanHistory /></LayoutWrapper>} />
+        <Route path="/Gamifikasi" element={<LayoutWrapper currentPageName="Gamifikasi"><Gamifikasi /></LayoutWrapper>} />
+        <Route path="/Investments" element={<LayoutWrapper currentPageName="Investments"><Investments /></LayoutWrapper>} />
+      </Route>
+
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     {showTour && (
