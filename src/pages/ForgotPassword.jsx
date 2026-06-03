@@ -27,7 +27,6 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout
-      icon={Mail}
       title="Reset kata sandi"
       subtitle="Kami akan kirim link untuk reset"
       footer={
@@ -54,7 +53,7 @@ export default function ForgotPassword() {
                 placeholder="kamu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+                className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
                 required
               />
             </div>

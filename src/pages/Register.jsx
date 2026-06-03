@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
@@ -78,7 +78,6 @@ export default function Register() {
   if (showOtp) {
     return (
       <AuthLayout
-        icon={Mail}
         title="Verifikasi email kamu"
         subtitle={`Kami kirim kode ke ${email}`}
       >
@@ -131,7 +130,6 @@ export default function Register() {
 
   return (
     <AuthLayout
-      icon={UserPlus}
       title="Buat akun kamu"
       subtitle="Daftar gratis untuk mulai"
       footer={
@@ -166,7 +164,7 @@ export default function Register() {
           <div className="w-full border-t border-white/10" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#1a1a1a] px-3 text-white/40">atau</span>
+          <span className="bg-[#1B1B1B] px-3 text-white/40">atau</span>
         </div>
       </div>
 
@@ -189,7 +187,7 @@ export default function Register() {
               placeholder="kamu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
               required
             />
           </div>
@@ -205,7 +203,7 @@ export default function Register() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
               required
             />
           </div>
@@ -221,7 +219,7 @@ export default function Register() {
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
               required
             />
           </div>

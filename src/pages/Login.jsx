@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import AppleIcon from "@/components/AppleIcon";
@@ -39,7 +39,6 @@ export default function Login() {
 
   return (
     <AuthLayout
-      icon={LogIn}
       title="Selamat datang kembali"
       subtitle="Masuk ke akun kamu"
       footer={
@@ -74,7 +73,7 @@ export default function Login() {
           <div className="w-full border-t border-white/10" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#1a1a1a] px-3 text-white/40">atau</span>
+          <span className="bg-[#1B1B1B] px-3 text-white/40">atau</span>
         </div>
       </div>
 
@@ -97,7 +96,7 @@ export default function Login() {
               placeholder="kamu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
               required
             />
           </div>
@@ -118,7 +117,7 @@ export default function Login() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
               required
             />
           </div>

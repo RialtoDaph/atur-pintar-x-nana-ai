@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Loader2, AlertTriangle } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 
 export default function ResetPassword() {
@@ -37,7 +37,6 @@ export default function ResetPassword() {
   if (!resetToken) {
     return (
       <AuthLayout
-        icon={AlertTriangle}
         title="Link tidak valid"
         subtitle="Link reset kata sandi ini hilang atau tidak valid"
         footer={
@@ -55,7 +54,6 @@ export default function ResetPassword() {
 
   return (
     <AuthLayout
-      icon={Lock}
       title="Kata sandi baru"
       subtitle="Masukkan kata sandi baru kamu"
     >
@@ -77,7 +75,7 @@ export default function ResetPassword() {
               placeholder="••••••••"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
               required
             />
           </div>
@@ -93,7 +91,7 @@ export default function ResetPassword() {
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-[#F97316]/50"
+              className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-2 focus-visible:ring-[#F97316] focus-visible:ring-offset-0"
               required
             />
           </div>
