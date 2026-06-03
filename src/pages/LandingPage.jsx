@@ -210,7 +210,7 @@ function NanaChatDemo() {
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-white/8">
               <div className="w-8 h-8 rounded-full overflow-hidden bg-[#F97316] flex items-center justify-center flex-shrink-0">
-                <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="Nana" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
+                <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="Avatar Nana AI — asisten keuangan virtual Atur Pintar" loading="lazy" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
               </div>
               <div>
                 <p className="text-white text-xs font-bold leading-none">Nana AI</p>
@@ -245,7 +245,7 @@ function NanaChatDemo() {
               <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : ""}`}>
                   {m.role === "nana" &&
                 <div className="w-6 h-6 rounded-full overflow-hidden bg-[#F97316] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="N" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
+                      <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="Avatar Nana AI" loading="lazy" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
                     </div>
                 }
                   <div className={`rounded-2xl px-3 py-2.5 max-w-[85%] text-xs leading-relaxed ${m.role === "nana" ? "bg-white/6 rounded-tl-sm text-white/80" : "bg-[#F97316] rounded-tr-sm text-white"}`}>
@@ -259,7 +259,7 @@ function NanaChatDemo() {
               {typing &&
               <div className="flex gap-2">
                   <div className="w-6 h-6 rounded-full overflow-hidden bg-[#F97316] flex items-center justify-center flex-shrink-0">
-                    <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="N" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
+                    <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/51c7f5e6a_Nana_AI.png" alt="Nana sedang mengetik" loading="lazy" className="w-full h-full object-cover" onError={(e) => {e.target.style.display = "none";}} />
                   </div>
                   <div className="bg-white/6 rounded-2xl rounded-tl-sm px-3 py-2.5">
                     <span className="text-white/40 text-xs">Nana mengetik<span className="typing-dots">...</span></span>
@@ -575,7 +575,7 @@ export default function LandingPage() {
       {/* ── NAV ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center px-5 sm:px-12 lg:px-20 py-3 bg-[#0A0A0A]/95 border-b border-white/5">
         <div className="flex items-center gap-2">
-          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-7 h-7" />
+          <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo Atur Pintar — aplikasi keuangan AI" width="28" height="28" className="w-7 h-7" />
           <span className="font-black text-white text-sm tracking-tight">Atur Pintar</span>
         </div>
         <div className="hidden sm:flex items-center gap-6 ml-10">
@@ -849,7 +849,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-6 h-6" />
+                <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo Atur Pintar" width="24" height="24" loading="lazy" className="w-6 h-6" />
                 <span className="text-sm font-black text-white">Atur Pintar</span>
               </div>
               <p className="text-white/30 text-xs leading-relaxed italic">"Duit diatur, hidup lebih pintar."</p>
