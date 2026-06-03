@@ -52,7 +52,7 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
@@ -133,15 +133,17 @@ export default function AddSubscriptionModal({ onClose, onSaved }) {
         </div>
 
         {/* Next due date */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="text-xs font-semibold text-[#8FA4C8] uppercase tracking-widest mb-1.5 block">Jatuh Tempo Berikutnya</label>
           <input
             type="date"
+            min={new Date().toISOString().split("T")[0]}
             className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC]"
             value={form.next_due_date}
             onChange={e => setForm(f => ({ ...f, next_due_date: e.target.value }))}
           />
         </div>
+        <div className="mb-2" />
 
         <button
           onClick={handleSave}
