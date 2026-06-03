@@ -16,14 +16,16 @@ export default function BossBattleFloating({ user, gamificationProfile, onProfil
 
   return (
     <>
-      {/* Floating trigger — icon only, hidden when popup open */}
+      {/* Floating trigger — icon only, hidden when popup open.
+          Mobile: above bottom nav (nav ~70px + safe-area + 36px breathing room).
+          Desktop: pinned at bottom-right with 24px margin. */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
           aria-label="Buka Boss Battle"
-          className="fixed z-[70] right-4 sm:right-6 bottom-24 sm:bottom-6 flex items-center justify-center active:scale-90 transition-transform"
+          className="fixed z-[70] right-4 sm:right-6 flex items-center justify-center active:scale-90 transition-transform sm:bottom-6"
           style={{
-            bottom: window.innerWidth >= 640 ? "24px" : "calc(96px + env(safe-area-inset-bottom, 0px))",
+            bottom: "calc(110px + env(safe-area-inset-bottom, 0px))",
           }}
         >
           <span className="text-5xl drop-shadow-lg" aria-hidden="true">👹</span>

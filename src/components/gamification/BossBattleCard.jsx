@@ -90,6 +90,9 @@ export default function BossBattleCard({ user, gamificationProfile, onProfileUpd
       streak: result.streak,
     });
 
+    // Notify leaderboard to invalidate its cache
+    window.dispatchEvent(new CustomEvent("boss-attacked"));
+
     if (result.bossDefeated) setShowWinModal(true);
     setAttacking(false);
   }

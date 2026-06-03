@@ -3,9 +3,18 @@ import { base44 } from "@/api/base44Client";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
-// Module-level cache — leaderboard tidak berubah cepat, cache 60 detik
+// Module-level cache — leaderboard tidak berubah cepat, cache 60 detik.
+// Invalidate ketika user attack boss (event "transaction-added" tidak relevan;
+// bossBattleAttack adalah trigger sebenarnya).
 let _cache = { data: null, ts: 0 };
 const CACHE_MS = 60 * 1000;
+
+// Listen for boss attack events to invalidate cache globally
+if (typeof window !== "undefined") {
+  window.addEventListener("boss-attacked", () => {
+    _cache = { data: null, ts: 0 };
+  });
+}
 
 /**
  * Compact leaderboard for the floating Boss Battle popup.
