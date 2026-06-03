@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Lightbulb, X } from "lucide-react";
+import { useState } from "react";
+import { TrendingDown, AlertTriangle, CheckCircle, Lightbulb, X } from "lucide-react";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
 export default function DashboardInsights({ transactions, goals }) {
-  const { formatCurrency, t } = useAppSettings();
+  const { formatCurrency } = useAppSettings();
   const [dismissedInsights, setDismissedInsights] = useState([]);
 
   const now = new Date();
@@ -26,7 +26,6 @@ export default function DashboardInsights({ transactions, goals }) {
 
   const insights = [];
 
-  // Expense comparison
   if (lastExpense > 0) {
     if (expenseChange > 20) {
       insights.push({
@@ -47,7 +46,6 @@ export default function DashboardInsights({ transactions, goals }) {
     }
   }
 
-  // Savings rate
   if (thisIncome > 0) {
     if (savingsRate >= 20) {
       insights.push({
@@ -68,7 +66,6 @@ export default function DashboardInsights({ transactions, goals }) {
     }
   }
 
-  // Urgent goals
   const urgentGoals = goals.filter(g => {
     if (!g.deadline || g.status === "completed") return false;
     const days = Math.ceil((new Date(g.deadline) - now) / (1000 * 60 * 60 * 24));
@@ -80,7 +77,7 @@ export default function DashboardInsights({ transactions, goals }) {
       id: "urgent_goals",
       icon: <AlertTriangle className="w-4 h-4 text-[#F97316]" />,
       color: "bg-[#F97316]/15 border-[#F97316]/50",
-        textColor: "text-[#F97316]",
+      textColor: "text-[#F97316]",
       text: `${urgentGoals.length} tujuan tabungan mendekati deadline — "${urgentGoals[0].name}" dalam ${Math.ceil((new Date(urgentGoals[0].deadline) - now) / (1000 * 60 * 60 * 24))} hari.`,
     });
   }

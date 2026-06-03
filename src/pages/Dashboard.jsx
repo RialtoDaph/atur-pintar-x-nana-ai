@@ -24,7 +24,6 @@ import StreakCelebrationPopup from "@/components/dashboard/StreakCelebrationPopu
 import AchievementPopup from "@/components/dashboard/AchievementPopup";
 import LevelUpModal from "@/components/gamification/LevelUpModal";
 
-const DashboardInsights = lazy(() => import("@/components/dashboard/DashboardInsights"));
 const BudgetAlertWidget = lazy(() => import("@/components/dashboard/BudgetAlertWidget"));
 const CashflowForecast = lazy(() => import("@/components/dashboard/CashflowForecast"));
 const GoalsProgressWidget = lazy(() => import("@/components/dashboard/GoalsProgressWidget"));

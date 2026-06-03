@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Wallet, Eye, EyeOff, Users, LineChart, Credit
 import { useNavigate } from "react-router-dom";
 import AccountAvatar from "@/components/ui/AccountAvatar";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 
 function compactRupiah(value) {
   return Math.abs(value).toLocaleString('id-ID');
@@ -15,34 +16,52 @@ export default function BalanceCardCarousel({ income, expense, savings, accounts
   const [currentSlide, setCurrentSlide] = useState(0);
   const [storageKey, setStorageKey] = useState(null);
   const [hidden, setHidden] = useState(false);
-  const [sharedWallets, setSharedWallets] = useState([]);
-  const [investments, setInvestments] = useState([]);
-  const [investmentTxs, setInvestmentTxs] = useState([]);
-  const [debts, setDebts] = useState([]);
+  const [userEmail, setUserEmail] = useState(null);
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
-  // Scope hidden state per user + load shared wallets + investments
+  // Resolve user once + load hidden state preference
   useEffect(() => {
     base44.auth.me().then((u) => {
       if (!u?.email) return;
+      setUserEmail(u.email);
       const key = `balance_hidden::${u.email}`;
       setStorageKey(key);
       setHidden(localStorage.getItem(key) === "1");
-      // Load shared wallets where user is owner or member
-      base44.entities.SharedWallet.list().then((all) => {
-        const mine = (all || []).filter(w =>
-          w.owner_email === u.email || (w.members || []).includes(u.email)
-        );
-        setSharedWallets(mine);
-      }).catch(() => {});
-      // Load investments + transactions
-      base44.entities.Investment.filter({ created_by: u.email }).then(setInvestments).catch(() => {});
-      base44.entities.InvestmentTransaction.filter({ created_by: u.email }).then(setInvestmentTxs).catch(() => {});
-      // Load active debts
-      base44.entities.Debt.filter({ created_by: u.email, status: "active" }).then(setDebts).catch(() => {});
     }).catch(() => {});
   }, []);
+
+  // Cached queries (shared across components via react-query) — replaces 4 raw fetches
+  const { data: sharedWallets = [] } = useQuery({
+    queryKey: ["shared_wallets", userEmail],
+    queryFn: async () => {
+      const all = await base44.entities.SharedWallet.list();
+      return (all || []).filter(w => w.owner_email === userEmail || (w.members || []).includes(userEmail));
+    },
+    enabled: !!userEmail,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: investments = [] } = useQuery({
+    queryKey: ["investments", userEmail],
+    queryFn: () => base44.entities.Investment.filter({ created_by: userEmail }),
+    enabled: !!userEmail,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: investmentTxs = [] } = useQuery({
+    queryKey: ["investment_txs", userEmail],
+    queryFn: () => base44.entities.InvestmentTransaction.filter({ created_by: userEmail }),
+    enabled: !!userEmail,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: debts = [] } = useQuery({
+    queryKey: ["debts_active", userEmail],
+    queryFn: () => base44.entities.Debt.filter({ created_by: userEmail, status: "active" }),
+    enabled: !!userEmail,
+    staleTime: 5 * 60 * 1000,
+  });
 
   function toggleHidden(e) {
     e.stopPropagation();
