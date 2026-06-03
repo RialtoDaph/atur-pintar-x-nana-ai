@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import { completeMission } from "@/hooks/useGamificationActions";
 import MoodPicker from "@/components/nana/MoodPicker";
 import NanaQuickActions from "@/components/nana/NanaQuickActions";
@@ -47,7 +48,7 @@ function NanaInner() {
   function toggleVoice() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      alert("Browser kamu belum mendukung voice input.");
+      toast.error("Browser kamu belum mendukung voice input.");
       return;
     }
     if (isListening && recognitionRef.current) {
