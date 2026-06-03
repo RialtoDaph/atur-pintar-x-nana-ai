@@ -823,9 +823,9 @@ export default function LandingPage() {
 
       {/* ── FINAL CTA ── */}
       <section className="pb-0 px-5 sm:px-12 lg:px-20 relative z-10">
-          <div className="relative rounded-3xl overflow-hidden py-20 px-8 sm:px-16 text-center" style={{ background: "#1A1A2E" }}>
-            <div className="absolute top-0 left-0 w-64 h-64 rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2" style={{ background: "radial-gradient(circle, rgba(255,106,0,0.10) 0%, transparent 70%)" }} />
-            <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full pointer-events-none translate-x-1/3 translate-y-1/3" style={{ background: "radial-gradient(circle, rgba(255,106,0,0.08) 0%, transparent 70%)" }} />
+          <div className="relative rounded-3xl overflow-hidden py-20 px-8 sm:px-16 text-center bg-[#0A0A0A] border border-white/[0.08]">
+            <div className="absolute top-0 left-0 w-64 h-64 rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2" style={{ background: "radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)" }} />
+            <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full pointer-events-none translate-x-1/3 translate-y-1/3" style={{ background: "radial-gradient(circle, rgba(249,115,22,0.10) 0%, transparent 70%)" }} />
             <Reveal>
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black g-text mb-4 leading-tight">Duit bukan musuh.<br />Malas yang musuh.</h2>
             </Reveal>
