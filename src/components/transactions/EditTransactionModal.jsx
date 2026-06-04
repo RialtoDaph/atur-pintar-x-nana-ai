@@ -49,6 +49,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const [appSettings, setAppSettings] = useState(null);
   const [subCatPopup, setSubCatPopup] = useState(null);
   const [accounts, setAccounts] = useState([]);
+  const [accountError, setAccountError] = useState("");
 
   useEffect(() => {
     loadCustomCats();
@@ -92,7 +93,13 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   }
 
   async function handleSave() {
-    if (!form.amount || !form.category || !form.account_id) return;
+    // account_id required for expense/income; savings exempt
+    if (!isSavings && !form.account_id) {
+      setAccountError("Pilih rekening untuk transaksi ini.");
+      return;
+    }
+    if (!form.amount || !form.category) return;
+    if (!isSavings && !form.account_id) return;
     setSaving(true);
     await onSave(transaction.id, {
       ...form,
@@ -191,11 +198,13 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
                 {accounts.map(acc => (
                   <button
                     key={acc.id}
-                    onClick={() => setForm({ ...form, account_id: acc.id })}
+                    onClick={() => { setForm({ ...form, account_id: acc.id }); setAccountError(""); }}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border-[1.5px] transition-all ${
                       form.account_id === acc.id
                         ? "border-[#F97316] bg-[#FFF7ED] text-[#EA580C]"
-                        : "border-[#E2E8F0] bg-[#F8FAFC] text-[#4A5568]"
+                        : accountError
+                          ? "border-[#DC2626] bg-[#F8FAFC] text-[#4A5568]"
+                          : "border-[#E2E8F0] bg-[#F8FAFC] text-[#4A5568]"
                     }`}
                   >
                     <AccountAvatar logoUrl={acc.logo_url} name={acc.name} color={acc.color || "#F97316"} size="w-5 h-5" />
@@ -203,6 +212,9 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
                   </button>
                 ))}
               </div>
+              {accountError && !isSavings && (
+                <p className="text-[11px] text-[#DC2626] font-semibold mt-1.5">{accountError}</p>
+              )}
             </div>
           )}
 
@@ -329,7 +341,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
             )}
           </div>
 
-          <button onClick={handleSave} disabled={saving || !form.amount || !form.category || !form.account_id}
+          <button onClick={handleSave} disabled={saving || !form.amount || !form.category || (!isSavings && !form.account_id)}
             className="w-full py-3 rounded-xl font-bold text-sm text-white disabled:opacity-40 transition-colors"
             style={{ backgroundColor: tab === "expense" ? "#FF6B6B" : "#00C9A7" }}>
             {saving ? t('saving') : t('save_changes')}

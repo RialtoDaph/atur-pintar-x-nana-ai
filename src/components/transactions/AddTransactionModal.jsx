@@ -53,6 +53,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const [receiptData, setReceiptData] = useState(null);
   const [showSplitBill, setShowSplitBill] = useState(false);
   const [lowBalanceConfirm, setLowBalanceConfirm] = useState(null);
+  const [accountError, setAccountError] = useState("");
   const suggestTimer = useRef(null);
   const amountInputRef = useRef(null);
   const fileRef = useRef(null);
@@ -148,7 +149,9 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
   const selectedAccount = accounts.find(a => a.id === accountId);
   const amount = parseAmount(amountRaw);
-  const canSave = amount > 0 && accountId;
+  // account_id required for expense/income (savings handled in Goals flow, not this modal)
+  const needsAccount = tab === "expense" || tab === "income";
+  const canSave = amount > 0 && (!needsAccount || !!accountId);
 
   async function doSave() {
     setSaving(true);
@@ -197,6 +200,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   }
 
   function handleSave() {
+    if (needsAccount && !accountId) {
+      setAccountError("Pilih rekening untuk transaksi ini.");
+      return;
+    }
     if (!canSave) return;
     if (tab === "expense" && !isRecurring && selectedAccount && (selectedAccount.balance || 0) < amount) {
       setLowBalanceConfirm(true);
@@ -432,10 +439,10 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                   {accounts.map(acc => {
                     const active = accountId === acc.id;
                     return (
-                      <button key={acc.id} onClick={() => setAccountId(acc.id)}
+                      <button key={acc.id} onClick={() => { setAccountId(acc.id); setAccountError(""); }}
                         className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border-[1.5px] transition-all"
                         style={{
-                          borderColor: active ? "#F97316" : "#E2E8F0",
+                          borderColor: active ? "#F97316" : (accountError ? "#DC2626" : "#E2E8F0"),
                           backgroundColor: active ? "#FFF7ED" : "#F8FAFC",
                           color: active ? "#EA580C" : "#4A5568"
                         }}>
@@ -445,6 +452,9 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                     );
                   })}
                 </div>
+                {accountError && (
+                  <p className="text-[11px] text-[#DC2626] font-semibold mt-1.5">{accountError}</p>
+                )}
               </div>
             )}
 
