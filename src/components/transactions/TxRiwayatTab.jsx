@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import TxDetailSheet from "./TxDetailSheet";
 import EditTransactionModal from "./EditTransactionModal";
 import { syncAccountBalance } from "@/components/utils/accountSync";
+import { recalcGoalAmount } from "@/components/utils/recalcGoalAmount";
 
 const SUB_TABS = [
   { key: "all", label: "Semua" },
@@ -154,6 +155,10 @@ export default function TxRiwayatTab({ transactions, categories, accounts, forma
     if (tx.account_id && !tx.is_recurring) {
       await syncAccountBalance(tx.account_id, tx.amount, tx.type, -1);
     }
+    // If this was a savings tx linked to a goal, recalc goal current_amount (sum decreases)
+    if (tx.type === "savings" && tx.goal_id) {
+      await recalcGoalAmount(tx.goal_id);
+    }
     onRefresh();
   }
 
@@ -173,6 +178,12 @@ export default function TxRiwayatTab({ transactions, categories, accounts, forma
         await syncAccountBalance(newAccountId, newAmount, newType, 1);
       }
     }
+    // Recalc any goal that was/is linked — covers all 4 cases:
+    // goal_id added, removed, swapped, or amount/type changed on the same goal.
+    const oldGoalId = oldTx?.goal_id;
+    const newGoalId = data.goal_id ?? oldGoalId;
+    if (oldGoalId) await recalcGoalAmount(oldGoalId);
+    if (newGoalId && newGoalId !== oldGoalId) await recalcGoalAmount(newGoalId);
     setEditingTx(null);
     onRefresh();
   }
