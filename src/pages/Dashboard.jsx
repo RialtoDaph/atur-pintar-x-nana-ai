@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import PullToRefresh from "@/components/utils/PullToRefresh";
 
 import { base44 } from "@/api/base44Client";
@@ -10,7 +10,9 @@ import NanaIntroModal from "@/components/onboarding/NanaIntroModal";
 import SampleDataBanner, { hasSampleData } from "@/components/onboarding/SampleDataManager";
 import BalanceCardCarousel from "@/components/dashboard/BalanceCardCarousel";
 import TodayTransactionsCard from "@/components/dashboard/TodayTransactionsCard";
+import SubscriptionExpiredBanner from "@/components/dashboard/SubscriptionExpiredBanner";
 import { syncAccountBalance } from "@/components/utils/accountSync";
+import { saveTransactionWithSync } from "@/components/utils/saveTransaction";
 
 import RecurringManager from "@/components/transactions/RecurringManager";
 import { useGamification } from "@/hooks/useGamification";
@@ -35,7 +37,6 @@ export default function Dashboard() {
   const [showNanaIntro, setShowNanaIntro] = useState(false);
   const [user, setUser] = useState(null);
   const [showSampleBanner, setShowSampleBanner] = useState(hasSampleData);
-  const [gamProfile, setGamProfile] = useState(null);
   const [desktopUnreadCount, setDesktopUnreadCount] = useState(0);
 
   const gamification = useGamification(user);
@@ -136,10 +137,11 @@ export default function Dashboard() {
   // Date range: from start of current month to today.
   // Filter at the server (date >= firstDayOfMonth) instead of pulling 500 records and
   // filtering client-side — guarantees correctness for power users with >500 lifetime tx.
-  const firstDayOfMonthStr = (() => {
+  // Memoized once per mount — `new Date()` recomputed only when the day rolls over (won't happen mid-session realistically).
+  const firstDayOfMonthStr = useMemo(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split("T")[0];
-  })();
+  }, []);
 
   const { data: rawTransactions = [], isLoading: txLoading } = useQuery({
     queryKey: ["transactions_dashboard", user?.email, firstDayOfMonthStr],
@@ -155,7 +157,10 @@ export default function Dashboard() {
 
   // Exclude recurring TEMPLATES (parent) from displayed/aggregated transactions —
   // only generated child transactions should affect totals & UI lists.
-  const transactions = rawTransactions.filter(t => !(t.is_recurring === true && !t.is_recurring_child));
+  const transactions = useMemo(
+    () => rawTransactions.filter(t => !(t.is_recurring === true && !t.is_recurring_child)),
+    [rawTransactions]
+  );
 
   const { data: budgets = [], isLoading: budgetsLoading } = useQuery({
     queryKey: ["budgets", user?.email],
@@ -172,6 +177,8 @@ export default function Dashboard() {
     refetchOnWindowFocus: true,
   });
 
+  // Fallback query — populates profile on first mount before `checkStreakOnLoad` runs.
+  // Once the hook's `gamification.profile` is set, that becomes authoritative.
   const { data: gamProfiles = [] } = useQuery({
     queryKey: ["gam_profile", user?.email],
     queryFn: () => base44.entities.GamificationProfile.filter({ created_by: user.email }),
@@ -183,7 +190,9 @@ export default function Dashboard() {
     placeholderData: (prev) => prev,
   });
 
-  const activeGamProfile = gamProfile || gamProfiles?.[0] || null;
+  // Single source of truth: hook's profile (kept fresh by processGamification responses) wins,
+  // fall back to the initial query result while the hook hasn't loaded yet.
+  const activeGamProfile = gamification.profile || gamProfiles?.[0] || null;
 
   const { data: allCategories = [] } = useQuery({
     queryKey: ["categories", user?.email],
@@ -205,17 +214,19 @@ export default function Dashboard() {
     ]);
   }
 
-  const now = new Date();
-  const todayStr = now.toISOString().split("T")[0];
+  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
 
-  // Filter transactions from day 1 of month to today (server already returned date >= firstDayOfMonth)
-  const thisMonthTx = transactions.filter(t => t.date <= todayStr && !t.is_deleted);
-
-  const monthIncome = thisMonthTx.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-  // Pengeluaran hanya menghitung type=expense, savings tidak dihitung sebagai pengeluaran (dipisah sebagai "tabungan")
-  const monthExpense = thisMonthTx.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-  // Total disisihkan ke tabungan/goals bulan ini
-  const monthSavings = thisMonthTx.filter(t => t.type === "savings").reduce((s, t) => s + t.amount, 0);
+  // Single-pass aggregation — avoids 3x filter+reduce traversals over the same array
+  const { monthIncome, monthExpense, monthSavings } = useMemo(() => {
+    let inc = 0, exp = 0, sav = 0;
+    for (const t of transactions) {
+      if (t.is_deleted || t.date > todayStr) continue;
+      if (t.type === "income") inc += t.amount;
+      else if (t.type === "expense") exp += t.amount;
+      else if (t.type === "savings") sav += t.amount;
+    }
+    return { monthIncome: inc, monthExpense: exp, monthSavings: sav };
+  }, [transactions, todayStr]);
 
   return (
     <PullToRefresh onRefresh={loadData}>
@@ -262,7 +273,7 @@ export default function Dashboard() {
               <DailyMissionsCard
                 user={user}
                 gamificationProfile={activeGamProfile}
-                onProfileUpdate={setGamProfile}
+                onProfileUpdate={gamification.setProfile}
               />
             )}
 
@@ -270,16 +281,7 @@ export default function Dashboard() {
               <SampleDataBanner onDismiss={() => { setShowSampleBanner(false); loadData(); }} />
             )}
 
-            {user?.subscription_status === "expired" && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3">
-                <span className="text-lg">⚠️</span>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-red-700">Langganan kamu sudah berakhir</p>
-                  <p className="text-xs text-red-500">Perpanjang untuk akses fitur premium</p>
-                </div>
-                <a href="/Subscription" className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold">Perpanjang</a>
-              </div>
-            )}
+            {user?.subscription_status === "expired" && <SubscriptionExpiredBanner />}
 
             <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
               <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} globalCategories={allCategories} />
@@ -310,16 +312,7 @@ export default function Dashboard() {
                 <SampleDataBanner onDismiss={() => { setShowSampleBanner(false); loadData(); }} />
               )}
 
-              {user?.subscription_status === "expired" && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3">
-                  <span className="text-lg">⚠️</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-red-700">Langganan kamu sudah berakhir</p>
-                    <p className="text-xs text-red-500">Perpanjang untuk akses fitur premium</p>
-                  </div>
-                  <a href="/Subscription" className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold">Perpanjang</a>
-                </div>
-              )}
+              {user?.subscription_status === "expired" && <SubscriptionExpiredBanner />}
 
               <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
                 <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} globalCategories={allCategories} />
@@ -336,7 +329,7 @@ export default function Dashboard() {
                 <DailyMissionsCard
                   user={user}
                   gamificationProfile={activeGamProfile}
-                  onProfileUpdate={setGamProfile}
+                  onProfileUpdate={gamification.setProfile}
                 />
               )}
 
@@ -357,7 +350,7 @@ export default function Dashboard() {
         <BossBattleFloating
           user={user}
           gamificationProfile={activeGamProfile}
-          onProfileUpdate={setGamProfile}
+          onProfileUpdate={gamification.setProfile}
         />
 
         {showAddTransaction && (
@@ -365,14 +358,8 @@ export default function Dashboard() {
             goals={goals}
             onClose={() => setShowAddTransaction(false)}
             onSave={async (data) => {
-              await base44.entities.Transaction.create(data);
-              if (data.account_id && !data.is_recurring) {
-                await syncAccountBalance(data.account_id, data.amount, data.type, 1);
-              }
+              await saveTransactionWithSync(data);
               setShowAddTransaction(false);
-              // Gamification handled by the "transaction-added" listener (see useEffect above) —
-              // calling it here too would double-invoke processGamification.
-              window.dispatchEvent(new CustomEvent("transaction-added"));
               await loadData();
             }}
           />

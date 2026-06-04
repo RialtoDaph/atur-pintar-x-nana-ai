@@ -9,7 +9,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
 import ReminderNotificationPopup from "@/components/reminders/ReminderNotificationPopup";
-import { syncAccountBalance } from "@/components/utils/accountSync";
+import { saveTransactionWithSync } from "@/components/utils/saveTransaction";
 import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSettingsContext";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import DashboardTopTabs from "@/components/dashboard/DashboardTopTabs";
@@ -431,16 +431,8 @@ function LayoutInner({ children, currentPageName }) {
         goals={[]}
         onClose={() => setShowAddTransaction(false)}
         onSave={async (data) => {
-          await base44.entities.Transaction.create(data);
-          // Recurring templates don't affect balance — only generated child transactions do
-          if (data.account_id && !data.is_recurring) {
-            await syncAccountBalance(data.account_id, data.amount, data.type, 1);
-          }
-          // Trigger gamification — backend processGamification handles streaks, achievements, AND challenge progress
-          window.dispatchEvent(new CustomEvent("transaction-added"));
+          await saveTransactionWithSync(data);
           setShowAddTransaction(false);
-          // Small delay to let account balance update propagate, then refresh dashboard
-          setTimeout(() => window.dispatchEvent(new Event("refresh-dashboard")), 400);
         }} />
 
       }
