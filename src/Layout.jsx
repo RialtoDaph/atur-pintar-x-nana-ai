@@ -41,6 +41,12 @@ function LayoutInner({ children, currentPageName }) {
       // Log login
       base44.functions.invoke('logUserLogin', {}).catch(() => {});
 
+      // Ping gamification streak once per session (app_opened activity)
+      if (!sessionStorage.getItem("streak_ping_sent")) {
+        sessionStorage.setItem("streak_ping_sent", "1");
+        base44.functions.invoke('processGamification', { trigger: 'app_opened' }).catch(() => {});
+      }
+
       // Subscription expiry check (skip for admin) — runs once per session
       if (u?.role !== 'admin' && u?.subscription_status === "active" && !sessionStorage.getItem("sub_expiry_checked")) {
         sessionStorage.setItem("sub_expiry_checked", "1");

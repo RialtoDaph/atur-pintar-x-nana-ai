@@ -27,8 +27,8 @@ const ACHIEVEMENTS_DEF = [
   { key: "transaction_10",     xp: 50,  category: "transaction", title: "📊 10 Transaksi!",      icon: "📊", hint: "Total 10 transaksi" },
   { key: "transaction_50",     xp: 150, category: "transaction", title: "🗂️ 50 Transaksi!",     icon: "🗂️", hint: "Total 50 transaksi" },
   { key: "transaction_100",    xp: 300, category: "transaction", title: "💯 100 Transaksi!",     icon: "💯", hint: "Total 100 transaksi" },
-  { key: "streak_3",           xp: 30,  category: "streak",      title: "🔥 3 Hari Berturut!",  icon: "🔥", hint: "Streak 3 hari" },
-  { key: "streak_7",           xp: 70,  category: "streak",      title: "🔥 Seminggu Penuh!",   icon: "🔥", hint: "Streak 7 hari" },
+  { key: "streak_3",           xp: 50,  category: "streak",      title: "🔥 3 Hari Berturut!",  icon: "🔥", hint: "Streak 3 hari" },
+  { key: "streak_7",           xp: 100, category: "streak",      title: "🔥 Seminggu Penuh!",   icon: "🔥", hint: "Streak 7 hari" },
   { key: "streak_14",          xp: 140, category: "streak",      title: "🔥 2 Minggu Konsisten!", icon: "🔥", hint: "Streak 14 hari" },
   { key: "streak_30",          xp: 300, category: "streak",      title: "💎 30 Hari Konsisten!", icon: "💎", hint: "Streak 30 hari" },
   { key: "first_goal",         xp: 30,  category: "goal",        title: "🎯 Punya Tujuan!",     icon: "🎯", hint: "Buat 1 savings goal" },
@@ -55,18 +55,33 @@ function getLevelFromXP(xp) {
   return level.level;
 }
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
+// All streak/date math uses Jakarta time (WIB, UTC+7) so a user's "day"
+// matches their local calendar regardless of the server timezone.
+const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
 
-function yesterdayStr() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
+function wibDate(offsetDays = 0) {
+  const d = new Date(Date.now() + WIB_OFFSET_MS);
+  if (offsetDays) d.setUTCDate(d.getUTCDate() + offsetDays);
   return d.toISOString().slice(0, 10);
 }
 
+function todayStr() {
+  return wibDate(0);
+}
+
+function yesterdayStr() {
+  return wibDate(-1);
+}
+
 function currentMonth() {
-  return new Date().toISOString().slice(0, 7);
+  return wibDate(0).slice(0, 7);
+}
+
+// Days between two YYYY-MM-DD strings (b - a), date-only, ignoring time.
+function daysBetween(a, b) {
+  const da = new Date(a + "T00:00:00Z");
+  const db = new Date(b + "T00:00:00Z");
+  return Math.round((db - da) / (1000 * 60 * 60 * 24));
 }
 
 Deno.serve(async (req) => {
@@ -98,11 +113,13 @@ Deno.serve(async (req) => {
     }
 
     // ── 2. Streak update ──────────────────────────────────────────────────────
-    // Streak HANYA naik kalau user catat transaksi baru.
-    // Trigger lain (goal, budget, nana, mood, daily_check) tidak menyentuh streak
-    // — itu cuma buat XP & achievement, bukan habit harian.
+    // Streak naik untuk setiap aktivitas user yang relevan:
+    // catat transaksi, selesaikan misi harian, atau buka aplikasi.
+    // Trigger lain (goal, budget, nana, dll) tetap menambah XP tapi tidak menyentuh streak.
     const ACTIVITY_TRIGGERS = new Set([
       "transaction_created",
+      "mission_completed",
+      "app_opened",
     ]);
     const isActivity = ACTIVITY_TRIGGERS.has(trigger);
 
@@ -121,14 +138,10 @@ Deno.serve(async (req) => {
     let streakChanged = false;
 
     // ── Streak Freeze logic ───────────────────────────────────────────────────
-    // Auto-protect streak kalau user skip 1 hari (last_activity = 2 hari lalu) DAN
-    // ada freeze tersedia. Freeze regen: +1 per 7 hari sejak last_regen, max 2.
+    // Freeze regen: +1 per 7 hari sejak last_regen, max 2. Dicek setiap streak check jalan.
     const FREEZE_MAX = 2;
     const FREEZE_REGEN_DAYS = 7;
 
-    // Hitung berapa freeze yang diregen sejak last_regen.
-    // Untuk user lama yg profilnya dibuat sebelum fitur freeze ada (streak_freezes_available
-    // dan streak_freeze_last_regen masih undefined), kasih 1 freeze awal & set last_regen ke today.
     const hasFreezeFields =
       freshProfile.streak_freezes_available !== undefined &&
       freshProfile.streak_freeze_last_regen;
@@ -137,55 +150,43 @@ Deno.serve(async (req) => {
     let freezeLastUsed = freshProfile.streak_freeze_last_used || null;
     let freezeUsedToday = false;
 
-    // Hanya regen kalau field memang sudah ada (hindari kasih regen palsu utk user baru)
+    // Regen freezes: 1 per 7 hari sejak last_regen (max 2). Untuk user lama tanpa field,
+    // kasih 1 freeze awal & set last_regen ke today (tanpa regen palsu).
     if (hasFreezeFields) {
-      const daysSinceRegen = Math.floor(
-        (new Date(today) - new Date(freezeLastRegen)) / (1000 * 60 * 60 * 24)
-      );
-      if (daysSinceRegen >= FREEZE_REGEN_DAYS) {
+      const daysSinceRegen = daysBetween(freezeLastRegen, today);
+      if (daysSinceRegen >= FREEZE_REGEN_DAYS && freezesAvailable < FREEZE_MAX) {
         const regenAmount = Math.floor(daysSinceRegen / FREEZE_REGEN_DAYS);
         freezesAvailable = Math.min(FREEZE_MAX, freezesAvailable + regenAmount);
         freezeLastRegen = today;
       }
     }
 
-    // Cek apakah user skip tepat 1 hari (last = day before yesterday)
-    function dayBeforeYesterdayStr() {
-      const d = new Date();
-      d.setDate(d.getDate() - 2);
-      return d.toISOString().slice(0, 10);
-    }
-    const dayBeforeYesterday = dayBeforeYesterdayStr();
-
     if (isActivity) {
-      if (last === today) {
-        // Same day — no change. Idempotent: repeated activity on the same day never bumps streak.
+      if (!last) {
+        // First-ever activity
+        newStreak = 1;
+        streakChanged = true;
+      } else if (last === today) {
+        // Same day — no change. Idempotent.
       } else if (last === yesterday) {
         newStreak = currentStreak + 1;
         streakChanged = true;
-      } else if (
-        last === dayBeforeYesterday &&
-        currentStreak > 0 &&
-        freezesAvailable > 0
-      ) {
-        // Skip 1 hari & ada freeze → auto-protect streak (lanjut + 1, freeze terpakai)
-        newStreak = currentStreak + 1;
-        streakChanged = true;
-        freezesAvailable -= 1;
-        freezeLastUsed = yesterday;
-        freezeUsedToday = true;
       } else {
-        // More than 1 day ago or null — start fresh at 1.
-        newStreak = 1;
-        streakChanged = true;
+        // 2+ days gap
+        if (freezesAvailable >= 1 && currentStreak > 0) {
+          // Freeze preserves streak (no increment, just keep it alive)
+          freezesAvailable -= 1;
+          freezeLastUsed = today;
+          freezeUsedToday = true;
+          // streak unchanged, but last_activity_date will be updated below
+        } else {
+          // No freeze available → reset to 0
+          newStreak = 0;
+          streakChanged = true;
+        }
       }
     } else {
-      // Non-activity trigger (e.g. daily_check): reset display if skipped >1 day
-      // tanpa freeze (jangan terapkan freeze di sini — freeze hanya kepakai kalau ada aktivitas).
-      if (last && last !== today && last !== yesterday && last !== dayBeforeYesterday && currentStreak > 0) {
-        newStreak = 0;
-        streakChanged = true;
-      }
+      // Non-activity trigger: do not touch streak here. Streak is read-only for these.
     }
 
     const newLongest = Math.max(freshProfile.longest_streak || 0, newStreak);
@@ -204,9 +205,8 @@ Deno.serve(async (req) => {
     else if (trigger === "challenge_claimed") xpToAdd = Math.max(0, parseInt(metadata?.xp_reward || 0, 10));
     else if (trigger === "boss_attack") xpToAdd = Math.max(0, parseInt(metadata?.xp_reward || 20, 10));
 
-    // Streak milestone bonus
-    if (streakChanged && newStreak === 7) xpToAdd += 100;
-    if (streakChanged && newStreak === 30) xpToAdd += 500;
+    // Streak milestone XP is awarded via the streak_3/7/30 achievements (50/100/300 XP).
+    // No extra bonus here to avoid double-counting.
 
     const oldXP = profile.total_points || 0;
     let newXP = oldXP + xpToAdd;
