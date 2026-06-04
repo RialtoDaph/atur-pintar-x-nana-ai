@@ -133,9 +133,20 @@ export default function Dashboard() {
     staleTime: 2 * 60 * 1000,
   });
 
+  // Date range: from start of current month to today.
+  // Filter at the server (date >= firstDayOfMonth) instead of pulling 500 records and
+  // filtering client-side — guarantees correctness for power users with >500 lifetime tx.
+  const firstDayOfMonthStr = (() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split("T")[0];
+  })();
+
   const { data: rawTransactions = [], isLoading: txLoading } = useQuery({
-    queryKey: ["transactions_dashboard", user?.email],
-    queryFn: () => base44.entities.Transaction.filter({ created_by: user.email, is_deleted: false }, "-date", 500),
+    queryKey: ["transactions_dashboard", user?.email, firstDayOfMonthStr],
+    queryFn: () => base44.entities.Transaction.filter(
+      { created_by: user.email, is_deleted: false, date: { $gte: firstDayOfMonthStr } },
+      "-date"
+    ),
     enabled,
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -193,18 +204,16 @@ export default function Dashboard() {
   }
 
   const now = new Date();
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
   const todayStr = now.toISOString().split("T")[0];
-  
-  // Filter transactions from day 1 of month to today
-  const thisMonthTx = transactions.filter(t => {
-    const d = new Date(t.date);
-    return t.date >= firstDayOfMonth && t.date <= todayStr && !t.is_deleted;
-  });
+
+  // Filter transactions from day 1 of month to today (server already returned date >= firstDayOfMonth)
+  const thisMonthTx = transactions.filter(t => t.date <= todayStr && !t.is_deleted);
 
   const monthIncome = thisMonthTx.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   // Pengeluaran hanya menghitung type=expense, savings tidak dihitung sebagai pengeluaran (dipisah sebagai "tabungan")
   const monthExpense = thisMonthTx.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  // Total disisihkan ke tabungan/goals bulan ini
+  const monthSavings = thisMonthTx.filter(t => t.type === "savings").reduce((s, t) => s + t.amount, 0);
 
   return (
     <PullToRefresh onRefresh={loadData}>
@@ -234,7 +243,7 @@ export default function Dashboard() {
               <BalanceCardCarousel
                 income={monthIncome}
                 expense={monthExpense}
-                savings={0}
+                savings={monthSavings}
                 accounts={accounts}
                 loading={loading}
               />
@@ -290,7 +299,7 @@ export default function Dashboard() {
               <BalanceCardCarousel
                 income={monthIncome}
                 expense={monthExpense}
-                savings={0}
+                savings={monthSavings}
                 accounts={accounts}
                 loading={loading}
               />

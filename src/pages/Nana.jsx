@@ -350,15 +350,16 @@ function NanaInner() {
         completeMission(user.email, "tanya_nana").catch(() => {});
       }
 
-      // Quota update — read latest user state to avoid race when user sends multiple messages quickly
+      // Quota update — delegated to backend function for atomic read-modify-write.
+      // Prevents race condition when user spams messages (concurrent updateMe calls
+      // overwriting each other with stale counts).
       if (!isPremium) {
-        setUser(u => {
-          if (!u) return u;
-          const sameMonth = u.nana_message_month === currentMonth;
-          const newCount = (sameMonth ? (u.nana_message_count || 0) : 0) + 1;
-          base44.auth.updateMe({ nana_message_count: newCount, nana_message_month: currentMonth }).catch(() => {});
-          return { ...u, nana_message_count: newCount, nana_message_month: currentMonth };
-        });
+        base44.functions.invoke("incrementNanaQuota", {}).then((res) => {
+          const data = res?.data;
+          if (data?.count !== undefined) {
+            setUser(u => u ? { ...u, nana_message_count: data.count, nana_message_month: data.month } : u);
+          }
+        }).catch(() => {});
       }
 
       // XP for sending message via backend (max 3x per day; backend awards 2 XP per nana_message_sent)

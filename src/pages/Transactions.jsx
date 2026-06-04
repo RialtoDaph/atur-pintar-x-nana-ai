@@ -104,12 +104,32 @@ export default function Transactions() {
           throw err;
         }
       };
-      const [txsRaw, accs, dts, subs] = await Promise.all([
-        withRetry(() => base44.entities.Transaction.filter({ created_by: user.email }, "-date")),
+      // Date range: current filter month — load only that month's transactions from server
+      // instead of the user's entire history. Drastically reduces payload for power users.
+      // Recurring templates (no date in the month) are still needed for the "Rutin" tab,
+      // so we fetch them separately.
+      const monthStart = `${filters.year}-${String(filters.month + 1).padStart(2, "0")}-01`;
+      const monthLastDay = new Date(filters.year, filters.month + 1, 0).getDate();
+      const monthEnd = `${filters.year}-${String(filters.month + 1).padStart(2, "0")}-${String(monthLastDay).padStart(2, "0")}`;
+
+      const [monthTx, recurringTemplates, accs, dts, subs] = await Promise.all([
+        withRetry(() => base44.entities.Transaction.filter(
+          { created_by: user.email, date: { $gte: monthStart, $lte: monthEnd } },
+          "-date"
+        )),
+        // Recurring templates (no date constraint) for the Rutin tab
+        base44.entities.Transaction.filter({ created_by: user.email, is_recurring: true }).catch(() => []),
         withRetry(() => base44.entities.Account.filter({ created_by: user.email }, "name")),
         base44.entities.Debt.filter({ created_by: user.email }).catch(() => []),
         base44.entities.Subscription.filter({ created_by: user.email }).catch(() => []),
       ]);
+
+      // Merge: month transactions + recurring templates (deduped by id)
+      const seen = new Set();
+      const txsRaw = [];
+      for (const t of [...(monthTx || []), ...(recurringTemplates || [])]) {
+        if (!seen.has(t.id)) { seen.add(t.id); txsRaw.push(t); }
+      }
 
       const txs = (txsRaw || []).filter(t => t.is_deleted !== true);
       setTransactions(txs);
@@ -128,6 +148,9 @@ export default function Transactions() {
   }
 
   useEffect(() => { fetchData(); }, []);
+
+  // Refetch whenever the active month/year filter changes (server-side date filtering)
+  useEffect(() => { fetchData(true); }, [filters.month, filters.year]);
 
   // Re-fetch when a transaction is added/edited elsewhere (e.g., FAB in Layout)
   useEffect(() => {
