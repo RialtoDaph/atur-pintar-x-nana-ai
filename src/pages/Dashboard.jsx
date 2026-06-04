@@ -192,6 +192,8 @@ export default function Dashboard() {
     staleTime: 10 * 60 * 1000,
   });
 
+  // Balance card only needs transaction totals — don't gate it on goals/budgets loading
+  const balanceLoading = txLoading;
   const loading = goalsLoading || txLoading || budgetsLoading;
 
   async function loadData() {
@@ -245,7 +247,7 @@ export default function Dashboard() {
                 expense={monthExpense}
                 savings={monthSavings}
                 accounts={accounts}
-                loading={loading}
+                loading={balanceLoading}
               />
             </div>
           </div>
@@ -280,7 +282,7 @@ export default function Dashboard() {
             )}
 
             <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
-              <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
+              <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} globalCategories={allCategories} />
             </Suspense>
             <Suspense fallback={<div className="bg-white rounded-2xl h-24 animate-pulse shadow-sm" />}>
               <GoalsProgressWidget goals={goals} loading={goalsLoading} />
@@ -301,7 +303,7 @@ export default function Dashboard() {
                 expense={monthExpense}
                 savings={monthSavings}
                 accounts={accounts}
-                loading={loading}
+                loading={balanceLoading}
               />
 
               {showSampleBanner && (
@@ -320,7 +322,7 @@ export default function Dashboard() {
               )}
 
               <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
-                <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} />
+                <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} globalCategories={allCategories} />
               </Suspense>
 
               {user?.onboarding_completed && (
