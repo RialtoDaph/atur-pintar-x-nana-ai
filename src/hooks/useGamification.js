@@ -80,26 +80,12 @@ export function useGamification(user) {
   const checkStreakOnLoad = useCallback(async () => {
     if (!user?.email) return;
     try {
+      // Read-only: load the profile so UI can render current streak.
+      // All streak mutation (increment / freeze / reset) is owned by the
+      // backend `processGamification` function — never write here, otherwise
+      // we race with backend updates triggered by transaction saves.
       const p = await getOrCreateProfile();
       setProfile(p);
-      const today              = format(new Date(), "yyyy-MM-dd");
-      const yesterday          = format(subDays(new Date(), 1), "yyyy-MM-dd");
-      const dayBeforeYesterday = format(subDays(new Date(), 2), "yyyy-MM-dd");
-      const last = p.last_activity_date;
-      // Streak hanya reset secara display kalau user skip >1 hari TANPA freeze.
-      // Skip tepat 1 hari (last = day before yesterday) tidak reset di sini —
-      // freeze akan dipakai otomatis saat user catat aktivitas pertama hari ini.
-      if (
-        last &&
-        last !== today &&
-        last !== yesterday &&
-        last !== dayBeforeYesterday &&
-        (p.daily_streak || 0) > 0
-      ) {
-        const updated = await base44.entities.GamificationProfile.update(p.id, { daily_streak: 0 });
-        setProfile({ ...p, ...updated });
-        setStreakResetMsg("Streak kamu reset nih 😢 Tambah transaksi hari ini untuk mulai lagi!");
-      }
     } catch (e) {}
   }, [user?.email]);
 
@@ -179,10 +165,22 @@ export function useGamification(user) {
     }
   }, [user?.email]);
 
-  // Legacy compat: onNewTransaction still works
-  const onNewTransaction = useCallback(async (opts = {}) => {
-    await addXP(10, { checkTransactions: true, checkGoals: opts.isFirstGoal, ...opts });
-  }, [addXP]);
+  // Legacy compat: onNewTransaction.
+  // `saveTransactionWithSync` now invokes processGamification directly so the
+  // streak updates on transaction save from ANY page (not just Dashboard).
+  // Here we only refresh the local profile so the UI (streak number, XP bar,
+  // popups via re-render) reflects the new server state. No second backend
+  // call — that would double-award XP.
+  const onNewTransaction = useCallback(async (_opts = {}) => {
+    if (!user?.email) return;
+    try {
+      // Small delay so the in-flight processGamification from saveTransactionWithSync
+      // finishes writing before we re-read.
+      await new Promise(r => setTimeout(r, 600));
+      const profiles = await base44.entities.GamificationProfile.filter({ created_by: user.email });
+      if (profiles?.[0]) setProfile(profiles[0]);
+    } catch {}
+  }, [user?.email]);
 
   return {
     profile,
