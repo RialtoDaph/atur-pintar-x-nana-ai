@@ -91,8 +91,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     const onRefresh = () => loadData();
-    const onTxAdded = () => {
-      if (user?.email) gamification.onNewTransaction();
+    const onTxAdded = (e) => {
+      if (user?.email) gamification.onNewTransaction(e?.detail?.gamification || null);
     };
     window.addEventListener("refresh-dashboard", onRefresh);
     window.addEventListener("transaction-added", onTxAdded);

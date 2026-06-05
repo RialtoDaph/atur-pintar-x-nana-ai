@@ -24,11 +24,14 @@ export async function saveTransactionWithSync(data) {
     await recalcGoalAmount(data.goal_id);
   }
   // Fire streak/XP update immediately — independent of whether the user is on
-  // the Dashboard. The Dashboard listener (gamification.onNewTransaction) only
-  // runs when that page is mounted, so if the FAB is used from any other page
-  // (Transactions, Goals, etc.) the streak would never increment without this.
-  // Backend processGamification is idempotent for same-day activity.
-  base44.functions.invoke("processGamification", { trigger: "transaction_created" }).catch(() => {});
-  window.dispatchEvent(new CustomEvent("transaction-added"));
+  // the Dashboard. We AWAIT the response (briefly) so we can forward streak/level/
+  // achievement deltas to the Dashboard listener via the `transaction-added`
+  // event payload — that's what drives the celebration popups.
+  let gamificationResult = null;
+  try {
+    const res = await base44.functions.invoke("processGamification", { trigger: "transaction_created" });
+    gamificationResult = res?.data || null;
+  } catch {}
+  window.dispatchEvent(new CustomEvent("transaction-added", { detail: { gamification: gamificationResult } }));
   setTimeout(() => window.dispatchEvent(new Event("refresh-dashboard")), 400);
 }

@@ -165,20 +165,60 @@ export function useGamification(user) {
     }
   }, [user?.email]);
 
-  // Legacy compat: onNewTransaction.
-  // `saveTransactionWithSync` now invokes processGamification directly so the
-  // streak updates on transaction save from ANY page (not just Dashboard).
-  // Here we only refresh the local profile so the UI (streak number, XP bar,
-  // popups via re-render) reflects the new server state. No second backend
-  // call — that would double-award XP.
-  const onNewTransaction = useCallback(async (_opts = {}) => {
+  // `saveTransactionWithSync` invokes processGamification directly and forwards
+  // the response in the `transaction-added` event detail. Here we consume that
+  // payload to fire the streak/level/achievement popups — same logic as addXP,
+  // but without re-invoking the backend (would double-award XP).
+  const onNewTransaction = useCallback(async (gamData = null) => {
     if (!user?.email) return;
     try {
-      // Small delay so the in-flight processGamification from saveTransactionWithSync
-      // finishes writing before we re-read.
-      await new Promise(r => setTimeout(r, 600));
+      // Refresh profile so streak number / XP bar reflect new server state
       const profiles = await base44.entities.GamificationProfile.filter({ created_by: user.email });
       if (profiles?.[0]) setProfile(profiles[0]);
+
+      if (!gamData) return;
+
+      // XP float
+      if ((gamData.xpAdded || 0) > 0) {
+        setXpFloatMsg(`+${gamData.xpAdded} XP`);
+        setTimeout(() => setXpFloatMsg(null), 2000);
+      }
+
+      // Streak popup
+      const newStreak = gamData.streak || 0;
+      if (gamData.streakChanged && newStreak >= 1) {
+        setStreakPopup({ message: `🔥 Streak ${newStreak} hari!`, streak: newStreak });
+      }
+
+      // Streak Freeze toast
+      if (gamData.streakFreezeUsedToday) {
+        toast.success("❄️ Streak Freeze dipakai!", {
+          description: `Streak kamu aman, lanjut ke ${newStreak} hari. Sisa freeze: ${gamData.streakFreezesAvailable}`,
+          duration: 6000,
+        });
+      }
+
+      // Level up
+      if (gamData.leveledUp) {
+        const newLevelData = LEVELS.find(l => l.level === gamData.level) || LEVELS[0];
+        setLevelUpPopup({ level: newLevelData });
+      }
+
+      // Achievements
+      if (gamData.unlockedAchievements?.length > 0) {
+        const key = gamData.unlockedAchievements[0];
+        const def = ACHIEVEMENTS_DEF.find(a => a.key === key);
+        if (def) setAchievementPopup(def);
+        for (const aKey of gamData.unlockedAchievements) {
+          const aDef = ACHIEVEMENTS_DEF.find(a => a.key === aKey);
+          if (aDef) {
+            toast.success(`${aDef.icon} Achievement Unlocked: ${aDef.title}`, {
+              description: `+${aDef.xp} XP — ${aDef.hint}`,
+              duration: 5000,
+            });
+          }
+        }
+      }
     } catch {}
   }, [user?.email]);
 
