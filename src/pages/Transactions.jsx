@@ -43,6 +43,7 @@ export default function Transactions() {
   const [accounts, setAccounts] = useState([]);
   const [debts, setDebts] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
+  const [goals, setGoals] = useState([]);
   const [filters, setFilters] = useState(loadFilters);
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -112,7 +113,7 @@ export default function Transactions() {
       const monthLastDay = new Date(filters.year, filters.month + 1, 0).getDate();
       const monthEnd = `${filters.year}-${String(filters.month + 1).padStart(2, "0")}-${String(monthLastDay).padStart(2, "0")}`;
 
-      const [monthTx, recurringTemplates, accs, dts, subs] = await Promise.all([
+      const [monthTx, recurringTemplates, accs, dts, subs, gls] = await Promise.all([
         withRetry(() => base44.entities.Transaction.filter(
           { created_by: user.email, date: { $gte: monthStart, $lte: monthEnd } },
           "-date"
@@ -122,6 +123,7 @@ export default function Transactions() {
         withRetry(() => base44.entities.Account.filter({ created_by: user.email }, "name")),
         base44.entities.Debt.filter({ created_by: user.email }).catch(() => []),
         base44.entities.Subscription.filter({ created_by: user.email }).catch(() => []),
+        base44.entities.SavingsGoal.filter({ created_by: user.email }).catch(() => []),
       ]);
 
       // Merge: month transactions + recurring templates (deduped by id)
@@ -141,6 +143,7 @@ export default function Transactions() {
         if (!b.next_due_date) return -1;
         return new Date(a.next_due_date) - new Date(b.next_due_date);
       }));
+      setGoals(gls || []);
     } finally {
       setLoading(false);
       fetchingRef.current = false;
@@ -319,6 +322,7 @@ export default function Transactions() {
               transactions={filtered}
               categories={categories}
               accounts={accounts}
+              goals={goals}
               formatCurrency={formatCurrency}
               onRefresh={fetchData}
             />

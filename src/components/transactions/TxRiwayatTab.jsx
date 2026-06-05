@@ -21,7 +21,12 @@ function formatDateHeader(dateStr) {
   return `${DAYS_ID[d.getDay()]}, ${d.getDate()} ${MONTHS_ID[d.getMonth()]}`.toUpperCase();
 }
 
-function resolveCategory(tx, categories) {
+function resolveCategory(tx, categories, goals = []) {
+  // Savings tx linked to a goal → use the goal's own icon + name as the badge
+  if (tx.type === "savings" && tx.goal_id) {
+    const g = goals.find(x => x.id === tx.goal_id);
+    if (g) return { emoji: g.icon || "🐷", label: g.name || "Tabungan", color: "#3B82F6" };
+  }
   const cat = categories.find(c => c.id === tx.category || c.name?.toLowerCase() === tx.category?.toLowerCase());
   if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color };
   const legacyMap = {
@@ -137,7 +142,7 @@ function SwipeItem({ tx, cat, accountName, formatCurrency, onTap, onDelete }) {
   );
 }
 
-export default function TxRiwayatTab({ transactions, categories, accounts, formatCurrency, onRefresh, onAdd }) {
+export default function TxRiwayatTab({ transactions, categories, accounts, goals = [], formatCurrency, onRefresh, onAdd }) {
   const [subTab, setSubTab] = useState("all");
   const [selectedTx, setSelectedTx] = useState(null);
   const [editingTx, setEditingTx] = useState(null);
@@ -233,7 +238,7 @@ export default function TxRiwayatTab({ transactions, categories, accounts, forma
               </p>
               <div className="bg-white rounded-2xl overflow-hidden shadow-sm divide-y divide-[#F2F4F7]">
                 {group.items.map(tx => {
-                  const cat = resolveCategory(tx, categories);
+                  const cat = resolveCategory(tx, categories, goals);
                   const acc = accounts.find(a => a.id === tx.account_id);
                   return (
                     <SwipeItem
@@ -257,7 +262,7 @@ export default function TxRiwayatTab({ transactions, categories, accounts, forma
       {selectedTx && (
         <TxDetailSheet
           tx={selectedTx}
-          cat={resolveCategory(selectedTx, categories)}
+          cat={resolveCategory(selectedTx, categories, goals)}
           accountName={accounts.find(a => a.id === selectedTx?.account_id)?.name}
           formatCurrency={formatCurrency}
           onClose={() => setSelectedTx(null)}
