@@ -43,6 +43,13 @@ function resolveCategory(tx, categories) {
     const custom = categories.find(c => c.id === id);
     if (custom) return { emoji: custom.emoji, label: custom.name, color: custom.color };
   }
+  // Fallback by type — transactions created from Goals page don't set `category`,
+  // so a savings tx would otherwise show "Lainnya". Map by type so the badge
+  // reads "Tabungan" 🐷 instead.
+  if (!tx.category) {
+    if (tx.type === "savings") return { emoji: "🐷", label: "Tabungan", color: "#3B82F6" };
+    if (tx.type === "income")  return { emoji: "💼", label: "Pemasukan", color: "#27AE60" };
+  }
   return { emoji: "📦", label: tx.category || "Lainnya", color: "#95A5A6" };
 }
 
