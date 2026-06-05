@@ -66,8 +66,9 @@ export default function Login() {
     >
       <Button
         variant="outline"
-        className="w-full h-12 text-sm font-semibold mb-3 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white"
+        className="w-full h-12 text-sm font-semibold mb-3 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white disabled:opacity-50"
         onClick={handleGoogle}
+        disabled={!agreed}
       >
         <GoogleIcon className="w-5 h-5 mr-2" />
         Lanjut dengan Google
@@ -75,8 +76,9 @@ export default function Login() {
 
       <Button
         variant="outline"
-        className="w-full h-12 text-sm font-semibold mb-6 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white"
+        className="w-full h-12 text-sm font-semibold mb-6 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white disabled:opacity-50"
         onClick={handleApple}
+        disabled={!agreed}
       >
         <AppleIcon className="w-5 h-5 mr-2" />
         Lanjut dengan Apple
@@ -145,11 +147,11 @@ export default function Login() {
           />
           <Label htmlFor="agree-terms" className="text-xs text-white/60 leading-relaxed font-normal cursor-pointer">
             Saya setuju dengan{" "}
-            <Link to="/PrivacyPolicy" target="_blank" className="text-[#F97316] hover:underline">
+            <Link to="/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
               Kebijakan Privasi
             </Link>{" "}
             dan{" "}
-            <Link to="/TermsOfService" target="_blank" className="text-[#F97316] hover:underline">
+            <Link to="/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
               Ketentuan Layanan
             </Link>
           </Label>
