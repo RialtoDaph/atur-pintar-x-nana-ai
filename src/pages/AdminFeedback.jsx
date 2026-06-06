@@ -189,7 +189,6 @@ function FilterChip({ active, onClick, label, icon: Icon }) {
 
 function FeedbackCard({ item, onClick }) {
   const typeMeta = TYPE_META[item.type] || TYPE_META.other;
-  const statusMeta = STATUS_META[item.status] || STATUS_META.open;
   const TypeIcon = typeMeta.icon;
   const date = item.created_date ? new Date(item.created_date).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "";
 
