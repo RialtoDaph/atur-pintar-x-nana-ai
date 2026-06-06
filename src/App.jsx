@@ -44,6 +44,7 @@ const AdminCategories = lazy(() => import('@/pages/AdminCategories'));
 const AdminSettings = lazy(() => import('@/pages/AdminSettings'));
 const AdminDefaultAccounts = lazy(() => import('@/pages/AdminDefaultAccounts'));
 const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
+const AdminFeedback = lazy(() => import('@/pages/AdminFeedback'));
 
 // Suspense fallback — inline spinner that respects layout (sidebar/nav stay visible)
 const PageLoader = () => (
@@ -146,6 +147,7 @@ const AuthenticatedApp = () => {
         <Route path="/AdminNotifications" element={<LayoutWrapper currentPageName="AdminNotifications"><AdminProtect><AdminNotifications /></AdminProtect></LayoutWrapper>} />
         <Route path="/AdminCategories" element={<LayoutWrapper currentPageName="AdminCategories"><AdminProtect><AdminCategories /></AdminProtect></LayoutWrapper>} />
         <Route path="/AdminSettings" element={<LayoutWrapper currentPageName="AdminSettings"><AdminProtect><AdminSettings /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminFeedback" element={<LayoutWrapper currentPageName="AdminFeedback"><AdminProtect><AdminFeedback /></AdminProtect></LayoutWrapper>} />
         <Route path="/AdminDefaultAccounts" element={<LayoutWrapper currentPageName="AdminDefaultAccounts"><AdminProtect><AdminDefaultAccounts /></AdminProtect></LayoutWrapper>} />
         <Route path="/AdminAIInsights" element={<Navigate to="/AdminDashboard" replace />} />
         <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />

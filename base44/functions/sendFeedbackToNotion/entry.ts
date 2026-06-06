@@ -13,15 +13,23 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Message required' }, { status: 400 });
     }
 
-    // Get admin email from AppConfig (fallback to env)
+    // Get admin email — priority: AppConfig.admin_alert_email → env → first admin user
     let adminEmail = Deno.env.get("ADMIN_ALERT_EMAIL");
     try {
       const configs = await base44.asServiceRole.entities.AppConfig.list();
       if (configs?.[0]?.admin_alert_email) adminEmail = configs[0].admin_alert_email;
     } catch (_) {}
 
+    // Final fallback: lookup first admin user so feedback notifications never silently disappear
     if (!adminEmail) {
-      // Silently accept — feedback already saved on email side from frontend.
+      try {
+        const admins = await base44.asServiceRole.entities.User.filter({ role: 'admin' });
+        if (admins?.[0]?.email) adminEmail = admins[0].email;
+      } catch (_) {}
+    }
+
+    if (!adminEmail) {
+      // Feedback still saved in FeedbackReport entity — admin can view it in AdminFeedback page.
       return Response.json({ success: true, forwarded: false });
     }
 
