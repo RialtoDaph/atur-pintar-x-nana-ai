@@ -58,7 +58,7 @@ export default function FloatingFeedback({ user }) {
               Report
             </span>
             {hasUnreadResponse && (
-              <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-[#EF4444] border-2 border-white shadow-md animate-pulse" aria-hidden="true" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#EF4444] border-2 border-white shadow-md animate-pulse" aria-hidden="true" />
             )}
           </span>
         </button>
