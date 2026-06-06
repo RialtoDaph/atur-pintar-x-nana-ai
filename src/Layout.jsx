@@ -9,6 +9,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
 import ReminderNotificationPopup from "@/components/reminders/ReminderNotificationPopup";
+import FloatingFeedback from "@/components/feedback/FloatingFeedback";
 import { saveTransactionWithSync } from "@/components/utils/saveTransaction";
 import { AppSettingsProvider, useAppSettings } from "@/components/utils/AppSettingsContext";
 import GlobalSearch from "@/components/search/GlobalSearch";
@@ -445,6 +446,9 @@ function LayoutInner({ children, currentPageName }) {
 
       {/* Reminder Notification Popup */}
       <ReminderNotificationPopup user={user} />
+
+      {/* Floating Beta Feedback — global on every page */}
+      <FloatingFeedback user={user} />
 
 
 

@@ -23,7 +23,6 @@ import DashboardDesktopTopBar from "@/components/dashboard/DashboardDesktopTopBa
 import DailyMissionsCard from "@/components/dashboard/DailyMissionsCard";
 import UMKMPintarAdBanner from "@/components/dashboard/UMKMPintarAdBanner";
 import BossBattleFloating from "@/components/gamification/BossBattleFloating";
-import FloatingFeedback from "@/components/feedback/FloatingFeedback";
 import StreakCelebrationPopup from "@/components/dashboard/StreakCelebrationPopup";
 import AchievementPopup from "@/components/dashboard/AchievementPopup";
 import LevelUpModal from "@/components/gamification/LevelUpModal";
@@ -348,9 +347,6 @@ export default function Dashboard() {
 
         {/* Sponsored banner — paling bawah sebelum bottom nav */}
         <UMKMPintarAdBanner />
-
-        {/* Floating Beta Feedback — sits above Boss Battle icon */}
-        <FloatingFeedback user={user} />
 
         {/* Floating Boss Battle — bottom-right, replaces inline card */}
         <BossBattleFloating

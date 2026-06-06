@@ -47,15 +47,16 @@ export default function FeedbackReportPanel({ user, onClose }) {
     if (!message.trim()) return;
     setSending(true);
     try {
-      await base44.entities.FeedbackReport.create({
+      const payload = {
         type,
-        title: title.trim() || null,
         message: message.trim(),
         page: window.location.pathname,
         user_name: user?.full_name || "Anonymous",
-        user_email: user?.email || null,
         status: "open",
-      });
+      };
+      if (title.trim()) payload.title = title.trim();
+      if (user?.email) payload.user_email = user.email;
+      await base44.entities.FeedbackReport.create(payload);
       base44.functions.invoke("sendFeedbackToNotion", {
         rating: null,
         message: `[${type.toUpperCase()}] ${title ? title + " — " : ""}${message}`,

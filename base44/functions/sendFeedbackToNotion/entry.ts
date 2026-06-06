@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 // NOTE: Notion connector is not authorized for this app. Feedback is forwarded
 // to admin email instead. Rename kept for backward-compatibility with frontend.
