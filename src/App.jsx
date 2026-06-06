@@ -133,7 +133,7 @@ const AuthenticatedApp = () => {
           />
         ))}
         <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
-        <Route path="/AdminSubscriptions" element={<LayoutWrapper currentPageName="AdminSubscriptions"><AdminSubscriptions /></LayoutWrapper>} />
+        <Route path="/AdminSubscriptions" element={<AdminProtect><AdminSubscriptions /></AdminProtect>} />
         <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
         <Route path="/Notifications" element={<Navigate to="/Dashboard" replace />} />
         <Route path="/Reminders" element={<Navigate to="/Dashboard" replace />} />
@@ -141,14 +141,14 @@ const AuthenticatedApp = () => {
         <Route path="/Accounts" element={<LayoutWrapper currentPageName="Accounts"><Accounts /></LayoutWrapper>} />
         <Route path="/SharedFinance" element={<LayoutWrapper currentPageName="SharedFinance"><SharedFinance /></LayoutWrapper>} />
         <Route path="/Menu" element={<Navigate to="/Accounts" replace />} />
-        <Route path="/AdminDashboard" element={<LayoutWrapper currentPageName="AdminDashboard"><AdminProtect><AdminDashboard /></AdminProtect></LayoutWrapper>} />
-        <Route path="/AdminUsers" element={<LayoutWrapper currentPageName="AdminUsers"><AdminProtect><AdminUsers /></AdminProtect></LayoutWrapper>} />
-        <Route path="/AdminLogs" element={<LayoutWrapper currentPageName="AdminLogs"><AdminProtect><AdminLogs /></AdminProtect></LayoutWrapper>} />
-        <Route path="/AdminNotifications" element={<LayoutWrapper currentPageName="AdminNotifications"><AdminProtect><AdminNotifications /></AdminProtect></LayoutWrapper>} />
-        <Route path="/AdminCategories" element={<LayoutWrapper currentPageName="AdminCategories"><AdminProtect><AdminCategories /></AdminProtect></LayoutWrapper>} />
-        <Route path="/AdminSettings" element={<LayoutWrapper currentPageName="AdminSettings"><AdminProtect><AdminSettings /></AdminProtect></LayoutWrapper>} />
-        <Route path="/AdminFeedback" element={<LayoutWrapper currentPageName="AdminFeedback"><AdminProtect><AdminFeedback /></AdminProtect></LayoutWrapper>} />
-        <Route path="/AdminDefaultAccounts" element={<LayoutWrapper currentPageName="AdminDefaultAccounts"><AdminProtect><AdminDefaultAccounts /></AdminProtect></LayoutWrapper>} />
+        <Route path="/AdminDashboard" element={<AdminProtect><AdminDashboard /></AdminProtect>} />
+        <Route path="/AdminUsers" element={<AdminProtect><AdminUsers /></AdminProtect>} />
+        <Route path="/AdminLogs" element={<AdminProtect><AdminLogs /></AdminProtect>} />
+        <Route path="/AdminNotifications" element={<AdminProtect><AdminNotifications /></AdminProtect>} />
+        <Route path="/AdminCategories" element={<AdminProtect><AdminCategories /></AdminProtect>} />
+        <Route path="/AdminSettings" element={<AdminProtect><AdminSettings /></AdminProtect>} />
+        <Route path="/AdminFeedback" element={<AdminProtect><AdminFeedback /></AdminProtect>} />
+        <Route path="/AdminDefaultAccounts" element={<AdminProtect><AdminDefaultAccounts /></AdminProtect>} />
         <Route path="/AdminAIInsights" element={<Navigate to="/AdminDashboard" replace />} />
         <Route path="/AdminAnomalies" element={<Navigate to="/AdminDashboard" replace />} />
         <Route path="/AdminTransactions" element={<Navigate to="/AdminUsers" replace />} />
