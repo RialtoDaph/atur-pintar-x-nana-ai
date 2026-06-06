@@ -6,6 +6,7 @@ import TxDetailSheet from "./TxDetailSheet";
 import EditTransactionModal from "./EditTransactionModal";
 import { syncAccountBalance } from "@/components/utils/accountSync";
 import { recalcGoalAmount } from "@/components/utils/recalcGoalAmount";
+import { resolveTransactionCategory } from "@/components/utils/resolveTransactionCategory";
 
 const SUB_TABS = [
   { key: "all", label: "Semua" },
@@ -21,45 +22,9 @@ function formatDateHeader(dateStr) {
   return `${DAYS_ID[d.getDay()]}, ${d.getDate()} ${MONTHS_ID[d.getMonth()]}`.toUpperCase();
 }
 
-function resolveCategory(tx, categories, goals = []) {
-  // Savings tx → label stays "Tabungan", but use the goal's icon when linked
-  if (tx.type === "savings") {
-    if (tx.goal_id) {
-      const g = goals.find(x => x.id === tx.goal_id);
-      if (g) return { emoji: g.icon || "🐷", label: "Tabungan", color: "#3B82F6" };
-    }
-    return { emoji: "🐷", label: "Tabungan", color: "#3B82F6" };
-  }
-  const cat = categories.find(c => c.id === tx.category || c.name?.toLowerCase() === tx.category?.toLowerCase());
-  if (cat) return { emoji: cat.emoji, label: cat.name, color: cat.color };
-  const legacyMap = {
-    food: { emoji: "🍔", label: "Makanan", color: "#00C9A7" },
-    transport: { emoji: "🚗", label: "Transport", color: "#F5A623" },
-    housing: { emoji: "🏠", label: "Rumah", color: "#4F7CFF" },
-    health: { emoji: "❤️", label: "Kesehatan", color: "#FF6B6B" },
-    entertainment: { emoji: "🎬", label: "Hiburan", color: "#9B59B6" },
-    shopping: { emoji: "🛍️", label: "Belanja", color: "#E91E8C" },
-    subscriptions: { emoji: "📱", label: "Langganan", color: "#1ABC9C" },
-    salary: { emoji: "💼", label: "Gaji", color: "#27AE60" },
-    freelance: { emoji: "💻", label: "Freelance", color: "#2ECC71" },
-    savings: { emoji: "🐷", label: "Tabungan", color: "#3B82F6" },
-    other: { emoji: "📦", label: "Lainnya", color: "#95A5A6" },
-  };
-  if (tx.category && legacyMap[tx.category]) return legacyMap[tx.category];
-  if (tx.category?.startsWith("custom_")) {
-    const id = tx.category.replace("custom_", "");
-    const custom = categories.find(c => c.id === id);
-    if (custom) return { emoji: custom.emoji, label: custom.name, color: custom.color };
-  }
-  // Fallback by type — transactions created from Goals page don't set `category`,
-  // so a savings tx would otherwise show "Lainnya". Map by type so the badge
-  // reads "Tabungan" 🐷 instead.
-  if (!tx.category) {
-    if (tx.type === "savings") return { emoji: "🐷", label: "Tabungan", color: "#3B82F6" };
-    if (tx.type === "income")  return { emoji: "💼", label: "Pemasukan", color: "#27AE60" };
-  }
-  return { emoji: "📦", label: tx.category || "Lainnya", color: "#95A5A6" };
-}
+// Category resolution is centralized in @/components/utils/resolveTransactionCategory
+const resolveCategory = (tx, categories, goals = []) =>
+  resolveTransactionCategory(tx, { categories, goals });
 
 function SwipeItem({ tx, cat, accountName, goalName, formatCurrency, onTap, onDelete }) {
   const [swipeX, setSwipeX] = useState(0);

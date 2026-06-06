@@ -293,7 +293,7 @@ export default function Dashboard() {
             </Suspense>
 
             {user?.onboarding_completed && (
-              <TodayTransactionsCard transactions={transactions} allCategories={allCategories} />
+              <TodayTransactionsCard transactions={transactions} allCategories={allCategories} goals={goals} />
             )}
           </div>
 
@@ -321,7 +321,7 @@ export default function Dashboard() {
               </Suspense>
 
               {user?.onboarding_completed && (
-                <TodayTransactionsCard transactions={transactions} allCategories={allCategories} />
+                <TodayTransactionsCard transactions={transactions} allCategories={allCategories} goals={goals} />
               )}
             </div>
 

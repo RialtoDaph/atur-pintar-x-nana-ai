@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
+import { resolveTransactionCategory } from "@/components/utils/resolveTransactionCategory";
 
 function compactRupiah(value) {
   const abs = Math.abs(value);
@@ -17,7 +18,7 @@ function formatTime(dateStr, createdDate) {
   return date.toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-export default function TodayTransactionsCard({ transactions, allCategories }) {
+export default function TodayTransactionsCard({ transactions, allCategories, goals = [] }) {
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().split("T")[0];
   
@@ -26,12 +27,6 @@ export default function TodayTransactionsCard({ transactions, allCategories }) {
     .filter(t => t.date === todayStr && !t.is_deleted)
     .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
     .slice(0, 5);
-
-  // Map category
-  const getCategoryInfo = (categoryKey) => {
-    const cat = allCategories?.find(c => c.name === categoryKey || c.id === categoryKey);
-    return cat ? { emoji: cat.emoji, name: cat.name } : { emoji: "💸", name: categoryKey };
-  };
 
   if (todayTx.length === 0) {
     return (
@@ -52,15 +47,16 @@ export default function TodayTransactionsCard({ transactions, allCategories }) {
       
       <div className="space-y-3">
         {todayTx.map((tx) => {
-          const catInfo = getCategoryInfo(tx.category);
+          const catInfo = resolveTransactionCategory(tx, { categories: allCategories || [], goals });
           const isExpense = tx.type === "expense";
+          const goal = tx.type === "savings" && tx.goal_id ? goals.find(g => g.id === tx.goal_id) : null;
           
           return (
             <div key={tx.id} className="flex items-center justify-between p-3 bg-[#F2F4F7] rounded-xl hover:bg-[#E8EBEF] transition-colors">
               <div className="flex items-center gap-3 flex-1">
                 <span className="text-xl">{catInfo.emoji}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-[#1A1A1A] truncate">{catInfo.name}</p>
+                  <p className="text-xs font-semibold text-[#1A1A1A] truncate">{tx.note || goal?.name || catInfo.label}</p>
                   <p className="text-[10px] text-[#8FA4C8]">{formatTime(tx.date, tx.created_date)}</p>
                 </div>
               </div>
