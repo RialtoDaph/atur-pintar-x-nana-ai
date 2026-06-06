@@ -28,7 +28,7 @@ export default function FloatingFeedback({ user }) {
           <span className="relative">
             <span className="text-5xl drop-shadow-lg" aria-hidden="true">💬</span>
             <span className="absolute -top-1 -right-1 text-[8px] font-bold text-white bg-[#F97316] rounded px-1 py-0.5 leading-none uppercase tracking-wider shadow-md">
-              Beta
+              Report
             </span>
           </span>
         </button>
