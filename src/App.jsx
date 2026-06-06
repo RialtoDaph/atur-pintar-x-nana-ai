@@ -36,6 +36,7 @@ const About = lazy(() => import('@/pages/About'));
 const ReceiptScanHistory = lazy(() => import('@/pages/ReceiptScanHistory'));
 const Gamifikasi = lazy(() => import('@/pages/Gamifikasi'));
 const Investments = lazy(() => import('@/pages/Investments'));
+const AdminInbox = lazy(() => import('@/pages/AdminInbox'));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const AdminUsers = lazy(() => import('@/pages/AdminUsers'));
 const AdminLogs = lazy(() => import('@/pages/AdminLogs'));
@@ -141,6 +142,7 @@ const AuthenticatedApp = () => {
         <Route path="/Accounts" element={<LayoutWrapper currentPageName="Accounts"><Accounts /></LayoutWrapper>} />
         <Route path="/SharedFinance" element={<LayoutWrapper currentPageName="SharedFinance"><SharedFinance /></LayoutWrapper>} />
         <Route path="/Menu" element={<Navigate to="/Accounts" replace />} />
+        <Route path="/AdminInbox" element={<AdminProtect><AdminInbox /></AdminProtect>} />
         <Route path="/AdminDashboard" element={<AdminProtect><AdminDashboard /></AdminProtect>} />
         <Route path="/AdminUsers" element={<AdminProtect><AdminUsers /></AdminProtect>} />
         <Route path="/AdminLogs" element={<AdminProtect><AdminLogs /></AdminProtect>} />

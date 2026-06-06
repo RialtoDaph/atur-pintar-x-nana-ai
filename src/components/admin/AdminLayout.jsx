@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   LayoutDashboard, Users, ArrowLeftRight, Tag, Sparkles,
-  CreditCard, Bell, ScrollText, AlertTriangle, ChevronRight, Shield, Menu, X, Settings, Wallet, MessageSquare
+  CreditCard, Bell, ScrollText, AlertTriangle, ChevronRight, Shield, Menu, X, Settings, Wallet, MessageSquare, Inbox
 } from "lucide-react";
-import AdminBottomNav from "./AdminBottomNav";
 import AdminDensityToggle from "./AdminDensityToggle";
 import AdminCompactStyles from "./AdminCompactStyles";
 
 const NAV_ITEMS = [
+  { label: "Inbox", icon: Inbox, page: "AdminInbox" },
   { label: "Dashboard", icon: LayoutDashboard, page: "AdminDashboard" },
   { label: "Users", icon: Users, page: "AdminUsers" },
   { label: "Categories", icon: Tag, page: "AdminCategories" },
@@ -144,17 +144,9 @@ export default function AdminLayout({ children, currentPage }) {
       <AdminCompactStyles />
 
       {/* Content */}
-      <div className="sm:ml-56 flex-1 min-h-screen overflow-x-hidden pt-14 sm:pt-0 admin-area" style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom, 0px))" }}>
+      <div className="sm:ml-56 flex-1 min-h-screen overflow-x-hidden pt-14 sm:pt-0 admin-area" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         {children}
       </div>
-
-      {/* Mobile Bottom Nav */}
-      <AdminBottomNav
-        currentPage={currentPage}
-        onOpenMore={() => setSidebarOpen(true)}
-        pendingPaymentCount={pendingPaymentCount}
-        openFeedbackCount={openFeedbackCount}
-      />
     </div>
   );
 }
