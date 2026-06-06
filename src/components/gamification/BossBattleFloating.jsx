@@ -13,6 +13,7 @@ export default function BossBattleFloating({ user, gamificationProfile, onProfil
   const [open, setOpen] = useState(false);
 
   if (!user?.onboarding_completed) return null;
+  if (typeof window !== "undefined" && window.location.pathname.startsWith("/Admin")) return null;
 
   return (
     <>
