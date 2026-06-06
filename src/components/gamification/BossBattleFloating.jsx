@@ -23,13 +23,17 @@ export default function BossBattleFloating({ user, gamificationProfile, onProfil
         <button
           onClick={() => setOpen(true)}
           aria-label="Buka Boss Battle"
-          className="fixed z-[70] right-4 sm:right-6 flex flex-col items-center gap-0.5 active:scale-90 transition-transform sm:bottom-6"
+          className="fixed z-[70] right-4 sm:right-6 flex items-center justify-center active:scale-90 transition-transform sm:bottom-6"
           style={{
             bottom: "calc(110px + env(safe-area-inset-bottom, 0px))",
           }}
         >
-          <span className="text-5xl drop-shadow-lg leading-none" aria-hidden="true">👹</span>
-          <span className="text-[10px] font-bold text-white bg-[#0A0A0A]/80 rounded-full px-2 py-0.5 leading-none shadow-md">Boss Battle</span>
+          <span className="relative">
+            <span className="text-5xl drop-shadow-lg" aria-hidden="true">👹</span>
+            <span className="absolute -top-1 -right-1 text-[8px] font-bold text-white bg-[#0A0A0A] rounded px-1 py-0.5 leading-none uppercase tracking-wider shadow-md">
+              Boss
+            </span>
+          </span>
         </button>
       )}
 
