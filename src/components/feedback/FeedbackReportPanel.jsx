@@ -205,6 +205,12 @@ function ReportForm({ type, setType, title, setTitle, message, setMessage, touch
   );
 }
 
+const KANBAN_COLUMNS = [
+  { key: "waiting", label: "Menunggu", icon: Clock, color: "text-[#8FA4C8]", dot: "bg-[#8FA4C8]", statuses: ["open"] },
+  { key: "progress", label: "Diproses", icon: Eye, color: "text-blue-500", dot: "bg-blue-500", statuses: ["in_review"] },
+  { key: "done", label: "Selesai", icon: CheckCircle2, color: "text-green-500", dot: "bg-green-500", statuses: ["resolved", "wont_fix"] },
+];
+
 function HistoryList({ history, loading, onSwitchToReport }) {
   if (loading) {
     return (
@@ -232,9 +238,37 @@ function HistoryList({ history, loading, onSwitchToReport }) {
     );
   }
 
+  const grouped = KANBAN_COLUMNS.map((col) => ({
+    ...col,
+    items: history.filter((h) => col.statuses.includes(h.status || "open")),
+  }));
+
   return (
-    <div className="space-y-2">
-      {history.map((item) => <ReportCard key={item.id} item={item} />)}
+    <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-1 snap-x snap-mandatory">
+      {grouped.map((col) => {
+        const ColIcon = col.icon;
+        return (
+          <div key={col.key} className="flex-shrink-0 w-[78%] sm:w-[32%] snap-start bg-[#F8FAFC] rounded-xl p-2 flex flex-col">
+            <div className="flex items-center justify-between mb-2 px-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${col.dot}`} />
+                <ColIcon className={`w-3 h-3 ${col.color}`} />
+                <span className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-wider">{col.label}</span>
+              </div>
+              <span className="text-[10px] font-semibold text-[#8FA4C8] bg-white rounded-full px-1.5 py-0.5 leading-none">
+                {col.items.length}
+              </span>
+            </div>
+            <div className="space-y-1.5">
+              {col.items.length === 0 ? (
+                <p className="text-[10px] text-[#CBD5E1] text-center py-3">Kosong</p>
+              ) : (
+                col.items.map((item) => <ReportCard key={item.id} item={item} />)
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
