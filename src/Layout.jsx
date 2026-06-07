@@ -100,14 +100,32 @@ function LayoutInner({ children, currentPageName }) {
     return () => window.visualViewport.removeEventListener('resize', handler);
   }, []);
 
-  // Dark mode: default light, only enable if user manually set it
+  // Dark mode: follow system preference unless user has set a manual override
   useEffect(() => {
     const manualDarkMode = localStorage.getItem("darkMode");
+    const applyTheme = (isDark) => {
+      if (isDark) document.documentElement.classList.add("dark");
+      else document.documentElement.classList.remove("dark");
+    };
+
     if (manualDarkMode === "true") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+      applyTheme(true);
+      return;
     }
+    if (manualDarkMode === "false") {
+      applyTheme(false);
+      return;
+    }
+    // No manual override → follow system preference
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    applyTheme(mql.matches);
+    const listener = (e) => {
+      // Re-check override in case user toggled it during this session
+      if (localStorage.getItem("darkMode") !== null) return;
+      applyTheme(e.matches);
+    };
+    mql.addEventListener("change", listener);
+    return () => mql.removeEventListener("change", listener);
   }, []);
 
   const navItems = [
@@ -380,7 +398,7 @@ function LayoutInner({ children, currentPageName }) {
 
       {/* Mobile bottom nav — hidden on sm+ (tablet/desktop uses sidebar), and hidden on Nana page */}
       {currentPageName !== "Nana" && (
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
+      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10 select-none" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
         {mobileMainNav.flatMap((item, idx) => {
           const active = currentPageName === item.page;
           const button = (
@@ -390,7 +408,7 @@ function LayoutInner({ children, currentPageName }) {
               data-tour={item.page === "Nana" ? "nana-tab" : item.page === "Analytics" ? "analytics-tab" : undefined}
               aria-label={item.label}
               aria-current={active ? "page" : undefined}
-              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
+              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer select-none ${
               active ? "text-[#F97316]" : "text-[#888]"}`}>
 
               {item.avatarUrl ? (
@@ -416,7 +434,7 @@ function LayoutInner({ children, currentPageName }) {
         onClick={handleFabClick}
         data-tour="add-transaction-btn"
         aria-label={showAddTransaction ? "Tutup form transaksi" : "Catat transaksi baru"}
-        className="fixed left-1/2 -translate-x-1/2 z-[80] flex items-center justify-center rounded-full active:scale-95 transition-all duration-200 tap-highlight-fix sm:hidden"
+        className="fixed left-1/2 -translate-x-1/2 z-[80] flex items-center justify-center rounded-full active:scale-95 transition-all duration-200 tap-highlight-fix select-none sm:hidden"
         style={{
           width: 56, height: 56,
           bottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',

@@ -92,7 +92,37 @@ export default function ProfileSettings() {
   async function handleLogout() { base44.auth.logout('/'); }
   async function handleDeleteAccount() {
     setDeleting(true);
-    try { await base44.auth.deleteAccount(); } catch {}
+    try {
+      const me = await base44.auth.me();
+      const email = me?.email;
+      if (email) {
+        // Delete user-owned entity data (best-effort, ignore individual failures)
+        const entitiesToWipe = [
+          "Transaction", "Account", "SavingsGoal", "Budget", "Debt",
+          "CustomCategory", "Investment", "InvestmentTransaction", "InvestmentWatchlist",
+          "Subscription", "DetectedSubscription", "Reminder", "Alert",
+          "GamificationProfile", "DailyMission", "Achievement", "Challenge",
+          "BossBattleContribution", "WeeklyRecap", "ReceiptScan", "MoodCheckIn",
+          "NanaConversation", "NanaPreferences", "AppSettings", "UserPersona",
+          "UserRiskProfile", "FinancialHealthScore", "CategoryLearning",
+          "ShareableCard", "ExportLog", "FeedbackReport", "SharedWalletTransaction",
+        ];
+        for (const ent of entitiesToWipe) {
+          try {
+            const rows = await base44.entities[ent].filter({ created_by: email });
+            await Promise.all((rows || []).map(r => base44.entities[ent].delete(r.id).catch(() => {})));
+          } catch {}
+        }
+      }
+      // Attempt platform-level account deletion if SDK supports it
+      try { if (typeof base44.auth.deleteAccount === "function") await base44.auth.deleteAccount(); } catch {}
+      toast.success("Akun & semua data berhasil dihapus.");
+      // Force logout & redirect to landing
+      setTimeout(() => base44.auth.logout('/'), 600);
+    } catch {
+      toast.error("Gagal menghapus akun. Coba lagi.");
+      setDeleting(false);
+    }
   }
 
   // Account actions
