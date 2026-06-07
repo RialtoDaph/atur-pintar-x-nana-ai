@@ -1,11 +1,11 @@
 import { createPageUrl } from "@/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, Settings, Bell, Lightbulb, Search, Grid3x3, ArrowLeft, Wallet, Users, Sparkles, Plus } from "lucide-react";
+import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, Settings, Bell, Search, ArrowLeft, Wallet, Users, Plus } from "lucide-react";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
 import { haptic } from "@/hooks/useHaptic";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
 import ReminderNotificationPopup from "@/components/reminders/ReminderNotificationPopup";
@@ -381,30 +381,31 @@ function LayoutInner({ children, currentPageName }) {
       {/* Mobile bottom nav — hidden on sm+ (tablet/desktop uses sidebar), and hidden on Nana page */}
       {currentPageName !== "Nana" && (
       <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-[#0A0A0A] flex z-[60] border-t border-white/10" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.5)', paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
-        {mobileMainNav.map((item, idx) => {
+        {mobileMainNav.flatMap((item, idx) => {
           const active = currentPageName === item.page;
-          return (
-            <React.Fragment key={`nav-${item.page}`}>
-              {idx === 2 && <div className="w-16 flex-shrink-0" aria-hidden="true" />}
-              <button
-                onClick={() => handleTabClick(item.page)}
-                data-tour={item.page === "Nana" ? "nana-tab" : item.page === "Analytics" ? "analytics-tab" : undefined}
-                aria-label={item.label}
-                aria-current={active ? "page" : undefined}
-                className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
-                active ? "text-[#F97316]" : "text-[#888]"}`}>
+          const button = (
+            <button
+              key={`nav-${item.page}`}
+              onClick={() => handleTabClick(item.page)}
+              data-tour={item.page === "Nana" ? "nana-tab" : item.page === "Analytics" ? "analytics-tab" : undefined}
+              aria-label={item.label}
+              aria-current={active ? "page" : undefined}
+              className={`flex-1 flex flex-col items-center py-3 gap-0.5 text-[10px] font-medium transition-colors tap-highlight-fix bg-transparent border-none cursor-pointer ${
+              active ? "text-[#F97316]" : "text-[#888]"}`}>
 
-                {item.avatarUrl ? (
-                  <div className={`w-5 h-5 rounded-full overflow-hidden flex-shrink-0 ${active ? "ring-2 ring-[#F97316]" : ""}`}>
-                    <img src={item.avatarUrl} alt="" aria-hidden="true" className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <item.icon className="w-5 h-5" aria-hidden="true" />
-                )}
-                {item.label}
-              </button>
-            </React.Fragment>);
-
+              {item.avatarUrl ? (
+                <div className={`w-5 h-5 rounded-full overflow-hidden flex-shrink-0 ${active ? "ring-2 ring-[#F97316]" : ""}`}>
+                  <img src={item.avatarUrl} alt="" aria-hidden="true" className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <item.icon className="w-5 h-5" aria-hidden="true" />
+              )}
+              {item.label}
+            </button>
+          );
+          return idx === 2
+            ? [<div key={`spacer-${item.page}`} className="w-16 flex-shrink-0" aria-hidden="true" />, button]
+            : [button];
         })}
       </div>
       )}
