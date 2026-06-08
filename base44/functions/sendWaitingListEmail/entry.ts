@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     </div>
     <div class="footer">
       Salam, Tim Atur Pintar 🧡<br>
-      <a href="mailto:support@aturpintar.id" style="color:rgba(255,255,255,0.3); text-decoration:none;">support@aturpintar.id</a>
+      <a href="mailto:nana.ai@aturpintar.id" style="color:rgba(255,255,255,0.3); text-decoration:none;">nana.ai@aturpintar.id</a>
     </div>
   </div>
 </body>

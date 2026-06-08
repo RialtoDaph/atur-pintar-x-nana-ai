@@ -59,7 +59,7 @@ function emailLayout({ previewText, content }) {
                   <td class="footer-pad" style="background-color:#F8FAFC;padding:24px 40px;text-align:center;border-top:1px solid #E2E8F0;">
                     <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#1A1A1A;">Atur Pintar</p>
                     <p style="margin:0 0 4px;font-size:11px;color:#94A3B8;">Produk dari PT Rideff Vreka Tech</p>
-                    <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.7;">Ada pertanyaan soal tagihan? Hubungi <a href="mailto:support@aturpintar.id" style="color:#FF6A00;text-decoration:none;">support@aturpintar.id</a></p>
+                    <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.7;">Ada pertanyaan soal tagihan? Hubungi <a href="mailto:nana.ai@aturpintar.id" style="color:#FF6A00;text-decoration:none;">nana.ai@aturpintar.id</a></p>
                   </td>
                 </tr>
 
