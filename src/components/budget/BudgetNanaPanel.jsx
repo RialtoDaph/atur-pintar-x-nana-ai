@@ -121,12 +121,18 @@ Format: emoji, singkat, berdampak. Maksimal 150 kata. Bahasa Indonesia santai.`;
     setLoading(false);
   }
 
-  const severityColor = exceeded.length > 0 ? "#FF6B6B" : critical.length > 0 ? "#F5A623" : nearLimit.length > 0 ? "#FFB347" : "#4F7CFF";
-  const severityBg = severityColor;
+  const title = exceeded.length > 0
+    ? `${exceeded.length} Anggaran Terlampaui`
+    : allHealthy
+      ? "Rekomendasi Anggaran"
+      : `${alertBudgets.length} Anggaran Mendekati Batas`;
+
+  const subtitle = allHealthy
+    ? (lang === "id" ? "Tips menjaga anggaran tetap sehat" : "Tips to keep your budget healthy")
+    : (lang === "id" ? "Ketuk untuk saran dari Nana AI" : "Tap for Nana AI tips");
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-      {/* Header */}
       <button
         onClick={() => {
           if (!advice && !loading) getLifestyleAdvice();
@@ -134,53 +140,20 @@ Format: emoji, singkat, berdampak. Maksimal 150 kata. Bahasa Indonesia santai.`;
         }}
         className="w-full flex items-center gap-3 p-4 hover:bg-[#F8FAFC] transition-colors text-left"
       >
-        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2" style={{ ringColor: severityColor, boxShadow: `0 0 0 2px ${severityColor}33` }}>
+        <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0">
           <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png" alt="Nana AI" className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#1A1A1A]">
-            {exceeded.length > 0
-              ? `⚠️ ${exceeded.length} Anggaran Terlampaui`
-              : allHealthy
-                ? `💡 Rekomendasi Anggaran Nana AI`
-                : `🔔 ${alertBudgets.length} Anggaran Mendekati Batas`}
-          </p>
-          <p className="text-xs text-[#8FA4C8]">
-            {allHealthy
-              ? (lang === "id" ? "Tips proaktif menjaga anggaranmu tetap sehat" : "Proactive tips to keep your budget healthy")
-              : (lang === "id" ? "Ketuk untuk saran penyesuaian dari Nana AI" : "Tap for Nana AI lifestyle tips")
-            }
-          </p>
+          <p className="text-sm font-semibold text-[#1A1A1A] truncate">{title}</p>
+          <p className="text-xs text-[#8FA4C8] truncate">{subtitle}</p>
         </div>
-        <div className="flex items-center gap-2">
-          {loading && <Loader2 className="w-4 h-4 text-[#F97316] animate-spin" />}
-          {expanded
-            ? <ChevronUp className="w-4 h-4 text-[#8FA4C8]" />
-            : <ChevronDown className="w-4 h-4 text-[#8FA4C8]" />
-          }
-        </div>
+        {loading
+          ? <Loader2 className="w-4 h-4 text-[#F97316] animate-spin flex-shrink-0" />
+          : expanded
+            ? <ChevronUp className="w-4 h-4 text-[#8FA4C8] flex-shrink-0" />
+            : <ChevronDown className="w-4 h-4 text-[#8FA4C8] flex-shrink-0" />
+        }
       </button>
-
-      {/* Budget status pills */}
-      {!allHealthy && (
-      <div className="px-4 pb-3 flex flex-wrap gap-1.5">
-        {exceeded.map(b => (
-          <span key={b.id} className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#FF6B6B]/10 text-[#FF6B6B]">
-            {CATEGORY_LABELS[b.category]?.emoji || "📦"} {b.pct}% — Terlampaui
-          </span>
-        ))}
-        {critical.map(b => (
-          <span key={b.id} className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#F5A623]/10 text-[#F5A623]">
-            {CATEGORY_LABELS[b.category]?.emoji || "📦"} {b.pct}% — Kritis
-          </span>
-        ))}
-        {nearLimit.map(b => (
-          <span key={b.id} className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-yellow-50 text-yellow-600">
-            {CATEGORY_LABELS[b.category]?.emoji || "📦"} {b.pct}% — Perhatian
-          </span>
-        ))}
-      </div>
-      )}
 
       {/* Nana AI Advice */}
       {expanded && (

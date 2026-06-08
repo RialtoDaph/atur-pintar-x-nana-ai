@@ -58,19 +58,21 @@ Format: poin singkat, angka konkret, maksimal 150 kata. Bahasa Indonesia santai.
         onClick={() => { if (!advice && !loading) getAdvice(); else setExpanded(e => !e); }}
         className="w-full flex items-center gap-3 p-4 hover:bg-[#F8FAFC] transition-colors text-left"
       >
-        <div className={`w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ${urgentCount > 0 ? "ring-[#F5A623]/30" : "ring-[#4F7CFF]/20"}`}>
+        <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0">
           <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69a82e8090f60786b869983c/7708b64f5_generated_image.png" alt="Nana AI" className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#1A1A1A]">
-            {urgentCount > 0 ? `⚠️ ${urgentCount} Tujuan Mendesak` : "💡"} Strategi Tabungan Nana AI
+          <p className="text-sm font-semibold text-[#1A1A1A] truncate">Strategi Tabungan</p>
+          <p className="text-xs text-[#8FA4C8] truncate">
+            {urgentCount > 0 ? `${urgentCount} tujuan mendesak · ` : ""}{activeGoals.length} tujuan aktif
           </p>
-          <p className="text-xs text-[#8FA4C8]">{activeGoals.length} tujuan aktif</p>
         </div>
-        <div className="flex items-center gap-2">
-          {loading && <Loader2 className="w-4 h-4 text-[#F97316] animate-spin" />}
-          {expanded ? <ChevronUp className="w-4 h-4 text-[#8FA4C8]" /> : <ChevronDown className="w-4 h-4 text-[#8FA4C8]" />}
-        </div>
+        {loading
+          ? <Loader2 className="w-4 h-4 text-[#F97316] animate-spin flex-shrink-0" />
+          : expanded
+            ? <ChevronUp className="w-4 h-4 text-[#8FA4C8] flex-shrink-0" />
+            : <ChevronDown className="w-4 h-4 text-[#8FA4C8] flex-shrink-0" />
+        }
       </button>
 
       {expanded && (
