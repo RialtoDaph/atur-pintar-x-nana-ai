@@ -191,7 +191,11 @@ export default function BudgetPage() {
     spendingByCategory[key] = (spendingByCategory[key] || 0) + tx.amount;
   });
 
-  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  // 🎁 Free access window — all users get unlimited budgets until 2026-08-08
+  const FREE_ACCESS_UNTIL = "2026-08-08";
+  const todayStr = new Date().toISOString().split("T")[0];
+  const inFreeWindow = todayStr <= FREE_ACCESS_UNTIL;
+  const isPremium = inFreeWindow || user?.role === "admin" || user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
   const budgetLimitReached = !isPremium && budgets.length >= FREE_BUDGET_LIMIT;
 
   const totalBudget = budgets.reduce((s, b) => s + b.amount, 0);

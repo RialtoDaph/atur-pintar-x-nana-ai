@@ -45,9 +45,14 @@ export function usePremiumUser() {
 
   const today = new Date().toISOString().split('T')[0];
 
+  // 🎁 FREE ACCESS WINDOW — all features unlocked for everyone until this date.
+  // Remove this block (or set FREE_ACCESS_UNTIL to a past date) to re-enable premium gating.
+  const FREE_ACCESS_UNTIL = '2026-08-08';
+
   const { isPremium, isExpired } = (() => {
     if (!user) return { isPremium: false, isExpired: false };
     if (user.role === 'admin') return { isPremium: true, isExpired: false };
+    if (today <= FREE_ACCESS_UNTIL) return { isPremium: true, isExpired: false };
 
     // SubscriptionPayment-based check (new source of truth)
     if (latestPayment) {
