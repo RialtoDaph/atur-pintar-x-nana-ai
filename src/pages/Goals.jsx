@@ -44,7 +44,11 @@ export default function Goals() {
   const goal = goals.find((g) => g.id === goalId) || null;
 
   const [user, setUser] = useState(null);
-  const isPremium = user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  // 🎁 Free access window — semua user dapat unlimited goals sampai tanggal ini
+  const FREE_ACCESS_UNTIL = "2026-08-08";
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const inFreeWindow = todayStr <= FREE_ACCESS_UNTIL;
+  const isPremium = inFreeWindow || user?.role === "admin" || user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
   const goalsLimitReached = !isPremium && goals.length >= FREE_GOALS_LIMIT;
 
   useEffect(() => {
