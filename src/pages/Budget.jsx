@@ -314,6 +314,7 @@ export default function BudgetPage() {
             spendingByCategory={spendingByCategory}
             budgets={budgets}
             transactions3M={transactions3M}
+            getCategoryMeta={getCategoryMeta}
           />
         )}
 

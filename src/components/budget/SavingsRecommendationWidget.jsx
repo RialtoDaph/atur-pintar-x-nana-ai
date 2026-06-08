@@ -4,6 +4,7 @@ import { Sparkles, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 
+// Fallback labels for legacy/built-in category keys (kept for backward compatibility)
 const CATEGORY_LABELS = {
   housing: { id: "Rumah/Sewa", en: "Housing/Rent", emoji: "🏠" },
   food: { id: "Makanan", en: "Food", emoji: "🍔" },
@@ -15,17 +16,33 @@ const CATEGORY_LABELS = {
   other: { id: "Lainnya", en: "Other", emoji: "📦" },
 };
 
-function getCatLabel(key, lang) {
-  const meta = CATEGORY_LABELS[key] || { emoji: "📦", id: key, en: key };
-  return `${meta.emoji} ${lang === "id" ? meta.id : meta.en}`;
+// Detect raw IDs (e.g. "69e5598816967cd0bb4dc383") so we can hide them as labels
+function isRawId(key) {
+  return typeof key === "string" && /^[a-f0-9]{20,}$/i.test(key);
 }
 
-export default function SavingsRecommendationWidget({ spendingByCategory, budgets, transactions3M }) {
+export default function SavingsRecommendationWidget({ spendingByCategory, budgets, transactions3M, getCategoryMeta }) {
   const { formatCurrency, settings } = useAppSettings();
   const lang = settings.language || "id";
   const [loading, setLoading] = useState(false);
   const [recommendation, setRecommendation] = useState(null);
   const [expanded, setExpanded] = useState(false);
+
+  // Resolve category key → "emoji label" string.
+  // Priority: parent-provided categoryMap (real names from DB) → static fallback → "Lainnya" if raw ID.
+  function getCatLabel(key) {
+    if (getCategoryMeta) {
+      const meta = getCategoryMeta(key);
+      // Avoid showing raw IDs even if categoryMap fell back to the key itself
+      if (meta?.label && !isRawId(meta.label)) {
+        return `${meta.emoji || "📦"} ${meta.label}`;
+      }
+    }
+    const fallback = CATEGORY_LABELS[key];
+    if (fallback) return `${fallback.emoji} ${lang === "id" ? fallback.id : fallback.en}`;
+    // Last resort — never show raw hash to the user
+    return `📦 ${lang === "id" ? "Lainnya" : "Other"}`;
+  }
 
   // Compute 3-month average per category from transactions3M
   const catAvg3M = {};
@@ -61,12 +78,12 @@ export default function SavingsRecommendationWidget({ spendingByCategory, budget
     const fmt = (n) => `Rp ${Math.round(n || 0).toLocaleString("id-ID")}`;
 
     const spikesText = spikes.map((s) =>
-      `- ${getCatLabel(s.key, lang)}: bulan ini ${fmt(s.thisMonth)}, rata-rata 3 bulan lalu ${fmt(s.avg)} (+${s.pct}%, lebih ${fmt(s.diff)})`
+      `- ${getCatLabel(s.key)}: bulan ini ${fmt(s.thisMonth)}, rata-rata 3 bulan lalu ${fmt(s.avg)} (+${s.pct}%, lebih ${fmt(s.diff)})`
     ).join("\n");
 
     const overText = overBudget.map((b) => {
       const spent = spendingByCategory[b.category] || 0;
-      return `- ${getCatLabel(b.category, lang)}: limit ${fmt(b.amount)}, terpakai ${fmt(spent)} (lebih ${fmt(spent - b.amount)})`;
+      return `- ${getCatLabel(b.category)}: limit ${fmt(b.amount)}, terpakai ${fmt(spent)} (lebih ${fmt(spent - b.amount)})`;
     }).join("\n");
 
     const prompt = `Analisis pola pengeluaran bulanan pengguna dan berikan rekomendasi penghematan yang spesifik dan actionable.
@@ -127,7 +144,7 @@ Format jawaban: singkat, padat, gunakan bullet points. Maksimal 200 kata.`;
         <div className="px-4 pb-3 flex flex-wrap gap-1.5">
           {spikes.slice(0, 4).map((s) => (
             <span key={s.key} className="text-[10px] font-semibold px-2 py-1 rounded-full bg-[#FF6B6B]/10 text-[#FF6B6B]">
-              {getCatLabel(s.key, lang)} +{s.pct}%
+              {getCatLabel(s.key)} +{s.pct}%
             </span>
           ))}
         </div>
