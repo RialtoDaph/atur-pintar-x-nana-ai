@@ -26,8 +26,13 @@ Deno.serve(async (req) => {
 
     const isPremium = user.subscription_plan === "premium_monthly" || user.subscription_plan === "premium_yearly";
 
-    // Premium users have no limit — return early without touching state.
-    if (isPremium) {
+    // 🎁 Free access window — semua user dapat unlimited Nana chat sampai tanggal ini
+    const FREE_ACCESS_UNTIL = "2026-08-08";
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const inFreeWindow = todayStr <= FREE_ACCESS_UNTIL;
+
+    // Premium users (atau dalam free window) tidak punya limit — return early.
+    if (isPremium || inFreeWindow || user.role === "admin") {
       return Response.json({ count: 0, month: currentMonth(), limitReached: false, isPremium: true });
     }
 
