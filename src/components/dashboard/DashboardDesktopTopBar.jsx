@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Bell, Plus } from "lucide-react";
+import { Search, Bell, Plus, Sun, Moon } from "lucide-react";
 import { Link } from "react-router-dom";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
@@ -18,7 +18,16 @@ export default function DashboardDesktopTopBar({
 }) {
   const [showSearch, setShowSearch] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
+  const [isDark, setIsDark] = useState(() => localStorage.getItem("darkMode") === "true");
   const streak = gamificationProfile?.daily_streak ?? 0;
+
+  function toggleDark() {
+    const next = !isDark;
+    setIsDark(next);
+    localStorage.setItem("darkMode", next ? "true" : "false");
+    if (next) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }
 
   const hour = new Date().getHours();
   const emailPrefix = user?.email?.split("@")[0];
@@ -57,6 +66,16 @@ export default function DashboardDesktopTopBar({
         <span className="text-sm font-bold text-[#1A1A1A]">{streak}</span>
         <span className="text-sm text-gray-600">hari</span>
       </Link>
+
+      {/* Dark mode toggle */}
+      <button
+        onClick={toggleDark}
+        className="w-11 h-11 rounded-full bg-white border border-[#E2E8F0] hover:border-[#CBD5E1] flex items-center justify-center transition-colors shadow-sm"
+        title={isDark ? "Mode Terang" : "Mode Gelap"}
+        aria-label={isDark ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
+      >
+        {isDark ? <Moon className="w-4 h-4 text-[#1A1A1A]" /> : <Sun className="w-4 h-4 text-[#F97316]" />}
+      </button>
 
       {/* Bell / Alerts */}
       <button
