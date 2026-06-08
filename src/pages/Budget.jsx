@@ -4,7 +4,6 @@ import { Plus, ChevronLeft, ChevronRight, TrendingUp, Crown } from "lucide-react
 import { Link } from "react-router-dom";
 import AddBudgetModal from "@/components/budget/AddBudgetModal";
 import BudgetCard from "@/components/budget/BudgetCard";
-import SavingsRecommendationWidget from "@/components/budget/SavingsRecommendationWidget";
 import BudgetNanaPanel from "@/components/budget/BudgetNanaPanel";
 import BudgetAlertChecker from "@/components/budget/BudgetAlertChecker";
 import BudgetChartSection from "@/components/budget/BudgetChartSection";
@@ -305,16 +304,6 @@ export default function BudgetPage() {
             budgets={budgets}
             spendingByCategory={spendingByCategory}
             categoryMap={Object.fromEntries(Object.entries(categoryMap).map(([k, v]) => [k, v.label]))}
-          />
-        )}
-
-        {/* Nana AI Savings Recommendation — moved up for prominence */}
-        {!loading && Object.keys(spendingByCategory).length > 0 && (
-          <SavingsRecommendationWidget
-            spendingByCategory={spendingByCategory}
-            budgets={budgets}
-            transactions3M={transactions3M}
-            getCategoryMeta={getCategoryMeta}
           />
         )}
 
