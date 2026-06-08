@@ -10,6 +10,9 @@ import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import AppleIcon from "@/components/AppleIcon";
 import { toast } from "@/components/ui/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link as RouterLink } from "react-router-dom";
+import ConsentModal from "@/components/auth/ConsentModal";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -19,10 +22,16 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [consentProvider, setConsentProvider] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!agreed) {
+      setError("Kamu harus menyetujui Kebijakan Privasi & Ketentuan Layanan");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Kata sandi tidak cocok");
       return;
@@ -67,12 +76,10 @@ export default function Register() {
     }
   };
 
-  const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/");
-  };
-
-  const handleApple = () => {
-    base44.auth.loginWithProvider("apple", "/");
+  const handleSocialConfirm = () => {
+    const provider = consentProvider;
+    setConsentProvider(null);
+    if (provider) base44.auth.loginWithProvider(provider, "/");
   };
 
   if (showOtp) {
@@ -144,7 +151,7 @@ export default function Register() {
       <Button
         variant="outline"
         className="w-full h-12 text-sm font-semibold mb-3 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white"
-        onClick={handleGoogle}
+        onClick={() => setConsentProvider("google")}
       >
         <GoogleIcon className="w-5 h-5 mr-2" />
         Lanjut dengan Google
@@ -153,7 +160,7 @@ export default function Register() {
       <Button
         variant="outline"
         className="w-full h-12 text-sm font-semibold mb-6 bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white"
-        onClick={handleApple}
+        onClick={() => setConsentProvider("apple")}
       >
         <AppleIcon className="w-5 h-5 mr-2" />
         Lanjut dengan Apple
@@ -224,7 +231,26 @@ export default function Register() {
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-bold bg-[#F97316] hover:bg-[#e05e00] text-white" disabled={loading}>
+        <div className="flex items-start gap-2.5 pt-1">
+          <Checkbox
+            id="agree-terms-register"
+            checked={agreed}
+            onCheckedChange={(v) => setAgreed(v === true)}
+            className="mt-0.5 border-white/30 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
+          />
+          <Label htmlFor="agree-terms-register" className="text-xs text-white/60 leading-relaxed font-normal cursor-pointer">
+            Saya setuju dengan{" "}
+            <RouterLink to="/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
+              Kebijakan Privasi
+            </RouterLink>{" "}
+            dan{" "}
+            <RouterLink to="/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
+              Ketentuan Layanan
+            </RouterLink>
+          </Label>
+        </div>
+
+        <Button type="submit" className="w-full h-12 font-bold bg-[#F97316] hover:bg-[#e05e00] text-white disabled:opacity-50" disabled={loading || !agreed}>
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -235,6 +261,13 @@ export default function Register() {
           )}
         </Button>
       </form>
+
+      <ConsentModal
+        open={!!consentProvider}
+        provider={consentProvider}
+        onClose={() => setConsentProvider(null)}
+        onConfirm={handleSocialConfirm}
+      />
     </AuthLayout>
   );
 }
