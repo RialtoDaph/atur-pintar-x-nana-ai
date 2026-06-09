@@ -15,6 +15,9 @@ async function findLinkedRecurringTx(title, userEmail) {
 
 const TYPE_CONFIG = {
   tagihan: { label: "Tagihan", emoji: "🧾", color: "#FF6B6B" },
+  cicilan: { label: "Cicilan", emoji: "🏦", color: "#F97316" },
+  langganan: { label: "Langganan", emoji: "📱", color: "#8B5CF6" },
+  tabungan: { label: "Tabungan", emoji: "🐷", color: "#00C9A7" },
   lainnya: { label: "Lainnya", emoji: "📌", color: "#F5A623" },
 };
 
@@ -25,7 +28,8 @@ function getDaysUntilDue(dueDay) {
   const maxDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const clampedDay = Math.min(dueDay, maxDay);
   const thisMonth = new Date(today.getFullYear(), today.getMonth(), clampedDay);
-  if (thisMonth <= today) {
+  // Use < (not <=) so the actual due day shows as "Today" (0 days), not skipped to next month
+  if (thisMonth < today) {
     const nextMaxDay = new Date(today.getFullYear(), today.getMonth() + 2, 0).getDate();
     const nextDay = Math.min(dueDay, nextMaxDay);
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, nextDay);
@@ -97,7 +101,7 @@ export default function Reminders() {
     setLoading(true);
     try {
       const data = await base44.entities.Reminder.filter({ created_by: user.email }, "-created_date");
-      const allowed = data.filter(r => !r.type || r.type === 'tagihan' || r.type === 'lainnya');
+      const allowed = data.filter(r => !r.type || ['tagihan', 'cicilan', 'langganan', 'tabungan', 'lainnya'].includes(r.type));
       setReminders(allowed);
     } catch (e) {
       console.error("Failed to load reminders", e);

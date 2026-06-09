@@ -5,6 +5,9 @@ import useLockBodyScroll from "@/hooks/useLockBodyScroll";
 
 const TYPES = [
   { key: "tagihan", label: "Tagihan", emoji: "🧾" },
+  { key: "cicilan", label: "Cicilan", emoji: "🏦" },
+  { key: "langganan", label: "Langganan", emoji: "📱" },
+  { key: "tabungan", label: "Tabungan", emoji: "🐷" },
   { key: "lainnya", label: "Lainnya", emoji: "📌" },
 ];
 

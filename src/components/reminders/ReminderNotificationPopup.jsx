@@ -15,7 +15,8 @@ function getDaysUntilDue(dueDay) {
   const maxDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const clampedDay = Math.min(dueDay, maxDay);
   const thisMonth = new Date(today.getFullYear(), today.getMonth(), clampedDay);
-  if (thisMonth <= today) {
+  // Use < (not <=) so the actual due day shows as "Today" (0 days), not skipped to next month
+  if (thisMonth < today) {
     const nextMaxDay = new Date(today.getFullYear(), today.getMonth() + 2, 0).getDate();
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, Math.min(dueDay, nextMaxDay));
     return Math.ceil((nextMonth - today) / (1000 * 60 * 60 * 24));
@@ -130,7 +131,7 @@ Total: ${upcomingList.length} pengingat aktif${urgentItems.length > 0 ? ", " + u
     loadAndNotify();
   }, [loadAndNotify]);
 
-  function dismissItem(id) {
+  async function dismissItem(id) {
     const key = id + "_" + currentMonth;
     const updated = [...dismissed, key];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -138,14 +139,29 @@ Total: ${upcomingList.length} pengingat aktif${urgentItems.length > 0 ? ", " + u
     const newUpcoming = upcoming.filter(r => r.id !== id);
     setUpcoming(newUpcoming);
     if (newUpcoming.length === 0) setVisible(false);
+    // Sync dismissal to DB for multi-device consistency
+    try {
+      await base44.entities.Reminder.update(id, { last_dismissed_month: currentMonth });
+    } catch (e) {
+      console.error("[ReminderPopup] Failed to sync dismissal to DB:", e?.message || e);
+    }
   }
 
-  function dismissAll() {
-    const updated = [...dismissed, ...upcoming.map(r => r.id + "_" + currentMonth)];
+  async function dismissAll() {
+    const ids = upcoming.map(r => r.id);
+    const updated = [...dismissed, ...ids.map(id => id + "_" + currentMonth)];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     setDismissed(updated);
     setUpcoming([]);
     setVisible(false);
+    // Sync all dismissals to DB for multi-device consistency
+    try {
+      await Promise.all(ids.map(id =>
+        base44.entities.Reminder.update(id, { last_dismissed_month: currentMonth })
+      ));
+    } catch (e) {
+      console.error("[ReminderPopup] Failed to sync dismissAll to DB:", e?.message || e);
+    }
   }
 
   return (
