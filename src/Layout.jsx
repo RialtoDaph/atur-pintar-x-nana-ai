@@ -1,6 +1,6 @@
 import { createPageUrl } from "@/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, Settings, Bell, Search, ArrowLeft, Wallet, Users, Plus } from "lucide-react";
+import { LayoutDashboard, Target, ArrowLeftRight, BarChart2, PiggyBank, CreditCard, Settings, Bell, Search, ArrowLeft, Wallet, Users, Plus, Shield } from "lucide-react";
 import { toast } from "sonner";
 import AddTransactionModal from "@/components/transactions/AddTransactionModal";
 import AlertsDrawer from "@/components/dashboard/AlertsDrawer";
@@ -376,6 +376,14 @@ function LayoutInner({ children, currentPageName }) {
           }
 
           <div className="flex items-center gap-2">
+            {user?.role === 'admin' && (
+              <Link
+                to={createPageUrl("AdminDashboard")}
+                aria-label="Buka halaman admin"
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white tap-highlight-fix">
+                <Shield className="w-4 h-4" aria-hidden="true" />
+              </Link>
+            )}
             <button
               onClick={() => {setShowAlertsDrawer(true);setUnreadAlertCount(0);setUnreadAdminCount(0);}}
               aria-label={`Buka notifikasi${unreadAlertCount + unreadAdminCount > 0 ? ` (${unreadAlertCount + unreadAdminCount} belum dibaca)` : ''}`}
