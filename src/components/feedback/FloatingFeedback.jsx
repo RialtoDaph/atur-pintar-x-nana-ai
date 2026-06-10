@@ -39,7 +39,6 @@ export default function FloatingFeedback({ user }) {
   };
 
   if (!user?.onboarding_completed) return null;
-  if (typeof window !== "undefined" && window.location.pathname !== "/Dashboard") return null;
 
   return (
     <>

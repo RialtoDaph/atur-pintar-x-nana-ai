@@ -190,7 +190,8 @@ function LayoutInner({ children, currentPageName }) {
     }
   }, [currentPageName]);
 
-  // FAB click: guard — require at least 1 account before opening AddTransactionModal
+  // FAB click: guard — require at least 1 account before opening AddTransactionModal.
+  // If no account → navigate langsung ke halaman Accounts (lebih jelas dari sekadar toast yang gampang ke-skip di mobile).
   const handleFabClick = async () => {
     haptic.medium();
     if (showAddTransaction) { setShowAddTransaction(false); return; }
@@ -198,10 +199,8 @@ function LayoutInner({ children, currentPageName }) {
       const u = user || (await base44.auth.me());
       const accs = await base44.entities.Account.filter({ created_by: u.email });
       if (!accs || accs.length === 0) {
-        toast.error("Buat rekening dulu yuk sebelum catat transaksi", {
-          action: { label: "Buat Rekening", onClick: () => navigate(createPageUrl("Accounts")) },
-          duration: 5000,
-        });
+        toast.info("Buat rekening dulu yuk sebelum catat transaksi 💳", { duration: 3500 });
+        navigate(createPageUrl("Accounts"));
         return;
       }
       setShowAddTransaction(true);
