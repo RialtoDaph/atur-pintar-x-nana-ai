@@ -65,16 +65,30 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
       if (!u?.email) return;
       Promise.all([
         base44.entities.Account.filter({ created_by: u.email }, "name"),
-        base44.entities.GlobalCategory.list("sort_order"),
+        base44.entities.GlobalCategory.list("sort_order").catch(() => []),
         base44.entities.AppSettings.filter({ created_by: u.email }),
-      ]).then(([accs, cats, settings]) => {
+        base44.entities.CustomCategory.filter({ created_by: u.email }).catch(() => []),
+      ]).then(([accs, cats, settings, customCats]) => {
         const deduped = [];
         const seen = new Set();
         for (const a of (accs || [])) { if (!seen.has(a.name)) { seen.add(a.name); deduped.push(a); } }
         setAccounts(deduped);
         const def = deduped.find(a => a.is_default) || deduped[0];
         if (def) setAccountId(def.id);
-        setGlobalCategories((cats || []).filter(c => c.is_active !== false));
+
+        // Merge global + user's custom categories (both work as selectable options)
+        const activeGlobal = (cats || []).filter(c => c.is_active !== false);
+        const customAsCategory = (customCats || []).map(c => ({
+          id: `custom_${c.id}`,
+          name: c.name,
+          emoji: c.emoji || "📦",
+          color: c.color || "#95A5A6",
+          type: c.type || "both",
+          sort_order: 999,
+          is_subcategory: false,
+        }));
+        setGlobalCategories([...activeGlobal, ...customAsCategory]);
+
         const s = settings?.[0] || null;
         setAppSettings(s);
         if (!s?.favorite_categories?.length) setFavTab("all");
@@ -527,6 +541,20 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                           </div>
                         );
                       })}
+                    </div>
+                  );
+                }
+                if (filteredCats.length === 0) {
+                  return (
+                    <div className="border border-dashed border-[#E2E8F0] rounded-xl px-3 py-4 text-center">
+                      <p className="text-xs text-[#8FA4C8] mb-2">
+                        Belum ada kategori {tab === "expense" ? "pengeluaran" : "pemasukan"}.
+                      </p>
+                      <Link to="/Settings" onClick={onClose}
+                        className="inline-block px-3 py-1.5 bg-[#F97316] text-white rounded-lg text-[11px] font-semibold">
+                        Atur Kategori
+                      </Link>
+                      <p className="text-[10px] text-[#8FA4C8] mt-2">Transaksi tetap bisa disimpan tanpa kategori.</p>
                     </div>
                   );
                 }
