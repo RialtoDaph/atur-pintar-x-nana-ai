@@ -26,8 +26,8 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-white font-bold text-base mb-3">1. Identitas Pengelola</h2>
             <p>Atur Pintar adalah produk yang dikelola oleh <strong className="text-white">PT Rideff Vreka Tech</strong>, perusahaan teknologi yang berdomisili di Indonesia.</p>
-            <p className="mt-2">Email: <span className="text-[#FF6A00] font-medium">support@aturpintar.id</span></p>
-            <p className="mt-1 text-white/50 text-xs">Data yang kami kumpulkan meliputi: email, nama, data transaksi keuangan, dan profil pengguna — digunakan semata-mata untuk layanan manajemen keuangan personal. Data disimpan aman dan tidak dijual ke pihak ketiga. Pengguna dapat meminta penghapusan akun dengan mengirim email ke support@aturpintar.id.</p>
+            <p className="mt-2">Email: <span className="text-[#FF6A00] font-medium">admin@aturpintar.id</span></p>
+            <p className="mt-1 text-white/50 text-xs">Data yang kami kumpulkan meliputi: email, nama, data transaksi keuangan, dan profil pengguna — digunakan semata-mata untuk layanan manajemen keuangan personal. Data disimpan aman dan tidak dijual ke pihak ketiga. Pengguna dapat meminta penghapusan akun dengan mengirim email ke admin@aturpintar.id.</p>
           </section>
 
           <section>
@@ -39,7 +39,7 @@ export default function PrivacyPolicy() {
               <li>Data transaksi keuangan yang dimasukkan secara manual</li>
               <li>Informasi tujuan tabungan, anggaran, utang, dan investasi</li>
               <li>Riwayat percakapan dengan Nana AI</li>
-              <li>Informasi pembayaran langganan (diproses melalui Midtrans, tidak disimpan di server kami)</li>
+              <li>Informasi pembayaran langganan (diproses melalui Xendit, tidak disimpan di server kami)</li>
             </ul>
             <p className="font-semibold text-white/80 mb-1">b. Data yang dikumpulkan otomatis:</p>
             <ul className="list-disc list-inside space-y-1.5 text-white/55">
@@ -73,7 +73,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-white font-bold text-base mb-3">5. Layanan Pihak Ketiga</h2>
             <p className="mb-2">Atur Pintar menggunakan layanan pihak ketiga berikut:</p>
             <ul className="list-disc list-inside space-y-2 text-white/55">
-              <li><strong className="text-white/80">Midtrans (Goto Financial)</strong> — Pemrosesan pembayaran langganan. Data kartu kredit diproses langsung oleh Midtrans dan tidak disimpan di server kami. Kebijakan privasi Midtrans berlaku.</li>
+              <li><strong className="text-white/80">Xendit (PT Xendit Investasi Indonesia)</strong> — Pemrosesan pembayaran langganan. Data kartu kredit/rekening diproses langsung oleh Xendit dan tidak disimpan di server kami. Kebijakan privasi Xendit berlaku.</li>
               <li><strong className="text-white/80">OpenAI / Anthropic</strong> — Layanan AI untuk fitur Nana AI. Pertanyaan yang kamu ajukan dapat dikirim ke API mereka untuk diproses, tanpa menyertakan data identitas pribadi.</li>
               <li><strong className="text-white/80">Base44</strong> — Infrastruktur aplikasi dan penyimpanan data.</li>
               <li><strong className="text-white/80">Google Analytics (opsional)</strong> — Analitik penggunaan anonim untuk meningkatkan layanan.</li>
@@ -100,7 +100,7 @@ export default function PrivacyPolicy() {
               <li><strong className="text-white/80">Portabilitas:</strong> Mengunduh data kamu dalam format yang dapat dibaca mesin</li>
               <li><strong className="text-white/80">Keberatan:</strong> Menolak pemrosesan data untuk tujuan tertentu</li>
             </ul>
-            <p className="mt-2">Untuk mengajukan permintaan, hubungi: <span className="text-[#FF6A00]">support@aturpintar.id</span></p>
+            <p className="mt-2">Untuk mengajukan permintaan, hubungi: <span className="text-[#FF6A00]">admin@aturpintar.id</span></p>
           </section>
 
           <section>
@@ -121,19 +121,23 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-white font-bold text-base mb-3">11. Hubungi Kami</h2>
             <p>Pertanyaan, keluhan, atau permintaan terkait privasi data dapat disampaikan ke:</p>
-            <p className="mt-2 text-white/55">Email: <span className="text-[#FF6A00] font-medium">support@aturpintar.id</span></p>
+            <p className="mt-2 text-white/55">Email: <span className="text-[#FF6A00] font-medium">admin@aturpintar.id</span></p>
             <p className="mt-2 text-white/40 text-xs">Kami akan merespons dalam 14 hari kerja.</p>
           </section>
         </div>
       </div>
 
       <footer className="border-t border-white/5 py-6 px-5 text-center">
-        <div className="flex items-center justify-center gap-4 mb-2">
+        <div className="flex items-center justify-center gap-4 mb-2 flex-wrap">
           <Link to="/LandingPage" className="text-white/30 hover:text-white/60 text-xs transition-colors">Beranda</Link>
           <span className="text-white/15 text-xs">·</span>
           <Link to="/TermsOfService" className="text-white/30 hover:text-white/60 text-xs transition-colors">Syarat & Ketentuan</Link>
+          <span className="text-white/15 text-xs">·</span>
+          <Link to="/RefundPolicy" className="text-white/30 hover:text-white/60 text-xs transition-colors">Kebijakan Refund</Link>
+          <span className="text-white/15 text-xs">·</span>
+          <Link to="/CancellationPolicy" className="text-white/30 hover:text-white/60 text-xs transition-colors">Pembatalan Langganan</Link>
         </div>
-        <p className="text-white/20 text-xs">© 2025 PT Rideff Vreka Tech. Semua hak dilindungi.</p>
+        <p className="text-white/20 text-xs">© 2026 PT Rideff Vreka Tech. Semua hak dilindungi.</p>
         <p className="text-white/15 text-xs mt-1">Atur Pintar adalah produk dari PT Rideff Vreka Tech</p>
       </footer>
     </div>

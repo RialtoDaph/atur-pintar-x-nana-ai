@@ -62,23 +62,23 @@ export default function TermsOfService() {
             
             <p className="mb-2 font-semibold text-white/80">4.2 Pembayaran</p>
             <ul className="list-disc list-inside space-y-1.5 text-white/55 mb-3">
-              <li>Pembayaran diproses melalui <strong className="text-white/80">Midtrans</strong> (PT Midtrans, anak perusahaan GoTo Financial)</li>
+              <li>Pembayaran diproses melalui <strong className="text-white/80">Xendit</strong> (PT Xendit Investasi Indonesia), payment gateway berlisensi Bank Indonesia</li>
               <li>Atur Pintar tidak menyimpan data kartu kredit atau rekening bank kamu</li>
               <li>Semua transaksi dalam mata uang Rupiah Indonesia (IDR)</li>
               <li>Bukti pembayaran akan dikirimkan melalui email setelah transaksi berhasil</li>
             </ul>
 
             <p className="mb-2 font-semibold text-white/80">4.3 Aktivasi Layanan</p>
-            <p className="mb-3 text-white/55">Akses Premium aktif segera setelah pembayaran dikonfirmasi oleh sistem Midtrans. Periode berlangganan dihitung mulai tanggal konfirmasi pembayaran.</p>
+            <p className="mb-3 text-white/55">Akses Premium aktif segera setelah pembayaran dikonfirmasi oleh sistem Xendit. Periode berlangganan dihitung mulai tanggal konfirmasi pembayaran.</p>
 
             <p className="mb-2 font-semibold text-white/80">4.4 Perpanjangan</p>
             <p className="mb-3 text-white/55">Saat ini berlangganan bersifat satu kali bayar (tidak auto-renewal). Kamu perlu melakukan pembayaran baru untuk memperpanjang akses Premium.</p>
 
             <p className="mb-2 font-semibold text-white/80">4.5 Kebijakan Pengembalian Dana (Refund)</p>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mt-1">
-              <p className="text-white/70 font-medium mb-1">⚠️ Tidak Ada Pengembalian Dana</p>
-              <p className="text-white/50 text-xs">Sesuai sifat layanan digital, pembayaran yang telah dikonfirmasi tidak dapat dikembalikan. Dengan melakukan pembayaran, kamu menyetujui kebijakan ini. Pengecualian hanya berlaku jika layanan mengalami gangguan total selama lebih dari 7 hari berturut-turut.</p>
-            </div>
+            <p className="mb-3 text-white/55">Kebijakan refund mengatur kondisi-kondisi tertentu di mana pengembalian dana dapat diajukan (mis. pembayaran ganda, akses Premium tidak aktif, gangguan teknis berkepanjangan, atau permintaan dalam masa 7 hari pertama dengan syarat tertentu). Detail lengkap dapat dibaca di halaman <Link to="/RefundPolicy" className="text-[#FF6A00] hover:underline">Kebijakan Refund</Link>.</p>
+
+            <p className="mb-2 font-semibold text-white/80">4.6 Pembatalan Langganan</p>
+            <p className="mb-3 text-white/55">Karena berlangganan bersifat satu kali bayar (tidak auto-renewal), pembatalan dilakukan dengan tidak memperpanjang. Selama periode aktif, akses Premium tetap berjalan sampai tanggal berakhir. Detail di halaman <Link to="/CancellationPolicy" className="text-[#FF6A00] hover:underline">Pembatalan Langganan</Link>.</p>
           </section>
 
           <section>
@@ -142,18 +142,22 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-white font-bold text-base mb-3">12. Hubungi Kami</h2>
             <p>Pertanyaan, keluhan, atau pengaduan terkait Layanan:</p>
-            <p className="mt-2 text-white/55">Untuk pertanyaan, keluhan, atau laporan, silakan hubungi kami melalui email: <span className="text-[#FF6A00] font-medium">support@aturpintar.id</span>. Kami akan merespons dalam 1–3 hari kerja.</p>
+            <p className="mt-2 text-white/55">Untuk pertanyaan, keluhan, atau laporan, silakan hubungi kami melalui email: <span className="text-[#FF6A00] font-medium">admin@aturpintar.id</span>. Kami akan merespons dalam 1–3 hari kerja.</p>
           </section>
         </div>
       </div>
 
       <footer className="border-t border-white/5 py-6 px-5 text-center">
-        <div className="flex items-center justify-center gap-4 mb-2">
+        <div className="flex items-center justify-center gap-4 mb-2 flex-wrap">
           <Link to="/LandingPage" className="text-white/30 hover:text-white/60 text-xs transition-colors">Beranda</Link>
           <span className="text-white/15 text-xs">·</span>
           <Link to="/PrivacyPolicy" className="text-white/30 hover:text-white/60 text-xs transition-colors">Kebijakan Privasi</Link>
+          <span className="text-white/15 text-xs">·</span>
+          <Link to="/RefundPolicy" className="text-white/30 hover:text-white/60 text-xs transition-colors">Kebijakan Refund</Link>
+          <span className="text-white/15 text-xs">·</span>
+          <Link to="/CancellationPolicy" className="text-white/30 hover:text-white/60 text-xs transition-colors">Pembatalan Langganan</Link>
         </div>
-        <p className="text-white/20 text-xs">© 2025 PT Rideff Vreka Tech. Semua hak dilindungi.</p>
+        <p className="text-white/20 text-xs">© 2026 PT Rideff Vreka Tech. Semua hak dilindungi.</p>
         <p className="text-white/15 text-xs mt-1">Atur Pintar adalah produk dari PT Rideff Vreka Tech</p>
       </footer>
     </div>
