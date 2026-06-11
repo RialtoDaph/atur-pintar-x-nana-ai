@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 export default function RefundPolicy() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { font-family: 'Inter', sans-serif; }`}</style>
@@ -11,7 +12,7 @@ export default function RefundPolicy() {
           <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Logo" className="w-6 h-6" />
           <span className="font-black text-white text-sm">Atur Pintar</span>
         </div>
-        <button onClick={() => window.history.length > 1 ? window.history.back() : null} className="ml-auto flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors">
+        <button onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/LandingPage")} className="ml-auto flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" /> Kembali
         </button>
       </nav>
