@@ -17,6 +17,8 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import LandingPage from '@/pages/LandingPage';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
+import RefundPolicy from '@/pages/RefundPolicy';
+import CancellationPolicy from '@/pages/CancellationPolicy';
 import MaintenancePage from '@/pages/MaintenancePage';
 import TourGuide from '@/components/onboarding/TourGuide';
 
@@ -123,6 +125,8 @@ const AuthenticatedApp = () => {
       <Route path="/LandingPage" element={<LandingPage />} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
+      <Route path="/RefundPolicy" element={<RefundPolicy />} />
+      <Route path="/CancellationPolicy" element={<CancellationPolicy />} />
       <Route path="/About" element={<About />} />
 
       {/* ── Gated app routes ── */}

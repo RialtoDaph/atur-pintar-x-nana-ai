@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Instagram, Facebook } from "lucide-react";
+import { Mail, Instagram, Facebook, Phone, MapPin, Clock } from "lucide-react";
 import { TikTokIcon, ThreadsIcon } from "./SocialIcons";
 
 export default function LandingFooter() {
@@ -19,16 +19,29 @@ export default function LandingFooter() {
             <div className="space-y-2">
               <div><Link to="/PrivacyPolicy" className="text-white/30 hover:text-white/70 text-xs transition-colors">Privacy Policy</Link></div>
               <div><Link to="/TermsOfService" className="text-white/30 hover:text-white/70 text-xs transition-colors">Terms of Service</Link></div>
+              <div><Link to="/RefundPolicy" className="text-white/30 hover:text-white/70 text-xs transition-colors">Kebijakan Refund</Link></div>
+              <div><Link to="/CancellationPolicy" className="text-white/30 hover:text-white/70 text-xs transition-colors">Pembatalan Langganan</Link></div>
               <div><a href="mailto:admin@aturpintar.id" className="text-white/30 hover:text-white/70 text-xs transition-colors">Hubungi Kami</a></div>
             </div>
           </div>
           <div>
             <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-3">Kontak</p>
-            <a href="mailto:admin@aturpintar.id" className="flex items-center gap-2 text-white/30 hover:text-white/70 text-xs transition-colors mb-3">
-              <Mail className="w-3.5 h-3.5" />
-              admin@aturpintar.id
+            <a href="mailto:admin@aturpintar.id" className="flex items-start gap-2 text-white/30 hover:text-white/70 text-xs transition-colors mb-2">
+              <Mail className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              <span>admin@aturpintar.id</span>
             </a>
-            <p className="text-white/20 text-[11px]">aturpintar.id</p>
+            <a href="tel:+6287811042612" className="flex items-start gap-2 text-white/30 hover:text-white/70 text-xs transition-colors mb-2">
+              <Phone className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              <span>+62 878-1104-2612</span>
+            </a>
+            <div className="flex items-start gap-2 text-white/30 text-xs mb-2">
+              <Clock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              <span>Senin–Jumat, 09:00–18:00 WIB</span>
+            </div>
+            <div className="flex items-start gap-2 text-white/30 text-xs mb-3">
+              <MapPin className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              <span className="leading-relaxed">Graha Adhiyasa Ciledug, Desa Tenjomaya, Kec. Ciledug, Kab. Cirebon, Jawa Barat, Indonesia</span>
+            </div>
             <div className="flex items-center gap-3 mt-3">
               <a href="https://instagram.com/aturpintar" target="_blank" rel="noopener noreferrer" aria-label="Instagram Atur Pintar" className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#F97316]/20 flex items-center justify-center text-white/40 hover:text-[#F97316] transition-colors">
                 <Instagram className="w-3.5 h-3.5" />
