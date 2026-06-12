@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Check, Crown, Clock, CheckCircle2, Zap, AlertCircle } from "lucide-react";
+import { Check, Crown, Clock, CheckCircle2, Zap, AlertCircle, ShieldCheck } from "lucide-react";
 import { useAppConfig } from "@/components/utils/useAppConfig";
 
 const FEATURES_FREE = [
@@ -37,7 +38,7 @@ export default function Subscription() {
   const [orderId, setOrderId] = useState(null);
 
   const monthlyPrice = config?.premium_price_monthly || 49000;
-  const yearlyPrice = config?.premium_price_yearly || 490000;
+  const yearlyPrice = config?.premium_price_yearly || 399900;
   const yearlyDiscount = monthlyPrice > 0
     ? Math.round((1 - yearlyPrice / (monthlyPrice * 12)) * 100)
     : 0;
@@ -62,6 +63,9 @@ export default function Subscription() {
         // Bersihkan query param tanpa reload
         window.history.replaceState({}, "", window.location.pathname);
       }).catch(() => {});
+    } else if (paid === "0") {
+      setPaymentError("Pembayaran dibatalkan atau gagal. Silakan coba lagi atau hubungi admin@aturpintar.id kalau ada kendala.");
+      window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
 
@@ -241,6 +245,18 @@ export default function Subscription() {
               </li>
             ))}
           </ol>
+        </div>
+
+        {/* Legal disclaimer */}
+        <div className="bg-white rounded-2xl shadow-sm p-4 flex items-start gap-3">
+          <ShieldCheck className="w-4 h-4 text-[#8FA4C8] flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-[#8FA4C8] leading-relaxed">
+            Dengan melanjutkan pembayaran, kamu menyetujui{" "}
+            <Link to="/TermsOfService" className="text-[#F97316] hover:underline font-medium">Syarat & Ketentuan</Link>,{" "}
+            <Link to="/RefundPolicy" className="text-[#F97316] hover:underline font-medium">Kebijakan Refund</Link>, dan{" "}
+            <Link to="/CancellationPolicy" className="text-[#F97316] hover:underline font-medium">Pembatalan Langganan</Link>{" "}
+            Atur Pintar. Pembayaran diproses oleh Xendit (PT Xendit Investasi Indonesia), payment gateway berlisensi Bank Indonesia.
+          </p>
         </div>
       </div>
 
