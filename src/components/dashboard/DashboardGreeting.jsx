@@ -47,22 +47,29 @@ export default function DashboardGreeting({ user, gamificationProfile }) {
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-xl font-bold">{greeting}</h2>
       <div className="flex items-center gap-2">
-        <Link
-          to="/Gamifikasi"
-          className="flex items-center gap-1 bg-white/10 sm:bg-black/5 hover:bg-white/20 sm:hover:bg-black/10 active:bg-white/25 transition-colors px-2.5 py-1 rounded-full tap-highlight-fix"
-          title="Lihat progres gamifikasi"
-        >
-          <span className="text-sm">🔥</span>
-          <span className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-[11px] font-bold">{streak} hari</span>
-          {freezes > 0 && (
-            <span
-              className="ml-1 text-[10px] text-white sm:text-[#1A1A1A] dark:sm:text-white opacity-80"
-              title={`Streak Freeze tersedia: ${freezes}`}
-            >
-              ❄️{freezes}
-            </span>
-          )}
-        </Link>
+        {(streak > 0 || freezes > 0) && (
+          <Link
+            to="/Gamifikasi"
+            className="flex items-center gap-1.5 bg-white/10 sm:bg-black/5 hover:bg-white/20 sm:hover:bg-black/10 active:bg-white/25 transition-colors px-2.5 py-1 rounded-full tap-highlight-fix"
+            title="Lihat progres gamifikasi"
+          >
+            {streak > 0 && (
+              <span className="flex items-center gap-1">
+                <span className="text-sm">🔥</span>
+                <span className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-[11px] font-bold">{streak} hari</span>
+              </span>
+            )}
+            {freezes > 0 && (
+              <span
+                className="flex items-center gap-0.5 text-[11px] font-bold text-white sm:text-[#1A1A1A] dark:sm:text-white"
+                title={`Streak Freeze tersedia: ${freezes}`}
+              >
+                <span className="text-sm">❄️</span>
+                {freezes}
+              </span>
+            )}
+          </Link>
+        )}
         <button
           onClick={toggleDark}
           className="w-8 h-8 rounded-full bg-white/10 sm:bg-black/5 flex items-center justify-center text-base hover:bg-white/20 sm:hover:bg-black/10 transition-all tap-highlight-fix"
