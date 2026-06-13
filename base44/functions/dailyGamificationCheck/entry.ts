@@ -6,18 +6,25 @@
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
+// Use Jakarta time (WIB, UTC+7) so a user's "day" matches their local calendar,
+// regardless of where the scheduler runs. MUST stay in sync with processGamification.
+const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
 
-function yesterdayStr() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
+function wibDate(offsetDays = 0) {
+  const d = new Date(Date.now() + WIB_OFFSET_MS);
+  if (offsetDays) d.setUTCDate(d.getUTCDate() + offsetDays);
   return d.toISOString().slice(0, 10);
 }
 
-function currentMonth() {
-  return new Date().toISOString().slice(0, 7);
+function todayStr() { return wibDate(0); }
+function yesterdayStr() { return wibDate(-1); }
+function currentMonth() { return wibDate(0).slice(0, 7); }
+
+// Days between two YYYY-MM-DD strings (b - a), date-only.
+function daysBetween(a, b) {
+  const da = new Date(a + "T00:00:00Z");
+  const db = new Date(b + "T00:00:00Z");
+  return Math.round((db - da) / (1000 * 60 * 60 * 24));
 }
 
 Deno.serve(async (req) => {
@@ -40,27 +47,32 @@ Deno.serve(async (req) => {
       const userEmail = profile.created_by;
       if (!userEmail) continue;
 
-      // 1. Streak reset: if last_activity_date is older than yesterday, reset streak to 0.
-      // BUT: skip tepat 1 hari (last = day before yesterday) dilindungi oleh Streak Freeze —
-      // jangan reset di sini. Freeze baru akan benar-benar dikonsumsi saat user catat aktivitas
-      // berikutnya via processGamification. Kalau user skip 2 hari atau lebih, baru reset.
-      const dayBeforeYesterday = (() => {
-        const d = new Date();
-        d.setDate(d.getDate() - 2);
-        return d.toISOString().slice(0, 10);
-      })();
+      // 1. Streak protection / reset:
+      //   - last == today / yesterday → fine, no action.
+      //   - gap >= 2 days + streak > 0 → consume 1 Streak Freeze if available
+      //     (keeps streak alive; bump last_activity_date to yesterday so the user
+      //     coming back today naturally extends streak by +1 and we don't
+      //     double-consume on the next scheduler run).
+      //   - gap >= 2 days + no freeze → reset streak to 0.
       const last = profile.last_activity_date;
-      if (
-        last &&
-        last !== today &&
-        last !== yesterday &&
-        last !== dayBeforeYesterday &&
-        (profile.daily_streak || 0) > 0
-      ) {
-        await base44.asServiceRole.entities.GamificationProfile.update(profile.id, {
-          daily_streak: 0,
-        }).catch((e) => console.error('dailyGamificationCheck: streak reset failed:', e));
-        results.streak_resets++;
+      const currentStreak = profile.daily_streak || 0;
+      const gapDays = last ? daysBetween(last, today) : 0;
+
+      if (last && gapDays >= 2 && currentStreak > 0) {
+        const freezes = profile.streak_freezes_available ?? 0;
+        if (freezes >= 1) {
+          await base44.asServiceRole.entities.GamificationProfile.update(profile.id, {
+            streak_freezes_available: freezes - 1,
+            streak_freeze_last_used: today,
+            last_activity_date: yesterday,
+          }).catch((e) => console.error('dailyGamificationCheck: freeze consume failed:', e));
+          results.freezes_consumed = (results.freezes_consumed || 0) + 1;
+        } else {
+          await base44.asServiceRole.entities.GamificationProfile.update(profile.id, {
+            daily_streak: 0,
+          }).catch((e) => console.error('dailyGamificationCheck: streak reset failed:', e));
+          results.streak_resets++;
+        }
       }
 
       // 2. Challenge failure check
