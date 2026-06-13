@@ -48,14 +48,6 @@ export default function Login() {
     <AuthLayout
       title="Hallo Pintarians!"
       subtitle="Masuk ke akun kamu"
-      footer={
-        <>
-          Belum punya akun?{" "}
-          <Link to="/register" className="text-[#F97316] font-semibold hover:underline">
-            Daftar di sini
-          </Link>
-        </>
-      }
     >
       <InAppBrowserBanner />
 
@@ -133,6 +125,13 @@ export default function Login() {
             "Masuk"
           )}
         </Button>
+
+        <p className="text-center text-sm text-white/60">
+          Belum punya akun?{" "}
+          <Link to="/register" className="text-[#F97316] font-semibold hover:underline">
+            Daftar di sini
+          </Link>
+        </p>
       </form>
 
       <div className="relative my-6">
