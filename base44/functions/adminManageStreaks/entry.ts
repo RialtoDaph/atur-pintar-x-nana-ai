@@ -28,11 +28,19 @@ Deno.serve(async (req) => {
     // Full streak reset — also clears freeze state so the user starts clean
     // (otherwise: streak=0 but masih punya freeze + last_used menyebabkan
     // widget snowflake nyangkut, dan freeze gak match dengan streak yang nol).
+    // Hitung Senin (WIB) minggu ini untuk regen quota awal.
+    const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
+    const todayWIB = new Date(Date.now() + WIB_OFFSET_MS).toISOString().slice(0, 10);
+    const d = new Date(todayWIB + "T00:00:00Z");
+    const day = d.getUTCDay();
+    d.setUTCDate(d.getUTCDate() + (day === 0 ? -6 : 1 - day));
+    const currentWeekStart = d.toISOString().slice(0, 10);
+
     const fullStreakReset = {
       daily_streak: 0,
       last_activity_date: null,
-      streak_freezes_available: 1,
-      streak_freeze_last_regen: null,
+      streak_freezes_available: 3,
+      streak_freeze_week_start: currentWeekStart,
       streak_freeze_last_used: null,
     };
 

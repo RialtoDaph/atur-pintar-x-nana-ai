@@ -84,6 +84,15 @@ function daysBetween(a, b) {
   return Math.round((db - da) / (1000 * 60 * 60 * 24));
 }
 
+// Monday (WIB) of the week containing dateStr (YYYY-MM-DD). ISO week start.
+function wibWeekStart(dateStr) {
+  const d = new Date(dateStr + "T00:00:00Z");
+  const day = d.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -101,7 +110,7 @@ Deno.serve(async (req) => {
       profile = await base44.entities.GamificationProfile.create({
         daily_streak: 0, longest_streak: 0, total_points: 0, level: 1,
         achievements: [], last_activity_date: null,
-        streak_freezes_available: 1, streak_freeze_last_regen: todayStr(),
+        streak_freezes_available: 3, streak_freeze_week_start: wibWeekStart(todayStr()),
       });
     } else {
       const sorted = [...profiles].sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
@@ -134,28 +143,24 @@ Deno.serve(async (req) => {
     let newStreak = currentStreak;
     let streakChanged = false;
 
-    // ── Streak Freeze logic ───────────────────────────────────────────────────
-    // Freeze regen: +1 per 7 hari sejak last_regen, max 2. Dicek setiap streak check jalan.
-    const FREEZE_MAX = 2;
-    const FREEZE_REGEN_DAYS = 7;
+    // ── Streak Freeze logic (WEEKLY QUOTA) ────────────────────────────────────
+    // Setiap user dapat 3 freeze per MINGGU (regen tiap Senin WIB).
+    // Setiap hari bolong = pakai 1 freeze otomatis, dan ANGKA STREAK TETAP NAIK
+    // (angka berjalan terus selama dilindungi freeze, icon di UI berubah jadi ❄️).
+    // Kalau dalam minggu sama freeze habis (=0) dan masih bolong → streak reset 0.
+    const FREEZE_PER_WEEK = 3;
+    const currentWeekStart = wibWeekStart(today);
 
-    const hasFreezeFields =
-      freshProfile.streak_freezes_available !== undefined &&
-      freshProfile.streak_freeze_last_regen;
-    let freezesAvailable = hasFreezeFields ? (freshProfile.streak_freezes_available ?? 1) : 1;
-    let freezeLastRegen = freshProfile.streak_freeze_last_regen || today;
+    let freezesAvailable = freshProfile.streak_freezes_available ?? FREEZE_PER_WEEK;
+    let freezeWeekStart = freshProfile.streak_freeze_week_start || null;
     let freezeLastUsed = freshProfile.streak_freeze_last_used || null;
     let freezeUsedToday = false;
 
-    // Regen freezes: 1 per 7 hari sejak last_regen (max 2). Untuk user lama tanpa field,
-    // kasih 1 freeze awal & set last_regen ke today (tanpa regen palsu).
-    if (hasFreezeFields) {
-      const daysSinceRegen = daysBetween(freezeLastRegen, today);
-      if (daysSinceRegen >= FREEZE_REGEN_DAYS && freezesAvailable < FREEZE_MAX) {
-        const regenAmount = Math.floor(daysSinceRegen / FREEZE_REGEN_DAYS);
-        freezesAvailable = Math.min(FREEZE_MAX, freezesAvailable + regenAmount);
-        freezeLastRegen = today;
-      }
+    // Weekly regen: migrasi user lama (tanpa week_start) → set quota ke 3 minggu ini.
+    // Atau kalau minggu sudah ganti vs yang tersimpan → reset ke 3.
+    if (!freezeWeekStart || freezeWeekStart !== currentWeekStart) {
+      freezesAvailable = FREEZE_PER_WEEK;
+      freezeWeekStart = currentWeekStart;
     }
 
     if (isActivity) {
@@ -169,16 +174,19 @@ Deno.serve(async (req) => {
         newStreak = currentStreak + 1;
         streakChanged = true;
       } else {
-        // 2+ days gap
-        if (freezesAvailable >= 1 && currentStreak > 0) {
-          // Freeze preserves streak (no increment, just keep it alive)
-          freezesAvailable -= 1;
-          freezeLastUsed = today;
-          freezeUsedToday = true;
-          // streak unchanged, but last_activity_date will be updated below
+        // 2+ days gap — biasanya scheduler harian sudah maju-in cursor (last → yesterday)
+        // lewat freeze, jadi sampai sini berarti scheduler belum jalan untuk gap ini.
+        // Tutup tiap missed day pakai freeze; tiap hari yang ketutup tetap NAIKIN angka streak.
+        const missed = daysBetween(last, today) - 1; // hari yang bolong di antara last & today
+        if (missed <= freezesAvailable && currentStreak > 0) {
+          freezesAvailable -= missed;
+          freezeLastUsed = yesterday; // freeze terakhir nutup kemarin
+          freezeUsedToday = missed > 0;
+          newStreak = currentStreak + missed + 1; // missed days + today
+          streakChanged = true;
         } else {
-          // No freeze available → reset to 0
-          newStreak = 0;
+          // Freeze gak cukup → streak hangus, mulai ulang dari hari ini.
+          newStreak = 1;
           streakChanged = true;
         }
       }
@@ -378,7 +386,7 @@ Deno.serve(async (req) => {
       longest_streak: newLongest,
       achievements: freshProfile.achievements || profile.achievements || [],
       streak_freezes_available: freezesAvailable,
-      streak_freeze_last_regen: freezeLastRegen,
+      streak_freeze_week_start: freezeWeekStart,
     };
     if (freezeLastUsed) {
       profileUpdates.streak_freeze_last_used = freezeLastUsed;

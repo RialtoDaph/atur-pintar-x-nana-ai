@@ -33,7 +33,11 @@ export default function DashboardGreeting({ user, gamificationProfile }) {
   else greeting = `Malam, ${name}!`;
 
   const streak = gamificationProfile?.daily_streak ?? 0;
-  const freezes = gamificationProfile?.streak_freezes_available ?? 0;
+  // Match backend WIB date so users outside Indonesia see the right state.
+  const wibTodayStr = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const isActiveToday = gamificationProfile?.last_activity_date === wibTodayStr;
+  // Streak > 0 + belum transaksi hari ini = sedang dilindungi freeze (atau menunggu input).
+  const isFrozen = streak > 0 && !isActiveToday;
 
   function toggleDark() {
     const next = !isDark;
@@ -47,27 +51,14 @@ export default function DashboardGreeting({ user, gamificationProfile }) {
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-xl font-bold">{greeting}</h2>
       <div className="flex items-center gap-2">
-        {(streak > 0 || freezes > 0) && (
+        {streak > 0 && (
           <Link
             to="/Gamifikasi"
-            className="flex items-center gap-1.5 bg-white/10 sm:bg-black/5 hover:bg-white/20 sm:hover:bg-black/10 active:bg-white/25 transition-colors px-2.5 py-1 rounded-full tap-highlight-fix"
-            title="Lihat progres gamifikasi"
+            className="flex items-center gap-1 bg-white/10 sm:bg-black/5 hover:bg-white/20 sm:hover:bg-black/10 active:bg-white/25 transition-colors px-2.5 py-1 rounded-full tap-highlight-fix"
+            title={isFrozen ? "Streak terkunci freeze — catat transaksi biar makin panjang" : "Streak aktif hari ini"}
           >
-            {streak > 0 && (
-              <span className="flex items-center gap-1">
-                <span className="text-sm">🔥</span>
-                <span className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-[11px] font-bold">{streak} hari</span>
-              </span>
-            )}
-            {freezes > 0 && (
-              <span
-                className="flex items-center gap-0.5 text-[11px] font-bold text-white sm:text-[#1A1A1A] dark:sm:text-white"
-                title={`Streak Freeze tersedia: ${freezes}`}
-              >
-                <span className="text-sm">❄️</span>
-                {freezes}
-              </span>
-            )}
+            <span className="text-sm">{isFrozen ? "❄️" : "🔥"}</span>
+            <span className="text-white sm:text-[#1A1A1A] dark:sm:text-white text-[11px] font-bold">{streak} hari</span>
           </Link>
         )}
         <button

@@ -27,6 +27,17 @@ function daysBetween(a, b) {
   return Math.round((db - da) / (1000 * 60 * 60 * 24));
 }
 
+// Monday (WIB) of the week containing dateStr. MUST stay in sync with processGamification.
+function wibWeekStart(dateStr) {
+  const d = new Date(dateStr + "T00:00:00Z");
+  const day = d.getUTCDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
+const FREEZE_PER_WEEK = 3;
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -52,32 +63,52 @@ Deno.serve(async (req) => {
       const userEmail = profile.created_by;
       if (!userEmail) continue;
 
-      // 1. Streak protection / reset:
+      // 1. Streak protection / reset (WEEKLY QUOTA):
+      //   - Weekly regen: kalau profile.streak_freeze_week_start != currentWeekStart → reset freezes=3
       //   - last == today / yesterday → fine, no action.
-      //   - gap >= 2 days + streak > 0 → consume 1 Streak Freeze if available
-      //     (keeps streak alive; bump last_activity_date to yesterday so the user
-      //     coming back today naturally extends streak by +1 and we don't
-      //     double-consume on the next scheduler run).
-      //   - gap >= 2 days + no freeze → reset streak to 0.
+      //   - gap >= 2 days + streak > 0 → pakai 1 freeze; ANGKA STREAK NAIK +1 (covers yesterday);
+      //     last_activity_date dimajukan ke yesterday agar berikutnya gap=1 (no double-consume).
+      //   - gap >= 2 days + freeze habis → reset streak ke 0.
       const last = profile.last_activity_date;
       const currentStreak = profile.daily_streak || 0;
       const gapDays = last ? daysBetween(last, today) : 0;
 
+      // Weekly regen first (juga handle migrasi user lama tanpa week_start)
+      const currentWeekStart = wibWeekStart(today);
+      let freezes = profile.streak_freezes_available ?? FREEZE_PER_WEEK;
+      let freezeWeekStart = profile.streak_freeze_week_start || null;
+      let weekRegenNeeded = false;
+      if (!freezeWeekStart || freezeWeekStart !== currentWeekStart) {
+        freezes = FREEZE_PER_WEEK;
+        freezeWeekStart = currentWeekStart;
+        weekRegenNeeded = true;
+      }
+
       if (last && gapDays >= 2 && currentStreak > 0) {
-        const freezes = profile.streak_freezes_available ?? 0;
         if (freezes >= 1) {
           await base44.asServiceRole.entities.GamificationProfile.update(profile.id, {
             streak_freezes_available: freezes - 1,
-            streak_freeze_last_used: today,
+            streak_freeze_week_start: freezeWeekStart,
+            streak_freeze_last_used: yesterday,
             last_activity_date: yesterday,
+            daily_streak: currentStreak + 1, // angka berjalan: freeze hari kemarin tetap nambah streak
+            longest_streak: Math.max(profile.longest_streak || 0, currentStreak + 1),
           }).catch((e) => console.error('dailyGamificationCheck: freeze consume failed:', e));
           results.freezes_consumed = (results.freezes_consumed || 0) + 1;
         } else {
           await base44.asServiceRole.entities.GamificationProfile.update(profile.id, {
             daily_streak: 0,
+            last_activity_date: null,
+            streak_freeze_week_start: freezeWeekStart,
           }).catch((e) => console.error('dailyGamificationCheck: streak reset failed:', e));
           results.streak_resets++;
         }
+      } else if (weekRegenNeeded) {
+        // Profile sehat (gap < 2), tapi minggu baru → tetap simpan regen quota.
+        await base44.asServiceRole.entities.GamificationProfile.update(profile.id, {
+          streak_freezes_available: freezes,
+          streak_freeze_week_start: freezeWeekStart,
+        }).catch((e) => console.error('dailyGamificationCheck: weekly regen failed:', e));
       }
 
       // 2. Challenge failure check

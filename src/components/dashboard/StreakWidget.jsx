@@ -26,9 +26,11 @@ export default function StreakWidget({
   // WIB date — match backend (processGamification / dailyGamificationCheck) so users
   // outside Indonesia don't see "Catat hari ini!" when backend already records them active.
   const wibTodayStr = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const streakCount = safeProfile.daily_streak || 0;
   const isActiveToday = safeProfile.last_activity_date === wibTodayStr;
-  const freezeProtecting = !isActiveToday && safeProfile.streak_freeze_last_used === wibTodayStr && (safeProfile.daily_streak || 0) > 0;
-  // Treat freeze-protected day as "active" for visual state (orange theme, real streak count).
+  // Streak > 0 + belum aktif hari ini = sedang dilindungi freeze (angka tetap jalan).
+  const freezeProtecting = !isActiveToday && streakCount > 0;
+  // Active visual state (orange theme) when user logged today OR streak is frozen-alive.
   const showActive = isActiveToday || freezeProtecting;
   const StreakIcon = freezeProtecting ? Snowflake : Flame;
 
@@ -75,11 +77,11 @@ export default function StreakWidget({
 
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-[#1A1A1A] leading-tight">
-              {freezeProtecting
-                ? `${safeProfile.daily_streak} hari aman dengan freeze ❄️`
-                : !isActiveToday
-                ? "Catat transaksi hari ini!"
-                : `${safeProfile.daily_streak} hari berturut-turut 🔥`}
+              {streakCount === 0
+                ? "Catat transaksi pertamamu! 🚀"
+                : freezeProtecting
+                ? `${streakCount} hari — terkunci freeze ❄️`
+                : `${streakCount} hari berturut-turut 🔥`}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <div className="flex-1 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">

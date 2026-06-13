@@ -5,7 +5,7 @@
     "daily_streak": {
       "type": "integer",
       "default": 0,
-      "description": "Streak harian"
+      "description": "Streak harian (angka berjalan; naik tiap hari user aktif ATAU saat freeze otomatis melindungi)"
     },
     "longest_streak": {
       "type": "integer",
@@ -15,7 +15,7 @@
     "last_activity_date": {
       "type": "string",
       "format": "date",
-      "description": "Tanggal aktivitas terakhir"
+      "description": "Tanggal terakhir streak dihitung (lewat aktivitas user ATAU freeze otomatis)"
     },
     "total_points": {
       "type": "integer",
@@ -37,13 +37,13 @@
     },
     "streak_freezes_available": {
       "type": "integer",
-      "default": 1,
-      "description": "Jumlah streak freeze yang tersedia (auto-protect streak kalau skip 1 hari). Max 2, regen 1 per 7 hari."
+      "default": 3,
+      "description": "Sisa streak freeze MINGGU INI (max 3). Setiap user dapat 3 freeze tiap minggu (regen tiap Senin WIB). Setiap hari bolong otomatis pakai 1 freeze; kalau habis dan tetap bolong \u2192 streak reset 0."
     },
-    "streak_freeze_last_regen": {
+    "streak_freeze_week_start": {
       "type": "string",
       "format": "date",
-      "description": "Tanggal terakhir streak freeze di-regenerate"
+      "description": "Tanggal Senin (WIB) dari minggu freeze quota saat ini. Dipakai untuk regen mingguan."
     },
     "streak_freeze_last_used": {
       "type": "string",
