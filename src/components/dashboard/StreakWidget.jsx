@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Flame, ChevronDown, ChevronUp } from "lucide-react";
+import { Flame, Snowflake, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { LEVELS, getLevelFromXP } from "@/hooks/useGamification";
@@ -25,6 +25,13 @@ export default function StreakWidget({
     ? Math.min(100, ((safeProfile.total_points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100)
     : 100;
   const isActiveToday = safeProfile.last_activity_date === format(new Date(), "yyyy-MM-dd");
+  // WIB date — match backend (processGamification / dailyGamificationCheck) so we detect
+  // a freeze-protected day even when the user's browser timezone differs from WIB.
+  const wibTodayStr = new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const freezeProtecting = !isActiveToday && safeProfile.streak_freeze_last_used === wibTodayStr && (safeProfile.daily_streak || 0) > 0;
+  // Treat freeze-protected day as "active" for visual state (orange theme, real streak count).
+  const showActive = isActiveToday || freezeProtecting;
+  const StreakIcon = freezeProtecting ? Snowflake : Flame;
 
   return (
     <>
@@ -57,19 +64,23 @@ export default function StreakWidget({
 
         <button onClick={() => setExpanded(v => !v)} className="w-full px-4 py-3 flex items-center gap-3 text-left tap-highlight-fix">
           <motion.div
-            animate={isActiveToday ? { scale: [1, 1.15, 1] } : {}}
+            animate={showActive ? { scale: [1, 1.15, 1] } : {}}
             transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
-            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${isActiveToday ? "bg-[#F97316]/10" : "bg-[#F2F4F7]"}`}
+            className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${showActive ? "bg-[#F97316]/10" : "bg-[#F2F4F7]"}`}
           >
-            <Flame className={`w-4 h-4 ${isActiveToday ? "text-[#F97316]" : "text-[#8FA4C8]"}`} />
-            <p className={`text-xs font-black leading-none mt-0.5 ${isActiveToday ? "text-[#F97316]" : "text-[#8FA4C8]"}`}>
+            <StreakIcon className={`w-4 h-4 ${showActive ? "text-[#F97316]" : "text-[#8FA4C8]"}`} />
+            <p className={`text-xs font-black leading-none mt-0.5 ${showActive ? "text-[#F97316]" : "text-[#8FA4C8]"}`}>
               {safeProfile.daily_streak}
             </p>
           </motion.div>
 
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-[#1A1A1A] leading-tight">
-              {!isActiveToday ? "Catat transaksi hari ini!" : `${safeProfile.daily_streak} hari berturut-turut 🔥`}
+              {freezeProtecting
+                ? `${safeProfile.daily_streak} hari aman dengan freeze ❄️`
+                : !isActiveToday
+                ? "Catat transaksi hari ini!"
+                : `${safeProfile.daily_streak} hari berturut-turut 🔥`}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <div className="flex-1 h-1.5 bg-[#F2F4F7] rounded-full overflow-hidden">
