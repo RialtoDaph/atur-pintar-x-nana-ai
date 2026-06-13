@@ -188,10 +188,23 @@ export default function BudgetPage() {
     return { label: "Kategori dihapus", emoji: "📦", color: "#95A5A6" };
   }
 
-  // Aggregate spending by category key (GlobalCategory.id or custom_<id>)
+  // Build alias map: name → id, so legacy budgets (stored by name) still match
+  // transactions stored by GlobalCategory.id (and vice versa).
+  const aliasMap = {};
+  globalCategories.forEach(c => {
+    aliasMap[c.id] = c.id;
+    if (c.name) aliasMap[c.name] = c.id;
+    if (c.name) aliasMap[c.name.toLowerCase()] = c.id;
+  });
+  const canonical = (key) => {
+    if (!key) return "other";
+    return aliasMap[key] || aliasMap[String(key).toLowerCase()] || key;
+  };
+
+  // Aggregate spending by canonical category key
   const spendingByCategory = {};
   transactions.forEach(tx => {
-    const key = tx.category || "other";
+    const key = canonical(tx.category);
     spendingByCategory[key] = (spendingByCategory[key] || 0) + tx.amount;
   });
 
@@ -203,7 +216,7 @@ export default function BudgetPage() {
   const budgetLimitReached = !isPremium && budgets.length >= FREE_BUDGET_LIMIT;
 
   const totalBudget = budgets.reduce((s, b) => s + b.amount, 0);
-  const totalSpent = budgets.reduce((s, b) => s + (spendingByCategory[b.category] || 0), 0);
+  const totalSpent = budgets.reduce((s, b) => s + (spendingByCategory[canonical(b.category)] || 0), 0);
   const overallPercent = totalBudget > 0 ? Math.min((totalSpent / totalBudget) * 100, 100) : 0;
 
   const monthLabel = new Date(currentMonth + "-01").toLocaleString(

@@ -19,6 +19,19 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
 
 
 
+  // Build alias map: name → id, so we can match budgets that store the category
+  // as a name with transactions that store it as the id (and vice versa).
+  const aliasMap = {};
+  (globalCategories || []).forEach(c => {
+    aliasMap[c.id] = c.id;
+    if (c.name) aliasMap[c.name] = c.id;
+    if (c.name) aliasMap[c.name.toLowerCase()] = c.id;
+  });
+  const canonical = (key) => {
+    if (!key) return "other";
+    return aliasMap[key] || aliasMap[String(key).toLowerCase()] || key;
+  };
+
   // Calculate spending per category for this month
   const now = new Date();
   const thisMonthExpenses = transactions.filter(t => {
@@ -28,7 +41,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
 
   const spendingByCategory = {};
   thisMonthExpenses.forEach(tx => {
-    const key = tx.category || "other";
+    const key = canonical(tx.category);
     spendingByCategory[key] = (spendingByCategory[key] || 0) + tx.amount;
   });
 
@@ -38,7 +51,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
   // Only show budgets that are >= 70% used
   const alertBudgets = currentMonthBudgets
     .map(b => {
-      const spent = spendingByCategory[b.category] || 0;
+      const spent = spendingByCategory[canonical(b.category)] || 0;
       const percent = b.amount > 0 ? (spent / b.amount) * 100 : 0;
       return { ...b, spent, percent };
     })
@@ -48,7 +61,7 @@ export default function BudgetAlertWidget({ transactions = [], loading = false, 
   // Map all budgets with spending info
   const allBudgets = currentMonthBudgets
     .map(b => {
-      const spent = spendingByCategory[b.category] || 0;
+      const spent = spendingByCategory[canonical(b.category)] || 0;
       const percent = b.amount > 0 ? (spent / b.amount) * 100 : 0;
       return { ...b, spent, percent };
     })
