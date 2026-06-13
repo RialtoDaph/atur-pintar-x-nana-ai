@@ -188,17 +188,38 @@ export default function BudgetPage() {
     return { label: "Kategori dihapus", emoji: "📦", color: "#95A5A6" };
   }
 
-  // Build alias map: name → id, so legacy budgets (stored by name) still match
-  // transactions stored by GlobalCategory.id (and vice versa).
+  // Build alias map (name ↔ id) + children-of-parent map.
+  // Budgets often target a PARENT category (e.g. "Transportasi") while transactions
+  // are stored on the SUBCATEGORY (e.g. "Taxi Online"). For a parent budget we sum
+  // the parent's own spending PLUS every subcategory under it.
   const aliasMap = {};
+  const childrenByParent = {};
   globalCategories.forEach(c => {
     aliasMap[c.id] = c.id;
-    if (c.name) aliasMap[c.name] = c.id;
-    if (c.name) aliasMap[c.name.toLowerCase()] = c.id;
+    if (c.name) {
+      aliasMap[c.name] = c.id;
+      aliasMap[c.name.toLowerCase()] = c.id;
+    }
+  });
+  globalCategories.forEach(c => {
+    if (c.is_subcategory && c.parent_category) {
+      const parentId = aliasMap[c.parent_category] || aliasMap[c.parent_category.toLowerCase()];
+      if (parentId) {
+        if (!childrenByParent[parentId]) childrenByParent[parentId] = [];
+        childrenByParent[parentId].push(c.id);
+      }
+    }
   });
   const canonical = (key) => {
     if (!key) return "other";
     return aliasMap[key] || aliasMap[String(key).toLowerCase()] || key;
+  };
+  const spentFor = (budgetCategory) => {
+    const id = canonical(budgetCategory);
+    let total = spendingByCategory[id] || 0;
+    const childIds = childrenByParent[id] || [];
+    childIds.forEach(cid => { total += spendingByCategory[cid] || 0; });
+    return total;
   };
 
   // Aggregate spending by canonical category key
@@ -206,6 +227,24 @@ export default function BudgetPage() {
   transactions.forEach(tx => {
     const key = canonical(tx.category);
     spendingByCategory[key] = (spendingByCategory[key] || 0) + tx.amount;
+  });
+
+  // Roll-up: for each budget targeting a PARENT category, sum all its subcategories
+  // into the parent key. This way every consumer (chart, NanaPanel, AlertChecker,
+  // BudgetCard) sees the correct total without each having to redo the rollup.
+  budgets.forEach(b => {
+    const id = canonical(b.category);
+    const childIds = childrenByParent[id] || [];
+    if (childIds.length > 0) {
+      let total = spendingByCategory[id] || 0;
+      childIds.forEach(cid => { total += spendingByCategory[cid] || 0; });
+      spendingByCategory[id] = total;
+      if (id !== b.category) spendingByCategory[b.category] = total;
+    } else if (id !== b.category) {
+      // Budget stored by name but transactions stored by id (or vice versa) —
+      // mirror the value so direct-key lookups still work.
+      spendingByCategory[b.category] = spendingByCategory[id] || 0;
+    }
   });
 
   // 🎁 Free access window — all users get unlimited budgets until 2026-08-08
@@ -216,7 +255,7 @@ export default function BudgetPage() {
   const budgetLimitReached = !isPremium && budgets.length >= FREE_BUDGET_LIMIT;
 
   const totalBudget = budgets.reduce((s, b) => s + b.amount, 0);
-  const totalSpent = budgets.reduce((s, b) => s + (spendingByCategory[canonical(b.category)] || 0), 0);
+  const totalSpent = budgets.reduce((s, b) => s + spentFor(b.category), 0);
   const overallPercent = totalBudget > 0 ? Math.min((totalSpent / totalBudget) * 100, 100) : 0;
 
   const monthLabel = new Date(currentMonth + "-01").toLocaleString(
