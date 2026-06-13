@@ -58,6 +58,19 @@ const PageLoader = () => (
 
 const { Pages, Layout } = pagesConfig;
 
+// Root route: logged-in users skip the landing page and go straight to the dashboard
+const RootRoute = () => {
+  const { isAuthenticated, isLoadingAuth } = useAuth();
+  if (isLoadingAuth) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  return isAuthenticated ? <Navigate to="/Dashboard" replace /> : <LandingPage />;
+};
+
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>
     <RouteErrorBoundary pageKey={currentPageName}>{children}</RouteErrorBoundary>
@@ -122,7 +135,7 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* ── Public marketing/legal pages ── */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<RootRoute />} />
       <Route path="/LandingPage" element={<LandingPage />} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
