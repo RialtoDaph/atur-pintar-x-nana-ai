@@ -48,7 +48,9 @@ export default function BudgetPage() {
   const debounceRef = useRef(null);
   const debouncedLoad = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => loadData(), 1500);
+    // Longer debounce reduces burst when many subscription events fire back-to-back
+    // (e.g. user adding several transactions in a row), which was triggering rate limits.
+    debounceRef.current = setTimeout(() => loadData(), 3000);
   }, []);
 
   // Load static refs (categories) once per user — they almost never change
@@ -105,9 +107,13 @@ export default function BudgetPage() {
     };
 
     try {
-      // Sequential calls to avoid burst that triggers rate limits
+      // Sequential calls to avoid burst that triggers rate limits.
+      // Small inter-call delay further smooths bursts when subscriptions fire back-to-back.
+      const sleep = (ms) => new Promise(r => setTimeout(r, ms));
       const bRaw = await withRetry(() => base44.entities.Budget.filter({ month: currentMonth, created_by: user.email }, 'created_date'));
+      await sleep(120);
       const txAll = await withRetry(() => base44.entities.Transaction.filter({ created_by: user.email }, "-date", 300));
+      await sleep(120);
       const g = await withRetry(() => base44.entities.SavingsGoal.filter({ created_by: user.email, status: "active" }));
 
       // Dedup budgets: for each (category+month), keep only the OLDEST record
@@ -138,6 +144,14 @@ export default function BudgetPage() {
       if (monthOffset === 0 && !carryOverCheckedRef.current && b.length === 0) {
         carryOverCheckedRef.current = true;
         await tryCarryOverBudgets(currentMonth);
+      }
+    } catch (e) {
+      // Rate limit or transient error after retries — keep existing data shown,
+      // schedule a quiet retry, and never crash the page.
+      if (/rate limit/i.test(e?.message || "")) {
+        setTimeout(() => { loadData(); }, 8000);
+      } else {
+        console.error("Budget loadData failed:", e);
       }
     } finally {
       setLoading(false);
