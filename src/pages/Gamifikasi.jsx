@@ -161,7 +161,7 @@ export default function Gamifikasi() {
                 <p className="text-sm font-bold text-[#1A1A1A]">🔥 Streak Harian</p>
                 <span
                   className="text-xs font-bold text-[#1A1A1A] bg-[#F2F4F7] px-2 py-0.5 rounded-full"
-                  title="Streak Freeze otomatis lindungi streak kamu kalau skip 1 hari. Regen +1 per 7 hari, max 2."
+                  title="Streak Freeze otomatis lindungi streak kamu kalau skip 1 hari. Quota 3x per minggu, reset tiap Senin (WIB)."
                 >
                   ❄️ {gamificationProfile?.streak_freezes_available ?? 0} freeze
                 </span>
@@ -173,6 +173,33 @@ export default function Gamifikasi() {
                   ❄️ Freeze terakhir terpakai: {gamificationProfile.streak_freeze_last_used}
                 </p>
               )}
+
+              {/* Weekly freeze reset info */}
+              {(() => {
+                // Compute next Monday (WIB) — when freeze quota refreshes to 3.
+                // WIB = UTC+7. Get "today" in WIB, find days until next Monday.
+                const nowWIB = new Date(Date.now() + 7 * 60 * 60 * 1000);
+                const wibDay = nowWIB.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+                const daysUntilMonday = wibDay === 1 ? 7 : (8 - wibDay) % 7 || 7;
+                const nextResetWIB = new Date(nowWIB);
+                nextResetWIB.setUTCDate(nowWIB.getUTCDate() + daysUntilMonday);
+                const resetDateStr = nextResetWIB.toLocaleDateString("id-ID", { day: "numeric", month: "long" });
+                const label = daysUntilMonday === 1 ? "besok" : `${daysUntilMonday} hari lagi`;
+                return (
+                  <div className="mt-3 pt-3 border-t border-[#F2F4F7]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">🔄</span>
+                        <p className="text-[11px] font-semibold text-[#1A1A1A]">Freeze reset</p>
+                      </div>
+                      <p className="text-[11px] font-bold text-[#F97316]">{label}</p>
+                    </div>
+                    <p className="text-[10px] text-[#8FA4C8] mt-0.5">
+                      Senin, {resetDateStr} (WIB) · jatah freeze kembali ke 3
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
           </>
         )}
