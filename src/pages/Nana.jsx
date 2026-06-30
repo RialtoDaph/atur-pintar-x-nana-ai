@@ -542,7 +542,14 @@ function NanaInner() {
               })
             )}
             <AnimatePresence>
-            {sending && (
+            {sending && (() => {
+              // Hide typing indicator once assistant has started streaming —
+              // otherwise user sees the streaming bubble + a separate "...typing"
+              // bubble at the same time (double loading template).
+              const lastMsg = visibleMessages[visibleMessages.length - 1];
+              const assistantAlreadyResponding = lastMsg?.role === "assistant" && lastMsg?.content;
+              if (assistantAlreadyResponding) return null;
+              return (
               <motion.div
                 key="typing-indicator"
                 initial={{ opacity: 0, y: 8 }}
@@ -560,7 +567,8 @@ function NanaInner() {
                   ))}
                 </div>
               </motion.div>
-            )}
+              );
+            })()}
             </AnimatePresence>
           </div>
 
