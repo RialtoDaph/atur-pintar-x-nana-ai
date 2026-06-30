@@ -61,7 +61,19 @@ function NanaInner() {
     rec.interimResults = true;
     rec.onstart = () => setIsListening(true);
     rec.onend = () => setIsListening(false);
-    rec.onerror = () => setIsListening(false);
+    rec.onerror = (e) => {
+      setIsListening(false);
+      const err = e?.error;
+      if (err === "not-allowed" || err === "service-not-allowed") {
+        toast.error("Mic diblokir. Izinkan akses mic di pengaturan browser.");
+      } else if (err === "no-speech") {
+        toast("Suara tidak terdengar. Coba lagi ya.", { icon: "🎤" });
+      } else if (err === "network") {
+        toast.error("Voice input butuh koneksi internet.");
+      } else if (err && err !== "aborted") {
+        toast.error("Voice input gagal. Coba ketik aja ya.");
+      }
+    };
     rec.onresult = (e) => {
       const transcript = Array.from(e.results).map((r) => r[0].transcript).join("");
       setInput(transcript);
@@ -316,7 +328,11 @@ function NanaInner() {
     if (!user) return;
     // Rate limit: min 3 detik antar pesan (anti-spam, hemat AI credits)
     const nowMs = Date.now();
-    if (nowMs - lastSendAt.current < 3000) return;
+    if (nowMs - lastSendAt.current < 3000) {
+      const waitSec = Math.ceil((3000 - (nowMs - lastSendAt.current)) / 1000);
+      toast(`Sabar ya, tunggu ${waitSec} detik lagi 😊`, { icon: "⏳" });
+      return;
+    }
 
     let conv = activeConv;
     // 🔒 SECURITY: refuse to send into a conversation not owned by current user
@@ -380,6 +396,7 @@ function NanaInner() {
       console.error("Error sending message:", error);
       // Restore input so user doesn't lose their message on failure
       setInput(previousInput);
+      toast.error("Gagal kirim pesan. Cek koneksi & coba lagi ya.");
     } finally {
       setSending(false);
     }
