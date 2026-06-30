@@ -271,6 +271,26 @@ export default function Settings() {
             </div>
           </Link>
           <Link
+            to="/RefundPolicy"
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+          >
+            <ShieldCheck className="w-5 h-5 text-[#8FA4C8]" />
+            <div className="text-left">
+              <p className="font-medium text-[#1A1A1A] text-sm">Kebijakan Refund</p>
+              <p className="text-xs text-[#8FA4C8]">Ketentuan & cara mengajukan refund</p>
+            </div>
+          </Link>
+          <Link
+            to="/CancellationPolicy"
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+          >
+            <ShieldCheck className="w-5 h-5 text-[#8FA4C8]" />
+            <div className="text-left">
+              <p className="font-medium text-[#1A1A1A] text-sm">Pembatalan Langganan</p>
+              <p className="text-xs text-[#8FA4C8]">Cara membatalkan langganan Premium</p>
+            </div>
+          </Link>
+          <Link
             to="/About"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
