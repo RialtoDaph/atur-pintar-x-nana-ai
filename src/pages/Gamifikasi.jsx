@@ -174,38 +174,51 @@ export default function Gamifikasi() {
                 </p>
               )}
 
-              {/* Weekly freeze reset info */}
-              {(() => {
-                // Compute next Monday (WIB) — when freeze quota refreshes to 3.
-                // WIB = UTC+7. Get "today" in WIB, find days until next Monday.
-                const nowWIB = new Date(Date.now() + 7 * 60 * 60 * 1000);
-                const wibDay = nowWIB.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-                const daysUntilMonday = wibDay === 1 ? 7 : (8 - wibDay) % 7 || 7;
-                const nextResetWIB = new Date(nowWIB);
-                nextResetWIB.setUTCDate(nowWIB.getUTCDate() + daysUntilMonday);
-                const resetDateStr = nextResetWIB.toLocaleDateString("id-ID", { day: "numeric", month: "long" });
-                const label = daysUntilMonday === 1 ? "besok" : `${daysUntilMonday} hari lagi`;
-                return (
-                  <div className="mt-3 pt-3 border-t border-[#F2F4F7]">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm">🔄</span>
-                        <p className="text-[11px] font-semibold text-[#1A1A1A]">Freeze reset</p>
-                      </div>
-                      <p className="text-[11px] font-bold text-[#F97316]">{label}</p>
-                    </div>
-                    <p className="text-[10px] text-[#8FA4C8] mt-0.5">
-                      Senin, {resetDateStr} (WIB) · jatah freeze kembali ke 3
-                    </p>
-                    {gamificationProfile?.streak_freeze_week_start && (
-                      <p className="text-[10px] text-[#8FA4C8] mt-1.5" data-testid="freeze-week-start">
-                        <span className="font-semibold text-[#1A1A1A]">Minggu freeze aktif:</span> mulai {gamificationProfile.streak_freeze_week_start}
-                      </p>
-                    )}
-                  </div>
-                );
-              })()}
             </div>
+
+            {/* Weekly Reset Card — dedicated, prominent indicator */}
+            {(() => {
+              // Compute next Monday (WIB) — when freeze quota refreshes to 3.
+              const nowWIB = new Date(Date.now() + 7 * 60 * 60 * 1000);
+              const wibDay = nowWIB.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+              const daysUntilMonday = wibDay === 1 ? 7 : (8 - wibDay) % 7 || 7;
+              const nextResetWIB = new Date(nowWIB);
+              nextResetWIB.setUTCDate(nowWIB.getUTCDate() + daysUntilMonday);
+              const resetDateStr = nextResetWIB.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" });
+              const label = daysUntilMonday === 1 ? "besok" : `${daysUntilMonday} hari lagi`;
+              const progressPct = ((7 - daysUntilMonday) / 7) * 100;
+              return (
+                <div className="bg-white rounded-2xl shadow-sm p-4" data-testid="weekly-reset-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-bold text-[#1A1A1A]">🔄 Reset Mingguan</p>
+                    <span className="text-xs font-bold text-[#F97316] bg-[#FFF5F0] px-2 py-0.5 rounded-full">
+                      {label}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#8FA4C8] mb-2">
+                    Jatah freeze kembali ke 3 setiap <span className="font-semibold text-[#1A1A1A]">Senin (WIB)</span>
+                  </p>
+                  <div className="h-2 bg-[#F2F4F7] rounded-full overflow-hidden mb-2">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-[#F97316] to-[#FFD700]"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progressPct}%` }}
+                      transition={{ duration: 0.6 }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <p className="text-[#8FA4C8]">Reset berikutnya</p>
+                    <p className="font-bold text-[#1A1A1A]" data-testid="next-reset-date">{resetDateStr}</p>
+                  </div>
+                  {gamificationProfile?.streak_freeze_week_start && (
+                    <div className="mt-2 pt-2 border-t border-[#F2F4F7] flex items-center justify-between text-[11px]">
+                      <p className="text-[#8FA4C8]">Minggu aktif sejak</p>
+                      <p className="font-bold text-[#1A1A1A]" data-testid="freeze-week-start">{gamificationProfile.streak_freeze_week_start}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </>
         )}
 
