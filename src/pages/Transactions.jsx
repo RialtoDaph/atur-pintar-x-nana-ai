@@ -67,6 +67,10 @@ export default function Transactions() {
     fetchingRef.current = true;
     setLoading(true);
     try {
+      // Safety net: if anything below throws unexpectedly, we still exit the loading
+      // state instead of leaving the page stuck on a spinner forever. Previously the
+      // finally block was the only path out — race between two useEffects on mount
+      // + a network failure inside Promise.all could leave loading=true.
       // Retry once on rate limit to avoid blank page
       const me = async () => {
         try { return await base44.auth.me(); }
@@ -144,15 +148,19 @@ export default function Transactions() {
         return new Date(a.next_due_date) - new Date(b.next_due_date);
       }));
       setGoals(gls || []);
+    } catch (err) {
+      // Never leave the user stuck on a loading spinner if a fetch fails.
+      // Empty state is a better fallback than a permanent loader.
+      console.error("Transactions fetchData failed:", err);
     } finally {
       setLoading(false);
       fetchingRef.current = false;
     }
   }
 
-  useEffect(() => { fetchData(); }, []);
-
-  // Refetch whenever the active month/year filter changes (server-side date filtering)
+  // Single effect for both initial load and filter changes — avoids the previous
+  // race where two useEffects both fired on mount and the second was silently
+  // dropped by `fetchingRef`, leaving `loading=true` visible on the page.
   useEffect(() => { fetchData(true); }, [filters.month, filters.year]);
 
   // Re-fetch when a transaction is added/edited elsewhere (e.g., FAB in Layout)

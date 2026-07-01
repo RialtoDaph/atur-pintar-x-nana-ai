@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import AccountAvatar from "@/components/ui/AccountAvatar";
 import SplitBillModal from "./SplitBillModal";
 import ReceiptCorrectionForm from "./ReceiptCorrectionForm";
+import ManageCategoriesModal from "./ManageCategoriesModal";
 import useLockBodyScroll from "@/hooks/useLockBodyScroll";
 
 function formatDisplay(val) {
@@ -55,6 +56,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
   const [showSplitBill, setShowSplitBill] = useState(false);
   const [lowBalanceConfirm, setLowBalanceConfirm] = useState(null);
   const [accountError, setAccountError] = useState("");
+  const [showManageCats, setShowManageCats] = useState(false);
   const suggestTimer = useRef(null);
   const amountInputRef = useRef(null);
   const fileRef = useRef(null);
@@ -551,10 +553,14 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
                       <p className="text-xs text-[#8FA4C8] mb-2">
                         Belum ada kategori {tab === "expense" ? "pengeluaran" : "pemasukan"}.
                       </p>
-                      <Link to="/Settings" onClick={onClose}
-                        className="inline-block px-3 py-1.5 bg-[#F97316] text-white rounded-lg text-[11px] font-semibold">
+                      {/* Open ManageCategoriesModal in-place instead of navigating to /Settings,
+                          which doesn't actually expose category controls. */}
+                      <button
+                        onClick={() => setShowManageCats(true)}
+                        className="inline-block px-3 py-1.5 bg-[#F97316] text-white rounded-lg text-[11px] font-semibold"
+                      >
                         Atur Kategori
-                      </Link>
+                      </button>
                       <p className="text-[10px] text-[#8FA4C8] mt-2">Transaksi tetap bisa disimpan tanpa kategori.</p>
                     </div>
                   );
@@ -663,6 +669,33 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
 
       {showSplitBill && receiptData && (
         <SplitBillModal receiptData={receiptData} onClose={() => setShowSplitBill(false)} onConfirm={handleSplitConfirm} />
+      )}
+
+      {showManageCats && (
+        <ManageCategoriesModal
+          onClose={() => setShowManageCats(false)}
+          onUpdated={async () => {
+            // Refresh category list so newly-added ones show up immediately
+            try {
+              const u = await base44.auth.me();
+              const [cats, customCats] = await Promise.all([
+                base44.entities.GlobalCategory.list("sort_order").catch(() => []),
+                base44.entities.CustomCategory.filter({ created_by: u.email }).catch(() => []),
+              ]);
+              const activeGlobal = (cats || []).filter(c => c.is_active !== false);
+              const customAsCategory = (customCats || []).map(c => ({
+                id: `custom_${c.id}`,
+                name: c.name,
+                emoji: c.emoji || "📦",
+                color: c.color || "#95A5A6",
+                type: c.type || "both",
+                sort_order: 999,
+                is_subcategory: false,
+              }));
+              setGlobalCategories([...activeGlobal, ...customAsCategory]);
+            } catch {}
+          }}
+        />
       )}
     </>
   );
