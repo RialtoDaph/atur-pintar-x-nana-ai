@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Check, MessageSquare, ShieldCheck, MapPin, Download } from "lucide-react";
+import { Check, MessageSquare, ShieldCheck, MapPin, Download, Trophy } from "lucide-react";
 import ExportLaporanModal from "@/components/analytics/ExportLaporanModal";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
 import FeedbackModal from "@/components/settings/FeedbackModal";
@@ -187,6 +187,23 @@ export default function Settings() {
         {/* Integrasi & Export */}
         <div className="bg-white rounded-2xl shadow-md p-5 border border-[#F0F2F5]">
           <IntegrationSettings />
+        </div>
+
+        {/* Gamifikasi & Streak */}
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-[#F0F2F5]">
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Gamifikasi</p>
+          </div>
+          <Link
+            to={createPageUrl("Gamifikasi")}
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
+          >
+            <Trophy className="w-5 h-5 text-[#F97316]" />
+            <div className="text-left">
+              <p className="font-medium text-[#1A1A1A] text-sm">Streak & Reset Mingguan</p>
+              <p className="text-xs text-[#8FA4C8]">Lihat streak, sisa freeze & tanggal reset mingguan</p>
+            </div>
+          </Link>
         </div>
 
         {/* Tour Panduan */}

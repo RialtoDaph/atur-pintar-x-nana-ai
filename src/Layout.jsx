@@ -135,7 +135,8 @@ function LayoutInner({ children, currentPageName }) {
   { name: "Budget", label: t('nav_budget'), icon: PiggyBank, page: "Budget" },
   { name: "Debts", label: t('nav_debts'), icon: CreditCard, page: "Debts" },
   { name: "Accounts", label: "Rekening", icon: Wallet, page: "Accounts" },
-  { name: "SharedFinance", label: "Keuangan Bersama", icon: Users, page: "SharedFinance" }];
+  { name: "SharedFinance", label: "Keuangan Bersama", icon: Users, page: "SharedFinance" },
+  { name: "Gamifikasi", label: "Gamifikasi", icon: Target, page: "Gamifikasi" }];
 
 
   const navSettingsItems = [
