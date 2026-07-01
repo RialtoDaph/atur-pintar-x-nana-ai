@@ -10,7 +10,6 @@ import SampleDataBanner, { hasSampleData } from "@/components/onboarding/SampleD
 import BalanceCardCarousel from "@/components/dashboard/BalanceCardCarousel";
 import TodayTransactionsCard from "@/components/dashboard/TodayTransactionsCard";
 import SubscriptionExpiredBanner from "@/components/dashboard/SubscriptionExpiredBanner";
-import { syncAccountBalance } from "@/components/utils/accountSync";
 import { saveTransactionWithSync } from "@/components/utils/saveTransaction";
 
 import RecurringManager from "@/components/transactions/RecurringManager";

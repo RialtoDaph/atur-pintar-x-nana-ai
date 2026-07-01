@@ -67,14 +67,16 @@ export async function processRecurringTransactions(userEmail) {
       await base44.entities.Transaction.bulkCreate(toCreate);
     }
 
-    // Per spec: mark parent processed with today's date (not the child's date).
-    await base44.entities.Transaction.update(tx.id, {
-      recurring_last_generated: today,
-    });
-
-    if (anyCreated && tx.account_id) {
-      // Recalculate balance ONCE from source of truth (idempotent, accurate).
-      await recalculateAccountBalance(tx.account_id);
+    // Only touch the parent when we actually generated something —
+    // avoids a wasted write per template per day for users who open the app daily.
+    if (anyCreated) {
+      await base44.entities.Transaction.update(tx.id, {
+        recurring_last_generated: today,
+      });
+      if (tx.account_id) {
+        // Recalculate balance ONCE from source of truth (idempotent, accurate).
+        await recalculateAccountBalance(tx.account_id);
+      }
     }
   }
 }

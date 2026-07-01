@@ -1076,7 +1076,10 @@ export function AppSettingsProvider({ children }) {
     // Bust cache so next session reload picks up fresh values
     try { sessionStorage.setItem('app_settings_cache', JSON.stringify({ settings: newSettings, id: settingsId })); } catch {}
     if (settingsId) {
-      await base44.entities.AppSettings.update(settingsId, newSettings);
+      // Strip built-in fields — server rejects/validates them and it bloats the payload.
+      // Only send editable AppSettings schema properties.
+      const { id, created_by, created_by_id, created_date, updated_date, ...payload } = newSettings;
+      await base44.entities.AppSettings.update(settingsId, payload);
     }
   };
 

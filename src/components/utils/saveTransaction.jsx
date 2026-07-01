@@ -17,12 +17,25 @@ import { recalcGoalAmount } from "@/components/utils/recalcGoalAmount";
  */
 export async function saveTransactionWithSync(data) {
   await base44.entities.Transaction.create(data);
-  if (data.account_id && !data.is_recurring) {
+  // Recurring TEMPLATES (is_recurring=true, no child flag) are schedule definitions,
+  // not real activity — skip balance sync, gamification streak, and dashboard refresh
+  // for them. RecurringManager generates the actual child transactions later, and those
+  // trigger the proper flow when they land.
+  const isRecurringTemplate = data.is_recurring === true && !data.is_recurring_child;
+
+  if (data.account_id && !isRecurringTemplate) {
     await syncAccountBalance(data.account_id, data.amount, data.type, 1);
   }
-  if (data.type === "savings" && data.goal_id) {
+  if (data.type === "savings" && data.goal_id && !isRecurringTemplate) {
     await recalcGoalAmount(data.goal_id);
   }
+
+  if (isRecurringTemplate) {
+    // Template saved — refresh Rutin tab list, but don't award streak XP.
+    window.dispatchEvent(new Event("refresh-dashboard"));
+    return;
+  }
+
   // Fire streak/XP update immediately — independent of whether the user is on
   // the Dashboard. We AWAIT the response (briefly) so we can forward streak/level/
   // achievement deltas to the Dashboard listener via the `transaction-added`

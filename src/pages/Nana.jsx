@@ -414,7 +414,7 @@ function NanaInner() {
   const hasMood = todayMood && todayMood.mood;
 
   return (
-    <div className="flex flex-col bg-[#F2F4F7] dark:bg-[#0F1114] overflow-hidden" style={{ height: 'calc(100dvh - 56px)' }}>
+    <div className="flex flex-col bg-[#F2F4F7] dark:bg-[#0F1114] overflow-hidden" style={{ height: 'calc(100dvh - 56px - env(safe-area-inset-top, 0px))' }}>
 
       {/* Header */}
       <div className="bg-[#0A0A0A] px-4 pt-3 pb-3 flex items-center justify-between border-b border-white/10 flex-shrink-0">
