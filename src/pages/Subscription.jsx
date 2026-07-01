@@ -71,7 +71,17 @@ export default function Subscription() {
         window.history.replaceState({}, "", window.location.pathname);
       }).catch(() => {});
     } else if (paid === "0") {
-      setPaymentError("Pembayaran dibatalkan atau gagal. Silakan coba lagi atau hubungi admin@aturpintar.id kalau ada kendala.");
+      // Xendit redirected back with failure/cancellation. Show a detailed error card
+      // with concrete next steps — the modal below surfaces the same info in-context.
+      setPaymentError({
+        title: "Pembayaran Gagal atau Dibatalkan",
+        message: "Transaksi kamu ditolak oleh payment gateway atau dibatalkan sebelum selesai. Dana kamu aman — tidak ada biaya yang diambil.",
+        reasons: [
+          "Metode pembayaran ditolak (saldo/limit tidak cukup, kartu diblokir, atau data salah).",
+          "Sesi pembayaran kedaluwarsa sebelum kamu menyelesaikan transfer/OTP.",
+          "Kamu menutup halaman Xendit sebelum konfirmasi.",
+        ],
+      });
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
@@ -177,9 +187,42 @@ export default function Subscription() {
           </div>
         )}
         {paymentError && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            <p className="text-sm text-red-700">{paymentError}</p>
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-5">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                {typeof paymentError === "string" ? (
+                  <p className="text-sm text-red-700">{paymentError}</p>
+                ) : (
+                  <>
+                    <p className="text-sm font-bold text-red-800 mb-1">{paymentError.title}</p>
+                    <p className="text-xs text-red-700 leading-relaxed mb-2">{paymentError.message}</p>
+                    {paymentError.reasons?.length > 0 && (
+                      <>
+                        <p className="text-[11px] font-semibold text-red-800 uppercase tracking-wider mb-1">Kemungkinan penyebab</p>
+                        <ul className="text-xs text-red-700 leading-relaxed space-y-0.5 mb-3 list-disc list-inside">
+                          {paymentError.reasons.map((r, i) => <li key={i}>{r}</li>)}
+                        </ul>
+                      </>
+                    )}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <button
+                        onClick={() => setPaymentError(null)}
+                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                      >
+                        Coba Bayar Lagi
+                      </button>
+                      <a
+                        href="mailto:admin@aturpintar.id?subject=Bantuan%20Pembayaran%20Premium"
+                        className="px-3 py-1.5 bg-white border border-red-200 text-red-700 text-xs font-semibold rounded-lg hover:bg-red-100 transition-colors"
+                      >
+                        Hubungi Support
+                      </a>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
