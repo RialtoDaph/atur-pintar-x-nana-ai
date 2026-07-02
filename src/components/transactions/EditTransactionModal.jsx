@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Settings2, GripVertical } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { parseRupiah } from "@/components/utils/parseRupiah";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import AccountAvatar from "@/components/ui/AccountAvatar";
 import ManageCategoriesModal from "./ManageCategoriesModal";
@@ -10,23 +9,17 @@ import useLockBodyScroll from "@/hooks/useLockBodyScroll";
 import BottomSheetSelect from "@/components/ui/BottomSheetSelect";
 import { ChevronDown } from "lucide-react";
 
-const DEFAULT_CATEGORIES = {
-  expense: [
-    { key: "housing", i18nKey: "cat_housing", emoji: "🏠", color: "#4F7CFF" },
-    { key: "food", i18nKey: "cat_food", emoji: "🍔", color: "#00C9A7" },
-    { key: "transport", i18nKey: "cat_transport", emoji: "🚗", color: "#F5A623" },
-    { key: "health", i18nKey: "cat_health", emoji: "❤️", color: "#FF6B6B" },
-    { key: "entertainment", i18nKey: "cat_entertainment", emoji: "🎬", color: "#9B59B6" },
-    { key: "shopping", i18nKey: "cat_shopping", emoji: "🛍️", color: "#E91E8C" },
-    { key: "subscriptions", i18nKey: "cat_subscriptions", emoji: "📱", color: "#1ABC9C" },
-    { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" },
-  ],
-  income: [
-    { key: "salary", i18nKey: "cat_salary", emoji: "💼", color: "#27AE60" },
-    { key: "freelance", i18nKey: "cat_freelance", emoji: "💻", color: "#2ECC71" },
-    { key: "other", i18nKey: "cat_other", emoji: "📦", color: "#95A5A6" },
-  ],
-};
+// Match AddTransactionModal formatting — integer-only, id-ID grouping.
+function formatDisplay(val) {
+  if (!val && val !== 0) return "";
+  const num = parseInt(String(val).replace(/\D/g, ""), 10);
+  if (isNaN(num) || num === 0) return "";
+  return num.toLocaleString("id-ID");
+}
+function parseAmount(val) {
+  if (!val) return 0;
+  return parseInt(String(val).replace(/\D/g, ""), 10) || 0;
+}
 
 export default function EditTransactionModal({ transaction, goals = [], onClose, onSave }) {
   useLockBodyScroll();
@@ -37,7 +30,8 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const isSavings = transaction.type === "savings";
   const [tab, setTab] = useState(transaction.type === "income" ? "income" : "expense");
   const [form, setForm] = useState({
-    amount: String(transaction.amount || ""),
+    // Store raw digits internally — display uses formatDisplay(). Prevents dot/comma bugs.
+    amount: transaction.amount ? String(Math.round(transaction.amount)) : "",
     category: transaction.category || "",
     note: transaction.note || "",
     date: transaction.date || new Date().toISOString().split("T")[0],
@@ -45,6 +39,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
     account_id: transaction.account_id || "",
   });
   const [saving, setSaving] = useState(false);
+  const [globalCategories, setGlobalCategories] = useState([]);
   const [customCats, setCustomCats] = useState([]);
   const [showManage, setShowManage] = useState(false);
   const [catOrder, setCatOrder] = useState([]);
@@ -55,7 +50,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   const [showGoalSheet, setShowGoalSheet] = useState(false);
 
   useEffect(() => {
-    loadCustomCats();
+    loadCategories();
     loadAppSettings();
     base44.auth.me().then(u => {
       if (u?.email) {
@@ -84,15 +79,19 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
   }
 
   useEffect(() => {
-    const unsubscribe = base44.entities.CustomCategory.subscribe((event) => {
-      loadCustomCats();
+    const unsubscribe = base44.entities.CustomCategory.subscribe(() => {
+      loadCategories();
     });
     return unsubscribe;
   }, []);
 
-  async function loadCustomCats() {
-    const cats = await base44.entities.CustomCategory.list("-created_date");
-    setCustomCats(cats);
+  async function loadCategories() {
+    const [globals, customs] = await Promise.all([
+      base44.entities.GlobalCategory.list("sort_order").catch(() => []),
+      base44.entities.CustomCategory.list("-created_date").catch(() => []),
+    ]);
+    setGlobalCategories((globals || []).filter(c => c.is_active !== false));
+    setCustomCats(customs || []);
   }
 
   async function handleSave() {
@@ -101,33 +100,52 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
       setAccountError("Pilih rekening untuk transaksi ini.");
       return;
     }
-    if (!form.amount || !form.category) return;
+    if (!parseAmount(form.amount) || !form.category) return;
     if (!isSavings && !form.account_id) return;
     setSaving(true);
     await onSave(transaction.id, {
       ...form,
       // Preserve original type if it's "savings" — this modal only toggles expense/income.
       type: isSavings ? "savings" : tab,
-      amount: parseRupiah(form.amount),
+      amount: parseAmount(form.amount),
       goal_id: form.goal_id || undefined,
       account_id: form.account_id,
     });
     setSaving(false);
   }
 
-  const defaultCats = DEFAULT_CATEGORIES[tab] || [];
+  // Build category list from GlobalCategory (admin-managed) + user's CustomCategory,
+  // matching AddTransactionModal so both modals stay in sync.
+  const filteredGlobal = globalCategories.filter(c =>
+    tab === "expense" ? (c.type === "expense" || c.type === "both") : (c.type === "income" || c.type === "both")
+  );
   const filteredCustom = customCats.filter(c => c.type === tab || c.type === "both");
   const allCats = [
-    ...defaultCats.map(c => ({ ...c, label: t(c.i18nKey) })),
-    ...filteredCustom.map(c => ({ key: `custom_${c.id}`, label: c.name, emoji: c.emoji, color: c.color || "#888", parent_category_key: c.parent_category_key })),
+    ...filteredGlobal.map(c => ({
+      key: c.id,
+      label: c.name,
+      emoji: c.emoji || "📦",
+      color: c.color || "#888",
+      is_subcategory: c.is_subcategory,
+      parent_category_name: c.parent_category,
+    })),
+    ...filteredCustom.map(c => ({
+      key: `custom_${c.id}`,
+      label: c.name,
+      emoji: c.emoji || "📦",
+      color: c.color || "#888",
+    })),
   ];
 
-  // Build category structure with sub-categories
-  const mainCats = allCats.filter(c => !c.parent_category_key);
+  // Parents are non-subcategory GlobalCategory items + all CustomCategory items.
+  const mainCats = allCats.filter(c => !c.is_subcategory);
   const subCatsByParent = {};
-  allCats.filter(c => c.parent_category_key).forEach(c => {
-    if (!subCatsByParent[c.parent_category_key]) subCatsByParent[c.parent_category_key] = [];
-    subCatsByParent[c.parent_category_key].push(c);
+  allCats.filter(c => c.is_subcategory).forEach(c => {
+    // Match child → parent by the parent's NAME (as stored in GlobalCategory.parent_category)
+    const parent = mainCats.find(p => p.label === c.parent_category_name);
+    if (!parent) return;
+    if (!subCatsByParent[parent.key]) subCatsByParent[parent.key] = [];
+    subCatsByParent[parent.key].push(c);
   });
   
   // Apply drag order if available
@@ -248,23 +266,12 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8FA4C8] font-medium text-lg">{settings.currency_symbol}</span>
               <input
-                autoFocus type="text" inputMode="numeric"
+                autoFocus type="text" inputMode="numeric" pattern="[0-9]*"
                 className="w-full border border-[#E2E8F0] rounded-xl pl-9 pr-4 py-3 text-2xl font-bold text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#F97316] bg-[#F8FAFC]"
                 placeholder="0"
-                value={form.amount}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^0-9.,]/g, "");
-                  const numStr = val.replace(new RegExp("\\" + settings.thousand_separator, "g"), "").replace(settings.decimal_separator, ".");
-                  const num = parseFloat(numStr) || 0;
-                  const intPart = Math.floor(num);
-                  const intStr = intPart.toString().split('').reverse();
-                  const grouped = [];
-                  for (let i = 0; i < intStr.length; i++) {
-                    if (i > 0 && i % 3 === 0) grouped.push(settings.thousand_separator);
-                    grouped.push(intStr[i]);
-                  }
-                  setForm({ ...form, amount: grouped.reverse().join('') });
-                }}
+                value={formatDisplay(form.amount)}
+                onChange={(e) => setForm({ ...form, amount: e.target.value.replace(/\D/g, "") })}
+                autoComplete="off"
               />
             </div>
           </div>
@@ -374,7 +381,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
 
           {/* Sticky footer — always visible */}
           <div className="px-6 py-4 border-t border-[#F2F4F7] flex-shrink-0">
-            <button onClick={handleSave} disabled={saving || !form.amount || !form.category || (!isSavings && !form.account_id)}
+            <button onClick={handleSave} disabled={saving || !parseAmount(form.amount) || !form.category || (!isSavings && !form.account_id)}
               className="w-full py-3 rounded-xl font-bold text-sm text-white disabled:opacity-40 transition-colors"
               style={{ backgroundColor: tab === "expense" ? "#FF6B6B" : "#00C9A7" }}>
               {saving ? t('saving') : t('save_changes')}
