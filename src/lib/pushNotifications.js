@@ -104,7 +104,7 @@ export async function subscribeToPush() {
 /** Unsubscribe current browser from push. */
 export async function unsubscribeFromPush() {
   if (!isPushSupported()) return { ok: false, reason: 'unsupported' };
-  const reg = await navigator.serviceWorker.getRegistration('/');
+  const reg = (await navigator.serviceWorker.getRegistration()) || (await navigator.serviceWorker.ready.catch(() => null));
   if (!reg) return { ok: true };
   const sub = await reg.pushManager.getSubscription();
   if (!sub) return { ok: true };
@@ -124,7 +124,7 @@ export async function unsubscribeFromPush() {
 export async function isSubscribed() {
   if (!isPushSupported()) return false;
   if (Notification.permission !== 'granted') return false;
-  const reg = await navigator.serviceWorker.getRegistration('/');
+  const reg = (await navigator.serviceWorker.getRegistration()) || (await navigator.serviceWorker.ready.catch(() => null));
   if (!reg) return false;
   const sub = await reg.pushManager.getSubscription();
   return !!sub;
