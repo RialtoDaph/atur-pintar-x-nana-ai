@@ -192,12 +192,19 @@ fbq('init', '987349533876875');
 fbq('track', 'PageView');
 </script>
 <!-- End Meta Pixel Code -->
-<!-- Unregister any stale service workers + clear their caches (prevents cached JS chunks from breaking React) -->
+<!-- Unregister STALE service workers + clear their caches (prevents cached JS chunks from breaking React).
+     Preserve our own push-notification SW at /sw.js so notifications keep working across reloads. -->
 <script>
 (function() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(function(regs) {
-      regs.forEach(function(r) { r.unregister(); });
+      regs.forEach(function(r) {
+        var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+        // Keep our push SW; unregister anything else (stale Workbox/PWA leftovers)
+        if (url.indexOf('/sw.js') === -1) {
+          r.unregister();
+        }
+      });
     }).catch(function(){});
   }
   if (window.caches && caches.keys) {
