@@ -16,7 +16,7 @@ export default function TxDetailSheet({ tx, cat, accountName, formatCurrency, on
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-[80] flex items-end"
+        className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center sm:p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -24,14 +24,14 @@ export default function TxDetailSheet({ tx, cat, accountName, formatCurrency, on
         {/* Backdrop blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-        {/* Sheet */}
+        {/* Sheet — mobile: bottom sheet dark, desktop: floating centered card */}
         <motion.div
           role="dialog"
           aria-modal="true"
-          className="relative w-full bg-[#1A1E25] rounded-t-2xl z-10 pb-8 max-h-[90dvh] overflow-y-auto overscroll-contain"
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "100%" }}
+          className="relative w-full sm:max-w-md bg-[#1A1E25] rounded-t-2xl sm:rounded-3xl sm:shadow-2xl z-10 pb-8 sm:pb-6 max-h-[90dvh] overflow-y-auto overscroll-contain"
+          initial={{ y: "100%", opacity: 0, scale: 1 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: "100%", opacity: 0 }}
           transition={{ type: "spring", damping: 28, stiffness: 300 }}
         >
           {/* Handle */}
