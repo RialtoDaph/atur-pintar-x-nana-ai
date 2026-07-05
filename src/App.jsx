@@ -58,7 +58,8 @@ const PageLoader = () => (
 
 const { Pages, Layout } = pagesConfig;
 
-// Root route: logged-in users skip the landing page and go straight to the dashboard
+// Root route: logged-in users go to dashboard, everyone else goes to login.
+// Landing page dinonaktifkan sementara — akan di-serve dari domain terpisah nanti.
 const RootRoute = () => {
   const { isAuthenticated, isLoadingAuth } = useAuth();
   if (isLoadingAuth) {
@@ -68,7 +69,7 @@ const RootRoute = () => {
       </div>
     );
   }
-  return isAuthenticated ? <Navigate to="/Dashboard" replace /> : <LandingPage />;
+  return isAuthenticated ? <Navigate to="/Dashboard" replace /> : <Navigate to="/login" replace />;
 };
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
