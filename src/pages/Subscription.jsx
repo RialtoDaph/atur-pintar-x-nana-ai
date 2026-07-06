@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Check, Crown, Clock, CheckCircle2, Zap, AlertCircle, ShieldCheck } from "lucide-react";
 import { useAppConfig } from "@/components/utils/useAppConfig";
@@ -326,9 +325,9 @@ export default function Subscription() {
               />
               <span className="text-xs text-[#1A1A1A] leading-relaxed">
                 Saya sudah membaca dan menyetujui{" "}
-                <Link to="/TermsOfService" target="_blank" rel="noopener" className="text-[#F97316] hover:underline font-semibold">Syarat & Ketentuan</Link>,{" "}
-                <Link to="/RefundPolicy" target="_blank" rel="noopener" className="text-[#F97316] hover:underline font-semibold">Kebijakan Refund</Link>, dan{" "}
-                <Link to="/CancellationPolicy" target="_blank" rel="noopener" className="text-[#F97316] hover:underline font-semibold">Kebijakan Pembatalan Langganan</Link>{" "}
+                <a href="https://aturpintar.com/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Syarat & Ketentuan</a>,{" "}
+                <a href="https://aturpintar.com/RefundPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Kebijakan Refund</a>, dan{" "}
+                <a href="https://aturpintar.com/CancellationPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Kebijakan Pembatalan Langganan</a>{" "}
                 Atur Pintar.
               </span>
             </label>

@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster"
 import { useState, useEffect, lazy, Suspense } from 'react';
+// (useEffect juga dipakai oleh ExternalRedirect di bawah)
 import { QueryClientProvider } from '@tanstack/react-query'
 import { base44 } from '@/api/base44Client';
 import { queryClientInstance } from '@/lib/query-client'
@@ -13,14 +14,12 @@ import RouteErrorBoundary from '@/components/utils/RouteErrorBoundary';
 import AdminProtect from '@/components/admin/AdminProtect';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
-// Eager — needed for first paint (public landing + lightweight pages)
-import LandingPage from '@/pages/LandingPage';
-import PrivacyPolicy from '@/pages/PrivacyPolicy';
-import TermsOfService from '@/pages/TermsOfService';
-import RefundPolicy from '@/pages/RefundPolicy';
-import CancellationPolicy from '@/pages/CancellationPolicy';
+// Eager — needed for first paint (lightweight pages)
 import MaintenancePage from '@/pages/MaintenancePage';
 import TourGuide from '@/components/onboarding/TourGuide';
+
+// Landing page & halaman legal (Privacy, Terms, Refund, Cancellation) sekarang
+// di-serve dari app terpisah di https://aturpintar.com — bukan lagi bagian dari app ini.
 
 // Auth pages (custom auth) — eager so /login loads instantly
 import Login from '@/pages/Login';
@@ -59,7 +58,7 @@ const PageLoader = () => (
 const { Pages, Layout } = pagesConfig;
 
 // Root route: logged-in users go to dashboard, everyone else goes to login.
-// Landing page dinonaktifkan sementara — akan di-serve dari domain terpisah nanti.
+// Landing page dipindah ke app terpisah (https://aturpintar.com).
 const RootRoute = () => {
   const { isAuthenticated, isLoadingAuth } = useAuth();
   if (isLoadingAuth) {
@@ -70,6 +69,17 @@ const RootRoute = () => {
     );
   }
   return isAuthenticated ? <Navigate to="/Dashboard" replace /> : <Navigate to="/login" replace />;
+};
+
+// External redirect helper — dipakai untuk semua route legal lama.
+// Kalau ada link/email lama yang buka /PrivacyPolicy dll, langsung dilempar ke domain landing.
+const ExternalRedirect = ({ url }) => {
+  useEffect(() => { window.location.replace(url); }, [url]);
+  return (
+    <div className="fixed inset-0 flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+    </div>
+  );
 };
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
@@ -135,13 +145,14 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* ── Public marketing/legal pages ── */}
+      {/* ── Public marketing/legal pages ──
+          Semua di-redirect ke landing app (https://aturpintar.com). */}
       <Route path="/" element={<RootRoute />} />
-      <Route path="/LandingPage" element={<LandingPage />} />
-      <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-      <Route path="/TermsOfService" element={<TermsOfService />} />
-      <Route path="/RefundPolicy" element={<RefundPolicy />} />
-      <Route path="/CancellationPolicy" element={<CancellationPolicy />} />
+      <Route path="/LandingPage" element={<ExternalRedirect url="https://aturpintar.com" />} />
+      <Route path="/PrivacyPolicy" element={<ExternalRedirect url="https://aturpintar.com/PrivacyPolicy" />} />
+      <Route path="/TermsOfService" element={<ExternalRedirect url="https://aturpintar.com/TermsOfService" />} />
+      <Route path="/RefundPolicy" element={<ExternalRedirect url="https://aturpintar.com/RefundPolicy" />} />
+      <Route path="/CancellationPolicy" element={<ExternalRedirect url="https://aturpintar.com/CancellationPolicy" />} />
       <Route path="/About" element={<About />} />
 
       {/* ── Gated app routes ── */}

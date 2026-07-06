@@ -136,13 +136,15 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Legal */}
+        {/* Legal — halaman legal dipindah ke landing app (https://aturpintar.com) */}
         <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-[#F0F2F5]">
           <div className="px-5 pt-4 pb-2">
             <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Legal</p>
           </div>
-          <Link
-            to="/PrivacyPolicy"
+          <a
+            href="https://aturpintar.com/PrivacyPolicy"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
             <ShieldCheck className="w-5 h-5 text-[#F97316]" />
@@ -150,9 +152,11 @@ export default function Settings() {
               <p className="font-medium text-[#1A1A1A] text-sm">Kebijakan Privasi</p>
               <p className="text-xs text-[#8FA4C8]">Pelajari bagaimana kami melindungi data kamu</p>
             </div>
-          </Link>
-          <Link
-            to="/TermsOfService"
+          </a>
+          <a
+            href="https://aturpintar.com/TermsOfService"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
             <ShieldCheck className="w-5 h-5 text-[#8FA4C8]" />
@@ -160,9 +164,11 @@ export default function Settings() {
               <p className="font-medium text-[#1A1A1A] text-sm">Syarat & Ketentuan</p>
               <p className="text-xs text-[#8FA4C8]">Ketentuan penggunaan layanan Atur Pintar</p>
             </div>
-          </Link>
-          <Link
-            to="/RefundPolicy"
+          </a>
+          <a
+            href="https://aturpintar.com/RefundPolicy"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
             <ShieldCheck className="w-5 h-5 text-[#8FA4C8]" />
@@ -170,9 +176,11 @@ export default function Settings() {
               <p className="font-medium text-[#1A1A1A] text-sm">Kebijakan Refund</p>
               <p className="text-xs text-[#8FA4C8]">Ketentuan & cara mengajukan refund</p>
             </div>
-          </Link>
-          <Link
-            to="/CancellationPolicy"
+          </a>
+          <a
+            href="https://aturpintar.com/CancellationPolicy"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
           >
             <ShieldCheck className="w-5 h-5 text-[#8FA4C8]" />
@@ -180,7 +188,7 @@ export default function Settings() {
               <p className="font-medium text-[#1A1A1A] text-sm">Pembatalan Langganan</p>
               <p className="text-xs text-[#8FA4C8]">Cara membatalkan langganan Premium</p>
             </div>
-          </Link>
+          </a>
           <Link
             to="/About"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"

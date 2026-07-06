@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -77,13 +76,13 @@ export default function ConsentModal({ open, provider, onClose, onConfirm }) {
             />
             <Label htmlFor="consent-agree" className="text-xs text-white/80 leading-relaxed font-normal cursor-pointer">
               Saya setuju dengan{" "}
-              <Link to="/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
+              <a href="https://aturpintar.com/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
                 Kebijakan Privasi
-              </Link>{" "}
+              </a>{" "}
               dan{" "}
-              <Link to="/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
+              <a href="https://aturpintar.com/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
                 Ketentuan Layanan
-              </Link>{" "}
+              </a>{" "}
               Atur Pintar.
             </Label>
           </label>

@@ -11,7 +11,6 @@ import GoogleIcon from "@/components/GoogleIcon";
 import AppleIcon from "@/components/AppleIcon";
 import { toast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Link as RouterLink } from "react-router-dom";
 import ConsentModal from "@/components/auth/ConsentModal";
 import InAppBrowserBanner from "@/components/auth/InAppBrowserBanner";
 import { Sparkles } from "lucide-react";
@@ -216,13 +215,13 @@ export default function Register() {
           />
           <Label htmlFor="agree-terms-register" className="text-xs text-white/60 leading-relaxed font-normal cursor-pointer">
             Saya setuju dengan{" "}
-            <RouterLink to="/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
+            <a href="https://aturpintar.com/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
               Kebijakan Privasi
-            </RouterLink>{" "}
+            </a>{" "}
             dan{" "}
-            <RouterLink to="/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
+            <a href="https://aturpintar.com/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
               Ketentuan Layanan
-            </RouterLink>
+            </a>
           </Label>
         </div>
 

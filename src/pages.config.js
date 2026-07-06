@@ -21,7 +21,6 @@ const Debts = lazy(() => import('./pages/Debts'));
 const Goals = lazy(() => import('./pages/Goals'));
 const InvestmentDetail = lazy(() => import('./pages/InvestmentDetail'));
 const Investments = lazy(() => import('./pages/Investments'));
-const LandingPage = lazy(() => import('./pages/LandingPage'));
 const Nana = lazy(() => import('./pages/Nana.jsx'));
 const Reminders = lazy(() => import('./pages/Reminders'));
 const Settings = lazy(() => import('./pages/Settings'));
@@ -37,7 +36,6 @@ export const PAGES = {
     "Goals": Goals,
     "InvestmentDetail": InvestmentDetail,
     "Investments": Investments,
-    "LandingPage": LandingPage,
     "Nana": Nana,
     "Reminders": Reminders,
     "Settings": Settings,
@@ -46,7 +44,7 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "LandingPage",
+    mainPage: "Dashboard",
     Pages: PAGES,
     Layout: __Layout,
 };

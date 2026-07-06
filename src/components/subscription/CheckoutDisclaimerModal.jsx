@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { ShieldCheck, X, Zap } from "lucide-react";
 import useLockBodyScroll from "@/hooks/useLockBodyScroll";
 
@@ -91,9 +90,9 @@ export default function CheckoutDisclaimerModal({ plan, priceLabel, loading, onC
             />
             <span className="text-xs text-[#4A5568] leading-relaxed">
               Saya menyetujui{" "}
-              <Link to="/TermsOfService" target="_blank" rel="noopener" className="text-[#F97316] hover:underline font-semibold">Syarat & Ketentuan</Link>,{" "}
-              <Link to="/RefundPolicy" target="_blank" rel="noopener" className="text-[#F97316] hover:underline font-semibold">Kebijakan Refund</Link>, dan{" "}
-              <Link to="/CancellationPolicy" target="_blank" rel="noopener" className="text-[#F97316] hover:underline font-semibold">Pembatalan Langganan</Link>{" "}
+              <a href="https://aturpintar.com/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Syarat & Ketentuan</a>,{" "}
+              <a href="https://aturpintar.com/RefundPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Kebijakan Refund</a>, dan{" "}
+              <a href="https://aturpintar.com/CancellationPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Pembatalan Langganan</a>{" "}
               Atur Pintar.
             </span>
           </label>
