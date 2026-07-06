@@ -136,13 +136,13 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Legal — halaman legal dipindah ke landing app (https://aturpintar.com) */}
+        {/* Legal — halaman legal dipindah ke landing app (https://aturpintar.id) */}
         <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-[#F0F2F5]">
           <div className="px-5 pt-4 pb-2">
             <p className="text-xs font-bold text-[#8FA4C8] uppercase tracking-widest">Legal</p>
           </div>
           <a
-            href="https://aturpintar.com/PrivacyPolicy"
+            href="https://aturpintar.id/PrivacyPolicy"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
@@ -154,7 +154,7 @@ export default function Settings() {
             </div>
           </a>
           <a
-            href="https://aturpintar.com/TermsOfService"
+            href="https://aturpintar.id/TermsOfService"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
@@ -166,7 +166,7 @@ export default function Settings() {
             </div>
           </a>
           <a
-            href="https://aturpintar.com/RefundPolicy"
+            href="https://aturpintar.id/RefundPolicy"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"
@@ -178,7 +178,7 @@ export default function Settings() {
             </div>
           </a>
           <a
-            href="https://aturpintar.com/CancellationPolicy"
+            href="https://aturpintar.id/CancellationPolicy"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-t border-[#F2F4F7]"

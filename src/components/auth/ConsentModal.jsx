@@ -76,11 +76,11 @@ export default function ConsentModal({ open, provider, onClose, onConfirm }) {
             />
             <Label htmlFor="consent-agree" className="text-xs text-white/80 leading-relaxed font-normal cursor-pointer">
               Saya setuju dengan{" "}
-              <a href="https://aturpintar.com/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
+              <a href="https://aturpintar.id/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
                 Kebijakan Privasi
               </a>{" "}
               dan{" "}
-              <a href="https://aturpintar.com/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
+              <a href="https://aturpintar.id/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">
                 Ketentuan Layanan
               </a>{" "}
               Atur Pintar.

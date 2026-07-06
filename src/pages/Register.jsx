@@ -215,11 +215,11 @@ export default function Register() {
           />
           <Label htmlFor="agree-terms-register" className="text-xs text-white/60 leading-relaxed font-normal cursor-pointer">
             Saya setuju dengan{" "}
-            <a href="https://aturpintar.com/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
+            <a href="https://aturpintar.id/PrivacyPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
               Kebijakan Privasi
             </a>{" "}
             dan{" "}
-            <a href="https://aturpintar.com/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
+            <a href="https://aturpintar.id/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline">
               Ketentuan Layanan
             </a>
           </Label>

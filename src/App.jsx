@@ -19,7 +19,7 @@ import MaintenancePage from '@/pages/MaintenancePage';
 import TourGuide from '@/components/onboarding/TourGuide';
 
 // Landing page & halaman legal (Privacy, Terms, Refund, Cancellation) sekarang
-// di-serve dari app terpisah di https://aturpintar.com — bukan lagi bagian dari app ini.
+// di-serve dari app terpisah di https://aturpintar.id — bukan lagi bagian dari app ini.
 
 // Auth pages (custom auth) — eager so /login loads instantly
 import Login from '@/pages/Login';
@@ -58,7 +58,7 @@ const PageLoader = () => (
 const { Pages, Layout } = pagesConfig;
 
 // Root route: logged-in users go to dashboard, everyone else goes to login.
-// Landing page dipindah ke app terpisah (https://aturpintar.com).
+// Landing page dipindah ke app terpisah (https://aturpintar.id).
 const RootRoute = () => {
   const { isAuthenticated, isLoadingAuth } = useAuth();
   if (isLoadingAuth) {
@@ -146,13 +146,13 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* ── Public marketing/legal pages ──
-          Semua di-redirect ke landing app (https://aturpintar.com). */}
+          Semua di-redirect ke landing app (https://aturpintar.id). */}
       <Route path="/" element={<RootRoute />} />
-      <Route path="/LandingPage" element={<ExternalRedirect url="https://aturpintar.com" />} />
-      <Route path="/PrivacyPolicy" element={<ExternalRedirect url="https://aturpintar.com/PrivacyPolicy" />} />
-      <Route path="/TermsOfService" element={<ExternalRedirect url="https://aturpintar.com/TermsOfService" />} />
-      <Route path="/RefundPolicy" element={<ExternalRedirect url="https://aturpintar.com/RefundPolicy" />} />
-      <Route path="/CancellationPolicy" element={<ExternalRedirect url="https://aturpintar.com/CancellationPolicy" />} />
+      <Route path="/LandingPage" element={<ExternalRedirect url="https://aturpintar.id" />} />
+      <Route path="/PrivacyPolicy" element={<ExternalRedirect url="https://aturpintar.id/PrivacyPolicy" />} />
+      <Route path="/TermsOfService" element={<ExternalRedirect url="https://aturpintar.id/TermsOfService" />} />
+      <Route path="/RefundPolicy" element={<ExternalRedirect url="https://aturpintar.id/RefundPolicy" />} />
+      <Route path="/CancellationPolicy" element={<ExternalRedirect url="https://aturpintar.id/CancellationPolicy" />} />
       <Route path="/About" element={<About />} />
 
       {/* ── Gated app routes ── */}

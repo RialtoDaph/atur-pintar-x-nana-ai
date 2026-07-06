@@ -90,9 +90,9 @@ export default function CheckoutDisclaimerModal({ plan, priceLabel, loading, onC
             />
             <span className="text-xs text-[#4A5568] leading-relaxed">
               Saya menyetujui{" "}
-              <a href="https://aturpintar.com/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Syarat & Ketentuan</a>,{" "}
-              <a href="https://aturpintar.com/RefundPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Kebijakan Refund</a>, dan{" "}
-              <a href="https://aturpintar.com/CancellationPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Pembatalan Langganan</a>{" "}
+              <a href="https://aturpintar.id/TermsOfService" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Syarat & Ketentuan</a>,{" "}
+              <a href="https://aturpintar.id/RefundPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Kebijakan Refund</a>, dan{" "}
+              <a href="https://aturpintar.id/CancellationPolicy" target="_blank" rel="noopener noreferrer" className="text-[#F97316] hover:underline font-semibold">Pembatalan Langganan</a>{" "}
               Atur Pintar.
             </span>
           </label>
