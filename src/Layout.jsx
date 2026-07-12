@@ -18,7 +18,20 @@ import PullToRefresh from "@/components/utils/PullToRefresh";
 import { AnimatePresence, motion } from "framer-motion";
 function LayoutInner({ children, currentPageName }) {
   const [user, setUser] = useState(null);
-  const [showAddTransaction, setShowAddTransaction] = useState(false);
+  // AddTransaction visibility is driven by URL (?add=1) so the hardware / swipe
+  // back closes the sheet instead of exiting the current page.
+  const showAddTransaction = new URLSearchParams(location.search).get("add") === "1";
+  const openAddTransaction = () => {
+    const params = new URLSearchParams(location.search);
+    params.set("add", "1");
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` });
+  };
+  const closeAddTransaction = () => {
+    // If we opened via URL push, prefer history.back so it feels native.
+    if (new URLSearchParams(location.search).get("add") === "1") {
+      navigate(-1);
+    }
+  };
   const [showSearch, setShowSearch] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showAlertsDrawer, setShowAlertsDrawer] = useState(false);
@@ -213,7 +226,7 @@ function LayoutInner({ children, currentPageName }) {
   // If no account → navigate langsung ke halaman Accounts (lebih jelas dari sekadar toast yang gampang ke-skip di mobile).
   const handleFabClick = async () => {
     haptic.medium();
-    if (showAddTransaction) { setShowAddTransaction(false); return; }
+    if (showAddTransaction) { closeAddTransaction(); return; }
     try {
       const u = user || (await base44.auth.me());
       const accs = await base44.entities.Account.filter({ created_by: u.email });
@@ -222,10 +235,10 @@ function LayoutInner({ children, currentPageName }) {
         navigate(createPageUrl("Accounts"));
         return;
       }
-      setShowAddTransaction(true);
+      openAddTransaction();
     } catch {
       // fallback: open modal anyway if check fails
-      setShowAddTransaction(true);
+      openAddTransaction();
     }
   };
 
@@ -517,10 +530,10 @@ function LayoutInner({ children, currentPageName }) {
       {showAddTransaction &&
       <AddTransactionModal
         goals={[]}
-        onClose={() => setShowAddTransaction(false)}
+        onClose={closeAddTransaction}
         onSave={async (data) => {
           await saveTransactionWithSync(data);
-          setShowAddTransaction(false);
+          closeAddTransaction();
         }} />
 
       }
