@@ -30,12 +30,30 @@ function LayoutInner({ children, currentPageName }) {
   const navigate = useNavigate();
   const scrollPositions = useRef({});
   const mainContentRef = useRef(null);
+  // Each tab remembers the LAST path visited within its stack (including nested pages),
+  // so switching tabs and coming back restores the exact sub-screen the user was on.
   const tabHistory = useRef({
-    Dashboard: "Dashboard",
-    Nana: "Nana",
-    Analytics: "Analytics",
-    Transactions: "Transactions"
+    Dashboard: "/Dashboard",
+    Nana: "/Nana",
+    Analytics: "/Analytics",
+    Transactions: "/Transactions"
   });
+
+  // Map main tab → pages that belong to its stack (nested/detail views).
+  // Keep this small and explicit — only pages that logically "live under" a tab.
+  const TAB_STACKS = {
+    Dashboard: ["Dashboard", "Goals", "Budget", "Debts", "Reminders", "Alerts", "Tips", "ReceiptScanHistory"],
+    Nana: ["Nana"],
+    Analytics: ["Analytics"],
+    Transactions: ["Transactions"]
+  };
+
+  const getTabForPage = (pageName) => {
+    for (const [tab, pages] of Object.entries(TAB_STACKS)) {
+      if (pages.includes(pageName)) return tab;
+    }
+    return null;
+  };
 
   useEffect(() => {
     base44.auth.me().then((u) => {
@@ -182,14 +200,14 @@ function LayoutInner({ children, currentPageName }) {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [isNestedPage]);
 
-  // Update tab history when navigating to a main page
+  // Update tab history when navigating anywhere within a tab's stack
+  // — cache the FULL path (incl. search params) so nested screens are preserved.
   useEffect(() => {
-    const mobileMainNavNames = ["Dashboard", "Nana", "Analytics", "Transactions"];
-
-    if (mobileMainNavNames.includes(currentPageName)) {
-      tabHistory.current[currentPageName] = currentPageName;
+    const owningTab = getTabForPage(currentPageName);
+    if (owningTab) {
+      tabHistory.current[owningTab] = location.pathname + (location.search || "");
     }
-  }, [currentPageName]);
+  }, [currentPageName, location.pathname, location.search]);
 
   // FAB click: guard — require at least 1 account before opening AddTransactionModal.
   // If no account → navigate langsung ke halaman Accounts (lebih jelas dari sekadar toast yang gampang ke-skip di mobile).
@@ -224,22 +242,28 @@ function LayoutInner({ children, currentPageName }) {
 
   // Handle tab clicks - navigate with React Router for soft navigation
   const handleTabClick = (tabName) => {
-    const targetPage = tabHistory.current[tabName];
-    if (currentPageName === targetPage) {
-      // Already on this tab — scroll to top like native apps (smooth, both container & window)
+    const currentTab = getTabForPage(currentPageName);
+    const savedPath = tabHistory.current[tabName];
+    // Fall back to root of tab if nothing cached yet
+    const targetPath = savedPath || createPageUrl(tabName);
+
+    if (currentTab === tabName) {
+      // Tapping the tab we're already inside — reset to tab root & scroll to top (native pattern)
       haptic.light();
-      // Clear saved scroll for this tab so re-entry doesn't restore old position
       scrollPositions.current[tabName] = 0;
-      if (mainContentRef.current) {
-        mainContentRef.current.scrollTo({ top: 0, behavior: "smooth" });
-      }
+      tabHistory.current[tabName] = createPageUrl(tabName);
+      if (mainContentRef.current) mainContentRef.current.scrollTo({ top: 0, behavior: "smooth" });
       window.scrollTo({ top: 0, behavior: "smooth" });
+      // If we're on a nested page of this tab, pop back to the tab root
+      if (currentPageName !== tabName) {
+        navigate(createPageUrl(tabName));
+      }
     } else {
       haptic.light();
       // Save current tab's scroll before leaving
       saveCurrentScroll();
-      // Navigate to tab using React Router for better history preservation
-      navigate(createPageUrl(tabName));
+      // Restore the exact sub-screen this tab was last on
+      navigate(targetPath);
     }
   };
 
