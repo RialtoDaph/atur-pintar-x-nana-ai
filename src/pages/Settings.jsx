@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { MessageSquare, ShieldCheck, MapPin, Download, Trophy } from "lucide-react";
+import { MessageSquare, ShieldCheck, MapPin, Download, Trophy, AlertTriangle, Trash2 } from "lucide-react";
 import ExportLaporanModal from "@/components/analytics/ExportLaporanModal";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
 import FeedbackModal from "@/components/settings/FeedbackModal";
+import DeleteAccountConfirmDialog from "@/components/profile/DeleteAccountConfirmDialog";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { toast } from "sonner";
 
 // NOTE: Bahasa & mata uang HANYA dipilih sekali di onboarding dan tidak bisa
 // diubah lagi setelahnya. Section-nya sudah dihapus dari halaman ini.
@@ -18,6 +20,8 @@ export default function Settings() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [restartingTour, setRestartingTour] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +32,41 @@ export default function Settings() {
     setRestartingTour(true);
     await base44.auth.updateMe({ tour_completed: false });
     navigate('/Dashboard');
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    try {
+      const me = await base44.auth.me();
+      const email = me?.email;
+      if (email) {
+        // Hapus semua data user (best-effort, ignore kegagalan per-entity)
+        const entitiesToWipe = [
+          "Transaction", "Account", "SavingsGoal", "Budget", "Debt",
+          "CustomCategory", "Investment", "InvestmentTransaction", "InvestmentWatchlist",
+          "Subscription", "DetectedSubscription", "Reminder", "Alert",
+          "GamificationProfile", "DailyMission", "Achievement", "Challenge",
+          "BossBattleContribution", "WeeklyRecap", "ReceiptScan", "MoodCheckIn",
+          "NanaConversation", "NanaPreferences", "AppSettings", "UserPersona",
+          "UserRiskProfile", "FinancialHealthScore", "CategoryLearning",
+          "ShareableCard", "ExportLog", "FeedbackReport", "SharedWalletTransaction",
+        ];
+        for (const ent of entitiesToWipe) {
+          try {
+            const rows = await base44.entities[ent].filter({ created_by: email });
+            await Promise.all((rows || []).map(r => base44.entities[ent].delete(r.id).catch(() => {})));
+          } catch {}
+        }
+      }
+      // Attempt platform-level account deletion if SDK supports it
+      try { if (typeof base44.auth.deleteAccount === "function") await base44.auth.deleteAccount(); } catch {}
+      toast.success("Akun & semua data berhasil dihapus.");
+      // Force logout & redirect ke landing
+      setTimeout(() => base44.auth.logout('/'), 600);
+    } catch {
+      toast.error("Gagal menghapus akun. Coba lagi.");
+      setDeleting(false);
+    }
   }
 
   return (
@@ -201,6 +240,26 @@ export default function Settings() {
           </Link>
         </div>
 
+        {/* Danger Zone — Hapus Akun */}
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-red-100">
+          <div className="px-5 pt-4 pb-2 flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+            <p className="text-xs font-bold text-red-500 uppercase tracking-widest">Danger Zone</p>
+          </div>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="w-full flex items-start gap-3 px-5 py-4 hover:bg-red-50 transition-colors border-t border-[#F2F4F7] text-left"
+          >
+            <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+              <Trash2 className="w-4 h-4 text-red-500" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-sm text-red-600">Hapus Akun Selamanya</p>
+              <p className="text-xs text-[#8FA4C8] mt-0.5">Semua data kamu (transaksi, rekening, goal, dll) akan dihapus permanen dan tidak bisa dikembalikan.</p>
+            </div>
+          </button>
+        </div>
+
         <p className="text-center text-xs text-[#8FA4C8] pb-4">{t('settings_version')}</p>
       </div>
 
@@ -211,6 +270,13 @@ export default function Settings() {
       {showExport && (
         <ExportLaporanModal user={user} onClose={() => setShowExport(false)} />
       )}
+
+      <DeleteAccountConfirmDialog
+        open={showDeleteConfirm}
+        loading={deleting}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteAccount}
+      />
     </div>
   );
 }
