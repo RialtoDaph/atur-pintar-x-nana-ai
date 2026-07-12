@@ -81,7 +81,7 @@ export default function AddGoalModal({ goal, onClose, onSave }) {
           left: 0,
           right: 0,
           bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
-          top: '64px'
+          top: 'calc(56px + env(safe-area-inset-top, 0px))'
         }}>
         <div
           role="dialog"

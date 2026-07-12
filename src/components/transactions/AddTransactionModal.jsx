@@ -361,7 +361,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
           left: 0,
           right: 0,
           bottom: 'calc(112px + env(safe-area-inset-bottom, 0px))',
-          top: '64px'
+          top: 'calc(56px + env(safe-area-inset-top, 0px))'
         }}>
         <div
           role="dialog"
@@ -385,7 +385,7 @@ export default function AddTransactionModal({ goals = [], onClose, onSave, initi
             ))}
           </div>
 
-          <div className="px-5 pb-5">
+          <div className="px-5 pb-5" style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}>
             {/* Receipt scan buttons */}
             <div className="flex items-center justify-between py-2 mb-1">
               <div className="flex gap-2">
