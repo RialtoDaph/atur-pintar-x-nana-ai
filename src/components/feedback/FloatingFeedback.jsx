@@ -51,7 +51,7 @@ export default function FloatingFeedback({ user }) {
           aria-label={hasUnreadResponse ? "Balasan baru dari admin tersedia" : "Beta feedback & lapor masalah"}
           className="fixed z-[70] right-4 sm:right-6 flex items-center justify-center active:scale-90 transition-transform sm:bottom-[88px]"
           style={{
-            bottom: "calc(174px + env(safe-area-inset-bottom, 0px))",
+            bottom: "calc(158px + max(16px, env(safe-area-inset-bottom)))",
           }}
         >
           <span className="relative">

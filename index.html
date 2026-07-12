@@ -192,6 +192,21 @@ fbq('init', '987349533876875');
 fbq('track', 'PageView');
 </script>
 <!-- End Meta Pixel Code -->
+<!-- Instant dark-mode init (runs BEFORE React mounts, before first paint).
+     Manual override in localStorage takes precedence; otherwise follow prefers-color-scheme. -->
+<script>
+(function(){
+  try {
+    var manual = localStorage.getItem('darkMode');
+    var isDark;
+    if (manual === 'true')      isDark = true;
+    else if (manual === 'false') isDark = false;
+    else isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (isDark) document.documentElement.classList.add('dark');
+    else        document.documentElement.classList.remove('dark');
+  } catch (e) {}
+})();
+</script>
 <!-- Unregister STALE service workers + clear their caches (prevents cached JS chunks from breaking React).
      Preserve our own push-notification SW at /sw.js so notifications keep working across reloads. -->
 <script>
