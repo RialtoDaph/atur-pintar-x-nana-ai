@@ -18,6 +18,16 @@ import PullToRefresh from "@/components/utils/PullToRefresh";
 import { AnimatePresence, motion } from "framer-motion";
 function LayoutInner({ children, currentPageName }) {
   const [user, setUser] = useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [showAlertsDrawer, setShowAlertsDrawer] = useState(false);
+  const [anyModalOpen, setAnyModalOpen] = useState(false);
+  const [unreadAlertCount, setUnreadAlertCount] = useState(0);
+  const [unreadAdminCount, setUnreadAdminCount] = useState(0);
+  const { t } = useAppSettings();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // AddTransaction visibility is driven by URL (?add=1) so the hardware / swipe
   // back closes the sheet instead of exiting the current page.
   const showAddTransaction = new URLSearchParams(location.search).get("add") === "1";
@@ -32,15 +42,6 @@ function LayoutInner({ children, currentPageName }) {
       navigate(-1);
     }
   };
-  const [showSearch, setShowSearch] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [showAlertsDrawer, setShowAlertsDrawer] = useState(false);
-  const [anyModalOpen, setAnyModalOpen] = useState(false);
-  const [unreadAlertCount, setUnreadAlertCount] = useState(0);
-  const [unreadAdminCount, setUnreadAdminCount] = useState(0);
-  const { t } = useAppSettings();
-  const location = useLocation();
-  const navigate = useNavigate();
   const scrollPositions = useRef({});
   const mainContentRef = useRef(null);
   // Each tab remembers the LAST path visited within its stack (including nested pages),
