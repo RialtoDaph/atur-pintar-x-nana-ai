@@ -29,7 +29,6 @@ import ResetPassword from '@/pages/ResetPassword';
 
 // Lazy — loaded only when user navigates to them
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
-const Subscription = lazy(() => import('@/pages/Subscription'));
 const ProfileSettings = lazy(() => import('@/pages/ProfileSettings'));
 const Accounts = lazy(() => import('@/pages/Accounts'));
 const SharedFinance = lazy(() => import('@/pages/SharedFinance'));
@@ -45,7 +44,6 @@ const AdminNotifications = lazy(() => import('@/pages/AdminNotifications'));
 const AdminCategories = lazy(() => import('@/pages/AdminCategories'));
 const AdminSettings = lazy(() => import('@/pages/AdminSettings'));
 const AdminDefaultAccounts = lazy(() => import('@/pages/AdminDefaultAccounts'));
-const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
 const AdminFeedback = lazy(() => import('@/pages/AdminFeedback'));
 
 // Suspense fallback — inline spinner that respects layout (sidebar/nav stay visible)
@@ -173,8 +171,9 @@ const AuthenticatedApp = () => {
             }
           />
         ))}
-        <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
-        <Route path="/AdminSubscriptions" element={<AdminProtect><AdminSubscriptions /></AdminProtect>} />
+        {/* Subscription pages removed — payments will move to Apple In-App Purchase. */}
+        <Route path="/Subscription" element={<Navigate to="/Dashboard" replace />} />
+        <Route path="/AdminSubscriptions" element={<Navigate to="/AdminDashboard" replace />} />
         <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
         <Route path="/Notifications" element={<Navigate to="/Dashboard" replace />} />
         <Route path="/Reminders" element={<Navigate to="/Dashboard" replace />} />

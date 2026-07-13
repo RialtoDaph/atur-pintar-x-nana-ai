@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import AdminPageShell from "@/components/admin/AdminPageShell";
 import AdminStatBar from "@/components/admin/AdminStatBar";
 import InboxActionCard from "@/components/admin/InboxActionCard";
-import { CreditCard, MessageSquare, UserX, Clock, CheckCircle2, BarChart3 } from "lucide-react";
+import { MessageSquare, UserX, Clock, CheckCircle2, BarChart3 } from "lucide-react";
 
 /**
  * AdminInbox — new default admin landing page.
@@ -24,11 +24,11 @@ export default function AdminInbox() {
   const load = async () => {
     setLoading(true);
     try {
-      const [users, pending, feedback] = await Promise.all([
+      const [users, feedback] = await Promise.all([
         base44.entities.User.list().catch(() => []),
-        base44.entities.SubscriptionPayment.filter({ status: "pending" }).catch(() => []),
         base44.entities.FeedbackReport.filter({ status: "open" }).catch(() => []),
       ]);
+      const pending = [];
 
       const notOnboarded = users.filter((u) => !u.onboarding_completed).length;
       const sevenDaysFromNow = new Date();
@@ -56,17 +56,6 @@ export default function AdminInbox() {
 
   // Build action items sorted by priority
   const actions = [];
-  if (counts.pending > 0) {
-    actions.push({
-      priority: "high",
-      icon: CreditCard,
-      iconColor: "bg-[#EF4444]",
-      title: "Pembayaran Menunggu",
-      count: counts.pending,
-      description: "Review & approve pembayaran premium",
-      onClick: () => navigate("/AdminSubscriptions"),
-    });
-  }
   if (counts.feedback > 0) {
     actions.push({
       priority: "high",

@@ -3,12 +3,10 @@ import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import { CheckCircle2, Clock, AlertCircle, RefreshCw, UserX, Shield } from "lucide-react";
-import PendingPaymentMobileCard from "@/components/admin/PendingPaymentMobileCard";
 import UserMobileCard from "@/components/admin/UserMobileCard";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
-  const [payments, setPayments] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -39,17 +37,7 @@ export default function AdminUsers() {
     } catch (error) {
       setErrorMsg("Error loading users: " + error.message);
     }
-    try {
-      const pendingList = await base44.entities.SubscriptionPayment.filter(
-        { status: "pending" },
-        "-created_date",
-        200
-      );
-      setPayments(pendingList || []);
-    } catch (error) {
-      // Non-fatal: users table still works without the payments banner
-      setPayments([]);
-    }
+    // Payments removed — akan pakai Apple IAP nantinya
     setLoading(false);
   }
 
@@ -78,97 +66,7 @@ export default function AdminUsers() {
     }
   }
 
-  async function approvePayment(paymentId, userEmail, plan, amount) {
-    // Guard against missing/invalid plan or email — prevents inconsistent state
-    if (!userEmail || !plan || !["premium_monthly", "premium_yearly"].includes(plan)) {
-      setErrorMsg("Plan/email tidak valid. Tidak dapat menyetujui pembayaran.");
-      return;
-    }
-    try {
-      const today = new Date().toISOString().split("T")[0];
-      const daysToAdd = plan === "premium_yearly" ? 365 : 30;
-      const endDate = new Date(new Date().getTime() + daysToAdd * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-
-      // Upgrade user FIRST so payment marked approved only if user actually upgraded
-      const userList = await base44.entities.User.filter({ email: userEmail });
-      if (userList.length === 0) {
-        setErrorMsg(`User ${userEmail} tidak ditemukan. Pembayaran tidak disetujui.`);
-        return;
-      }
-      await base44.entities.User.update(userList[0].id, {
-        subscription_plan: plan,
-        subscription_status: "active",
-        subscription_start_date: today,
-        subscription_end_date: endDate
-      });
-
-      // Now mark payment as approved
-      await base44.entities.SubscriptionPayment.update(paymentId, { status: "approved", approved_at: today });
-
-      // Send notification to user
-      await base44.entities.AdminNotification.create({
-        title: "🎉 Akun Premium Aktif!",
-        message: "Pembayaran kamu sudah dikonfirmasi admin. Selamat menikmati semua fitur premium Atur Pintar! 🚀",
-        target_type: "specific",
-        target_email: userEmail,
-        is_read: false,
-        read_by: []
-      });
-
-      // Log action
-      await base44.entities.SystemLog.create({
-        log_type: "activity",
-        user_email: user?.email || "admin",
-        action: "payment_approved",
-        severity: "info",
-        details: `Plan: ${plan} upgraded for ${userEmail}, Amount: Rp ${amount}`
-      });
-
-      setSuccessMsg("✓ Pembayaran disetujui & user upgraded ke premium");
-      setTimeout(() => setSuccessMsg(""), 3000);
-      await loadData();
-    } catch (error) {
-      setErrorMsg("Error approving payment: " + error.message);
-    }
-  }
-
-  async function rejectPayment(paymentId) {
-    if (!window.confirm("Reject this payment?")) return;
-    try {
-      const paymentsList = await base44.entities.SubscriptionPayment.filter({ id: paymentId });
-      const payment = paymentsList.length > 0 ? paymentsList[0] : null;
-      const userEmail = payment?.user_email || payment?.created_by;
-
-      await base44.entities.SubscriptionPayment.update(paymentId, { status: "rejected" });
-
-      // Send rejection notification only if we have a real email — never fall back to a fake one
-      if (userEmail) {
-        await base44.entities.AdminNotification.create({
-          title: "❌ Pembayaran Ditolak",
-          message: "Pembayaran upgrade kamu telah ditolak. Silakan periksa riwayat atau hubungi support.",
-          target_type: "specific",
-          target_email: userEmail,
-          is_read: false,
-          read_by: []
-        });
-      }
-
-      // Log action
-      await base44.entities.SystemLog.create({
-        log_type: "activity",
-        user_email: user?.email || "admin",
-        action: "payment_rejected",
-        severity: "warning",
-        details: `Payment rejected for ${userEmail}`
-      });
-
-      setSuccessMsg("✓ Pembayaran ditolak");
-      setTimeout(() => setSuccessMsg(""), 3000);
-      await loadData();
-    } catch (error) {
-      setErrorMsg("Error rejecting payment: " + error.message);
-    }
-  }
+  // approvePayment/rejectPayment removed — Apple IAP will handle billing entitlements.
 
   const filteredUsers = users.filter(u => {
     // Premium = paid plan AND active status (matches the premiumUsers stat below)
@@ -185,11 +83,6 @@ export default function AdminUsers() {
   });
   const noOnboardingCount = users.filter(u => !u.onboarding_completed).length;
 
-  const pendingPayments = payments.filter(p => p.status === "pending");
-  const threeDaysAgo = new Date();
-  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-  const overduePending = pendingPayments.filter(p => new Date(p.created_date) < threeDaysAgo);
-  
   // Stats
   const totalUsers = users.length;
   const premiumUsers = users.filter(u => u.subscription_plan && u.subscription_plan !== "free" && u.subscription_status === "active").length;
@@ -250,11 +143,11 @@ export default function AdminUsers() {
   return (
     <AdminLayout currentPage="AdminUsers">
       <div className="p-4 sm:p-8">
-        <AdminPageHeader title="User Management" subtitle="Manage users & approve payments" />
+        <AdminPageHeader title="User Management" subtitle="Kelola user & role" />
         
         {/* Quick Stats */}
         {showStats && (
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
               <p className="text-xs text-[#8FA4C8] font-medium">Total</p>
               <p className="text-2xl font-bold text-[#1A1A1A]">{totalUsers}</p>
@@ -266,10 +159,6 @@ export default function AdminUsers() {
             <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
               <p className="text-xs text-[#8FA4C8] font-medium">Free</p>
               <p className="text-2xl font-bold text-gray-600">{freeUsers}</p>
-            </div>
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
-              <p className="text-xs text-[#8FA4C8] font-medium">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600">{pendingPayments.length}</p>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm border border-[#E2E8F0]">
               <p className="text-xs text-[#8FA4C8] font-medium">Inactive</p>
@@ -291,81 +180,7 @@ export default function AdminUsers() {
           </div>
         )}
 
-        {/* Pending Payments Alert */}
-        {overduePending.length > 0 && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="font-semibold text-red-900">⚠️ {overduePending.length} payments overdue (&gt;3 days pending)</p>
-              <p className="text-sm text-red-700 mt-1">Review in payment section below</p>
-            </div>
-          </div>
-        )}
-
-        {/* Payment Approval Section */}
-        {pendingPayments.length > 0 && (
-          <div className="mb-8 bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0]">
-            <h2 className="text-lg font-bold text-[#1A1A1A] mb-4">Pending Payments ({pendingPayments.length})</h2>
-
-            {/* Mobile: card list */}
-            <div className="sm:hidden space-y-2">
-              {pendingPayments.map(p => (
-                <PendingPaymentMobileCard
-                  key={p.id}
-                  payment={p}
-                  onApprove={approvePayment}
-                  onReject={rejectPayment}
-                />
-              ))}
-            </div>
-
-            {/* Desktop: original table */}
-            <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[#E2E8F0]">
-                    <th className="text-left py-3 px-2 font-semibold text-[#1A1A1A]">User Email</th>
-                    <th className="text-right py-3 px-2 font-semibold text-[#1A1A1A]">Amount</th>
-                    <th className="text-center py-3 px-2 font-semibold text-[#1A1A1A]">Status</th>
-                    <th className="text-center py-3 px-2 font-semibold text-[#1A1A1A]">Days Pending</th>
-                    <th className="text-center py-3 px-2 font-semibold text-[#1A1A1A]">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pendingPayments.map(p => {
-                    const daysPending = Math.floor((new Date() - new Date(p.created_date)) / (1000 * 60 * 60 * 24));
-                    return (
-                      <tr key={p.id} className="border-b border-[#F2F4F7] hover:bg-[#F8FAFC]">
-                        <td className="py-3 px-2 text-[#1A1A1A]">{p.created_by}</td>
-                        <td className="py-3 px-2 text-right text-[#1A1A1A] font-medium">Rp {(p.amount || 0).toLocaleString("id-ID")}</td>
-                        <td className="py-3 px-2 text-center">
-                          <span className={`px-2 py-1 rounded-full text-xs font-bold ${daysPending > 3 ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
-                            {daysPending}d
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-center text-[#8FA4C8] text-xs">{new Date(p.created_date).toLocaleDateString("id-ID")}</td>
-                        <td className="py-3 px-2 text-center space-x-2">
-                          <button
-                            onClick={() => approvePayment(p.id, p.user_email || p.created_by, p.plan, p.amount)}
-                            className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded hover:bg-green-700 transition-colors"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => rejectPayment(p.id)}
-                            className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700 transition-colors"
-                          >
-                            Reject
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        {/* Payment Approval Section removed — pembelian premium akan pindah ke Apple IAP. */}
 
         {/* Users Table */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0]">

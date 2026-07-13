@@ -438,10 +438,10 @@ export default function Goals() {
                 <h1 className="text-white text-2xl font-bold mt-0.5">{t('goals_title')}</h1>
               </div>
               {goalsLimitReached ? (
-                <Link to="/Subscription" className="h-10 px-4 rounded-full bg-[#8FA4C8] flex items-center gap-1.5 shadow-lg hover:bg-[#7a93b5] active:scale-95 transition-all" title="Upgrade untuk goals lebih banyak">
+                <div className="h-10 px-4 rounded-full bg-[#8FA4C8] flex items-center gap-1.5 shadow-lg" title="Batas free tercapai">
                   <Crown className="w-4 h-4 text-white" />
-                  <span className="text-white text-sm font-semibold">Upgrade</span>
-                </Link>
+                  <span className="text-white text-sm font-semibold">Batas Free</span>
+                </div>
               ) : (
                 <button
                   onClick={() => setShowAddGoal(true)}
@@ -471,9 +471,8 @@ export default function Goals() {
               <Crown className="w-5 h-5 text-[#F97316] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[#1A1A1A]">Batas {FREE_GOALS_LIMIT} tujuan tercapai</p>
-                <p className="text-xs text-[#8FA4C8]">Upgrade Premium untuk goals unlimited.</p>
+                <p className="text-xs text-[#8FA4C8]">Fitur unlimited akan segera tersedia via App Store.</p>
               </div>
-              <Link to="/Subscription" className="px-3 py-1.5 bg-[#F97316] text-white rounded-xl text-xs font-semibold hover:bg-[#EA580C] transition-colors flex-shrink-0">Upgrade</Link>
             </div>
           )}
           {loading ? (

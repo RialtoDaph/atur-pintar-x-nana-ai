@@ -15,7 +15,6 @@ const NAV_ITEMS = [
   { label: "Users", icon: Users, page: "AdminUsers" },
   { label: "Categories", icon: Tag, page: "AdminCategories" },
   { label: "Default Rekening", icon: Wallet, page: "AdminDefaultAccounts" },
-  { label: "Subscriptions", icon: CreditCard, page: "AdminSubscriptions" },
   { label: "Notifications", icon: Bell, page: "AdminNotifications" },
   { label: "Feedback", icon: MessageSquare, page: "AdminFeedback" },
   { label: "Settings", icon: Settings, page: "AdminSettings" },
@@ -33,12 +32,9 @@ export default function AdminLayout({ children, currentPage }) {
     const loadCounts = async () => {
       if (document.hidden) return;
       try {
-        const [payments, feedbacks] = await Promise.all([
-          base44.entities.SubscriptionPayment.filter({ status: "pending" }).catch(() => []),
-          base44.entities.FeedbackReport.filter({ status: "open" }).catch(() => []),
-        ]);
+        const feedbacks = await base44.entities.FeedbackReport.filter({ status: "open" }).catch(() => []);
         if (!mounted) return;
-        setPendingPaymentCount(payments?.length || 0);
+        setPendingPaymentCount(0);
         setOpenFeedbackCount(feedbacks?.length || 0);
       } catch {}
     };

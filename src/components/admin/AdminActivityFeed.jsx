@@ -27,9 +27,8 @@ export default function AdminActivityFeed() {
 
   const load = useCallback(async () => {
     try {
-      const [logs, payments, txns, users] = await Promise.all([
+      const [logs, txns, users] = await Promise.all([
         base44.entities.SystemLog.filter({ log_type: "login" }, "-created_date", 15).catch(() => []),
-        base44.entities.SubscriptionPayment.list("-created_date", 15).catch(() => []),
         base44.entities.Transaction.list("-created_date", 10).catch(() => []),
         base44.entities.User.list("-created_date", 10).catch(() => []),
       ]);
@@ -42,15 +41,6 @@ export default function AdminActivityFeed() {
         title: l.user_email || "Unknown",
         detail: "Login ke aplikasi",
         date: l.created_date,
-      }));
-
-      (payments || []).forEach(p => events.push({
-        id: `pay-${p.id}`,
-        type: p.status === "rejected" || p.status === "expired" ? "expired" : "payment",
-        title: p.user_email || p.user_name,
-        detail: `${p.plan === "premium_yearly" ? "Premium Tahunan" : "Premium Bulanan"} • ${p.status}`,
-        amount: p.amount,
-        date: p.created_date,
       }));
 
       (txns || []).forEach(t => events.push({

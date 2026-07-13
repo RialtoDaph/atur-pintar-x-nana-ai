@@ -281,7 +281,7 @@ function NanaDashboardChatInner() {
       <div className="px-3 py-2.5 border-t border-[#E2E8F0]">
         {nanaLimitReached ? (
           <p className="text-xs text-[#8FA4C8] text-center py-1">
-            Batas {FREE_NANA_LIMIT} chat/bulan tercapai. <Link to="/Subscription" className="text-[#F97316] font-semibold underline">Upgrade</Link>
+            Batas {FREE_NANA_LIMIT} chat/bulan tercapai. Fitur premium akan segera tersedia via App Store.
           </p>
         ) : (
           <div className="flex gap-2 bg-[#F2F4F7] rounded-xl border border-[#E2E8F0] px-3 py-1.5">

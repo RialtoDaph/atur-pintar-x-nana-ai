@@ -9,7 +9,6 @@ import NanaIntroModal from "@/components/onboarding/NanaIntroModal";
 import SampleDataBanner, { hasSampleData } from "@/components/onboarding/SampleDataManager";
 import BalanceCardCarousel from "@/components/dashboard/BalanceCardCarousel";
 import TodayTransactionsCard from "@/components/dashboard/TodayTransactionsCard";
-import SubscriptionExpiredBanner from "@/components/dashboard/SubscriptionExpiredBanner";
 import { saveTransactionWithSync } from "@/components/utils/saveTransaction";
 
 import RecurringManager from "@/components/transactions/RecurringManager";
@@ -282,8 +281,6 @@ export default function Dashboard() {
               <SampleDataBanner onDismiss={() => { setShowSampleBanner(false); loadData(); }} />
             )}
 
-            {(user?.subscription_status === "expired" || subscriptionExpired) && <SubscriptionExpiredBanner />}
-
             <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
               <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} globalCategories={allCategories} />
             </Suspense>
@@ -312,8 +309,6 @@ export default function Dashboard() {
               {showSampleBanner && (
                 <SampleDataBanner onDismiss={() => { setShowSampleBanner(false); loadData(); }} />
               )}
-
-              {(user?.subscription_status === "expired" || subscriptionExpired) && <SubscriptionExpiredBanner />}
 
               <Suspense fallback={<div className="bg-white rounded-2xl h-20 animate-pulse shadow-sm" />}>
                 <BudgetAlertWidget transactions={transactions} loading={loading} budgets={budgets} globalCategories={allCategories} />

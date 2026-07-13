@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { LayoutDashboard, Users, CreditCard, Menu } from "lucide-react";
+import { LayoutDashboard, Users, Tag, Menu } from "lucide-react";
 
 /**
  * AdminBottomNav — mobile-only bottom tab bar for fast admin navigation.
- * 4 tabs: Dashboard, Users, Subscriptions, More (opens sidebar drawer).
+ * 4 tabs: Dashboard, Users, Categories, More (opens sidebar drawer).
  */
-export default function AdminBottomNav({ currentPage, onOpenMore, pendingPaymentCount = 0, openFeedbackCount = 0 }) {
+export default function AdminBottomNav({ currentPage, onOpenMore, openFeedbackCount = 0 }) {
   const tabs = [
     { label: "Home", icon: LayoutDashboard, page: "AdminDashboard" },
     { label: "Users", icon: Users, page: "AdminUsers" },
-    { label: "Subs", icon: CreditCard, page: "AdminSubscriptions", badge: pendingPaymentCount },
+    { label: "Kategori", icon: Tag, page: "AdminCategories" },
     { label: "Lainnya", icon: Menu, isMore: true, badge: openFeedbackCount },
   ];
 

@@ -578,10 +578,7 @@ function NanaInner() {
               <div className="bg-white dark:bg-[#1A1E25] rounded-2xl border border-[#E2E8F0] dark:border-[#2D2D2D] p-5 text-center shadow-sm">
                 <Crown className="w-6 h-6 text-[#F97316] mx-auto mb-2" />
                 <p className="text-sm font-semibold text-[#1A1A1A] dark:text-white mb-1">Batas pesan tercapai</p>
-                <p className="text-xs text-[#8FA4C8] mb-4">{msgCount}/{FREE_MSG_LIMIT} pesan bulan ini. Upgrade untuk chat tanpa batas.</p>
-                <Link to="/Subscription" className="inline-block px-5 py-2 bg-[#F97316] text-white rounded-xl text-sm font-semibold hover:bg-[#e05e00] transition-colors">
-                  Upgrade Premium
-                </Link>
+                <p className="text-xs text-[#8FA4C8]">{msgCount}/{FREE_MSG_LIMIT} pesan bulan ini. Fitur premium akan segera tersedia via App Store.</p>
               </div>
             ) : (
               <>

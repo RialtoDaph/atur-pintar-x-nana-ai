@@ -282,24 +282,10 @@ export default function ProfileSettings() {
           )}
         </div>
 
-        {/* ── Tile navigation: Langganan, Nana, Risiko ──────── */}
+        {/* ── Tile navigation: Nana, Risiko ──────── */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <Link to={createPageUrl("Subscription")}
-            className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-b border-[#F2F4F7]">
-            <div className="w-8 h-8 rounded-xl bg-[#FFF3E0] flex items-center justify-center flex-shrink-0">
-              <Crown className="w-4 h-4 text-[#F97316]" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-[#1A1A1A]">Langganan</p>
-              <p className="text-xs text-[#8FA4C8]">
-                {user?.subscription_status === "active" ? "Premium aktif" : user?.subscription_status === "pending" ? "Menunggu konfirmasi" : "Paket Free"}
-              </p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-[#8FA4C8]" />
-          </Link>
-
           <button onClick={() => setScreen("risk")}
-            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-b border-[#F2F4F7]">
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors border-b border-[#F2F4F7] first:border-t-0">
             <div className="w-8 h-8 rounded-xl bg-[#E8F5E9] flex items-center justify-center flex-shrink-0 text-lg">
               📊
             </div>

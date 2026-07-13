@@ -27,28 +27,14 @@ export default function AdminDashboard() {
   async function loadStats() {
     setLoading(true);
     try {
-      const [allUsers, approvedPayments, appConfigRes] = await Promise.all([
-        base44.entities.User.list(),
-        base44.entities.SubscriptionPayment.filter({ status: "approved" }),
-        base44.entities.AppConfig.list().catch(() => []),
-      ]);
-
-      const appConfig = appConfigRes?.[0] || {};
-      const priceMonthly = appConfig.premium_price_monthly || 49000;
-      const priceYearly = appConfig.premium_price_yearly || 399900;
+      const allUsers = await base44.entities.User.list();
 
       const totalUsers = allUsers.length;
       const premiumMonthly = allUsers.filter(u => u.subscription_plan === "premium_monthly" && u.subscription_status === "active");
       const premiumYearly = allUsers.filter(u => u.subscription_plan === "premium_yearly" && u.subscription_status === "active");
       const premiumUsers = premiumMonthly.length + premiumYearly.length;
       const thisMonth = new Date().toISOString().slice(0, 7);
-
-      // Current month revenue
-      const currentMonthPayments = approvedPayments.filter(p => {
-        const date = p.approved_at || p.created_date;
-        return date?.startsWith(thisMonth);
-      });
-      const monthlyRevenue = currentMonthPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+      const monthlyRevenue = 0; // Payments removed — revenue akan tracked via Apple IAP nanti.
 
       // Onboarding
       const completedOnboarding = allUsers.filter(u => u.onboarding_completed).length;
@@ -67,8 +53,8 @@ export default function AdminDashboard() {
         });
       }
 
-      // MRR & churn
-      const mrr = premiumMonthly.length * priceMonthly + premiumYearly.length * Math.round(priceYearly / 12);
+      // MRR & churn — revenue disabled sampai Apple IAP integration
+      const mrr = 0;
       const expiredUsers = allUsers.filter(u => u.subscription_status === "expired" && u.updated_date?.startsWith(thisMonth)).length;
 
       setStats({

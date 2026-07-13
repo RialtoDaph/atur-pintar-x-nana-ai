@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { usePremiumUser } from "@/hooks/usePremiumUser";
 import { Crown, Loader2 } from "lucide-react";
-import { createPageUrl } from "@/utils";
 
 /**
  * Wraps premium-only content. Redirects/blocks free users.
@@ -28,16 +27,11 @@ export default function PremiumGuard({ children }) {
           </div>
           <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">Fitur Premium</h2>
           <p className="text-sm text-[#8FA4C8] mb-6">
-            Fitur ini tersedia untuk pengguna Premium. Upgrade sekarang untuk mengakses semua fitur unggulan Atur Pintar!
+            Fitur ini akan segera tersedia untuk pengguna Premium melalui App Store.
           </p>
           <button
-            onClick={() => navigate(createPageUrl("Subscription"))}
-            className="w-full py-3 rounded-xl bg-[#F97316] text-white font-bold text-sm hover:bg-[#e05e00] transition-colors">
-            Upgrade ke Premium
-          </button>
-          <button
             onClick={() => navigate(-1)}
-            className="w-full py-2.5 mt-2 rounded-xl text-[#8FA4C8] text-sm hover:text-[#1A1A1A] transition-colors">
+            className="w-full py-3 rounded-xl bg-[#F97316] text-white font-bold text-sm hover:bg-[#e05e00] transition-colors">
             Kembali
           </button>
         </div>

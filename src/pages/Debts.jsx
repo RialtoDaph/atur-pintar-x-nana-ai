@@ -224,10 +224,10 @@ export default function DebtsPage() {
               <h1 className="text-white text-2xl font-bold mt-0.5">{t('debts_title')}</h1>
             </div>
             {debtLimitReached ? (
-              <Link to="/Subscription" className="h-10 px-4 rounded-full bg-[#8FA4C8] flex items-center gap-1.5 shadow-lg hover:bg-[#7a93b5] active:scale-95 transition-all" title="Upgrade untuk tambah lebih banyak utang">
+              <div className="h-10 px-4 rounded-full bg-[#8FA4C8] flex items-center gap-1.5 shadow-lg" title="Batas free tercapai">
                 <Crown className="w-4 h-4 text-white" />
-                <span className="text-white text-sm font-semibold">Upgrade</span>
-              </Link>
+                <span className="text-white text-sm font-semibold">Batas Free</span>
+              </div>
             ) : (
               <button
                 onClick={() => setShowAdd(true)}
@@ -258,9 +258,8 @@ export default function DebtsPage() {
             <Crown className="w-5 h-5 text-[#F97316] flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#1A1A1A]">Batas {FREE_DEBTS_LIMIT} utang aktif tercapai</p>
-              <p className="text-xs text-[#8FA4C8]">Upgrade Premium untuk utang unlimited.</p>
+              <p className="text-xs text-[#8FA4C8]">Fitur unlimited akan segera tersedia via App Store.</p>
             </div>
-            <Link to="/Subscription" className="px-3 py-1.5 bg-[#F97316] text-white rounded-xl text-xs font-semibold hover:bg-[#EA580C] transition-colors flex-shrink-0">Upgrade</Link>
           </div>
         )}
         <IOUSection />
