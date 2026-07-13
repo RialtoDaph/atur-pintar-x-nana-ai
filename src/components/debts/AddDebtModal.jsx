@@ -83,10 +83,10 @@ export default function AddDebtModal({ onClose, onSave, debt }) {
         style={{
           left: 0,
           right: 0,
-          bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+          bottom: 'calc(96px + max(16px, env(safe-area-inset-bottom)))',
           top: 'calc(56px + env(safe-area-inset-top, 0px))'
         }}>
-        <div role="dialog" aria-modal="true" className="bg-white rounded-3xl shadow-2xl p-6 overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }} onClick={e => e.stopPropagation()}>
+        <div role="dialog" aria-modal="true" className="bg-white rounded-3xl shadow-2xl p-6 overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%', paddingBottom: 'calc(1.5rem + max(16px, env(safe-area-inset-bottom)))' }} onClick={e => e.stopPropagation()}>
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-[#1A1A1A]">{isEdit ? "Edit Utang/Kredit" : "Tambah Utang/Kredit"}</h2>
             <button onClick={onClose} className="text-[#9B9B9B] hover:text-[#1A1A1A] tap-highlight-fix"><X className="w-5 h-5" /></button>

@@ -80,7 +80,7 @@ export default function AddGoalModal({ goal, onClose, onSave }) {
         style={{
           left: 0,
           right: 0,
-          bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+          bottom: 'calc(96px + max(16px, env(safe-area-inset-bottom)))',
           top: 'calc(56px + env(safe-area-inset-top, 0px))'
         }}>
         <div
@@ -222,7 +222,7 @@ export default function AddGoalModal({ goal, onClose, onSave }) {
         </form>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-[#F2F4F7]" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}>
+        <div className="px-5 py-4 border-t border-[#F2F4F7]" style={{ paddingBottom: "calc(1rem + max(16px, env(safe-area-inset-bottom)))" }}>
           <button
             type="button"
             onClick={handleSubmit}
