@@ -9,6 +9,8 @@ import AddSharedTxModal from "@/components/sharedwallet/AddSharedTxModal";
 import CreateWalletModal from "@/components/sharedwallet/CreateWalletModal";
 import JoinWalletModal from "@/components/sharedwallet/JoinWalletModal";
 
+const FREE_ACCESS_UNTIL = "2099-12-31";
+
 function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -28,6 +30,12 @@ export default function SharedFinance() {
   useEffect(() => {
     base44.auth.me().then(async (u) => {
       setUser(u);
+      const today = new Date().toISOString().split("T")[0];
+      if (today <= FREE_ACCESS_UNTIL) {
+        setIsPremium(true);
+        setLoading(false);
+        return;
+      }
       const userPremium = u?.subscription_plan &&
         ["premium_monthly", "premium_yearly"].includes(u.subscription_plan) &&
         u?.subscription_status === "active";
