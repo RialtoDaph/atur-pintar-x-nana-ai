@@ -304,10 +304,7 @@ function LayoutInner({ children, currentPageName }) {
         <div className="mb-6 h-8 px-1 flex items-center gap-2">
           <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Atur Pintar logo" className="w-8 h-8 flex-shrink-0" />
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-            <div className="flex items-center gap-1.5">
-              <p className="text-base font-bold text-white tracking-tight leading-tight">Atur Pintar</p>
-              <span className="text-[8px] font-bold text-[#F97316] bg-[#F97316]/15 border border-[#F97316]/30 rounded px-1 py-0.5 leading-none uppercase tracking-wider">Beta</span>
-            </div>
+            <p className="text-base font-bold text-white tracking-tight leading-tight">Atur Pintar</p>
             <p className="text-[10px] text-[#8FA4C8] leading-tight">Financial Tracker</p>
           </div>
         </div>
@@ -398,7 +395,6 @@ function LayoutInner({ children, currentPageName }) {
           <div className="flex items-center gap-1">
               <img src="https://media.base44.com/images/public/69a82e8090f60786b869983c/d2e52bdf2_3.png" alt="Atur Pintar logo" className="w-8 h-8 flex-shrink-0" />
               <p className="text-white text-base font-bold tracking-tight">Atur Pintar</p>
-              <span className="ml-1 text-[8px] font-bold text-[#F97316] bg-[#F97316]/15 border border-[#F97316]/30 rounded px-1 py-0.5 leading-none uppercase tracking-wider">Beta</span>
             </div>
           }
 
