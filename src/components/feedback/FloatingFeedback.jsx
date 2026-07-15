@@ -85,8 +85,8 @@ export default function FloatingFeedback({ user }) {
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className="fixed z-[101] left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px]"
               style={{
-                top: "calc(56px + env(safe-area-inset-top, 0px) + 8px)",
-                bottom: "calc(96px + env(safe-area-inset-bottom, 0px) + 16px)",
+                top: "calc(56px + max(0px, env(safe-area-inset-top)) + 8px)",
+                bottom: "calc(96px + max(16px, env(safe-area-inset-bottom)))",
               }}
             >
               <div className="relative h-full flex flex-col">
