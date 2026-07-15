@@ -35,7 +35,7 @@ export default function JoinWalletModal({ onClose, onJoin }) {
             </div>
           )}
         </div>
-        <div className="px-5 pb-6">
+        <div className="px-5 pb-6" style={{ paddingBottom: 'calc(1.5rem + max(0px, env(safe-area-inset-bottom)))' }}>
           <button onClick={handleJoin} disabled={joining || joinCode.length !== 8}
             className="w-full py-3.5 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
             {joining ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}

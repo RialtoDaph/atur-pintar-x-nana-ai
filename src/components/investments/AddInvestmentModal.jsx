@@ -64,7 +64,7 @@ export default function AddInvestmentModal({ onClose, onSave }) {
           bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
           top: '64px'
         }}>
-        <div role="dialog" aria-modal="true" className="bg-white rounded-3xl shadow-2xl p-6 overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%' }} onClick={e => e.stopPropagation()}>
+        <div role="dialog" aria-modal="true" className="bg-white rounded-3xl shadow-2xl p-6 overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%', paddingBottom: 'calc(1.5rem + max(16px, env(safe-area-inset-bottom)))' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-[#1A1A1A]">
             {lang === "en" ? "Add Investment" : "Tambah Investasi"}

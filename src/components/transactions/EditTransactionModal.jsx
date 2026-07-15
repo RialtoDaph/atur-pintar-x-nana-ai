@@ -380,7 +380,7 @@ export default function EditTransactionModal({ transaction, goals = [], onClose,
           </div>
 
           {/* Sticky footer — always visible */}
-          <div className="px-6 py-4 border-t border-[#F2F4F7] flex-shrink-0">
+          <div className="px-6 py-4 border-t border-[#F2F4F7] flex-shrink-0" style={{ paddingBottom: 'calc(1rem + max(0px, env(safe-area-inset-bottom)))' }}>
             <button onClick={handleSave} disabled={saving || !parseAmount(form.amount) || !form.category || (!isSavings && !form.account_id)}
               className="w-full py-3 rounded-xl font-bold text-sm text-white disabled:opacity-40 transition-colors"
               style={{ backgroundColor: tab === "expense" ? "#FF6B6B" : "#00C9A7" }}>

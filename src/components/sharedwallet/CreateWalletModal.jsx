@@ -40,7 +40,7 @@ export default function CreateWalletModal({ onClose, onCreate }) {
             placeholder="Undang via email (opsional)" type="email"
             className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
         </div>
-        <div className="px-5 pb-6">
+        <div className="px-5 pb-6" style={{ paddingBottom: 'calc(1.5rem + max(0px, env(safe-area-inset-bottom)))' }}>
           <button onClick={handleCreate} disabled={saving || !form.name.trim()}
             className="w-full py-3.5 bg-[#F97316] text-white rounded-2xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}

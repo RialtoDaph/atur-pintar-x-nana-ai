@@ -45,7 +45,7 @@ export default function AddSavingsModal({ goal, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-2xl p-6 max-h-[88vh] sm:max-h-[90vh] overflow-y-auto overscroll-contain animate-slide-up-sheet" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
+      <div role="dialog" aria-modal="true" className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-2xl p-6 max-h-[88vh] sm:max-h-[90vh] overflow-y-auto overscroll-contain animate-slide-up-sheet" style={{ paddingBottom: 'calc(1.5rem + max(16px, env(safe-area-inset-bottom)))' }}>
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#00C9A7]/10 flex items-center justify-center text-xl">

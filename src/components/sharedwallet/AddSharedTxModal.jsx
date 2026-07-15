@@ -59,7 +59,7 @@ export default function AddSharedTxModal({ wallet, user, onClose, onSave }) {
             onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
             className="w-full px-4 py-3 bg-[#F2F4F7] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#F97316]/30" />
         </div>
-        <div className="px-5 pb-6">
+        <div className="px-5 pb-6" style={{ paddingBottom: 'calc(1.5rem + max(0px, env(safe-area-inset-bottom)))' }}>
           <button
             onClick={handleSave}
             disabled={saving || !form.amount}

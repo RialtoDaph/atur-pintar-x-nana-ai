@@ -94,7 +94,7 @@ export default function AddBudgetModal({ onClose, onSave, existingCategories, ed
           bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
           top: '64px'
         }}>
-        <div role="dialog" aria-modal="true" className="bg-white p-6 rounded-3xl shadow-2xl overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%' }} onClick={e => e.stopPropagation()}>
+        <div role="dialog" aria-modal="true" className="bg-white p-6 rounded-3xl shadow-2xl overflow-y-auto overscroll-contain pointer-events-auto animate-slide-up-sheet w-[calc(100%-24px)] sm:w-full sm:max-w-md" style={{ maxHeight: '100%', paddingBottom: 'calc(1.5rem + max(16px, env(safe-area-inset-bottom)))' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-[#1A1A1A]">
             {isEditing ? t("budget_edit_title") : t("budget_add_title")}
