@@ -26,7 +26,7 @@ export function usePremiumUser() {
 
   // 🎁 FREE ACCESS WINDOW — all features unlocked for everyone until this date.
   // Remove this block (or set FREE_ACCESS_UNTIL to a past date) to re-enable premium gating.
-  const FREE_ACCESS_UNTIL = '2026-08-08';
+  const FREE_ACCESS_UNTIL = '2099-12-31';
 
   const { isPremium, isExpired } = (() => {
     if (!user) return { isPremium: false, isExpired: false };

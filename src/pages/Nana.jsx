@@ -295,7 +295,7 @@ function NanaInner() {
   }
 
   // 🎁 Free access window — semua user dapat unlimited Nana chat sampai tanggal ini
-  const FREE_ACCESS_UNTIL_NANA = "2026-08-08";
+  const FREE_ACCESS_UNTIL_NANA = "2099-12-31";
   const todayStrNana = new Date().toISOString().slice(0, 10);
   const inFreeWindowNana = todayStrNana <= FREE_ACCESS_UNTIL_NANA;
   const isPremium = inFreeWindowNana || user?.role === "admin" || user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";

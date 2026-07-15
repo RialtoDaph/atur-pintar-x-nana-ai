@@ -261,8 +261,8 @@ export default function BudgetPage() {
     }
   });
 
-  // 🎁 Free access window — all users get unlimited budgets until 2026-08-08
-  const FREE_ACCESS_UNTIL = "2026-08-08";
+  // 🎁 Free access window — all users get unlimited budgets until 2099-12-31
+  const FREE_ACCESS_UNTIL = "2099-12-31";
   const todayStr = new Date().toISOString().split("T")[0];
   const inFreeWindow = todayStr <= FREE_ACCESS_UNTIL;
   const isPremium = inFreeWindow || user?.role === "admin" || user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
