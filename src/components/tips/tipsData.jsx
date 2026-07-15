@@ -233,15 +233,15 @@ export const TIPS = [
     items: [
       {
         q: "Apa beda Free vs Premium?",
-        a: "Free: fitur dasar pencatatan, anggaran, tujuan, dan utang. Premium: unlock Nana AI penuh, analitik lanjutan (heatmap, forecast, pattern), ekspor laporan, dan multi-rekening tanpa batas.",
+        a: "Saat ini semua fitur Atur Pintar gratis untuk semua pengguna — termasuk Nana AI, analitik lanjutan, ekspor laporan, dan multi-rekening. Tidak perlu berlangganan.",
       },
       {
         q: "Cara berlangganan Premium?",
-        a: "Buka halaman 'Subscription' dari menu profil → pilih paket Bulanan atau Tahunan → bayar via Midtrans (transfer bank, e-wallet, QRIS, kartu kredit). Premium aktif otomatis setelah pembayaran berhasil.",
+        a: "Belum perlu. Semua fitur sudah bisa kamu pakai gratis tanpa perlu berlangganan.",
       },
       {
         q: "Kapan langganan Premium berakhir?",
-        a: "Status & tanggal kadaluarsa langganan tampil di halaman Profil. App akan kirim reminder email H-7 sebelum berakhir.",
+        a: "Saat ini tidak ada masa berlaku — semua fitur gratis untuk semua pengguna.",
       },
     ],
   },
