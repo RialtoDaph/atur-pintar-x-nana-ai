@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { MessageSquare, ShieldCheck, MapPin, Download, Trophy, AlertTriangle, Trash2 } from "lucide-react";
+import { MessageSquare, ShieldCheck, MapPin, Download, Trophy, AlertTriangle, Trash2, Crown } from "lucide-react";
 import ExportLaporanModal from "@/components/analytics/ExportLaporanModal";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
 import FeedbackModal from "@/components/settings/FeedbackModal";
 import DeleteAccountConfirmDialog from "@/components/profile/DeleteAccountConfirmDialog";
+import PremiumStatusCard from "@/components/subscription/PremiumStatusCard";
 import { useAppSettings } from "@/components/utils/useAppSettings";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -79,6 +80,9 @@ export default function Settings() {
       </div>
 
       <div className="max-w-2xl mx-auto px-5 mt-6 space-y-4">
+
+        {/* ── Premium Status ──────────────────────────────── */}
+        <PremiumStatusCard />
 
         {/* Ekspor Laporan */}
         <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-[#F0F2F5]">
