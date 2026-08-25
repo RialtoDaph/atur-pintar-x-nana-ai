@@ -69,8 +69,8 @@ export default function PremiumGate({ user, featureName }) {
   const [showModal, setShowModal] = useState(false);
   const { config } = useAppConfig();
 
-  // 🎁 Free access window — semua user dapat akses premium sampai tanggal ini
-  const FREE_ACCESS_UNTIL = '2099-12-31';
+  // 🎁 Free access window — dinonaktifkan. Premium gating via Xendit aktif.
+  const FREE_ACCESS_UNTIL = '2020-01-01';
   const todayStr = new Date().toISOString().split('T')[0];
   const inFreeWindow = todayStr <= FREE_ACCESS_UNTIL;
   const isPremium = inFreeWindow || (user?.subscription_plan && ['premium_monthly', 'premium_yearly'].includes(user.subscription_plan) && user?.subscription_status === 'active');

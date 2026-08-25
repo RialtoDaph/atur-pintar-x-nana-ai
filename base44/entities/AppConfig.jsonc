@@ -47,13 +47,23 @@
       "type": "boolean"
     },
     "premium_price_monthly": {
-      "default": 49000,
-      "description": "Monthly premium price in IDR",
+      "default": 18000,
+      "description": "Harga premium bulanan (setelah diskon) \u2014 dalam IDR",
       "type": "number"
     },
     "premium_price_yearly": {
+      "default": 189000,
+      "description": "Harga premium tahunan (setelah diskon) \u2014 dalam IDR",
+      "type": "number"
+    },
+    "premium_price_monthly_original": {
+      "default": 49000,
+      "description": "Harga coret bulanan untuk display diskon \u2014 dalam IDR",
+      "type": "number"
+    },
+    "premium_price_yearly_original": {
       "default": 399900,
-      "description": "Yearly premium price in IDR",
+      "description": "Harga coret tahunan untuk display diskon \u2014 dalam IDR",
       "type": "number"
     },
     "admin_alert_email": {

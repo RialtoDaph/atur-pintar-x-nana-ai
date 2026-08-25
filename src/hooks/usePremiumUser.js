@@ -24,9 +24,9 @@ export function usePremiumUser() {
 
   const today = new Date().toISOString().split('T')[0];
 
-  // 🎁 FREE ACCESS WINDOW — all features unlocked for everyone until this date.
-  // Remove this block (or set FREE_ACCESS_UNTIL to a past date) to re-enable premium gating.
-  const FREE_ACCESS_UNTIL = '2099-12-31';
+  // 🎁 FREE ACCESS WINDOW — dinonaktifkan (tanggal masa lalu). Premium gating via Xendit sekarang aktif.
+  // Ubah ke tanggal masa depan (mis. '2099-12-31') kalau mau kasih akses gratis semua user lagi.
+  const FREE_ACCESS_UNTIL = '2020-01-01';
 
   const { isPremium, isExpired } = (() => {
     if (!user) return { isPremium: false, isExpired: false };
