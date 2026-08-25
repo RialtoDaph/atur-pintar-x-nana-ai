@@ -45,6 +45,8 @@ const AdminCategories = lazy(() => import('@/pages/AdminCategories'));
 const AdminSettings = lazy(() => import('@/pages/AdminSettings'));
 const AdminDefaultAccounts = lazy(() => import('@/pages/AdminDefaultAccounts'));
 const AdminFeedback = lazy(() => import('@/pages/AdminFeedback'));
+const Subscription = lazy(() => import('@/pages/Subscription'));
+const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
 
 // Suspense fallback — inline spinner that respects layout (sidebar/nav stay visible)
 const PageLoader = () => (
@@ -171,9 +173,9 @@ const AuthenticatedApp = () => {
             }
           />
         ))}
-        {/* Subscription pages removed — payments will move to Apple In-App Purchase. */}
-        <Route path="/Subscription" element={<Navigate to="/Dashboard" replace />} />
-        <Route path="/AdminSubscriptions" element={<Navigate to="/AdminDashboard" replace />} />
+        {/* Subscription — Xendit Invoice payment flow */}
+        <Route path="/Subscription" element={<LayoutWrapper currentPageName="Subscription"><Subscription /></LayoutWrapper>} />
+        <Route path="/AdminSubscriptions" element={<AdminProtect><AdminSubscriptions /></AdminProtect>} />
         <Route path="/ProfileSettings" element={<LayoutWrapper currentPageName="ProfileSettings"><ProfileSettings /></LayoutWrapper>} />
         <Route path="/Notifications" element={<Navigate to="/Dashboard" replace />} />
         <Route path="/Reminders" element={<Navigate to="/Dashboard" replace />} />
