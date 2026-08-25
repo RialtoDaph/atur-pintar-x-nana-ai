@@ -119,11 +119,12 @@ export default function InvestmentsPage() {
     }
   }
 
-  // 🎁 Free access window — semua user dapat akses Investasi sampai tanggal ini
-  const FREE_ACCESS_UNTIL = "2099-12-31";
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const inFreeWindow = todayStr <= FREE_ACCESS_UNTIL;
-  const isPremium = inFreeWindow || user?.role === "admin" || user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  // Premium gating via Xendit (usePremiumUser hook = single source of truth)
+  const isPremium = user?.role === "admin" ||
+    (user?.subscription_status === "active" &&
+      ["premium_monthly", "premium_yearly"].includes(user?.subscription_plan) &&
+      user?.subscription_end_date &&
+      new Date(user.subscription_end_date) > new Date());
 
   if (!loading && !isPremium) {
     return (

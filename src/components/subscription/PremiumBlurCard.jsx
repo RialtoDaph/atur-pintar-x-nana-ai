@@ -1,6 +1,8 @@
 import { Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function PremiumBlurCard({ children, title }) {
+  const navigate = useNavigate();
   return (
     <div className="relative rounded-2xl overflow-hidden">
       {title && (
@@ -16,7 +18,13 @@ export default function PremiumBlurCard({ children, title }) {
           <Crown className="w-5 h-5 text-[#F97316]" />
         </div>
         <p className="text-sm font-bold text-[#1A1A1A]">Fitur Premium</p>
-        <p className="text-xs text-[#8FA4C8]">Segera tersedia via App Store.</p>
+        <p className="text-xs text-[#8FA4C8]">Upgrade untuk buka fitur ini</p>
+        <button
+          onClick={() => navigate('/Subscription')}
+          className="mt-1 px-5 py-2 bg-[#F97316] text-white rounded-xl text-xs font-bold hover:bg-[#EA580C] transition-colors"
+        >
+          Upgrade Sekarang
+        </button>
       </div>
     </div>
   );

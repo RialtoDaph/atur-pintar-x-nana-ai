@@ -3,13 +3,12 @@ import { base44 } from "@/api/base44Client";
 import { Users, Plus, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import PremiumGate from "@/components/subscription/PremiumGate";
+import { usePremiumUser } from "@/hooks/usePremiumUser";
 import WalletCard from "@/components/sharedwallet/WalletCard";
 import PendingInviteBanner from "@/components/sharedwallet/PendingInviteBanner";
 import AddSharedTxModal from "@/components/sharedwallet/AddSharedTxModal";
 import CreateWalletModal from "@/components/sharedwallet/CreateWalletModal";
 import JoinWalletModal from "@/components/sharedwallet/JoinWalletModal";
-
-const FREE_ACCESS_UNTIL = "2099-12-31";
 
 function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -17,8 +16,7 @@ function generateCode() {
 }
 
 export default function SharedFinance() {
-  const [user, setUser] = useState(null);
-  const [isPremium, setIsPremium] = useState(false);
+  const { isPremium, user, loading: premiumLoading } = usePremiumUser();
   const [loading, setLoading] = useState(true);
   const [wallets, setWallets] = useState([]);
   const [allWalletsForInvite, setAllWalletsForInvite] = useState([]);
@@ -28,29 +26,8 @@ export default function SharedFinance() {
   const [addTxWallet, setAddTxWallet] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then(async (u) => {
-      setUser(u);
-      const today = new Date().toISOString().split("T")[0];
-      if (today <= FREE_ACCESS_UNTIL) {
-        setIsPremium(true);
-        setLoading(false);
-        return;
-      }
-      const userPremium = u?.subscription_plan &&
-        ["premium_monthly", "premium_yearly"].includes(u.subscription_plan) &&
-        u?.subscription_status === "active";
-      if (userPremium) {
-        setIsPremium(true);
-      } else {
-        try {
-          const subs = await base44.entities.Subscription.filter({ created_by: u.email });
-          const activeSub = subs?.find((s) => s.status === "active" && ["premium_monthly", "premium_yearly"].includes(s.plan));
-          setIsPremium(!!activeSub);
-        } catch { setIsPremium(false); }
-      }
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  }, []);
+    if (!premiumLoading) setLoading(false);
+  }, [premiumLoading]);
 
   useEffect(() => {
     if (!user || !isPremium) return;

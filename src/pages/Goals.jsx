@@ -44,11 +44,12 @@ export default function Goals() {
   const goal = goals.find((g) => g.id === goalId) || null;
 
   const [user, setUser] = useState(null);
-  // 🎁 Free access window — semua user dapat unlimited goals sampai tanggal ini
-  const FREE_ACCESS_UNTIL = "2099-12-31";
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const inFreeWindow = todayStr <= FREE_ACCESS_UNTIL;
-  const isPremium = inFreeWindow || user?.role === "admin" || user?.subscription_plan === "premium_monthly" || user?.subscription_plan === "premium_yearly";
+  // Premium gating via Xendit (aligned with usePremiumUser hook)
+  const isPremium = user?.role === "admin" ||
+    (user?.subscription_status === "active" &&
+      ["premium_monthly", "premium_yearly"].includes(user?.subscription_plan) &&
+      user?.subscription_end_date &&
+      new Date(user.subscription_end_date) > new Date());
   const goalsLimitReached = !isPremium && goals.length >= FREE_GOALS_LIMIT;
 
   useEffect(() => {
@@ -471,8 +472,14 @@ export default function Goals() {
               <Crown className="w-5 h-5 text-[#F97316] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[#1A1A1A]">Batas {FREE_GOALS_LIMIT} tujuan tercapai</p>
-                <p className="text-xs text-[#8FA4C8]">Fitur unlimited akan segera tersedia via App Store.</p>
+                <p className="text-xs text-[#8FA4C8]">Upgrade ke Premium untuk goals unlimited.</p>
               </div>
+              <button
+                onClick={() => navigate('/Subscription')}
+                className="px-3 py-1.5 rounded-lg bg-[#F97316] text-white text-xs font-bold hover:bg-[#EA580C] transition-colors flex-shrink-0"
+              >
+                Upgrade
+              </button>
             </div>
           )}
           {loading ? (

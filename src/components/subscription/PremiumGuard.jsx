@@ -27,11 +27,16 @@ export default function PremiumGuard({ children }) {
           </div>
           <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">Fitur Premium</h2>
           <p className="text-sm text-[#8FA4C8] mb-6">
-            Fitur ini akan segera tersedia untuk pengguna Premium melalui App Store.
+            Upgrade ke Premium untuk membuka fitur ini.
           </p>
           <button
+            onClick={() => navigate('/Subscription')}
+            className="w-full py-3 rounded-xl bg-[#F97316] text-white font-bold text-sm hover:bg-[#EA580C] transition-colors mb-2">
+            Upgrade Sekarang
+          </button>
+          <button
             onClick={() => navigate(-1)}
-            className="w-full py-3 rounded-xl bg-[#F97316] text-white font-bold text-sm hover:bg-[#e05e00] transition-colors">
+            className="w-full py-2.5 rounded-xl text-[#8FA4C8] font-semibold text-sm hover:bg-[#F2F4F7] transition-colors">
             Kembali
           </button>
         </div>
